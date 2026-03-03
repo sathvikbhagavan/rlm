@@ -1,0 +1,14 @@
+#!/bin/bash
+#SBATCH -J test-rlm
+#SBATCH -A a131
+#SBATCH -p normal
+#SBATCH --nodes=1
+#SBATCH --ntasks=1
+#SBATCH -t 3:00:00
+#SBATCH -o out/test-rlm_%j.out
+#SBATCH -e out/test-rlm_%j.err
+#SBATCH --environment=env
+
+echo $PWD
+export SSL_CERT_FILE=/etc/ssl/certs/ca-certificates.crt
+python /workspace/rlm/run_rlms.py
