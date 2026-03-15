@@ -1,3 +1,4 @@
+import os
 import time
 from collections.abc import Callable
 from contextlib import contextmanager
@@ -17,6 +18,7 @@ from rlm.core.types import (
 )
 from rlm.environments import BaseEnv, SupportsPersistence, get_environment
 from rlm.logger import RLMLogger, VerbosePrinter
+from rlm.tracing import get_tracer, using_tracing_attributes
 from rlm.utils.exceptions import (
     BudgetExceededError,
     CancellationError,
@@ -156,6 +158,10 @@ class RLM:
         self._last_error: str | None = None
         self._best_partial_answer: str | None = None
         self._completion_start_time: float | None = None  # Set when completion() starts
+        self._last_iteration_metrics: list[dict[str, Any]] = []
+        self._tracer = get_tracer("rlm.core.rlm")
+        self._trace_session_id = os.getenv("RLM_TRACE_SESSION_ID")
+        self._trace_user_id = os.getenv("RLM_TRACE_USER_ID")
 
         # Persistence support
         self.persistent = persistent
@@ -286,11 +292,30 @@ class RLM:
         """
         time_start = time.perf_counter()
         self._completion_start_time = time_start
+        completion_attributes = {
+            "openinference.span.kind": "chain",
+            "rlm.depth": self.depth,
+            "rlm.max_depth": self.max_depth,
+            "rlm.max_iterations": self.max_iterations,
+            "rlm.backend": self.backend,
+            "rlm.environment": self.environment_type,
+        }
+        root_model_name = (
+            self.backend_kwargs.get("model_name", "unknown") if self.backend_kwargs else "unknown"
+        )
+        if root_prompt is not None:
+            completion_attributes["rlm.has_root_prompt"] = True
+        trace_metadata = {
+            "backend": self.backend,
+            "environment": self.environment_type,
+            "depth": self.depth,
+        }
 
         # Reset tracking state for this completion
         self._consecutive_errors = 0
         self._last_error = None
         self._best_partial_answer = None
+        self._last_iteration_metrics = []
         # If we're at max depth, the RLM is an LM, so we fallback to the regular LM.
         if self.depth >= self.max_depth:
             return self._fallback_answer(prompt)
@@ -298,135 +323,249 @@ class RLM:
         if self.logger:
             self.logger.clear_iterations()
 
-        with self._spawn_completion_context(prompt) as (lm_handler, environment):
-            message_history = self._setup_prompt(prompt)
+        with using_tracing_attributes(
+            session_id=self._trace_session_id,
+            user_id=self._trace_user_id,
+            metadata=trace_metadata,
+            tags=["rlm", "completion"],
+        ):
+            with self._tracer.start_as_current_span(
+                "rlm.completion",
+                attributes=completion_attributes,
+            ) as completion_span:
+                with self._spawn_completion_context(prompt) as (lm_handler, environment):
+                    message_history = self._setup_prompt(prompt)
+                    prev_total_input_tokens = 0
+                    prev_total_output_tokens = 0
 
-            compaction_count = 0
-            try:
-                for i in range(self.max_iterations):
-                    # Check timeout before each iteration
-                    self._check_timeout(i, time_start)
+                    compaction_count = 0
+                    try:
+                        for i in range(self.max_iterations):
+                            iteration_num = i + 1
+                            iteration_started_at = time.perf_counter()
+                            if self.on_iteration_start:
+                                try:
+                                    self.on_iteration_start(self.depth, iteration_num)
+                                except Exception:
+                                    pass
 
-                    # Compaction: check if context needs summarization
-                    if self.compaction and hasattr(environment, "append_compaction_entry"):
-                        current_tokens, threshold_tokens, max_tokens = self._get_compaction_status(
-                            message_history
-                        )
-                        self.verbose.print_compaction_status(
-                            current_tokens, threshold_tokens, max_tokens
-                        )
-                        if current_tokens >= threshold_tokens:
-                            compaction_count += 1
-                            self.verbose.print_compaction()
-                            message_history = self._compact_history(
-                                lm_handler, environment, message_history, compaction_count
-                            )
+                            with self._tracer.start_as_current_span(
+                                "rlm.iteration",
+                                attributes={
+                                    "openinference.span.kind": "chain",
+                                    "rlm.depth": self.depth,
+                                    "rlm.iteration": iteration_num,
+                                },
+                            ) as iteration_span:
+                                try:
+                                    # Check timeout before each iteration
+                                    self._check_timeout(i, time_start)
 
-                    # Current prompt = message history + additional prompt suffix
-                    context_count = (
-                        environment.get_context_count()
-                        if isinstance(environment, SupportsPersistence)
-                        else 1
+                                    # Compaction: check if context needs summarization
+                                    if self.compaction and hasattr(environment, "append_compaction_entry"):
+                                        (
+                                            current_tokens,
+                                            threshold_tokens,
+                                            max_tokens,
+                                        ) = self._get_compaction_status(message_history)
+                                        self.verbose.print_compaction_status(
+                                            current_tokens,
+                                            threshold_tokens,
+                                            max_tokens,
+                                        )
+                                        if current_tokens >= threshold_tokens:
+                                            compaction_count += 1
+                                            self.verbose.print_compaction()
+                                            message_history = self._compact_history(
+                                                lm_handler,
+                                                environment,
+                                                message_history,
+                                                compaction_count,
+                                            )
+
+                                    # Current prompt = message history + additional prompt suffix
+                                    context_count = (
+                                        environment.get_context_count()
+                                        if isinstance(environment, SupportsPersistence)
+                                        else 1
+                                    )
+                                    history_count = (
+                                        environment.get_history_count()
+                                        if isinstance(environment, SupportsPersistence)
+                                        else 0
+                                    )
+                                    current_prompt = message_history + [
+                                        build_user_prompt(root_prompt, i, context_count, history_count)
+                                    ]
+                                    prompt_tokens = count_tokens(current_prompt, root_model_name)
+                                    context_limit_tokens = get_context_limit(root_model_name)
+                                    context_fill_pct = (
+                                        (prompt_tokens / context_limit_tokens) * 100
+                                        if context_limit_tokens > 0
+                                        else 0.0
+                                    )
+
+                                    iteration: RLMIteration = self._completion_turn(
+                                        prompt=current_prompt,
+                                        lm_handler=lm_handler,
+                                        environment=environment,
+                                    )
+
+                                    # Check error/budget/token limits after each iteration
+                                    self._check_iteration_limits(iteration, i, lm_handler)
+
+                                    # Check if RLM is done and has a final answer.
+                                    # Prefer FINAL_VAR result from REPL execution.
+                                    final_answer = None
+                                    for block in iteration.code_blocks:
+                                        if getattr(block.result, "final_answer", None):
+                                            final_answer = block.result.final_answer
+                                            break
+                                    if final_answer is None:
+                                        final_answer = find_final_answer(
+                                            iteration.response,
+                                            environment=environment,
+                                        )
+                                    iteration.final_answer = final_answer
+                                    current_usage = lm_handler.get_usage_summary()
+                                    total_input_tokens = current_usage.total_input_tokens
+                                    total_output_tokens = current_usage.total_output_tokens
+                                    total_tokens = total_input_tokens + total_output_tokens
+                                    iteration_input_tokens = max(
+                                        0,
+                                        total_input_tokens - prev_total_input_tokens,
+                                    )
+                                    iteration_output_tokens = max(
+                                        0,
+                                        total_output_tokens - prev_total_output_tokens,
+                                    )
+                                    iteration_total_tokens = (
+                                        iteration_input_tokens + iteration_output_tokens
+                                    )
+                                    prev_total_input_tokens = total_input_tokens
+                                    prev_total_output_tokens = total_output_tokens
+                                    iteration_had_error = any(
+                                        bool(block.result and block.result.stderr)
+                                        for block in iteration.code_blocks
+                                    )
+                                    self._last_iteration_metrics.append(
+                                        {
+                                            "iteration": iteration_num,
+                                            "prompt_tokens": prompt_tokens,
+                                            "context_limit_tokens": context_limit_tokens,
+                                            "context_fill_pct": context_fill_pct,
+                                            "iteration_input_tokens": iteration_input_tokens,
+                                            "iteration_output_tokens": iteration_output_tokens,
+                                            "iteration_total_tokens": iteration_total_tokens,
+                                            "total_input_tokens": total_input_tokens,
+                                            "total_output_tokens": total_output_tokens,
+                                            "total_tokens": total_tokens,
+                                            "iteration_time_s": iteration.iteration_time,
+                                            "code_block_count": len(iteration.code_blocks),
+                                            "had_error": int(iteration_had_error),
+                                        }
+                                    )
+
+                                    # Store as best partial answer (most recent response with content)
+                                    if iteration.response and iteration.response.strip():
+                                        self._best_partial_answer = iteration.response
+
+                                    # If logger is used, log the iteration.
+                                    if self.logger:
+                                        self.logger.log(iteration)
+
+                                    # Verbose output for this iteration
+                                    self.verbose.print_iteration(iteration, i + 1)
+
+                                    if final_answer is not None:
+                                        time_end = time.perf_counter()
+                                        usage = lm_handler.get_usage_summary()
+                                        self.verbose.print_final_answer(final_answer)
+                                        self.verbose.print_summary(
+                                            i + 1,
+                                            time_end - time_start,
+                                            usage.to_dict(),
+                                        )
+
+                                        # Store message history in persistent environment
+                                        if self.persistent and isinstance(environment, SupportsPersistence):
+                                            environment.add_history(message_history)
+                                        completion_span.set_attribute("rlm.completed", True)
+                                        completion_span.set_attribute("rlm.iterations", iteration_num)
+                                        completion_span.set_attribute("rlm.final_model", root_model_name)
+                                        completion_span.set_attribute(
+                                            "rlm.execution_time_s",
+                                            time_end - time_start,
+                                        )
+                                        iteration_span.set_attribute("rlm.has_final_answer", True)
+                                        return RLMChatCompletion(
+                                            root_model=root_model_name,
+                                            prompt=prompt,
+                                            response=final_answer,
+                                            usage_summary=usage,
+                                            execution_time=time_end - time_start,
+                                            metadata=self.logger.get_trajectory() if self.logger else None,
+                                        )
+
+                                    # Format the iteration for the next prompt.
+                                    new_messages = format_iteration(iteration)
+
+                                    # Update message history with the new messages.
+                                    message_history.extend(new_messages)
+                                    if self.compaction and hasattr(environment, "append_compaction_entry"):
+                                        environment.append_compaction_entry(new_messages)
+                                    iteration_span.set_attribute("rlm.has_final_answer", False)
+                                finally:
+                                    iteration_duration = time.perf_counter() - iteration_started_at
+                                    iteration_span.set_attribute(
+                                        "rlm.iteration_duration_s",
+                                        iteration_duration,
+                                    )
+                                    if self.on_iteration_complete:
+                                        try:
+                                            self.on_iteration_complete(
+                                                self.depth,
+                                                iteration_num,
+                                                iteration_duration,
+                                            )
+                                        except Exception:
+                                            pass
+
+                    except KeyboardInterrupt:
+                        self.verbose.print_limit_exceeded("cancelled", "User interrupted execution")
+                        completion_span.set_attribute("rlm.cancelled", True)
+                        raise CancellationError(
+                            partial_answer=self._best_partial_answer,
+                            message="Execution cancelled by user (Ctrl+C)",
+                        ) from None
+
+                    # Default behavior: we run out of iterations, provide one final answer
+                    time_end = time.perf_counter()
+                    final_answer = self._default_answer(message_history, lm_handler)
+                    usage = lm_handler.get_usage_summary()
+                    self.verbose.print_final_answer(final_answer)
+                    self.verbose.print_summary(
+                        self.max_iterations,
+                        time_end - time_start,
+                        usage.to_dict(),
                     )
-                    history_count = (
-                        environment.get_history_count()
-                        if isinstance(environment, SupportsPersistence)
-                        else 0
+
+                    # Store message history in persistent environment
+                    if self.persistent and isinstance(environment, SupportsPersistence):
+                        environment.add_history(message_history)
+
+                    completion_span.set_attribute("rlm.completed", True)
+                    completion_span.set_attribute("rlm.iterations", self.max_iterations)
+                    completion_span.set_attribute("rlm.final_model", root_model_name)
+                    completion_span.set_attribute("rlm.execution_time_s", time_end - time_start)
+                    return RLMChatCompletion(
+                        root_model=root_model_name,
+                        prompt=prompt,
+                        response=final_answer,
+                        usage_summary=usage,
+                        execution_time=time_end - time_start,
+                        metadata=self.logger.get_trajectory() if self.logger else None,
                     )
-                    current_prompt = message_history + [
-                        build_user_prompt(root_prompt, i, context_count, history_count)
-                    ]
-
-                    iteration: RLMIteration = self._completion_turn(
-                        prompt=current_prompt,
-                        lm_handler=lm_handler,
-                        environment=environment,
-                    )
-
-                    # Check error/budget/token limits after each iteration
-                    self._check_iteration_limits(iteration, i, lm_handler)
-
-                    # Check if RLM is done and has a final answer.
-                    # Prefer FINAL_VAR result from REPL execution.
-                    final_answer = None
-                    for block in iteration.code_blocks:
-                        if getattr(block.result, "final_answer", None):
-                            final_answer = block.result.final_answer
-                            break
-                    if final_answer is None:
-                        final_answer = find_final_answer(
-                            iteration.response, environment=environment
-                        )
-                    iteration.final_answer = final_answer
-
-                    # Store as best partial answer (most recent response with content)
-                    if iteration.response and iteration.response.strip():
-                        self._best_partial_answer = iteration.response
-
-                    # If logger is used, log the iteration.
-                    if self.logger:
-                        self.logger.log(iteration)
-
-                    # Verbose output for this iteration
-                    self.verbose.print_iteration(iteration, i + 1)
-
-                    if final_answer is not None:
-                        time_end = time.perf_counter()
-                        usage = lm_handler.get_usage_summary()
-                        self.verbose.print_final_answer(final_answer)
-                        self.verbose.print_summary(i + 1, time_end - time_start, usage.to_dict())
-
-                        # Store message history in persistent environment
-                        if self.persistent and isinstance(environment, SupportsPersistence):
-                            environment.add_history(message_history)
-
-                        return RLMChatCompletion(
-                            root_model=self.backend_kwargs.get("model_name", "unknown")
-                            if self.backend_kwargs
-                            else "unknown",
-                            prompt=prompt,
-                            response=final_answer,
-                            usage_summary=usage,
-                            execution_time=time_end - time_start,
-                            metadata=self.logger.get_trajectory() if self.logger else None,
-                        )
-
-                    # Format the iteration for the next prompt.
-                    new_messages = format_iteration(iteration)
-
-                    # Update message history with the new messages.
-                    message_history.extend(new_messages)
-                    if self.compaction and hasattr(environment, "append_compaction_entry"):
-                        environment.append_compaction_entry(new_messages)
-
-            except KeyboardInterrupt:
-                self.verbose.print_limit_exceeded("cancelled", "User interrupted execution")
-                raise CancellationError(
-                    partial_answer=self._best_partial_answer,
-                    message="Execution cancelled by user (Ctrl+C)",
-                ) from None
-
-            # Default behavior: we run out of iterations, provide one final answer
-            time_end = time.perf_counter()
-            final_answer = self._default_answer(message_history, lm_handler)
-            usage = lm_handler.get_usage_summary()
-            self.verbose.print_final_answer(final_answer)
-            self.verbose.print_summary(self.max_iterations, time_end - time_start, usage.to_dict())
-
-            # Store message history in persistent environment
-            if self.persistent and isinstance(environment, SupportsPersistence):
-                environment.add_history(message_history)
-
-            return RLMChatCompletion(
-                root_model=self.backend_kwargs.get("model_name", "unknown")
-                if self.backend_kwargs
-                else "unknown",
-                prompt=prompt,
-                response=final_answer,
-                usage_summary=usage,
-                execution_time=time_end - time_start,
-                metadata=self.logger.get_trajectory() if self.logger else None,
-            )
 
     def _check_timeout(self, iteration: int, time_start: float) -> None:
         """Raise TimeoutExceededError if the timeout has been exceeded."""
@@ -593,13 +732,41 @@ class RLM:
         and code execution + tool execution.
         """
         iter_start = time.perf_counter()
-        response = lm_handler.completion(prompt)
-        code_block_strs = find_code_blocks(response)
-        code_blocks = []
+        with self._tracer.start_as_current_span(
+            "rlm.completion_turn",
+            attributes={
+                "openinference.span.kind": "chain",
+                "rlm.depth": self.depth,
+            },
+        ) as turn_span:
+            with self._tracer.start_as_current_span(
+                "rlm.model_call",
+                attributes={
+                    "openinference.span.kind": "llm",
+                    "rlm.depth": self.depth,
+                },
+            ):
+                response = self._coerce_response_text(lm_handler.completion(prompt))
+            code_block_strs = find_code_blocks(response)
+            code_blocks = []
 
-        for code_block_str in code_block_strs:
-            code_result: REPLResult = environment.execute_code(code_block_str)
-            code_blocks.append(CodeBlock(code=code_block_str, result=code_result))
+            for block_idx, code_block_str in enumerate(code_block_strs):
+                with self._tracer.start_as_current_span(
+                    "rlm.repl.execute",
+                    attributes={
+                        "openinference.span.kind": "tool",
+                        "rlm.depth": self.depth,
+                        "rlm.code_block_index": block_idx,
+                    },
+                ) as repl_span:
+                    code_result: REPLResult = environment.execute_code(code_block_str)
+                    repl_span.set_attribute("rlm.has_stderr", bool(code_result.stderr))
+                    if code_result.stdout:
+                        repl_span.set_attribute("rlm.stdout_chars", len(code_result.stdout))
+                    if code_result.stderr:
+                        repl_span.set_attribute("rlm.stderr_chars", len(code_result.stderr))
+                    code_blocks.append(CodeBlock(code=code_block_str, result=code_result))
+            turn_span.set_attribute("rlm.code_block_count", len(code_blocks))
 
         iteration_time = time.perf_counter() - iter_start
         return RLMIteration(
@@ -620,7 +787,7 @@ class RLM:
                 "content": "Please provide a final answer to the user's question based on the information provided.",
             }
         ]
-        response = lm_handler.completion(current_prompt)
+        response = self._coerce_response_text(lm_handler.completion(current_prompt))
 
         if self.logger:
             self.logger.log(
@@ -639,7 +806,7 @@ class RLM:
         Fallback behavior if the RLM is actually at max depth, and should be treated as an LM.
         """
         client: BaseLM = get_client(self.backend, self.backend_kwargs)
-        response = client.completion(message)
+        response = self._coerce_response_text(client.completion(message))
         return response
 
     def _subcall(self, prompt: str, model: str | None = None) -> RLMChatCompletion:
@@ -660,151 +827,169 @@ class RLM:
             On error, returns a completion with the error message as the response.
         """
         next_depth = self.depth + 1
-
-        # Determine which backend/kwargs to use (model override or parent's default)
-        if model is not None:
-            child_backend_kwargs = (self.backend_kwargs or {}).copy()
-            child_backend_kwargs["model_name"] = model
-        else:
-            child_backend_kwargs = self.backend_kwargs
-        resolved_model = model or (child_backend_kwargs or {}).get("model_name", "unknown")
-
-        # If we'd hit/exceed the cap, do a normal LM completion (no REPL)
-        if next_depth >= self.max_depth:
-            # Use other_backend if available, otherwise use main backend
-            if self.other_backends and self.other_backend_kwargs:
-                client = get_client(self.other_backends[0], self.other_backend_kwargs[0])
+        with self._tracer.start_as_current_span(
+            "rlm.subcall",
+            attributes={
+                "openinference.span.kind": "chain",
+                "rlm.depth": self.depth,
+                "rlm.next_depth": next_depth,
+                "rlm.has_model_override": model is not None,
+            },
+        ) as subcall_span:
+            # Determine which backend/kwargs to use (model override or parent's default)
+            if model is not None:
+                child_backend_kwargs = (self.backend_kwargs or {}).copy()
+                child_backend_kwargs["model_name"] = model
             else:
-                client = get_client(self.backend, child_backend_kwargs or {})
-            root_model = model or client.model_name
-            start_time = time.perf_counter()
-            try:
-                response = client.completion(prompt)
-                end_time = time.perf_counter()
-                model_usage = client.get_last_usage()
-                usage_summary = UsageSummary(model_usage_summaries={root_model: model_usage})
-                return RLMChatCompletion(
-                    root_model=root_model,
-                    prompt=prompt,
-                    response=response,
-                    usage_summary=usage_summary,
-                    execution_time=end_time - start_time,
-                )
-            except Exception as e:
-                end_time = time.perf_counter()
-                return RLMChatCompletion(
-                    root_model=root_model,
-                    prompt=prompt,
-                    response=f"Error: LM query failed at max depth - {e}",
-                    usage_summary=UsageSummary(model_usage_summaries={}),
-                    execution_time=end_time - start_time,
-                )
+                child_backend_kwargs = self.backend_kwargs
+            resolved_model = model or (child_backend_kwargs or {}).get("model_name", "unknown")
+            subcall_span.set_attribute("rlm.resolved_model", str(resolved_model))
 
-        # Calculate remaining budget for child (if budget tracking enabled)
-        remaining_budget = None
-        if self.max_budget is not None:
-            remaining_budget = self.max_budget - self._cumulative_cost
-            if remaining_budget <= 0:
-                return RLMChatCompletion(
-                    root_model=resolved_model,
-                    prompt=prompt,
-                    response=(
-                        "Error: Budget exhausted "
-                        f"(spent ${self._cumulative_cost:.6f} of ${self.max_budget:.6f})"
-                    ),
-                    usage_summary=UsageSummary(model_usage_summaries={}),
-                    execution_time=0.0,
-                )
+            # If we'd hit/exceed the cap, do a normal LM completion (no REPL)
+            if next_depth >= self.max_depth:
+                # Use other_backend if available, otherwise use main backend
+                if self.other_backends and self.other_backend_kwargs:
+                    client = get_client(self.other_backends[0], self.other_backend_kwargs[0])
+                else:
+                    client = get_client(self.backend, child_backend_kwargs or {})
+                root_model = model or client.model_name
+                start_time = time.perf_counter()
+                with self._tracer.start_as_current_span(
+                    "rlm.subcall.max_depth_fallback",
+                    attributes={
+                        "openinference.span.kind": "llm",
+                        "rlm.depth": self.depth,
+                        "rlm.next_depth": next_depth,
+                    },
+                ):
+                    try:
+                        response = self._coerce_response_text(client.completion(prompt))
+                        end_time = time.perf_counter()
+                        model_usage = client.get_last_usage()
+                        usage_summary = UsageSummary(model_usage_summaries={root_model: model_usage})
+                        return RLMChatCompletion(
+                            root_model=root_model,
+                            prompt=prompt,
+                            response=response,
+                            usage_summary=usage_summary,
+                            execution_time=end_time - start_time,
+                        )
+                    except Exception as e:
+                        end_time = time.perf_counter()
+                        return RLMChatCompletion(
+                            root_model=root_model,
+                            prompt=prompt,
+                            response=f"Error: LM query failed at max depth - {e}",
+                            usage_summary=UsageSummary(model_usage_summaries={}),
+                            execution_time=end_time - start_time,
+                        )
 
-        # Calculate remaining timeout for child (if timeout tracking enabled)
-        remaining_timeout = None
-        if self.max_timeout is not None and self._completion_start_time is not None:
-            elapsed = time.perf_counter() - self._completion_start_time
-            remaining_timeout = self.max_timeout - elapsed
-            if remaining_timeout <= 0:
-                return RLMChatCompletion(
-                    root_model=resolved_model,
-                    prompt=prompt,
-                    response=f"Error: Timeout exhausted ({elapsed:.1f}s of {self.max_timeout:.1f}s)",
-                    usage_summary=UsageSummary(model_usage_summaries={}),
-                    execution_time=0.0,
-                )
+            # Calculate remaining budget for child (if budget tracking enabled)
+            remaining_budget = None
+            if self.max_budget is not None:
+                remaining_budget = self.max_budget - self._cumulative_cost
+                if remaining_budget <= 0:
+                    return RLMChatCompletion(
+                        root_model=resolved_model,
+                        prompt=prompt,
+                        response=(
+                            "Error: Budget exhausted "
+                            f"(spent ${self._cumulative_cost:.6f} of ${self.max_budget:.6f})"
+                        ),
+                        usage_summary=UsageSummary(model_usage_summaries={}),
+                        execution_time=0.0,
+                    )
 
-        # Resolve the model name for callbacks
-        prompt_preview = prompt[:80] if len(prompt) > 80 else prompt
+            # Calculate remaining timeout for child (if timeout tracking enabled)
+            remaining_timeout = None
+            if self.max_timeout is not None and self._completion_start_time is not None:
+                elapsed = time.perf_counter() - self._completion_start_time
+                remaining_timeout = self.max_timeout - elapsed
+                if remaining_timeout <= 0:
+                    return RLMChatCompletion(
+                        root_model=resolved_model,
+                        prompt=prompt,
+                        response=f"Error: Timeout exhausted ({elapsed:.1f}s of {self.max_timeout:.1f}s)",
+                        usage_summary=UsageSummary(model_usage_summaries={}),
+                        execution_time=0.0,
+                    )
 
-        # Fire subcall start callback
-        if self.on_subcall_start:
-            try:
-                self.on_subcall_start(next_depth, str(resolved_model), prompt_preview)
-            except Exception:
-                pass  # Don't let callback errors break execution
+            # Resolve the model name for callbacks
+            prompt_preview = prompt[:80] if len(prompt) > 80 else prompt
 
-        subcall_start = time.perf_counter()
-        error_msg: str | None = None
-
-        # Spawn a child RLM with its own LocalREPL
-        child = RLM(
-            backend=self.backend,
-            backend_kwargs=child_backend_kwargs,
-            environment=self.environment_type,
-            environment_kwargs=self.environment_kwargs,
-            depth=next_depth,
-            max_depth=self.max_depth,
-            max_iterations=self.max_iterations,
-            max_budget=remaining_budget,
-            max_timeout=remaining_timeout,
-            max_tokens=self.max_tokens,
-            max_errors=self.max_errors,
-            custom_system_prompt=self.system_prompt,
-            other_backends=self.other_backends,
-            other_backend_kwargs=self.other_backend_kwargs,
-            # Give child its own logger so its trajectory is captured in metadata
-            logger=RLMLogger() if self.logger else None,
-            verbose=False,
-            # Propagate custom tools to children (sub_tools become the child's tools)
-            custom_tools=self.custom_sub_tools,
-            custom_sub_tools=self.custom_sub_tools,
-            # Propagate callbacks to children for nested tracking
-            on_subcall_start=self.on_subcall_start,
-            on_subcall_complete=self.on_subcall_complete,
-        )
-        try:
-            result = child.completion(prompt, root_prompt=None)
-            # Track child's cost in parent's cumulative cost
-            if result.usage_summary and result.usage_summary.total_cost:
-                self._cumulative_cost += result.usage_summary.total_cost
-            return result
-        except BudgetExceededError as e:
-            # Propagate child's spending to parent
-            self._cumulative_cost += e.spent
-            error_msg = f"Budget exceeded - {e}"
-            return RLMChatCompletion(
-                root_model=resolved_model,
-                prompt=prompt,
-                response=f"Error: Child RLM budget exceeded - {e}",
-                usage_summary=UsageSummary(model_usage_summaries={}),
-                execution_time=time.perf_counter() - subcall_start,
-            )
-        except Exception as e:
-            error_msg = str(e)
-            return RLMChatCompletion(
-                root_model=resolved_model,
-                prompt=prompt,
-                response=f"Error: Child RLM completion failed - {e}",
-                usage_summary=UsageSummary(model_usage_summaries={}),
-                execution_time=time.perf_counter() - subcall_start,
-            )
-        finally:
-            # Ensure child resources are cleaned up
-            child.close()
-            # Fire subcall complete callback
-            if self.on_subcall_complete:
+            # Fire subcall start callback
+            if self.on_subcall_start:
                 try:
-                    duration = time.perf_counter() - subcall_start
-                    self.on_subcall_complete(next_depth, str(resolved_model), duration, error_msg)
+                    self.on_subcall_start(next_depth, str(resolved_model), prompt_preview)
                 except Exception:
                     pass  # Don't let callback errors break execution
+
+            subcall_start = time.perf_counter()
+            error_msg: str | None = None
+
+            # Spawn a child RLM with its own LocalREPL
+            child = RLM(
+                backend=self.backend,
+                backend_kwargs=child_backend_kwargs,
+                environment=self.environment_type,
+                environment_kwargs=self.environment_kwargs,
+                depth=next_depth,
+                max_depth=self.max_depth,
+                max_iterations=self.max_iterations,
+                max_budget=remaining_budget,
+                max_timeout=remaining_timeout,
+                max_tokens=self.max_tokens,
+                max_errors=self.max_errors,
+                custom_system_prompt=self.system_prompt,
+                other_backends=self.other_backends,
+                other_backend_kwargs=self.other_backend_kwargs,
+                # Give child its own logger so its trajectory is captured in metadata
+                logger=RLMLogger() if self.logger else None,
+                verbose=False,
+                # Propagate custom tools to children (sub_tools become the child's tools)
+                custom_tools=self.custom_sub_tools,
+                custom_sub_tools=self.custom_sub_tools,
+                # Propagate callbacks to children for nested tracking
+                on_subcall_start=self.on_subcall_start,
+                on_subcall_complete=self.on_subcall_complete,
+            )
+            try:
+                result = child.completion(prompt, root_prompt=None)
+                # Track child's cost in parent's cumulative cost
+                if result.usage_summary and result.usage_summary.total_cost:
+                    self._cumulative_cost += result.usage_summary.total_cost
+                return result
+            except BudgetExceededError as e:
+                # Propagate child's spending to parent
+                self._cumulative_cost += e.spent
+                error_msg = f"Budget exceeded - {e}"
+                return RLMChatCompletion(
+                    root_model=resolved_model,
+                    prompt=prompt,
+                    response=f"Error: Child RLM budget exceeded - {e}",
+                    usage_summary=UsageSummary(model_usage_summaries={}),
+                    execution_time=time.perf_counter() - subcall_start,
+                )
+            except Exception as e:
+                error_msg = str(e)
+                return RLMChatCompletion(
+                    root_model=resolved_model,
+                    prompt=prompt,
+                    response=f"Error: Child RLM completion failed - {e}",
+                    usage_summary=UsageSummary(model_usage_summaries={}),
+                    execution_time=time.perf_counter() - subcall_start,
+                )
+            finally:
+                # Ensure child resources are cleaned up
+                child.close()
+                # Fire subcall complete callback
+                if self.on_subcall_complete:
+                    try:
+                        duration = time.perf_counter() - subcall_start
+                        subcall_span.set_attribute("rlm.subcall_duration_s", duration)
+                        self.on_subcall_complete(next_depth, str(resolved_model), duration, error_msg)
+                    except Exception:
+                        pass  # Don't let callback errors break execution
 
     def _validate_persistent_environment_support(self) -> None:
         """
@@ -832,6 +1017,15 @@ class RLM:
             )
 
     @staticmethod
+    def _coerce_response_text(response: Any) -> str:
+        """Normalize LM responses so parsing never receives None/non-string values."""
+        if response is None:
+            return ""
+        if isinstance(response, str):
+            return response
+        return str(response)
+
+    @staticmethod
     def _env_supports_persistence(env: BaseEnv) -> bool:
         """Check if an environment instance supports persistent mode methods."""
         return isinstance(env, SupportsPersistence)
@@ -842,6 +1036,10 @@ class RLM:
             if hasattr(self._persistent_env, "cleanup"):
                 self._persistent_env.cleanup()
             self._persistent_env = None
+
+    def get_last_iteration_metrics(self) -> list[dict[str, Any]]:
+        """Return per-iteration token/context metrics for the most recent completion call."""
+        return list(self._last_iteration_metrics)
 
     def __enter__(self) -> "RLM":
         return self

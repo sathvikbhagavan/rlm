@@ -12,6 +12,7 @@ from threading import Thread
 from rlm.clients.base_lm import BaseLM
 from rlm.core.comms_utils import LMRequest, LMResponse, socket_recv, socket_send
 from rlm.core.types import RLMChatCompletion, UsageSummary
+from rlm.tracing import get_tracer
 
 
 class LMRequestHandler(StreamRequestHandler):
@@ -63,7 +64,16 @@ class LMRequestHandler(StreamRequestHandler):
         client = handler.get_client(request.model, request.depth)
 
         start_time = time.perf_counter()
-        content = client.completion(request.prompt)
+        with handler.tracer.start_as_current_span(
+            "rlm.lm_handler.single",
+            attributes={
+                "openinference.span.kind": "chain",
+                "rlm.depth": request.depth,
+                "rlm.is_batched": False,
+                "rlm.model": request.model or client.model_name,
+            },
+        ):
+            content = client.completion(request.prompt)
         end_time = time.perf_counter()
 
         model_usage = client.get_last_usage()
@@ -95,7 +105,17 @@ class LMRequestHandler(StreamRequestHandler):
             tasks = [run_one(prompt) for prompt in request.prompts]
             return await asyncio.gather(*tasks)
 
-        results = asyncio.run(run_all())
+        with handler.tracer.start_as_current_span(
+            "rlm.lm_handler.batched",
+            attributes={
+                "openinference.span.kind": "chain",
+                "rlm.depth": request.depth,
+                "rlm.is_batched": True,
+                "rlm.batch_size": len(request.prompts),
+                "rlm.model": request.model or client.model_name,
+            },
+        ):
+            results = asyncio.run(run_all())
         end_time = time.perf_counter()
 
         total_time = end_time - start_time
@@ -148,6 +168,7 @@ class LMHandler:
         self._thread: Thread | None = None
         self._port = port
         self.batch_max_concurrent = batch_max_concurrent
+        self.tracer = get_tracer("rlm.core.lm_handler")
 
         self.register_client(client.model_name, client)
 
