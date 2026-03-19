@@ -10,7 +10,7 @@ from rlm.tracing import init_tracing, using_tracing_attributes
 
 # os.environ["WANDB_MODE"] = "disabled"
 
-DATASET_PATH = "/workspace/datasets/reactionSmilesFigShareUSPTO2023.txt"
+DATASET_PATH = "/home/bhagavan/rlms/datasets/reactionSmilesFigShareUSPTO2023.txt"
 BACKEND = "openrouter"
 MODEL_NAME = "openai/gpt-5-mini"
 ENABLE_TRACING = True

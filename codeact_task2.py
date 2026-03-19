@@ -1,4 +1,5 @@
 from typing import Any, Callable, Dict, List, Optional, Tuple
+import argparse
 import io
 import contextlib
 import ast
@@ -28,16 +29,16 @@ from rlm.tracing import init_tracing, using_tracing_attributes
 from rlm.utils.token_utils import count_tokens
 
 
-DATASET_PATH = "/workspace/datasets/reactionSmilesFigShareUSPTO2023.txt"
-MODEL_NAME = "x-ai/grok-4.1-fast"  # or try something simpler first
+DATASET_PATH = "/home/bhagavan/rlms/datasets/reactionSmilesFigShareUSPTO2023.txt"
+MODEL_NAME = "openai/gpt-5-mini"  # or try something simpler first
 OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
 ENABLE_TRACING = True
-WORKFLOW_TIMEOUT_S = 300.0
+WORKFLOW_TIMEOUT_S = 600.0
 THRESHOLDS = list(range(100, 300, 10))
 SEED = 42
 CONTEXT_SIZE = 10
 RETRIEVER_NAME = "random"
-MAX_OUTPUT_TOKENS = 10_000
+MAX_OUTPUT_TOKENS = 30_000
 MAX_ITERATIONS = 8
 # os.environ["WANDB_MODE"] = "disabled"
 
@@ -554,8 +555,7 @@ class CodeActAgent(Workflow):
 
 def build_question(threshold: int) -> str:
     return f"""
-    There is a list of chemical reactions in SMILES format loaded into a variable `lines`.
-    Each reaction is in one of these forms:
+    Above is a list of chemical reactions in SMILES format. Each reaction is in one of these forms:
       - "index reactants>reagents>products"
       - "index reactants>>products"
 
@@ -591,9 +591,7 @@ async def run_agent_verbose(agent: CodeActAgent, ctx: Context, query: str):
 
 def build_code_executor(lines: list[str]) -> SimpleCodeExecutor:
     return SimpleCodeExecutor(
-        locals={
-            "lines": lines,
-        },
+        locals={},
         globals={
             "__builtins__": __builtins__,
             "np": __import__("numpy"),
@@ -602,7 +600,27 @@ def build_code_executor(lines: list[str]) -> SimpleCodeExecutor:
     )
 
 
-async def main() -> None:
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(description="Run CodeAct task 2 evaluation.")
+    parser.add_argument(
+        "--model-name",
+        type=str,
+        default=MODEL_NAME,
+        help=f"Model identifier for OpenRouter (default: {MODEL_NAME}).",
+    )
+    parser.add_argument(
+        "--context-size",
+        type=int,
+        default=CONTEXT_SIZE,
+        help=(
+            "Number of retrieved reactions to include in context "
+            f"(default: {CONTEXT_SIZE}; use -1 for all lines)."
+        ),
+    )
+    return parser.parse_args()
+
+
+async def main(model_name: str, context_size: int) -> None:
     maybe_init_tracing()
     lines = load_lines()
     rng = random.Random(SEED)
@@ -612,12 +630,12 @@ async def main() -> None:
     run = wandb.init(
         project="CodeAct-Task2",
         config={
-            "MODEL_NAME": MODEL_NAME,
+            "MODEL_NAME": model_name,
             "thresholds": THRESHOLDS,
             "dataset_path": DATASET_PATH,
             "workflow_timeout_s": WORKFLOW_TIMEOUT_S,
             "seed": SEED,
-            "context_size": CONTEXT_SIZE,
+            "context_size": context_size,
             "retriever_name": RETRIEVER_NAME,
         },
     )
@@ -634,7 +652,7 @@ async def main() -> None:
         retrieved_context = retriever.build_context(
             query=f"delta_weight_gt_{threshold}",
             target_index=-1,
-            k=CONTEXT_SIZE,
+            k=context_size,
         )
         retrieved_lines = [line for line in retrieved_context.splitlines() if line.strip()]
         context_coverage = len(retrieved_lines) / len(lines) if lines else 0.0
@@ -651,7 +669,7 @@ async def main() -> None:
         agent = CodeActAgent(
             code_execute_fn=executor.execute,
             llm=OpenRouter(
-                model=MODEL_NAME,
+                model=model_name,
                 api_key=OPENROUTER_API_KEY,
                 max_tokens=MAX_OUTPUT_TOKENS,
                 additional_kwargs={"max_completion_tokens": MAX_OUTPUT_TOKENS},
@@ -681,11 +699,11 @@ async def main() -> None:
         if not llm_turn_metrics:
             estimated_prompt_tokens = count_tokens(
                 [{"role": "user", "content": completion_prompt}],
-                MODEL_NAME,
+                model_name,
             )
             estimated_completion_tokens = count_tokens(
                 [{"role": "assistant", "content": response_text}],
-                MODEL_NAME,
+                model_name,
             )
             llm_turn_metrics = [
                 {
@@ -752,7 +770,7 @@ async def main() -> None:
                 f"sample/{i}/response_raw": response_text,
                 f"sample/{i}/completion_prompt_char_count": len(completion_prompt),
                 f"sample/{i}/context_char_count": len(retrieved_context),
-                f"sample/{i}/context_size": CONTEXT_SIZE,
+                f"sample/{i}/context_size": context_size,
                 f"sample/{i}/retrieved_line_count": len(retrieved_lines),
                 f"sample/{i}/context_coverage": context_coverage,
                 **({f"sample/{i}/final_total_cost_usd": final_cost} if has_cost else {}),
@@ -781,4 +799,5 @@ async def main() -> None:
 
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    args = parse_args()
+    asyncio.run(main(model_name=args.model_name, context_size=args.context_size))

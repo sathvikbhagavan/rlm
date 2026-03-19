@@ -13,7 +13,7 @@
 export TRACING_ENABLE="${TRACING_ENABLE:-1}"
 export TRACING_BATCH="${TRACING_BATCH:-0}"   # 1 = batch span processor
 export PHOENIX_PROJECT_NAME="${PHOENIX_PROJECT_NAME:-phoenix-tracing-dev}"
-export PHOENIX_STORAGE_DIR="${PHOENIX_STORAGE_DIR:-/users/sathvikbhagavan/rlms/phoenix}"
+export PHOENIX_STORAGE_DIR="${PHOENIX_STORAGE_DIR:-/home/bhagavan/rlms/phoenix}"
 export PHOENIX_WORKING_DIR="${PHOENIX_WORKING_DIR:-${PHOENIX_STORAGE_DIR}}"
 export PHOENIX_SQL_DATABASE_URL="${PHOENIX_SQL_DATABASE_URL:-sqlite:///${PHOENIX_STORAGE_DIR}/phoenix.db}"
 
