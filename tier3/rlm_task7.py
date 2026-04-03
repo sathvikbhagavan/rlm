@@ -10,12 +10,12 @@ from rdkit.Chem import rdChemReactions
 from rlm import RLM
 from rlm.tracing import init_tracing, using_tracing_attributes
 
-# os.environ["WANDB_MODE"] = "disabled"
+os.environ["WANDB_MODE"] = "disabled"
 
 DATASET_PATH = "/home/bhagavan/rlms/datasets/reactionSmilesFigShareUSPTO2023.txt"
 BACKEND = "openrouter"
 MODEL_NAME = "openai/gpt-5-mini"
-ENABLE_TRACING = True
+ENABLE_TRACING = False
 
 RLM_INIT_KWARGS = {
     "backend": BACKEND,
@@ -45,28 +45,16 @@ def parse_indices(response: str) -> Optional[list[int]]:
     return indices
 
 
-AMIDE_COUPLING_SMIRKS: dict[str, str] = {
-    "acyl_chloride_with_primary_amine": "[*:1]-[C;H0;D3;+0:2](=[O;H0;D1;+0:3])-[Cl].[#7;H2;!$(N[O,N]);D1;+0:5]>>[*:1]-[C;H0;D3;+0:2](=[O;H0;D1;+0:3])-[#7;H1;D2;+0:5]",
-    "acyl_chloride_with_secondary_amine": "[*:1]-[C;H0;D3;+0:2](=[O;H0;D1;+0:3])-[Cl].[#7;H1;D2;+0:5]>>[*:1]-[C;H0;D3;+0:2](=[O;H0;D1;+0:3])-[#7;H0;D3;+0:5]",
-    "carboxylic_acid_with_primary_amine": "[CX3;+0:2](=[O;H0;D1;+0:3])-[O;H1;D1;+0].[#7;H2;D1;+0:5]>>[CX3;+0:2](=[O;H0;D1;+0:3])-[#7;H1;D2;+0:5]",
-    "ester_with_primary_amine": "[#6:1]-[C;H0;D3;+0:2](=[O;!$(OC(C)(C)C);H0;D1;+0:3])-[O;H0;D2;+0].[#7;H2;D1;+0:5]>>[#6:1]-[C;H0;D3;+0:2](=[O;H0;D1;+0:3])-[#7;H1;D2;+0:5]",
-    "ester_with_secondary_amine": "[#6:1]-[C;H0;D3;+0:2](=[O;H0;D1;+0:3])-[O;!$(OC(C)(C)C);H0;D2;+0:4].[#7;H1;D2;+0:5]>>[#6:1]-[C;H0;D3;+0:2](=[O;H0;D1;+0:3])-[#7;H0;D3;+0:5]"
+TO_ALCOHOL_SMIRKS: dict[str, str] = {
+   "grignard_ketone_to_tertiary_alcohol": "[#6;+0:1]-[Mg]-[Br,I,Cl].[*:2]-[C;H0;D3;+0:3](=[O;H0;D1;+0:4])-[#6;+0:5]>>[*:2]-[C;H0;D4;+0:3](-[O;H1;D1;+0:4])(-[#6;+0:5])-[#6;+0:1]",
 }
 
-AMIDE_COUPLING_LABELS: dict[str, str] = {
-    "acyl_chloride_with_primary_amine": "Acyl chloride with primary amine to amide (Schotten-Baumann)",
-    "acyl_chloride_with_secondary_amine": "Acyl chloride with secondary amine to amide",
-    "carboxylic_acid_with_primary_amine": "Carboxylic acid with primary amine to amide",
-    "ester_with_primary_amine": "Ester with primary amine to amide",
-    "ester_with_secondary_amine": "Ester with secondary amine to amide"
+TO_ALCOHOL_LABELS: dict[str, str] = {
+    "grignard_ketone_to_tertiary_alcohol": "Grignard from ketone to alcohol",
 }
 
-AMIDE_COUPLING_DESCRIPTIONS: dict[str, str] = {
-    "acyl_chloride_with_primary_amine": "An amide bond formation through a nucleophilic acyl substitution between an acyl chloride and a primary amine. In this reaction, the nitrogen of the primary amine attacks the electrophilic carbonyl carbon of the acyl chloride, which is highly activated due to the electron-withdrawing chlorine substituent. The chloride ion acts as the leaving group and is displaced during the process, departing along with a proton as HCl. The product is an amide featuring a new carbon-nitrogen bond, while the original carbonyl (C=O) double bond is preserved. One of the two hydrogens on the amine nitrogen is consumed in forming the new bond, resulting in a secondary-type nitrogen in the product. The primary amine is restricted to simple amines whose nitrogen is not directly bonded to another nitrogen or oxygen, thereby excluding hydrazines, hydroxylamines, and similar heteroatom-substituted amines.",
-    "acyl_chloride_with_secondary_amine": "An amide bond formation through a nucleophilic acyl substitution between an acyl chloride and a secondary amine. The nitrogen of the secondary amine, which already bears two carbon substituents and one hydrogen, attacks the electrophilic carbonyl carbon of the acyl chloride. The chloride ion is displaced as the leaving group, departing along with a proton as HCl. The product is a tertiary amide in which the nitrogen has lost its only hydrogen and now forms three bonds to carbon-containing groups, while the carbonyl (C=O) double bond remains intact. Because acyl chlorides are highly activated electrophiles, this reaction proceeds readily and is a common method for constructing sterically hindered or N,N-disubstituted amides in synthetic chemistry.",
-    "carboxylic_acid_with_primary_amine": "An amide bond formation through a condensation reaction between a carboxylic acid and a primary amine. In this reaction, the nucleophilic nitrogen of the amine attacks the electrophilic carbonyl carbon of the carboxylic acid. The hydroxyl group on the carboxylic acid acts as the leaving group and is displaced during the process, ultimately departing as water. The product is an amide, featuring a new carbon-nitrogen bond while the original carbonyl (C=O) double bond is preserved. One of the two hydrogens on the amine nitrogen is consumed in forming the new bond, leaving a secondary-type nitrogen in the product. This reaction is one of the most fundamental transformations in both organic chemistry and biology, serving as the basis for peptide bond formation during protein synthesis.",
-    "ester_with_primary_amine": "An amide bond formation through aminolysis of an ester by a primary amine. In this reaction, the nucleophilic nitrogen of the primary amine attacks the electrophilic carbonyl carbon of the ester, displacing the alkoxy group as an alcohol leaving group. The carbonyl (C=O) double bond is preserved in the product, while a new carbon-nitrogen amide bond is formed. One of the two hydrogens on the amine nitrogen is consumed during bond formation, yielding a secondary-type nitrogen in the resulting amide. The substituent on the carbonyl carbon is restricted to a carbon-based group, confirming this is an organic ester. This transformation is commonly used in synthetic chemistry when milder conditions than acyl chloride chemistry are desired, though it typically requires heating or catalytic activation.",
-    "ester_with_secondary_amine": "An amide bond formation through aminolysis of an ester by a secondary amine. The nitrogen of the secondary amine, bearing one hydrogen and two carbon substituents, attacks the electrophilic carbonyl carbon of the ester. The alkoxy group is displaced as an alcohol leaving group, while the carbonyl (C=O) double bond remains intact in the product. The sole hydrogen on the amine nitrogen is consumed during the reaction, producing a tertiary amide in which the nitrogen carries three bonds to carbon-containing groups and no hydrogens. The ester specifically excludes tert-butyl esters, where the leaving oxygen is bonded to a quaternary carbon bearing three methyl groups, to avoid competing Boc-deprotection pathways. This reaction is useful for constructing N,N-disubstituted amides and generally requires elevated temperatures or coupling reagents to proceed efficiently."
+TO_ALCOHOL_DESCRIPTIONS: dict[str, str] = {
+    "grignard_ketone_to_tertiary_alcohol": "A Grignard reaction in which an organomagnesium halide adds to a ketone to form a tertiary alcohol. The carbon nucleophile of the Grignard reagent, bonded to magnesium which in turn bears a halide (bromide, iodide, or chloride), attacks the electrophilic carbonyl carbon of the ketone. The carbonyl carbon transitions from trigonal planar (three substituents) to tetrahedral (four substituents), gaining a new carbon-carbon bond to the Grignard carbon. The carbonyl oxygen is reduced from a double bond to a single bond, gaining a hydrogen to become a hydroxyl group in the product. Since the ketone carbonyl carbon already bears two carbon substituents, the addition of the Grignard carbon yields a tertiary alcohol with no hydrogens on the central carbon. This reaction is one of the most important carbon-carbon bond-forming reactions in organic synthesis, enabling the construction of complex molecular architectures from simpler precursors."
 }
 
 
@@ -85,40 +73,28 @@ def build_reaction_query(smarts: str) -> rdChemReactions.ChemicalReaction:
     return query
 
 
-def reaction_matches_acylation(
-    indexed_line: str, query_reaction: rdChemReactions.ChemicalReaction
-) -> bool:
-    try:
-        reactants, products = parse_reaction_sides(indexed_line)
-    except ValueError:
+def reaction_matches(indexed_line, query_reaction):
+    reactants, products = parse_reaction_sides(indexed_line)
+    
+    r_mols = [Chem.MolFromSmiles(s) for s in reactants.split(".")]
+    p_mols = [Chem.MolFromSmiles(s) for s in products.split(".")]
+    
+    if any(mol is None for mol in r_mols):
         return False
-
-    if not reactants or not products:
+    if any(mol is None for mol in p_mols):
         return False
-
-    reactant_mols = [Chem.MolFromSmiles(smi) for smi in reactants.split(".")]
-    product_mols  = [Chem.MolFromSmiles(smi) for smi in products.split(".")]
-
-    if any(mol is None for mol in reactant_mols):
-        return False
-    if any(mol is None for mol in product_mols):
-        return False
-
-    query_products = query_reaction.GetProducts()
-
-    try:
-        from itertools import permutations
-        for perm in permutations(reactant_mols):
-            results = query_reaction.RunReactants(perm)
-            if not results:
-                continue
-            # Verify predicted products match actual products in dataset
-            for q in query_products:
-                if any(mol.HasSubstructMatch(q) for mol in product_mols):
-                    return True
-        return False
-    except Exception:
-        return False
+    
+    # Check reactant patterns match some reactant molecule
+    for q in query_reaction.GetReactants():
+        if not any(m.HasSubstructMatch(q) for m in r_mols if m):
+            return False
+    
+    # Check product patterns match some product molecule
+    for q in query_reaction.GetProducts():
+        if not any(m.HasSubstructMatch(q) for m in p_mols if m):
+            return False
+    
+    return True
 
 def ground_truth_indices(
     lines: list[str], query_reaction: rdChemReactions.ChemicalReaction
@@ -127,7 +103,7 @@ def ground_truth_indices(
     for line in lines:
         idx_str, _ = line.split(" ", 1)
         idx = int(idx_str)
-        if reaction_matches_acylation(line, query_reaction):
+        if reaction_matches(line, query_reaction):
             matching_indices.append(idx)
     return matching_indices
 
@@ -163,8 +139,8 @@ def build_question(reaction_label: str, reaction_description: str) -> str:
     - {reaction_description}
 
     Guidance:
-    - Define Reaction SMARTS/SMIRKS patterns for the whole reaction to identify the reaction type.
-    - DO NOT use individual SMARTS for the donor, amine, or product.
+    - Define a single Reaction SMIRKS pattern encoding the full transformation (reactants >> products) with atom mapping to classify reactions. DO NOT match functional groups independently on reactants and products using individual SMARTS patterns.
+    - You may reason about a few candidate SMIRKS, but commit to exactly one for the final answer. DO NOT aggregate counts from multiple patterns.
     - Use RdKit for all analysis and counting.
     - DO NOT count other reaction types for this question.
     - Ignore reagents (middle field).
@@ -184,7 +160,7 @@ def maybe_init_tracing() -> None:
     if not ENABLE_TRACING:
         return
     initialized = init_tracing(
-        project_name="rlm-tracing-dev",
+        project_name="RLMs-Task7",
         auto_instrument=True,
         batch=False,
     )
@@ -196,7 +172,7 @@ def maybe_init_tracing() -> None:
 
 
 def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Run RLM task 6 prompt-only evaluation.")
+    parser = argparse.ArgumentParser(description="Run RLM task 7 prompt-only evaluation.")
     parser.add_argument(
         "--model-name",
         type=str,
@@ -218,18 +194,18 @@ def main(model_name: str) -> None:
         lines = [f"{i} {line}" for i, line in enumerate(raw_lines)]
 
     context = "\n".join(lines)
-    donor_keys = list(AMIDE_COUPLING_SMIRKS.keys())
+    donor_keys = list(TO_ALCOHOL_SMIRKS.keys())
 
     gt_indices_by_donor: dict[str, list[int]] = {}
     for donor_key in donor_keys:
-        smarts = AMIDE_COUPLING_SMIRKS[donor_key]
+        smarts = TO_ALCOHOL_SMIRKS[donor_key]
         query_reaction = build_reaction_query(smarts)
         gt_indices = ground_truth_indices(lines, query_reaction)
         gt_indices_by_donor[donor_key] = gt_indices
         print(f"Ground truth [{donor_key}] count={len(gt_indices)} ({smarts})")
 
     run = wandb.init(
-        project="RLMs-Task6",
+        project="RLMs-Task7",
         config={
             "MODEL_NAME": model_name,
             "backend": BACKEND,
@@ -237,8 +213,8 @@ def main(model_name: str) -> None:
             "dataset_path": DATASET_PATH,
             "num_questions": len(donor_keys),
             "rlm_init_kwargs": rlm_init_kwargs,
-            "task_description": "Count amide acylation reactions per acyl donor class.",
-            "AMIDE_COUPLING_SMIRKS": AMIDE_COUPLING_SMIRKS,
+            "task_description": "Count from ketone to alcohol reactions.",
+            "TO_ALCOHOL_SMIRKS": TO_ALCOHOL_SMIRKS,
             "ground_truth_indices_by_donor": gt_indices_by_donor,
         },
     )
@@ -253,9 +229,9 @@ def main(model_name: str) -> None:
     samples_with_cost = 0
 
     for i, donor_key in enumerate(donor_keys):
-        reaction_label = AMIDE_COUPLING_LABELS[donor_key]
-        reaction_description = AMIDE_COUPLING_DESCRIPTIONS[donor_key]
-        donor_smarts = AMIDE_COUPLING_SMIRKS[donor_key]
+        reaction_label = TO_ALCOHOL_LABELS[donor_key]
+        reaction_description = TO_ALCOHOL_DESCRIPTIONS[donor_key]
+        donor_smarts = TO_ALCOHOL_SMIRKS[donor_key]
         question = build_question(reaction_label=reaction_label, reaction_description=reaction_description)
         gt_indices = gt_indices_by_donor[donor_key]
         gt_set = set(gt_indices)
@@ -268,11 +244,11 @@ def main(model_name: str) -> None:
             metadata={
                 "sample_index": i,
                 "sample_count": len(donor_keys),
-                "task": "amide_acylation_count",
-                "acyl_donor_key": donor_key,
-                "AMIDE_COUPLING_SMIRKS": donor_smarts,
+                "task": "TO_ALCOHOL_count",
+                "TO_ALCOHOL_donor_key": donor_key,
+                "TO_ALCOHOL_SMIRKS": donor_smarts,
             },
-            tags=["run_rlms", "sample", "task6_amide_acylation_by_donor"],
+            tags=["run_rlms", "sample", "task7_TO_ALCOHOL_by_donor"],
         ):
             completion = rlm.completion(**completion_kwargs)
             response = completion.response
@@ -318,7 +294,7 @@ def main(model_name: str) -> None:
                 {
                     "sample_idx": i,
                     f"sample/{i}/acyl_donor_key": donor_key,
-                    f"sample/{i}/AMIDE_COUPLING_SMIRKS": donor_smarts,
+                    f"sample/{i}/TO_ALCOHOL_SMIRKS": donor_smarts,
                     f"sample/{i}/final_total_input_tokens": last_metric["total_input_tokens"],
                     f"sample/{i}/final_total_output_tokens": last_metric["total_output_tokens"],
                     f"sample/{i}/final_total_tokens": last_metric["total_tokens"],
