@@ -46,32 +46,33 @@ def parse_indices(response: str) -> Optional[list[int]]:
     return indices
 
 
-TO_FG_SMIRKS: dict[str, str] = {
-   "grignard_ketone_to_tertiary_alcohol": "[#6;+0:1]-[Mg]-[Br,I,Cl].[*:2]-[C;H0;D3;+0:3](=[O;H0;D1;+0:4])-[#6;+0:5]>>[*:2]-[C;H0;D4;+0:3](-[O;H1;D1;+0:4])(-[#6;+0:5])-[#6;+0:1]",
-   "grignard_aldehyde_to_secondary_alcohol": "[#6;+0:1]-[Mg]-[Br,I,Cl].[*:2]-[C;H1;D2;+0:3](=[O;H0;D1;+0:4])>>[*:2]-[C;H1;D3;+0:3](-[O;H1;D1;+0:4])-[#6;+0:1]",
-   "nitrile_to_amine": "[#6;+0:0]-[C;H0;D2;+0:1]#[N;H0;D1;+0:2]>>[#6;+0:0]-[C;H2;D2;+0:1]-[N;H2;D1;+0:2]",
-   "nitro_groups_to_amines": "[N;H0;D3;+1:1](=[O;H0;D1;+0])-[O;H0;D1;-1]>>[N;H2;D1;+0:1]",
-   "alcohol_to_azide": "[#6;+0:0]-[O;H1;D1;+0]>>[#6;+0:0]-[N;H0;D2;+0]=[N;H0;D2;+1]=[N;H0;D1;-1]",
-   "alcohol_to_carboxylic_acid": "[C;H2;D2;+0:1]-[O;H1;D1;+0:2]>>[C;H0;D3;+0:1](=[O;H0;D1;+0:2])-[O;H1;D1;+0]"
+NAMED_REACTIONS_SMIRKS: dict[str, str] = {
+    "suzuki_coupling_with_boronic_acids": "[#6;$([#6]:[#6]),$([#6]=[#6]),$([#6]#[#6]);+0:1]-[B;H0;D3;+0](-[O;H1;D1;+0])-[O;H1;D1;+0].[#6;$([#6]=[#6]),$([#6]~[#6]:[#6]),$([#6]~n);+0:2][Cl,Br,I]>>[#6;$([#6]:[#6]),$([#6]=[#6]),$([#6]#[#6]);+0:1]-[#6;$([#6]=[#6]),$([#6]~[#6]:[#6]),$([#6]~n);+0:2]",
+    "mitsunobu_sulfonamide": "[C;H1&$(C([#6])[#6]),H2&$(C[#6]):1][OH1].[NH1;$(N([#6])S(=O)=O):2]>>[C:1][N:2]",
+    # "sonogashira_coupling_terminal_alkyne_with_aryl_halide": "[c:0]-[Cl,Br,I].[#6;H0;D2;+0:1]#[C;H1;D1;+0:2]>>[c:0]-[#6;H0;D2;+0:1]#[C;H1;D1;+0:2]",
+    "buchwald_hartwig_n_arylation_primary_amine": "[c;H0;D3;+0:0]-[F,Cl,Br,I].[#6;+0:1]-[N;H2;D1;+0:2]>>[c;H0;D3;+0:0]-[N;H1;D2;+0:2]-[#6;+0:1]",
+    "stille_reaction_aryl": "[C;H2,H3;+0]-[Sn;H0;D4;+0](-[C;H2,H3;+0])(-[C;H2,H3;+0])-[c;H0;D3;+0:0].[#6;+0:2]-[F,Cl,Br,I]>>[#6;+0:2]-[c;H0;D3;+0:0]",
+    "wittig_with_phosphonium": "[#6:1]-[#6;+0:2](=O).[P;+1]-[C;H2;D2;+0:3]-[*:4]>>[#6:1]-[#6;+0:2]=[C;H1;D2;+0:3]-[*:4]"
 }
 
-TO_FG_LABELS: dict[str, str] = {
-    "grignard_ketone_to_tertiary_alcohol": "Grignard from ketone to alcohol",
-    "grignard_aldehyde_to_secondary_alcohol": "Grignard from aldehyde to secondary alcohol",
-    "nitrile_to_amine": "Reduction of nitrile to amine",
-    "nitro_groups_to_amines": "Reduction of nitro groups to amines",
-    "alcohol_to_azide": "Alcohol to azide",
-    "alcohol_to_carboxylic_acid": "Oxidation of alcohol to carboxylic acid"
+NAMED_REACTIONS_LABELS: dict[str, str] = {
+    "suzuki_coupling_with_boronic_acids": "Suzuki coupling with boronic acids",
+    "mitsunobu_sulfonamide": "Mitsunobu sulfonamide",
+    # "sonogashira_coupling_terminal_alkyne_with_aryl_halide": "Sonogashira coupling of terminal alkyne with aryl halide",
+    "buchwald_hartwig_n_arylation_primary_amine": "Buchwald-Hartwig Ullmann-Goldberg N-arylation primary amine",
+    "stille_reaction_aryl": "Stille reaction aryl",
+    "wittig_with_phosphonium": "Wittig with Phosphonium"
 }
 
-TO_FG_DESCRIPTIONS: dict[str, str] = {
-    "grignard_ketone_to_tertiary_alcohol": "A Grignard reaction in which an organomagnesium halide adds to a ketone to form a tertiary alcohol. The carbon nucleophile of the Grignard reagent, bonded to magnesium which in turn bears a halide (bromide, iodide, or chloride), attacks the electrophilic carbonyl carbon of the ketone. The carbonyl carbon transitions from trigonal planar (three substituents) to tetrahedral (four substituents), gaining a new carbon-carbon bond to the Grignard carbon. The carbonyl oxygen is reduced from a double bond to a single bond, gaining a hydrogen to become a hydroxyl group in the product. Since the ketone carbonyl carbon already bears two carbon substituents, the addition of the Grignard carbon yields a tertiary alcohol with no hydrogens on the central carbon. This reaction is one of the most important carbon-carbon bond-forming reactions in organic synthesis, enabling the construction of complex molecular architectures from simpler precursors.",
-    "grignard_aldehyde_to_secondary_alcohol": "A Grignard reaction in which an organomagnesium halide adds to an aldehyde to form a secondary alcohol. The carbon nucleophile of the Grignard reagent attacks the electrophilic carbonyl carbon of the aldehyde, forming a new carbon-carbon bond. The carbonyl carbon transitions from two substituents to three, and the carbonyl oxygen is reduced from a double bond to a hydroxyl group. Since the aldehyde carbon originally bears one hydrogen and one substituent, the addition of the Grignard carbon yields a secondary alcohol with one hydrogen remaining on the central carbon.",
-    "nitrile_to_amine": "Reduction of a nitrile to a primary amine. The reactant contains a carbon-based substituent bonded to a neutral nitrile carbon with no hydrogens and two connections, which is triple-bonded to a nitrogen with no hydrogens and one connection. In the product, the triple bond is fully reduced to a single bond — the carbon gains two hydrogens (going from zero to two) while retaining two connections, and the nitrogen also gains two hydrogens (going from zero to two) while remaining singly connected. The result is a primary amine, with four hydrogen atoms added overall across the carbon and nitrogen.",
-    "nitro_groups_to_amines": "Reduction of a nitro group to a primary amine. The reactant contains a nitrogen with no hydrogens, three connections, and a positive formal charge, double-bonded to one oxygen and single-bonded to another oxygen carrying a negative formal charge — the canonical representation of a nitro group (-NO₂). Both oxygens are unmapped and are completely removed during the transformation. In the product, the nitrogen loses all its oxygen substituents, drops from three connections to one, changes from a positive to neutral charge, and gains two hydrogens, becoming a free primary amine.",
-    "alcohol_to_azide": "Conversion of an alcohol to an azide via substitution of the hydroxyl group. The reactant contains a carbon-based substituent bonded to a neutral oxygen with one hydrogen and one connection — a simple hydroxyl group. In the product, the hydroxyl is replaced by an azide moiety consisting of three nitrogen atoms in a linear arrangement: the first nitrogen has no hydrogens, two connections, and is neutral; the middle nitrogen has no hydrogens, two connections, and carries a positive formal charge; and the terminal nitrogen has no hydrogens, one connection, and carries a negative formal charge. The oxygen is unmapped and fully removed, while the entire azide group is unmapped and newly introduced.",
-    "alcohol_to_carboxylic_acid": "Oxidation of a primary alcohol to a carboxylic acid. The reactant contains a neutral carbon with two hydrogens and two connections, bonded to a neutral hydroxyl oxygen with one hydrogen and one connection — a primary alcohol (R-CH₂-OH). In the product, the carbon loses both hydrogens (going from two to zero) and gains an additional connection (going from two to three). The original oxygen loses its hydrogen (going from one to zero) and becomes double-bonded to the carbon, forming a carbonyl. A new hydroxyl oxygen, unmapped in the reactant and freshly introduced, appears single-bonded to the carbon with one hydrogen and one connection. The result is a carboxylic acid (R-C(=O)-OH), representing a four-electron oxidation."
+NAMED_REACTIONS_DESCRIPTIONS: dict[str, str] = {
+    "suzuki_coupling_with_boronic_acids": "A Suzuki cross-coupling reaction in which a boronic acid reacts with an organohalide under palladium catalysis to form a new carbon-carbon bond. The boronic acid partner is restricted to aryl, vinyl, or alkynyl carbons attached to a B(OH)₂ group, while the halide partner carries a chlorine, bromine, or iodide leaving group on an aryl, vinyl, or heteroaryl carbon. In the product, the boron moiety and halide are both lost, and a direct C-C bond forms between the two coupling partners. Both sides of the coupling are restricted to sp2 or sp carbons, consistent with the mechanistic requirements of oxidative addition and transmetalation in the Suzuki catalytic cycle.",
+    "mitsunobu_sulfonamide": "A Mitsunobu reaction in which a sulfonamide nitrogen displaces a hydroxyl group on a primary or secondary alcohol, forming a new carbon-nitrogen bond with inversion of stereochemistry. The alcohol carbon is restricted to either a secondary carbon with one hydrogen and two carbon neighbors, or a primary carbon with two hydrogens and one carbon neighbor — excluding tertiary alcohols and methanol. The nitrogen nucleophile is a sulfonamide bearing one hydrogen, bonded to a carbon substituent and a sulfonyl group (S(=O)=O). In the product, the hydroxyl group is lost and a direct C-N bond forms between the alcohol carbon and the sulfonamide nitrogen. This reaction is mediated by a phosphine (typically triphenylphosphine) and a dialkyl azodicarboxylate (DIAD or DEAD), which together activate the alcohol as a leaving group and enable the SN2 displacement.",
+    # "sonogashira_coupling_terminal_alkyne_with_aryl_halide": "A Sonogashira cross-coupling reaction in which a terminal alkyne couples with an aryl halide to form an aryl-alkyne (C-C) bond. The aryl halide consists of an aromatic carbon bearing a chlorine, bromine, or iodine leaving group. The terminal alkyne has a substituted carbon with no hydrogens and two connections (one to the substituent, one to the triple bond) and a terminal carbon with one hydrogen and one connection. In the product, the halide is displaced and the aromatic carbon forms a new bond to the substituted alkyne carbon, which retains its two connections and gains no hydrogens, while the terminal alkyne carbon remains unchanged with its hydrogen intact. This reaction is typically catalyzed by a palladium complex with a copper(I) co-catalyst and a base, and is widely used for introducing alkyne functionality onto aromatic rings.",
+    "buchwald_hartwig_n_arylation_primary_amine": "A palladium- or copper-catalyzed N-arylation in which a primary amine couples with an aryl halide to form a new aryl carbon-nitrogen bond. The aryl halide consists of a neutral aromatic carbon with no hydrogens and three connections, bearing a fluorine, chlorine, bromine, or iodine leaving group. The primary amine has a neutral nitrogen with two hydrogens and one connection, bonded to a carbon-based substituent. In the product, the halide is displaced and the nitrogen forms a direct bond to the aromatic carbon, losing one hydrogen (going from two to one) and gaining one connection (going from one to two), yielding a secondary arylamine. This transformation encompasses several named reactions including Buchwald-Hartwig amination, Ullmann-Goldberg coupling, and nucleophilic aromatic substitution, depending on the catalyst and conditions employed.",
+    "stille_reaction_aryl": "A Stille cross-coupling reaction in which an aryl group is transferred from an organostannane to an organohalide under palladium catalysis, forming a new carbon-carbon bond. The organostannane consists of a tin center with no hydrogens and four connections — three alkyl substituents (methyl or longer chain, with two or three hydrogens on the carbon directly bonded to tin) and one aromatic carbon with no hydrogens and three connections that serves as the transferred group. The coupling partner is a neutral carbon bearing a fluorine, chlorine, bromine, or iodine leaving group. In the product, the tin moiety and halide are both lost, and a direct bond forms between the electrophilic carbon and the aromatic carbon from the stannane. This reaction is valued for its tolerance of diverse functional groups and mild reaction conditions.",
+    "wittig_with_phosphonium": "A Wittig olefination in which a phosphonium ylide reacts with an aldehyde or ketone to form a new carbon-carbon double bond. The carbonyl component has a neutral carbon bonded to a carbon substituent and a double-bonded oxygen. The phosphonium salt consists of a positively charged phosphorus bonded to a methylene carbon with two hydrogens and two connections, carrying one substituent. In the product, the carbonyl oxygen and phosphorus are both lost, and the carbonyl carbon forms a double bond to the ylide carbon, which loses one hydrogen (going from two to one) while retaining two connections. The resulting alkene bridges the two original substituents. This template specifically covers monosubstituted phosphonium ylides and is one of the most widely used methods for constructing alkenes with defined geometry."
 }
+
 
 def parse_reaction_sides(indexed_line: str) -> tuple[str, str]:
     _, reaction_smiles = indexed_line.split(" ", 1)
@@ -191,7 +192,7 @@ def maybe_init_tracing() -> None:
     if not ENABLE_TRACING:
         return
     initialized = init_tracing(
-        project_name="RLMs-Task7",
+        project_name="RLMs-Task9",
         auto_instrument=True,
         batch=False,
     )
@@ -203,7 +204,7 @@ def maybe_init_tracing() -> None:
 
 
 def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Run RLM task 7 prompt-only evaluation.")
+    parser = argparse.ArgumentParser(description="Run RLM task 9 prompt-only evaluation.")
     parser.add_argument(
         "--model-name",
         type=str,
@@ -225,18 +226,18 @@ def main(model_name: str) -> None:
         lines = [f"{i} {line}" for i, line in enumerate(raw_lines)]
 
     context = "\n".join(lines)
-    reaction_keys = list(TO_FG_SMIRKS.keys())
+    reaction_keys = list(NAMED_REACTIONS_SMIRKS.keys())
 
     gt_indices_by_reaction: dict[str, list[int]] = {}
     for reaction_key in reaction_keys:
-        smarts = TO_FG_SMIRKS[reaction_key]
+        smarts = NAMED_REACTIONS_SMIRKS[reaction_key]
         query_reaction = build_reaction_query(smarts)
         gt_indices = ground_truth_indices(lines, query_reaction)
         gt_indices_by_reaction[reaction_key] = gt_indices
         print(f"Ground truth [{reaction_key}] count={len(gt_indices)} ({smarts})")
 
     run = wandb.init(
-        project="RLMs-Task7",
+        project="RLMs-Task9",
         config={
             "MODEL_NAME": model_name,
             "backend": BACKEND,
@@ -244,8 +245,8 @@ def main(model_name: str) -> None:
             "dataset_path": DATASET_PATH,
             "num_questions": len(reaction_keys),
             "rlm_init_kwargs": rlm_init_kwargs,
-            "task_description": "Count from ketone to alcohol reactions.",
-            "TO_FG_SMIRKS": TO_FG_SMIRKS,
+            "task_description": "Count from named reactions.",
+            "NAMED_REACTIONS_SMIRKS": NAMED_REACTIONS_SMIRKS,
             "ground_truth_indices_by_reaction": gt_indices_by_reaction,
         },
     )
@@ -260,9 +261,9 @@ def main(model_name: str) -> None:
     samples_with_cost = 0
 
     for i, reaction_key in enumerate(reaction_keys):
-        reaction_label = TO_FG_LABELS[reaction_key]
-        reaction_description = TO_FG_DESCRIPTIONS[reaction_key]
-        reaction_smirks = TO_FG_SMIRKS[reaction_key]
+        reaction_label = NAMED_REACTIONS_LABELS[reaction_key]
+        reaction_description = NAMED_REACTIONS_DESCRIPTIONS[reaction_key]
+        reaction_smirks = NAMED_REACTIONS_SMIRKS[reaction_key]
         question = build_question(reaction_label=reaction_label, reaction_description=reaction_description)
         gt_indices = gt_indices_by_reaction[reaction_key]
         gt_set = set(gt_indices)
@@ -275,11 +276,11 @@ def main(model_name: str) -> None:
             metadata={
                 "sample_index": i,
                 "sample_count": len(reaction_keys),
-                "task": "TO_FG_count",
-                "TO_FG_reaction_key": reaction_key,
-                "TO_FG_SMIRKS": reaction_smirks,
+                "task": "NAMED_REACTIONS_count",
+                "NAMED_REACTIONS_reaction_key": reaction_key,
+                "NAMED_REACTIONS_SMIRKS": reaction_smirks,
             },
-            tags=["run_rlms", "sample", "task7_TO_FG"],
+            tags=["run_rlms", "sample", "task9_NAMED_REACTIONS"],
         ):
             completion = rlm.completion(**completion_kwargs)
             response = completion.response
@@ -325,7 +326,7 @@ def main(model_name: str) -> None:
                 {
                     "sample_idx": i,
                     f"sample/{i}/reaction_key": reaction_key,
-                    f"sample/{i}/TO_FG_SMIRKS": reaction_smirks,
+                    f"sample/{i}/NAMED_REACTIONS_SMIRKS": reaction_smirks,
                     f"sample/{i}/final_total_input_tokens": last_metric["total_input_tokens"],
                     f"sample/{i}/final_total_output_tokens": last_metric["total_output_tokens"],
                     f"sample/{i}/final_total_tokens": last_metric["total_tokens"],

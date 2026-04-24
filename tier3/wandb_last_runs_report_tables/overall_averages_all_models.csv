@@ -1,0 +1,4 @@
+metric,task_count_all_models,overall_avg_all_models
+precision,20,0.5809476097809219
+recall,20,0.5142666676033136
+f1,20,0.4862683914628435

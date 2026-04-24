@@ -1,49 +1,47 @@
 import argparse
+import asyncio
 import os
-import re
+import random
 import uuid
-from typing import Optional
 from itertools import permutations
 
 import wandb
 from rdkit import Chem
 from rdkit.Chem import rdChemReactions
-from rlm import RLM
-from rlm.tracing import init_tracing, using_tracing_attributes
+from llama_index.core.workflow import Context
+from llama_index.llms.openrouter import OpenRouter
 
-# os.environ["WANDB_MODE"] = "disabled"
+from rlm.codeact_core import (
+    CodeActAgent,
+    INDEX_CODEACT_SYSTEM_PROMPT,
+    INDEX_FORCE_LOOP_MESSAGE,
+    INDEX_OBSERVATION_FOLLOWUP,
+    make_simple_code_executor,
+    run_agent_verbose,
+)
+from rlm.codeact_helpers import (
+    build_retriever,
+    extract_response_text,
+    load_lines,
+    parse_indices,
+)
+from rlm.tracing import get_tracer, init_tracing, using_tracing_attributes
+from rlm.utils.token_utils import count_tokens
+
 
 DATASET_PATH = "/home/bhagavan/rlms/datasets/reactionSmilesFigShareUSPTO2023.txt"
-BACKEND = "openrouter"
 MODEL_NAME = "x-ai/grok-4-fast"
+OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
 ENABLE_TRACING = True
-
-RLM_INIT_KWARGS = {
-    "backend": BACKEND,
-    "backend_kwargs": {"model_name": MODEL_NAME},
-    "verbose": True,
-    "max_depth": 2,
-}
-
-
-def parse_indices(response: str) -> Optional[list[int]]:
-    response = response.strip()
-    if not response:
-        return []
-    normalized = response.replace(" ", "")
-    if normalized == "-1":
-        return []
-    matches = re.findall(r"\d+", response)
-    if not matches:
-        return []
-    indices: list[int] = []
-    seen: set[int] = set()
-    for match in matches:
-        idx = int(match)
-        if idx not in seen:
-            seen.add(idx)
-            indices.append(idx)
-    return indices
+WORKFLOW_TIMEOUT_S = 1200.0
+SEED = 42
+CONTEXT_SIZE = 100
+GROUND_TRUTH_FRACTION_PER_CONTEXT = 0.2
+RETRIEVER_NAME = "random"
+MAX_OUTPUT_TOKENS = 50_000
+REASONING_EFFORT = "high"
+MAX_ITERATIONS = 8
+# os.environ["WANDB_MODE"] = "disabled"
 
 
 TO_FG_SMIRKS: dict[str, str] = {
@@ -73,7 +71,8 @@ TO_FG_DESCRIPTIONS: dict[str, str] = {
     "alcohol_to_carboxylic_acid": "Oxidation of a primary alcohol to a carboxylic acid. The reactant contains a neutral carbon with two hydrogens and two connections, bonded to a neutral hydroxyl oxygen with one hydrogen and one connection — a primary alcohol (R-CH₂-OH). In the product, the carbon loses both hydrogens (going from two to zero) and gains an additional connection (going from two to three). The original oxygen loses its hydrogen (going from one to zero) and becomes double-bonded to the carbon, forming a carbonyl. A new hydroxyl oxygen, unmapped in the reactant and freshly introduced, appears single-bonded to the carbon with one hydrogen and one connection. The result is a carboxylic acid (R-C(=O)-OH), representing a four-electron oxidation."
 }
 
-def parse_reaction_sides(indexed_line: str) -> tuple[str, str]:
+
+def parse_reaction_sides(indexed_line: str) -> tuple[list[Chem.Mol], list[Chem.Mol]]:
     _, reaction_smiles = indexed_line.split(" ", 1)
     parts = reaction_smiles.split(">")
     reactant_smiles = [s for s in parts[0].split(".") if s]
@@ -92,13 +91,12 @@ def build_reaction_query(smarts: str) -> rdChemReactions.ChemicalReaction:
     return query
 
 
-def canonical_smiles_set(mols):
-    """Return a set of canonical SMILES for a list of molecules."""
+def canonical_smiles_set(mols: list[Chem.Mol]) -> set[str]:
     return {Chem.MolToSmiles(m) for m in mols if m is not None}
 
 
-def reaction_matches(reaction_smiles, query_reaction):
-    reactants, products = parse_reaction_sides(reaction_smiles)
+def reaction_matches(indexed_line: str, query_reaction: rdChemReactions.ChemicalReaction) -> bool:
+    reactants, products = parse_reaction_sides(indexed_line)
     template = query_reaction
     template.Initialize()
     actual_product_smiles = canonical_smiles_set(products)
@@ -111,14 +109,13 @@ def reaction_matches(reaction_smiles, query_reaction):
         except Exception:
             continue
         for prod_set in product_sets:
-            generated_smiles = set()
+            generated_smiles: set[str] = set()
             for mol in prod_set:
                 try:
                     Chem.SanitizeMol(mol)
                     generated_smiles.add(Chem.MolToSmiles(mol))
                 except Exception:
                     continue
-            # Match if every generated product appears in the actual products
             if generated_smiles and generated_smiles.issubset(actual_product_smiles):
                 return True
     return False
@@ -137,18 +134,14 @@ def ground_truth_indices(
 
 
 def precision_recall_f1(
-    predicted_indices: set[int], ground_truth_indices: set[int]
+    predicted_indices: set[int], gt_indices: set[int]
 ) -> tuple[float, float, float]:
-    tp = len(predicted_indices & ground_truth_indices)
-    fp = len(predicted_indices - ground_truth_indices)
-    fn = len(ground_truth_indices - predicted_indices)
+    tp = len(predicted_indices & gt_indices)
+    fp = len(predicted_indices - gt_indices)
+    fn = len(gt_indices - predicted_indices)
     precision = tp / (tp + fp) if (tp + fp) else 0.0
     recall = tp / (tp + fn) if (tp + fn) else 0.0
-    f1 = (
-        2 * precision * recall / (precision + recall)
-        if (precision + recall)
-        else 0.0
-    )
+    f1 = (2 * precision * recall / (precision + recall)) if (precision + recall) else 0.0
     return precision, recall, f1
 
 
@@ -162,7 +155,7 @@ def build_question(reaction_label: str, reaction_description: str) -> str:
     Task:
     Count how many reactions are of the following type:
     - {reaction_label}
-    
+
     Here is a detailed description of the reaction type:
     - {reaction_description}
 
@@ -178,7 +171,8 @@ def build_question(reaction_label: str, reaction_description: str) -> str:
     - DO NOT assume/simulate output of the code. Wait for the code to get executed and only then return the final answer.
     - DO NOT USE `FINAL` for writing a comment/thought. Only use this for the final answer.
     - DO NOT WRITE `FINAL` without observing the output of the code.
-
+    - DO NOT do `exit()` in the code in any case.
+    
     Output format:
     - Return ONLY the matching reaction INDICES.
     - Format must be a comma-separated list of integers in ascending order (e.g., 3,8,21).
@@ -191,7 +185,7 @@ def maybe_init_tracing() -> None:
     if not ENABLE_TRACING:
         return
     initialized = init_tracing(
-        project_name="RLMs-Task7",
+        project_name="CodeAct-Task7",
         auto_instrument=True,
         batch=False,
     )
@@ -203,50 +197,68 @@ def maybe_init_tracing() -> None:
 
 
 def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Run RLM task 7 prompt-only evaluation.")
+    parser = argparse.ArgumentParser(description="Run CodeAct task 7 evaluation.")
+    parser.add_argument("--model-name", type=str, default=MODEL_NAME)
+    parser.add_argument("--context-size", type=int, default=CONTEXT_SIZE)
     parser.add_argument(
-        "--model-name",
-        type=str,
-        default=MODEL_NAME,
-        help=f"Model identifier for backend (default: {MODEL_NAME}).",
+        "--ground-truth-fraction-per-context",
+        type=float,
+        default=GROUND_TRUTH_FRACTION_PER_CONTEXT,
     )
     return parser.parse_args()
 
 
-def main(model_name: str) -> None:
+def build_code_executor(lines: list[str]):
+    return make_simple_code_executor(
+        extra_locals={"lines": lines},
+        extra_globals={
+            "np": __import__("numpy"),
+            "rdkit": __import__("rdkit"),
+        },
+    )
+
+
+async def main(
+    model_name: str,
+    context_size: int,
+    ground_truth_fraction_per_context: float,
+) -> None:
     maybe_init_tracing()
-    rlm_init_kwargs = dict(RLM_INIT_KWARGS)
-    rlm_init_kwargs["backend_kwargs"] = {"model_name": model_name}
-    rlm = RLM(**rlm_init_kwargs)
-    run_session_id = f"run-rlms-{uuid.uuid4()}"
-
-    with open(DATASET_PATH, "r") as f:
-        raw_lines = [line.strip() for line in f.readlines() if line.strip()]
-        lines = [f"{i} {line}" for i, line in enumerate(raw_lines)]
-
+    tracer = get_tracer("codeact-task7")
+    lines = load_lines()
     context = "\n".join(lines)
+    rng = random.Random(SEED)
     reaction_keys = list(TO_FG_SMIRKS.keys())
+    run_session_id = f"codeact-task7-{uuid.uuid4()}"
 
-    gt_indices_by_reaction: dict[str, list[int]] = {}
+    full_gt_indices_by_reaction: dict[str, list[int]] = {}
     for reaction_key in reaction_keys:
-        smarts = TO_FG_SMIRKS[reaction_key]
-        query_reaction = build_reaction_query(smarts)
-        gt_indices = ground_truth_indices(lines, query_reaction)
-        gt_indices_by_reaction[reaction_key] = gt_indices
-        print(f"Ground truth [{reaction_key}] count={len(gt_indices)} ({smarts})")
+        query_reaction = build_reaction_query(TO_FG_SMIRKS[reaction_key])
+        full_gt_indices_by_reaction[reaction_key] = ground_truth_indices(lines, query_reaction)
+
+    retriever = build_retriever(
+        name=RETRIEVER_NAME,
+        lines=lines,
+        rng=rng,
+        ground_truth_indices_by_reaction=full_gt_indices_by_reaction,
+        ground_truth_fraction_per_context=ground_truth_fraction_per_context,
+    )
+    retriever_name = RETRIEVER_NAME if context_size >= 0 else "all_lines"
 
     run = wandb.init(
-        project="RLMs-Task7",
+        project="CodeAct-Task7",
         config={
             "MODEL_NAME": model_name,
-            "backend": BACKEND,
-            "model_name": model_name,
             "dataset_path": DATASET_PATH,
-            "num_questions": len(reaction_keys),
-            "rlm_init_kwargs": rlm_init_kwargs,
-            "task_description": "Count from ketone to alcohol reactions.",
+            "workflow_timeout_s": WORKFLOW_TIMEOUT_S,
+            "seed": SEED,
+            "context_size": context_size,
+            "ground_truth_fraction_per_context": ground_truth_fraction_per_context,
+            "retriever_name": retriever_name,
+            "reasoning_effort": REASONING_EFFORT,
+            "task_description": "Return reaction indices for Grignard alcohol-formation subtypes.",
             "TO_FG_SMIRKS": TO_FG_SMIRKS,
-            "ground_truth_indices_by_reaction": gt_indices_by_reaction,
+            "full_ground_truth_indices_by_reaction": full_gt_indices_by_reaction,
         },
     )
     wandb.define_metric("sample_iteration")
@@ -263,37 +275,102 @@ def main(model_name: str) -> None:
         reaction_label = TO_FG_LABELS[reaction_key]
         reaction_description = TO_FG_DESCRIPTIONS[reaction_key]
         reaction_smirks = TO_FG_SMIRKS[reaction_key]
+        query_reaction = build_reaction_query(reaction_smirks)
         question = build_question(reaction_label=reaction_label, reaction_description=reaction_description)
-        gt_indices = gt_indices_by_reaction[reaction_key]
+
+        if context_size < 0:
+            retrieved_context = context
+            retrieved_lines = lines
+        else:
+            retrieved_context = retriever.build_context(query=reaction_key, target_index=-1, k=context_size)
+            retrieved_lines = [line for line in retrieved_context.splitlines() if line.strip()]
+        context_coverage = len(retrieved_lines) / len(lines) if lines else 0.0
+        gt_indices_full = full_gt_indices_by_reaction[reaction_key]
+        gt_indices_in_context = ground_truth_indices(retrieved_lines, query_reaction)
+        # Evaluate against only the ground-truth reactions present in retrieved context.
+        gt_indices = gt_indices_in_context
         gt_set = set(gt_indices)
-        completion_kwargs = {"prompt": context, "root_prompt": question}
+        total_gt_count = len(gt_indices_full)
 
-        print(f"Question {i + 1}/{len(reaction_keys)} donor={reaction_key}")
+        completion_prompt = f"""
+        You are given a subset of chemical reactions in SMILES format and a question.
+        <context>
+        {retrieved_context}
+        </context>
+        <question>
+        {question}
+        </question>
+        """
+        print(f"Question {i + 1}/{len(reaction_keys)} for reaction_key={reaction_key}")
+        print(
+            f"Ground truth count (full dataset): {len(gt_indices_full)}/{total_gt_count}, "
+            f"in-context: {len(gt_indices_in_context)} (context lines: {len(retrieved_lines)})"
+        )
 
-        with using_tracing_attributes(
-            session_id=run_session_id,
-            metadata={
-                "sample_index": i,
-                "sample_count": len(reaction_keys),
-                "task": "TO_FG_count",
-                "TO_FG_reaction_key": reaction_key,
-                "TO_FG_SMIRKS": reaction_smirks,
-            },
-            tags=["run_rlms", "sample", "task7_TO_FG"],
-        ):
-            completion = rlm.completion(**completion_kwargs)
-            response = completion.response
+        executor = build_code_executor(lines=retrieved_lines)
+        agent = CodeActAgent(
+            code_execute_fn=executor.execute,
+            llm=OpenRouter(
+                model=model_name,
+                api_key=OPENROUTER_API_KEY,
+                max_tokens=MAX_OUTPUT_TOKENS,
+                reasoning_effort=REASONING_EFFORT,
+                additional_kwargs={"max_completion_tokens": MAX_OUTPUT_TOKENS},
+            ),
+            system_prompt=INDEX_CODEACT_SYSTEM_PROMPT,
+            max_iterations=MAX_ITERATIONS,
+            force_loop_message=INDEX_FORCE_LOOP_MESSAGE,
+            observation_followup=INDEX_OBSERVATION_FOLLOWUP,
+            timeout=WORKFLOW_TIMEOUT_S,
+        )
+        ctx = Context(agent)
 
-        iteration_metrics = rlm.get_last_iteration_metrics()
-        parsed_indices = parse_indices(response)
-        parsed_indices = parsed_indices if parsed_indices is not None else []
+        with tracer.start_as_current_span(f"codeact_task7_sample_{i}") as sample_span:
+            sample_span.set_attributes(
+                {
+                    "sample.index": i,
+                    "sample.count": len(reaction_keys),
+                    "reaction.key": reaction_key,
+                    "reaction.smirks": reaction_smirks,
+                    "agent.name": "codeact",
+                }
+            )
+            with using_tracing_attributes(
+                session_id=run_session_id,
+                metadata={
+                    "sample_index": i,
+                    "sample_count": len(reaction_keys),
+                    "reaction_key": reaction_key,
+                    "reaction_smirks": reaction_smirks,
+                    "agent": "codeact",
+                },
+                tags=["codeact", "sample", "task7_to_alcohol"],
+            ):
+                response = await run_agent_verbose(agent, ctx, completion_prompt)
+
+        response_text = extract_response_text(response)
+        llm_turn_metrics = await ctx.store.get("llm_turn_metrics", default=[])
+        if not llm_turn_metrics:
+            estimated_prompt_tokens = count_tokens(
+                [{"role": "user", "content": completion_prompt}],
+                model_name,
+            )
+            estimated_completion_tokens = count_tokens(
+                [{"role": "assistant", "content": response_text}],
+                model_name,
+            )
+            llm_turn_metrics = [
+                {
+                    "iteration": 1,
+                    "iteration_input_tokens": estimated_prompt_tokens,
+                    "iteration_output_tokens": estimated_completion_tokens,
+                    "iteration_total_tokens": estimated_prompt_tokens + estimated_completion_tokens,
+                }
+            ]
+
+        parsed_indices = parse_indices(response_text)
         pred_set = set(parsed_indices)
         precision, recall, f1 = precision_recall_f1(pred_set, gt_set)
-        sample_cost_usd = completion.usage_summary.total_cost
-        if sample_cost_usd is not None:
-            total_cost_usd += sample_cost_usd
-            samples_with_cost += 1
-
         is_exact_match = pred_set == gt_set
         if is_exact_match:
             exact_match_count += 1
@@ -301,57 +378,68 @@ def main(model_name: str) -> None:
         macro_recall += recall
         macro_f1 += f1
 
-        print(f"Response [{reaction_key}]: {response}")
-        print(f"Predicted [{reaction_key}] count: {len(parsed_indices)}")
-        print(f"Ground truth [{reaction_key}] count: {len(gt_indices)}")
-        print(
-            f"Metrics [{reaction_key}] -> precision={precision:.4f} "
-            f"recall={recall:.4f} f1={f1:.4f} exact_match={is_exact_match}"
-        )
-
-        for metric in iteration_metrics:
+        for metric in llm_turn_metrics:
             wandb.log(
                 {
                     "sample_iteration": metric["iteration"],
                     f"sample/{i}/iteration_input_tokens": metric["iteration_input_tokens"],
                     f"sample/{i}/iteration_output_tokens": metric["iteration_output_tokens"],
                     f"sample/{i}/iteration_total_tokens": metric["iteration_total_tokens"],
-                }
-            )
-
-        if iteration_metrics:
-            last_metric = iteration_metrics[-1]
-            wandb.log(
-                {
-                    "sample_idx": i,
-                    f"sample/{i}/reaction_key": reaction_key,
-                    f"sample/{i}/TO_FG_SMIRKS": reaction_smirks,
-                    f"sample/{i}/final_total_input_tokens": last_metric["total_input_tokens"],
-                    f"sample/{i}/final_total_output_tokens": last_metric["total_output_tokens"],
-                    f"sample/{i}/final_total_tokens": last_metric["total_tokens"],
-                    f"sample/{i}/iterations": len(iteration_metrics),
-                    f"sample/{i}/response_raw": response,
-                    f"sample/{i}/response_parsed_indices": ",".join(
-                        str(x) for x in parsed_indices
-                    ),
-                    f"sample/{i}/response_parsed_count": len(parsed_indices),
-                    f"sample/{i}/ground_truth_indices": ",".join(
-                        str(x) for x in gt_indices
-                    ),
-                    f"sample/{i}/ground_truth_count": len(gt_indices),
-                    f"sample/{i}/precision": precision,
-                    f"sample/{i}/recall": recall,
-                    f"sample/{i}/f1": f1,
-                    f"sample/{i}/is_exact_match": int(is_exact_match),
-                    f"sample/{i}/completion_root_prompt": question,
-                    f"sample/{i}/completion_prompt_char_count": len(context),
                     **(
-                        {f"sample/{i}/final_total_cost_usd": sample_cost_usd}
-                        if sample_cost_usd is not None
+                        {f"sample/{i}/iteration_cost_usd": metric["iteration_cost_usd"]}
+                        if "iteration_cost_usd" in metric
                         else {}
                     ),
                 }
             )
+
+        final_input_tokens = sum(int(m.get("iteration_input_tokens", 0)) for m in llm_turn_metrics)
+        final_output_tokens = sum(int(m.get("iteration_output_tokens", 0)) for m in llm_turn_metrics)
+        final_total_tokens = sum(int(m.get("iteration_total_tokens", 0)) for m in llm_turn_metrics)
+        final_cost = sum(float(m.get("iteration_cost_usd", 0.0)) for m in llm_turn_metrics)
+        has_cost = any("iteration_cost_usd" in m for m in llm_turn_metrics)
+        if has_cost:
+            total_cost_usd += final_cost
+            samples_with_cost += 1
+
+        wandb.log(
+            {
+                "sample_idx": i,
+                f"sample/{i}/reaction_key": reaction_key,
+                f"sample/{i}/reaction_smirks": reaction_smirks,
+                f"sample/{i}/final_total_input_tokens": final_input_tokens,
+                f"sample/{i}/final_total_output_tokens": final_output_tokens,
+                f"sample/{i}/final_total_tokens": final_total_tokens,
+                f"sample/{i}/iterations": len(llm_turn_metrics),
+                f"sample/{i}/is_exact_match": int(is_exact_match),
+                f"sample/{i}/precision": precision,
+                f"sample/{i}/recall": recall,
+                f"sample/{i}/f1": f1,
+                f"sample/{i}/ground_truth_count": len(gt_indices),
+                f"sample/{i}/ground_truth_in_context_count": len(gt_indices_in_context),
+                f"sample/{i}/ground_truth_full_count": len(gt_indices_full),
+                f"sample/{i}/prediction_count": len(parsed_indices),
+                f"sample/{i}/ground_truth_indices": ",".join(str(x) for x in gt_indices),
+                f"sample/{i}/ground_truth_in_context_indices": ",".join(
+                    str(x) for x in gt_indices_in_context
+                ),
+                f"sample/{i}/predicted_indices": ",".join(str(x) for x in parsed_indices),
+                f"sample/{i}/response_raw": response_text,
+                f"sample/{i}/completion_prompt_char_count": len(completion_prompt),
+                f"sample/{i}/context_char_count": len(retrieved_context),
+                f"sample/{i}/retrieved_line_count": len(retrieved_lines),
+                f"sample/{i}/context_coverage": context_coverage,
+                **({f"sample/{i}/final_total_cost_usd": final_cost} if has_cost else {}),
+            }
+        )
+        wandb.log(
+            {
+                "running_exact_match_accuracy": exact_match_count / (i + 1),
+                "running_macro_precision": macro_precision / (i + 1),
+                "running_macro_recall": macro_recall / (i + 1),
+                "running_macro_f1": macro_f1 / (i + 1),
+            }
+        )
 
     total = len(reaction_keys)
     exact_match_accuracy = (exact_match_count / total) if total else 0.0
@@ -364,12 +452,6 @@ def main(model_name: str) -> None:
     print(f"Macro recall: {macro_recall:.4f}")
     print(f"Macro F1: {macro_f1:.4f}")
 
-    for reaction_key in reaction_keys:
-        run.summary[f"ground_truth/{reaction_key}/count"] = len(gt_indices_by_reaction[reaction_key])
-        run.summary[f"ground_truth/{reaction_key}/indices"] = ",".join(
-            str(x) for x in gt_indices_by_reaction[reaction_key]
-        )
-
     run.summary["exact_match_correct"] = exact_match_count
     run.summary["total"] = total
     run.summary["exact_match_accuracy"] = exact_match_accuracy
@@ -380,9 +462,22 @@ def main(model_name: str) -> None:
     if samples_with_cost > 0:
         run.summary["total_cost_usd"] = total_cost_usd
         run.summary["avg_cost_per_sample_usd"] = total_cost_usd / samples_with_cost
+    for reaction_key in reaction_keys:
+        run.summary[f"full_ground_truth/{reaction_key}/count"] = len(
+            full_gt_indices_by_reaction[reaction_key]
+        )
+        run.summary[f"full_ground_truth/{reaction_key}/indices"] = ",".join(
+            str(x) for x in full_gt_indices_by_reaction[reaction_key]
+        )
     wandb.finish()
 
 
 if __name__ == "__main__":
     args = parse_args()
-    main(model_name=args.model_name)
+    asyncio.run(
+        main(
+            model_name=args.model_name,
+            context_size=args.context_size,
+            ground_truth_fraction_per_context=args.ground_truth_fraction_per_context,
+        )
+    )

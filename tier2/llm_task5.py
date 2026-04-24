@@ -1,20 +1,19 @@
-from typing import Optional
-import argparse
 import asyncio
 import os
 import random
 import uuid
+from typing import Optional
 
 import wandb
+from llama_index.core.llms import ChatMessage
+from llama_index.llms.openrouter import OpenRouter
 from rdkit import Chem
 from rdkit.Chem import Descriptors, rdMolDescriptors
-from llama_index.core.workflow import Context
-from llama_index.llms.openrouter import OpenRouter
 
-from rlm.codeact_core import CodeActAgent, make_simple_code_executor, run_agent_verbose
 from rlm.codeact_helpers import (
     build_retriever,
     extract_response_text,
+    extract_usage_metrics,
     load_lines,
     parse_count,
     parse_reaction_sides,
@@ -27,7 +26,6 @@ DATASET_PATH = "/home/bhagavan/rlms/datasets/reactionSmilesFigShareUSPTO2023.txt
 MODEL_NAME = "openai/gpt-5-mini"
 OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
 ENABLE_TRACING = True
-WORKFLOW_TIMEOUT_S = 600.0
 WEIGHT_THRESHOLDS_DA = [100, 150]
 RING_X_VALUES = [1, 2]
 SEED = 42
@@ -41,7 +39,7 @@ def maybe_init_tracing() -> None:
     if not ENABLE_TRACING:
         return
     initialized = init_tracing(
-        project_name="codeact-task5",
+        project_name="LLM-Task5",
         auto_instrument=True,
         batch=False,
     )
@@ -121,7 +119,8 @@ def count_matches_combo(lines: list[str], weight_threshold: int, ring_x: int) ->
 
 def build_question(weight_threshold: int, ring_x: int) -> str:
     return f"""
-    Above is a list of chemical reactions in SMILES format. Each reaction is in one of these forms:
+    There is a list of chemical reactions in SMILES format.
+    Each reaction is in one of these forms:
       - "index reactants>reagents>products"
       - "index reactants>>products"
 
@@ -140,8 +139,6 @@ def build_question(weight_threshold: int, ring_x: int) -> str:
     - Ignore reagents (middle field).
     - For each side (reactants/products), ignore invalid or empty dot-separated molecules.
     - Skip a reaction only if reactant side or product side has no valid molecules left after filtering.
-    - If you copy SMILES text into a Python string literal, handle backslashes safely:
-      use a raw string (for example, r\"\"\"...\"\"\") or escape backslashes as "\\\\".
 
     Output format:
     - Final response must be exactly: ANSWER: <integer>
@@ -151,41 +148,19 @@ def build_question(weight_threshold: int, ring_x: int) -> str:
 """
 
 
-def build_code_executor() -> object:
-    return make_simple_code_executor(
-        extra_globals={
-            "np": __import__("numpy"),
-            "rdkit": __import__("rdkit"),
-        }
-    )
-
-
-def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Run CodeAct task 5 evaluation.")
-    parser.add_argument(
-        "--model-name",
-        type=str,
-        default=MODEL_NAME,
-        help=f"Model identifier for OpenRouter (default: {MODEL_NAME}).",
-    )
-    parser.add_argument(
-        "--context-size",
-        type=int,
-        default=CONTEXT_SIZE,
-        help=(
-            "Number of retrieved reactions to include in context "
-            f"(default: {CONTEXT_SIZE}; use -1 for all lines)."
-        ),
-    )
-    return parser.parse_args()
-
-
-async def main(model_name: str, context_size: int) -> None:
+async def main() -> None:
     maybe_init_tracing()
-    lines = load_lines()
+    lines = load_lines(DATASET_PATH)
     rng = random.Random(SEED)
     retriever = build_retriever(name=RETRIEVER_NAME, lines=lines, rng=rng)
-    run_session_id = f"codeact-task5-{uuid.uuid4()}"
+    run_session_id = f"llm-task5-{uuid.uuid4()}"
+
+    llm = OpenRouter(
+        model=MODEL_NAME,
+        api_key=OPENROUTER_API_KEY,
+        max_tokens=MAX_OUTPUT_TOKENS,
+        additional_kwargs={"max_completion_tokens": MAX_OUTPUT_TOKENS},
+    )
 
     combinations = [
         (weight_threshold, ring_x)
@@ -194,16 +169,16 @@ async def main(model_name: str, context_size: int) -> None:
     ]
 
     run = wandb.init(
-        project="CodeAct-Task5",
+        project="LLM-Task5",
         config={
-            "MODEL_NAME": model_name,
+            "MODEL_NAME": MODEL_NAME,
             "weight_thresholds_da": WEIGHT_THRESHOLDS_DA,
             "ring_x_values": RING_X_VALUES,
             "dataset_path": DATASET_PATH,
-            "workflow_timeout_s": WORKFLOW_TIMEOUT_S,
             "seed": SEED,
-            "context_size": context_size,
+            "context_size": CONTEXT_SIZE,
             "retriever_name": RETRIEVER_NAME,
+            "mode": "llm_baseline_no_tools",
         },
     )
     wandb.define_metric("sample_iteration")
@@ -222,7 +197,7 @@ async def main(model_name: str, context_size: int) -> None:
         retrieved_context = retriever.build_context(
             query=f"weight_gt_{weight_threshold}_ring_eq_{ring_x}",
             target_index=-1,
-            k=context_size,
+            k=CONTEXT_SIZE,
         )
         retrieved_lines = [line for line in retrieved_context.splitlines() if line.strip()]
         context_coverage = len(retrieved_lines) / len(lines) if lines else 0.0
@@ -235,18 +210,6 @@ async def main(model_name: str, context_size: int) -> None:
         {question}
         </question>
         """
-        executor = build_code_executor()
-        agent = CodeActAgent(
-            code_execute_fn=executor.execute,
-            llm=OpenRouter(
-                model=model_name,
-                api_key=OPENROUTER_API_KEY,
-                max_tokens=MAX_OUTPUT_TOKENS,
-                additional_kwargs={"max_completion_tokens": MAX_OUTPUT_TOKENS},
-            ),
-            timeout=WORKFLOW_TIMEOUT_S,
-        )
-        ctx = Context(agent)
 
         with using_tracing_attributes(
             session_id=run_session_id,
@@ -255,35 +218,13 @@ async def main(model_name: str, context_size: int) -> None:
                 "sample_count": len(combinations),
                 "weight_threshold_da": weight_threshold,
                 "ring_x": ring_x,
-                "agent": "codeact",
+                "agent": "llm_baseline",
             },
-            tags=["codeact", "sample", "task5_combined"],
+            tags=["llm-baseline", "sample", "task5_combined"],
         ):
-            print(f"Prompt: {completion_prompt!r}")
-            response = await run_agent_verbose(agent, ctx, completion_prompt)
+            response = await llm.achat([ChatMessage(role="user", content=completion_prompt)])
 
         response_text = extract_response_text(response)
-        print(f"Raw response: {response_text!r}")
-        print("-" * 60)
-        llm_turn_metrics = await ctx.store.get("llm_turn_metrics", default=[])
-        if not llm_turn_metrics:
-            estimated_prompt_tokens = count_tokens(
-                [{"role": "user", "content": completion_prompt}],
-                model_name,
-            )
-            estimated_completion_tokens = count_tokens(
-                [{"role": "assistant", "content": response_text}],
-                model_name,
-            )
-            llm_turn_metrics = [
-                {
-                    "iteration": 1,
-                    "iteration_input_tokens": estimated_prompt_tokens,
-                    "iteration_output_tokens": estimated_completion_tokens,
-                    "iteration_total_tokens": estimated_prompt_tokens + estimated_completion_tokens,
-                }
-            ]
-
         parsed_count = parse_count(response_text)
         ground_truth_count = count_matches_combo(
             retrieved_lines, weight_threshold=weight_threshold, ring_x=ring_x
@@ -291,62 +232,53 @@ async def main(model_name: str, context_size: int) -> None:
         is_correct = parsed_count == ground_truth_count
         if is_correct:
             correct += 1
-        else:
-            print(f"Mismatch for weight>{weight_threshold} and ring=={ring_x}")
-            print(f"Predicted count: {parsed_count}")
-            print(f"Ground truth count (retrieved context): {ground_truth_count}")
-            print(f"Raw response: {response_text!r}")
-            print("-" * 60)
 
-        for metric in llm_turn_metrics:
-            wandb.log(
-                {
-                    "sample_iteration": metric["iteration"],
-                    f"sample/{i}/iteration_input_tokens": metric["iteration_input_tokens"],
-                    f"sample/{i}/iteration_output_tokens": metric["iteration_output_tokens"],
-                    f"sample/{i}/iteration_total_tokens": metric["iteration_total_tokens"],
-                    **(
-                        {f"sample/{i}/iteration_cost_usd": metric["iteration_cost_usd"]}
-                        if "iteration_cost_usd" in metric
-                        else {}
-                    ),
-                }
+        usage_metrics = extract_usage_metrics(response)
+        prompt_tokens = int(usage_metrics.get("prompt_tokens", 0))
+        completion_tokens = int(usage_metrics.get("completion_tokens", 0))
+        total_tokens = int(usage_metrics.get("total_tokens", 0))
+        sample_cost = (
+            float(usage_metrics["cost_usd"]) if "cost_usd" in usage_metrics else None
+        )
+        if total_tokens == 0:
+            prompt_tokens = count_tokens([{"role": "user", "content": completion_prompt}], MODEL_NAME)
+            completion_tokens = count_tokens(
+                [{"role": "assistant", "content": response_text}],
+                MODEL_NAME,
             )
-
-        final_input_tokens = sum(
-            int(metric.get("iteration_input_tokens", 0)) for metric in llm_turn_metrics
-        )
-        final_output_tokens = sum(
-            int(metric.get("iteration_output_tokens", 0)) for metric in llm_turn_metrics
-        )
-        final_total_tokens = sum(
-            int(metric.get("iteration_total_tokens", 0)) for metric in llm_turn_metrics
-        )
-        final_cost = sum(float(metric.get("iteration_cost_usd", 0.0)) for metric in llm_turn_metrics)
-        has_cost = any("iteration_cost_usd" in metric for metric in llm_turn_metrics)
-        if has_cost:
-            total_cost_usd += final_cost
+            total_tokens = prompt_tokens + completion_tokens
+        if sample_cost is not None:
+            total_cost_usd += sample_cost
             samples_with_cost += 1
 
+        wandb.log(
+            {
+                "sample_iteration": 1,
+                f"sample/{i}/iteration_input_tokens": prompt_tokens,
+                f"sample/{i}/iteration_output_tokens": completion_tokens,
+                f"sample/{i}/iteration_total_tokens": total_tokens,
+                **({f"sample/{i}/iteration_cost_usd": sample_cost} if sample_cost is not None else {}),
+            }
+        )
         wandb.log(
             {
                 "sample_idx": i,
                 f"sample/{i}/weight_threshold_da": weight_threshold,
                 f"sample/{i}/ring_x": ring_x,
-                f"sample/{i}/final_total_input_tokens": final_input_tokens,
-                f"sample/{i}/final_total_output_tokens": final_output_tokens,
-                f"sample/{i}/final_total_tokens": final_total_tokens,
-                f"sample/{i}/iterations": len(llm_turn_metrics),
+                f"sample/{i}/final_total_input_tokens": prompt_tokens,
+                f"sample/{i}/final_total_output_tokens": completion_tokens,
+                f"sample/{i}/final_total_tokens": total_tokens,
+                f"sample/{i}/iterations": 1,
                 f"sample/{i}/is_correct": int(is_correct),
                 f"sample/{i}/ground_truth_count": ground_truth_count,
                 f"sample/{i}/prediction_count": parsed_count if parsed_count is not None else -1,
                 f"sample/{i}/response_raw": response_text,
                 f"sample/{i}/completion_prompt_char_count": len(completion_prompt),
                 f"sample/{i}/context_char_count": len(retrieved_context),
-                f"sample/{i}/context_size": context_size,
+                f"sample/{i}/context_size": CONTEXT_SIZE,
                 f"sample/{i}/retrieved_line_count": len(retrieved_lines),
                 f"sample/{i}/context_coverage": context_coverage,
-                **({f"sample/{i}/final_total_cost_usd": final_cost} if has_cost else {}),
+                **({f"sample/{i}/final_total_cost_usd": sample_cost} if sample_cost is not None else {}),
             }
         )
         wandb.log(
@@ -372,5 +304,4 @@ async def main(model_name: str, context_size: int) -> None:
 
 
 if __name__ == "__main__":
-    args = parse_args()
-    asyncio.run(main(model_name=args.model_name, context_size=args.context_size))
+    asyncio.run(main())

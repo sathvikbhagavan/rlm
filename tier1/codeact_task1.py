@@ -1,91 +1,44 @@
-from typing import Any, Callable, Dict, Optional
-import io
-import contextlib
-import ast
-import traceback
+import argparse
 import asyncio
 import random
-import re
 import os
 import uuid
 
 import wandb
-from llama_index.core.llms import ChatMessage, LLM
-from llama_index.core.memory import ChatMemoryBuffer
-from llama_index.core.workflow import (
-    Context,
-    Event,
-    Workflow,
-    StartEvent,
-    StopEvent,
-    step,
-)
+from llama_index.core.workflow import Context
 from llama_index.llms.openrouter import OpenRouter
 
-from rlm.tracing import init_tracing, using_tracing_attributes
+from rlm.codeact_core import (
+    CodeActAgent,
+    INDEX_CODEACT_SYSTEM_PROMPT,
+    INDEX_FORCE_LOOP_MESSAGE,
+    INDEX_OBSERVATION_FOLLOWUP,
+    make_simple_code_executor,
+    run_agent_verbose,
+)
+from rlm.codeact_helpers import (
+    build_retriever,
+    extract_response_text,
+    load_lines,
+    parse_indices,
+)
+from rlm.tracing import get_tracer, init_tracing, using_tracing_attributes
 from rlm.utils.token_utils import count_tokens
 
 
-DATASET_PATH = "/workspace/datasets/reactionSmilesFigShareUSPTO2023.txt"
-MODEL_NAME = "x-ai/grok-4.1-fast"  # or try something simpler first
+DATASET_PATH = "/home/bhagavan/rlms/datasets/reactionSmilesFigShareUSPTO2023.txt"
+MODEL_NAME = "openai/gpt-5-mini"
 OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
-ENABLE_TRACING = False
-WORKFLOW_TIMEOUT_S = 300.0
-NUM_QUESTIONS = 2
+ENABLE_TRACING = True
+WORKFLOW_TIMEOUT_S = 900.0
+NUM_QUESTIONS = 20
 SEED = 42
 CONTEXT_SIZE = 100
 RETRIEVER_NAME = "random"
-MAX_OUTPUT_TOKENS = 10_000
-os.environ["WANDB_MODE"] = "disabled"
-
-
-def load_lines() -> list[str]:
-    with open(DATASET_PATH, "r") as f:
-        raw_lines = [line.strip() for line in f.readlines() if line.strip()]
-    return [f"{i} {line}" for i, line in enumerate(raw_lines)]
-
-
-class BaseRetriever:
-    def __init__(self, name: str):
-        self.name = name
-
-    def build_context(self, query: str, target_index: int, k: int) -> str:
-        raise NotImplementedError
-
-
-class RandomRetriever(BaseRetriever):
-    def __init__(self, lines: list[str], rng: random.Random):
-        super().__init__(name="random")
-        self.lines = lines
-        self.rng = rng
-
-    def build_context(self, query: str, target_index: int, k: int) -> str:
-        del query
-        if k < 0 or target_index < 0:
-            return "\n".join(self.lines)
-        other_indices = [i for i in range(len(self.lines)) if i != target_index]
-        sampled = self.rng.sample(other_indices, k=min(k - 1, len(other_indices)))
-        sampled.append(target_index)
-        self.rng.shuffle(sampled)
-        return "\n".join(self.lines[i] for i in sampled)
-
-
-def build_retriever(name: str, lines: list[str], rng: random.Random) -> BaseRetriever:
-    if name == "random":
-        return RandomRetriever(lines=lines, rng=rng)
-    raise ValueError(f"Unsupported retriever for codeact_task2: {name}")
-
-
-def parse_indices(response: str) -> list[int]:
-    cleaned = response.strip().replace('"', "").replace("'", "")
-    if not cleaned or cleaned == "-1":
-        return []
-    answer_match = re.search(r"ANSWER:\s*(-?\d+)", cleaned, flags=re.IGNORECASE)
-    if answer_match:
-        return [int(answer_match.group(1))]
-    if cleaned.isdigit():
-        return [int(cleaned)]
-    return [int(num.strip()) for num in cleaned.split(",") if num.strip().isdigit()]
+MAX_OUTPUT_TOKENS = 40_000
+MAX_ITERATIONS = 8
+REASONING_EFFORT = "medium"
+# os.environ["WANDB_MODE"] = "disabled"
 
 
 def extract_product(indexed_line: str) -> str:
@@ -93,38 +46,11 @@ def extract_product(indexed_line: str) -> str:
     return reaction_smiles.split(">")[-1].strip()
 
 
-def extract_response_text(response_obj: Any) -> str:
-    if response_obj is None:
-        return ""
-
-    result = getattr(response_obj, "result", None)
-    if result is not None:
-        message = getattr(result, "message", None)
-        if message is not None:
-            content = getattr(message, "content", None)
-            if isinstance(content, str):
-                return content
-        content = getattr(result, "content", None)
-        if isinstance(content, str):
-            return content
-
-    message = getattr(response_obj, "message", None)
-    if message is not None:
-        content = getattr(message, "content", None)
-        if isinstance(content, str):
-            return content
-    content = getattr(response_obj, "content", None)
-    if isinstance(content, str):
-        return content
-
-    return str(response_obj)
-
-
 def maybe_init_tracing() -> None:
     if not ENABLE_TRACING:
         return
     initialized = init_tracing(
-        project_name="codeact-rag-product-lookup",
+        project_name="CodeAct-Task1",
         auto_instrument=True,
         batch=False,
     )
@@ -133,357 +59,6 @@ def maybe_init_tracing() -> None:
             "Tracing requested, but Phoenix/OpenInference dependencies are unavailable. "
             "Install with: pip install '.[tracing]'"
         )
-
-
-def _extract_usage_metrics(response: Any) -> dict[str, float | int]:
-    def _from_usage_obj(usage: Any) -> tuple[int, int, int, float | None]:
-        if usage is None:
-            return 0, 0, 0, None
-        if isinstance(usage, dict):
-            prompt = int(usage.get("prompt_tokens", 0) or usage.get("input_tokens", 0) or 0)
-            completion = int(
-                usage.get("completion_tokens", 0) or usage.get("output_tokens", 0) or 0
-            )
-            total = int(usage.get("total_tokens", 0) or (prompt + completion))
-            cost = usage.get("cost")
-            if cost is None:
-                cost = (
-                    usage.get("cost_details", {}).get("upstream_inference_cost")
-                    if isinstance(usage.get("cost_details"), dict)
-                    else None
-                )
-            return prompt, completion, total, (float(cost) if cost is not None else None)
-        prompt = int(getattr(usage, "prompt_tokens", 0) or getattr(usage, "input_tokens", 0) or 0)
-        completion = int(
-            getattr(usage, "completion_tokens", 0) or getattr(usage, "output_tokens", 0) or 0
-        )
-        total = int(getattr(usage, "total_tokens", 0) or (prompt + completion))
-        cost = getattr(usage, "cost", None)
-        extra = getattr(usage, "model_extra", None)
-        if cost is None and isinstance(extra, dict):
-            cost = extra.get("cost")
-            if cost is None and isinstance(extra.get("cost_details"), dict):
-                cost = extra["cost_details"].get("upstream_inference_cost")
-        return prompt, completion, total, (float(cost) if cost is not None else None)
-
-    candidates: list[Any] = []
-    raw = getattr(response, "raw", None)
-    if raw is not None:
-        candidates.append(raw.get("usage") if isinstance(raw, dict) else getattr(raw, "usage", None))
-    candidates.append(getattr(response, "usage", None))
-    msg = getattr(response, "message", None)
-    if msg is not None:
-        msg_kwargs = getattr(msg, "additional_kwargs", None)
-        if isinstance(msg_kwargs, dict):
-            candidates.append(msg_kwargs.get("usage"))
-    add_kwargs = getattr(response, "additional_kwargs", None)
-    if isinstance(add_kwargs, dict):
-        candidates.append(add_kwargs.get("usage"))
-
-    for usage in candidates:
-        p, c, t, cost = _from_usage_obj(usage)
-        if p or c or t or cost is not None:
-            result: dict[str, float | int] = {
-                "prompt_tokens": p,
-                "completion_tokens": c,
-                "total_tokens": t,
-            }
-            if cost is not None:
-                result["cost_usd"] = cost
-            return result
-
-    return {"prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0}
-
-
-def _extract_finish_reason(response: Any) -> Optional[str]:
-    raw = getattr(response, "raw", None)
-    if raw is None:
-        return None
-
-    choices = raw.get("choices") if isinstance(raw, dict) else getattr(raw, "choices", None)
-    if not choices:
-        return None
-
-    first = choices[0]
-    if isinstance(first, dict):
-        reason = first.get("finish_reason")
-    else:
-        reason = getattr(first, "finish_reason", None)
-    return str(reason) if reason is not None else None
-
-
-class SimpleCodeExecutor:
-    """
-    Executes Python code with persistent state.
-    NOTE: not safe for production use.
-    """
-
-    def __init__(self, locals: Dict[str, Any], globals: Dict[str, Any]):
-        # Use one shared namespace for exec() so imports/defs are visible
-        # consistently (avoids NameError from split globals/locals scope).
-        self.namespace: Dict[str, Any] = {}
-        self.namespace.update(globals)
-        self.namespace.update(locals)
-
-    def execute(self, code: str) -> str:
-        stdout = io.StringIO()
-        stderr = io.StringIO()
-        output = ""
-        return_value = None
-        try:
-            with contextlib.redirect_stdout(stdout), contextlib.redirect_stderr(stderr):
-                try:
-                    tree = ast.parse(code)
-                    last_node = tree.body[-1] if tree.body else None
-
-                    if isinstance(last_node, ast.Expr):
-                        last_line = code.rstrip().split("\n")[-1]
-                        exec_code = code[: -len(last_line)] + "\n__result__ = " + last_line
-                        exec(exec_code, self.namespace, self.namespace)
-                        return_value = self.namespace.get("__result__")
-                    else:
-                        exec(code, self.namespace, self.namespace)
-                except Exception:
-                    exec(code, self.namespace, self.namespace)
-
-            output = stdout.getvalue()
-            if stderr.getvalue():
-                output += "\n" + stderr.getvalue()
-        except Exception as e:
-            output = f"Error: {type(e).__name__}: {str(e)}\n"
-            output += traceback.format_exc()
-
-        if return_value is not None:
-            output += "\n\n" + str(return_value)
-        return output
-
-
-class InputEvent(Event):
-    input: list[ChatMessage]
-
-
-class CodeExecutionEvent(Event):
-    code: str
-
-
-CODEACT_SYSTEM_PROMPT = """
-You are a helpful assistant in a CodeAct (Code + Acting) loop that can execute Python code to help you answer questions.  
-You must follow this format for each step:  
-
-1. THINK: Reason about what you need to do next 
-2. ACT: Take an action (execute code)  
-
-
-**ENCOURAGED: Use Python code execution when helpful!** - Code execution is verifiable and helps you check your work programmatically 
-- Use code to solve problems, verify calculations, analyze data, and validate your reasoning 
-- Code execution results are reliable and help you build confidence in your answers 
-- When in doubt, writing code to check, verify, or compute can be helpful 
-- If the user/task instructions require code execution, you must execute code at least once before finalizing.  
-
-Available Actions: 
-- Execute Python code: Write code in 
-
-```python 
-CODE...
-```
-The code will be executed and results returned. Always output your Python code in a code block starting with ```python and end with exactly ``` on a new line. Do not omit the closing backticks.
-
-- Provide final answer: When you have enough information, provide your final answer exactly as "ANSWER: <integer>".
-
-Format Requirements:
-- Start each turn with "THINK: " followed by your reasoning.
-- Then write Python code in ```python blocks to execute.
-- You can execute code multiple times.
-
-- Code execution results will be returned to you automatically 
-- Variables persist across code executions in the same session 
-- **CRITICAL: Code is executed in a persistent Python environment. Variables and imports persist across executions. You must include all necessary imports, data definitions, and context within your code blocks. Do not use fillers (e.g. FILL IN WITH REAL DATA), they have to be written in code.**  
-- **DO NOT SIMULATE EXECUTION**: Never invent code output, never claim "this would print", and never infer final numeric results without receiving a message produced by actual execution.
-- **WAIT FOR OBSERVATION**: After you send a Python block, stop and wait for the next tool result. Only then continue reasoning or provide `ANSWER: <integer>`.
-
-Example workflow:
-```
-Question: How many words in the list ['error', 'correct', 'arrow', 'berry', 'carrot', 'mirror'] have exactly 2 r's?  
-
-THINK: I need to count how many words in the list have exactly 2 r's. I can write Python code using regex to do this. 
-```python 
-    import re  
-    words = ['error', 'correct', 'arrow', 'berry', 'carrot', 'mirror'] 
-    pattern = r'^[^r]*r[^r]*r[^r]*$' # Matches words with exactly 2 r's 
-    count = 0 
-    matching_words = [] 
-    for word in words: if re.match(pattern, word): 
-        count += 1 matching_words.append(word) 
-        print(f"{word} has 2 r's") 
-    print(f"Total words with 2 r's: {count}") 
-```  
-```
-    
-[Code execution results returned...]  
-Answer: 4  
-
--- 
-
-Important: 
-- Always start with THINK to reason about your next step 
-- Be strategic to avoid exceeding the context window 
-- **CODE EXECUTION**: Use code to verify, check, and solve problems programmatically when helpful. If the task explicitly requires code execution, do not skip it. NEVER GUESS the answer.
-- **CODE EXECUTION CONTEXT**: Your code is executed in the python environment. You must explicitly include all imports, data, and context needed. Variables persist across executions, but each code block must be self-contained with all necessary setup.
-- **NO FAKE RESULTS**: If you have not seen the response for the current code block, you must not provide computed numbers or a final answer yet.
-- When you have enough information to answer, provide your final answer in the format: "ANSWER: [your answer]" without any additional text or formatting.
-"""
-
-
-class CodeActAgent(Workflow):
-    def __init__(
-        self,
-        code_execute_fn: Callable,
-        llm: LLM | None = None,
-        **workflow_kwargs: Any,
-    ) -> None:
-        super().__init__(**workflow_kwargs)
-        self.code_execute_fn = code_execute_fn
-        self.llm = llm
-        self.system_message = ChatMessage(
-            role="system",
-            content=CODEACT_SYSTEM_PROMPT,
-        )
-
-    def _parse_code(self, response: str) -> str | None:
-        fenced_matches = re.findall(r"```python\s*(.*?)```", response, re.DOTALL | re.IGNORECASE)
-        if fenced_matches:
-            return "\n\n".join(block.strip() for block in fenced_matches if block.strip())
-        return None
-
-    @step
-    async def prepare_chat_history(self, ctx: Context, ev: StartEvent) -> InputEvent:
-        memory = await ctx.store.get("memory", default=None)
-        if not memory:
-            memory = ChatMemoryBuffer.from_defaults(llm=self.llm)
-
-        user_input = ev.get("user_input")
-        if user_input is None:
-            raise ValueError("user_input kwarg is required")
-        memory.put(ChatMessage(role="user", content=user_input))
-
-        await ctx.store.set("memory", memory)
-        chat_history = memory.get()
-        return InputEvent(input=[self.system_message, *chat_history])
-
-    @step
-    async def handle_llm_input(
-        self, ctx: Context, ev: InputEvent
-    ) -> CodeExecutionEvent | StopEvent:
-        chat_history = ev.input
-
-        # --- iteration guard ---
-        iteration = await ctx.store.get("iteration", default=0)
-        iteration += 1
-        await ctx.store.set("iteration", iteration)
-
-        # --- single-shot response (simpler and less truncation-prone than delta assembly) ---
-        response = await self.llm.achat(
-            chat_history,
-        )
-        if response is None:
-            raise ValueError("LLM returned no response")
-        if response.message is None:
-            response.message = ChatMessage(role="assistant", content="")
-
-        full_content = response.message.content or ""
-
-        print(f"\n\n===== ITERATION {iteration} =====")
-
-        if "THINK:" in full_content:
-            print("---- THINK/ACT ----")
-
-        print(full_content)
-
-        if "ANSWER:" in full_content:
-            print("---- FINAL ANSWER DETECTED ----")
-
-        finish_reason = _extract_finish_reason(response)
-        print(f"---- FINISH REASON: {finish_reason} ----")
-
-        print("=" * 40 + "\n")
-
-        content = full_content.strip()
-
-        # --- store in memory ---
-        memory = await ctx.store.get("memory")
-        memory.put(response.message)
-        await ctx.store.set("memory", memory)
-
-        # --- metrics ---
-        llm_turn_metrics = await ctx.store.get("llm_turn_metrics", default=[])
-        usage_metrics = _extract_usage_metrics(response)
-
-        llm_turn_metrics.append(
-            {
-                "iteration": iteration,
-                "iteration_input_tokens": int(usage_metrics.get("prompt_tokens", 0)),
-                "iteration_output_tokens": int(usage_metrics.get("completion_tokens", 0)),
-                "iteration_total_tokens": int(usage_metrics.get("total_tokens", 0)),
-                **(
-                    {"iteration_cost_usd": float(usage_metrics["cost_usd"])}
-                    if "cost_usd" in usage_metrics
-                    else {}
-                ),
-            }
-        )
-        await ctx.store.set("llm_turn_metrics", llm_turn_metrics)
-
-        # --- stopping condition ---
-        if "ANSWER:" in content or iteration > 8:
-            return StopEvent(result=response)
-
-        # --- extract code ---
-        code = self._parse_code(content)
-
-        if not code:
-            # force model back into loop
-            memory.put(
-                ChatMessage(
-                    role="user",
-                    content=(
-                        "You must follow THINK → ACT.\n"
-                        "Write Python code to proceed.\n"
-                        "Or finish with: ANSWER: <integer>"
-                    ),
-                )
-            )
-            await ctx.store.set("memory", memory)
-
-            return InputEvent(input=[self.system_message, *memory.get()])
-
-        return CodeExecutionEvent(code=code)
-
-    @step
-    async def handle_code_execution(self, ctx: Context, ev: CodeExecutionEvent) -> InputEvent:
-        print("\n⚡ EXECUTION STEP TRIGGERED ⚡")
-
-        print("\n[CODE]")
-        print(ev.code)
-        print("[END CODE]\n")
-
-        output = self.code_execute_fn(ev.code)
-
-        print("[OUTPUT]")
-        print(output)
-        print("[END OUTPUT]\n")
-
-        memory = await ctx.store.get("memory")
-
-        memory.put(
-            ChatMessage(
-                role="assistant",  # <-- IMPORTANT (see below)
-                content=f"Observation:\n{output}",
-            )
-        )
-
-        await ctx.store.set("memory", memory)
-
-        return InputEvent(input=[self.system_message, *memory.get()])
 
 
 def build_question(product: str) -> str:
@@ -504,43 +79,56 @@ def build_question(product: str) -> str:
 """
 
 
-async def run_agent_verbose(agent: CodeActAgent, ctx: Context, query: str):
-    handler = agent.run(user_input=query, ctx=ctx)
-    async for _event in handler.stream_events():
-        pass
-    return await handler
-
-
-def build_code_executor(lines: list[str]) -> SimpleCodeExecutor:
-    return SimpleCodeExecutor(
-        locals={
+def build_code_executor(lines: list[str]):
+    return make_simple_code_executor(
+        extra_locals={
             "lines": lines,
         },
-        globals={
-            "__builtins__": __builtins__,
+        extra_globals={
             "np": __import__("numpy"),
         },
     )
 
 
-async def main() -> None:
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(description="Run CodeAct task 1 evaluation.")
+    parser.add_argument("--model-name", type=str, default=MODEL_NAME)
+    parser.add_argument("--num-questions", type=int, default=NUM_QUESTIONS)
+    parser.add_argument(
+        "--context-size",
+        type=int,
+        default=CONTEXT_SIZE,
+        help="Number of retrieved reactions to include in context; use -1 for all lines.",
+    )
+    parser.add_argument("--dataset-path", type=str, default=DATASET_PATH)
+    return parser.parse_args()
+
+
+async def main(
+    model_name: str,
+    num_questions: int,
+    context_size: int,
+    dataset_path: str,
+) -> None:
     maybe_init_tracing()
-    lines = load_lines()
+    tracer = get_tracer("codeact-task1")
+    lines = load_lines(dataset_path=dataset_path)
     rng = random.Random(SEED)
     retriever = build_retriever(name=RETRIEVER_NAME, lines=lines, rng=rng)
-    sampled_indices = rng.sample(range(len(lines)), k=min(NUM_QUESTIONS, len(lines)))
+    sampled_indices = rng.sample(range(len(lines)), k=min(num_questions, len(lines)))
     run_session_id = f"codeact-task1-{uuid.uuid4()}"
 
     run = wandb.init(
         project="CodeAct-Task1",
         config={
-            "MODEL_NAME": MODEL_NAME,
-            "NUM_QUESTIONS": NUM_QUESTIONS,
-            "dataset_path": DATASET_PATH,
+            "MODEL_NAME": model_name,
+            "NUM_QUESTIONS": num_questions,
+            "dataset_path": dataset_path,
             "workflow_timeout_s": WORKFLOW_TIMEOUT_S,
             "seed": SEED,
-            "context_size": CONTEXT_SIZE,
+            "context_size": context_size,
             "retriever_name": RETRIEVER_NAME,
+            "reasoning_effort": REASONING_EFFORT,
         },
     )
     wandb.define_metric("sample_iteration")
@@ -558,7 +146,7 @@ async def main() -> None:
         retrieved_context = retriever.build_context(
             query=target_product,
             target_index=target_index,
-            k=CONTEXT_SIZE,
+            k=context_size,
         )
         context_has_ground_truth = str(target_index) in retrieved_context
         retrieval_hits += int(context_has_ground_truth)
@@ -579,27 +167,41 @@ async def main() -> None:
         agent = CodeActAgent(
             code_execute_fn=executor.execute,
             llm=OpenRouter(
-                model=MODEL_NAME,
+                model=model_name,
                 api_key=OPENROUTER_API_KEY,
                 max_tokens=MAX_OUTPUT_TOKENS,
+                reasoning_effort=REASONING_EFFORT,
                 additional_kwargs={"max_completion_tokens": MAX_OUTPUT_TOKENS},
             ),
+            system_prompt=INDEX_CODEACT_SYSTEM_PROMPT,
+            max_iterations=MAX_ITERATIONS,
+            force_loop_message=INDEX_FORCE_LOOP_MESSAGE,
+            observation_followup=INDEX_OBSERVATION_FOLLOWUP,
             timeout=WORKFLOW_TIMEOUT_S,
         )
         ctx = Context(agent)
 
-        with using_tracing_attributes(
-            session_id=run_session_id,
-            metadata={
-                "sample_index": i,
-                "sample_count": len(sampled_indices),
-                "target_index": target_index,
-                "agent": "codeact",
-            },
-            tags=["codeact", "sample"],
-        ):
-            print(f"Prompt: {completion_prompt!r}")
-            response = await run_agent_verbose(agent, ctx, completion_prompt)
+        with tracer.start_as_current_span(f"codeact_task1_sample_{i}") as sample_span:
+            sample_span.set_attributes(
+                {
+                    "sample.index": i,
+                    "sample.count": len(sampled_indices),
+                    "target.index": target_index,
+                    "agent.name": "codeact",
+                }
+            )
+            with using_tracing_attributes(
+                session_id=run_session_id,
+                metadata={
+                    "sample_index": i,
+                    "sample_count": len(sampled_indices),
+                    "target_index": target_index,
+                    "agent": "codeact",
+                },
+                tags=["codeact", "sample"],
+            ):
+                print(f"Prompt: {completion_prompt!r}")
+                response = await run_agent_verbose(agent, ctx, completion_prompt)
 
         response_text = extract_response_text(response)
         print(f"Raw response: {response_text!r}")
@@ -608,11 +210,11 @@ async def main() -> None:
         if not llm_turn_metrics:
             estimated_prompt_tokens = count_tokens(
                 [{"role": "user", "content": completion_prompt}],
-                MODEL_NAME,
+                model_name,
             )
             estimated_completion_tokens = count_tokens(
                 [{"role": "assistant", "content": response_text}],
-                MODEL_NAME,
+                model_name,
             )
             llm_turn_metrics = [
                 {
@@ -678,7 +280,7 @@ async def main() -> None:
                 f"sample/{i}/response_parsed": ",".join(str(x) for x in parsed_indices),
                 f"sample/{i}/completion_prompt_char_count": len(completion_prompt),
                 f"sample/{i}/context_char_count": len(retrieved_context),
-                f"sample/{i}/context_size": CONTEXT_SIZE,
+                f"sample/{i}/context_size": context_size,
                 f"sample/{i}/retrieved_line_count": len(retrieved_lines),
                 f"sample/{i}/context_coverage": context_coverage,
                 f"sample/{i}/context_has_ground_truth": int(context_has_ground_truth),
@@ -712,4 +314,12 @@ async def main() -> None:
 
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    args = parse_args()
+    asyncio.run(
+        main(
+            model_name=args.model_name,
+            num_questions=args.num_questions,
+            context_size=args.context_size,
+            dataset_path=args.dataset_path,
+        )
+    )

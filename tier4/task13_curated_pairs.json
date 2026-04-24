@@ -1,0 +1,16 @@
+[
+  {
+    "idx_a": 0,
+    "idx_b": 1,
+    "gt_feature_labels": [
+      "silyl_ether"
+    ],
+    "gt_feature_in": "A",
+    "gt_keywords": [
+      "acid-sensitive",
+      "protecting group",
+      "milder oxidant"
+    ],
+    "notes": "Template example only. Replace with hand-curated real pair indices."
+  }
+]

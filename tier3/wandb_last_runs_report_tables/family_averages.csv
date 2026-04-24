@@ -1,0 +1,7 @@
+task_family,metric,task_count,family_avg_over_tasks
+CodeAct,f1,10,0.45806128455111433
+CodeAct,precision,10,0.5955048943682717
+CodeAct,recall,10,0.4317894805194805
+RLMs,f1,10,0.5144754983745727
+RLMs,precision,10,0.5663903251935721
+RLMs,recall,10,0.5967438546871466

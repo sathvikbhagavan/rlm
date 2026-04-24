@@ -1,0 +1,13 @@
+task_family,model_name,metric,task_count,family_model_avg_over_tasks
+CodeAct,openai/gpt-5-mini,f1,5,0.45001443400021823
+CodeAct,openai/gpt-5-mini,precision,5,0.6155047637547638
+CodeAct,openai/gpt-5-mini,recall,5,0.42215757575757573
+CodeAct,x-ai/grok-4-fast,f1,5,0.4661081351020105
+CodeAct,x-ai/grok-4-fast,precision,5,0.5755050249817796
+CodeAct,x-ai/grok-4-fast,recall,5,0.4414213852813853
+RLMs,openai/gpt-5-mini,f1,5,0.5521078742095196
+RLMs,openai/gpt-5-mini,precision,5,0.5694218305102744
+RLMs,openai/gpt-5-mini,recall,5,0.6776830901048235
+RLMs,x-ai/grok-4-fast,f1,5,0.47684312253962585
+RLMs,x-ai/grok-4-fast,precision,5,0.56335881987687
+RLMs,x-ai/grok-4-fast,recall,5,0.5158046192694699
