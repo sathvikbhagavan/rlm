@@ -1,0 +1,4 @@
+context_size,run_count_all_models,runs_with_cost_all_models,avg_total_cost_per_run_all_models_usd,avg_cost_per_sample_all_models_usd
+0,50,50,0.15923073899999998,0.03417851215
+100,50,50,0.202519069,0.041323305516666665
+500,49,49,0.28467399285714284,0.05921732596938775

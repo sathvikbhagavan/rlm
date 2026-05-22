@@ -26,13 +26,13 @@ from rlm.utils.token_utils import count_tokens
 
 DATASET_PATH = "/home/bhagavan/rlms/datasets/reactionSmilesFigShareUSPTO2023.txt"
 NEGATIVE_REACTIONS_PATH = "/home/bhagavan/rlms/rlm/tier3/negative_reactions.jsonl"
-MODEL_NAME = "x-ai/grok-4-fast"
+MODEL_NAME = "openai/gpt-5-mini"
 OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
 ENABLE_TRACING = True
 WORKFLOW_TIMEOUT_S = 1200.0
 SEED = 42
 NEGATIVES_PER_QUESTION = 10
-CONTEXT_SIZE = 100
+CONTEXT_SIZE = 500
 MAX_OUTPUT_TOKENS = 50_000
 REASONING_EFFORT = "high"
 MAX_ITERATIONS = 8

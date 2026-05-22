@@ -30,12 +30,12 @@ from rlm.utils.token_utils import count_tokens
 
 
 DATASET_PATH = "/home/bhagavan/rlms/datasets/reactionSmilesFigShareUSPTO2023.txt"
-MODEL_NAME = "x-ai/grok-4-fast"
+MODEL_NAME = "openai/gpt-5-mini"
 OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
 ENABLE_TRACING = True
 WORKFLOW_TIMEOUT_S = 1200.0
 SEED = 42
-CONTEXT_SIZE = 100
+CONTEXT_SIZE = 500
 GROUND_TRUTH_FRACTION_PER_CONTEXT = 0.2
 RETRIEVER_NAME = "random"
 MAX_OUTPUT_TOKENS = 50_000
