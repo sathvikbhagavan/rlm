@@ -3,7 +3,7 @@ from __future__ import annotations
 import random
 import re
 from itertools import permutations
-from typing import Any, Optional
+from typing import Any, Iterable, Optional
 
 from rdkit import Chem
 from rdkit.Chem import rdChemReactions
@@ -18,48 +18,100 @@ def load_lines(dataset_path: str = DEFAULT_DATASET_PATH) -> list[str]:
     return [f"{i} {line}" for i, line in enumerate(raw_lines)]
 
 
-class BaseRetriever:
+class BaseContextPipeline:
     def __init__(self, name: str):
         self.name = name
 
-    def build_context(self, query: str, target_index: int, k: int) -> str:
+    def build_context(
+        self,
+        *,
+        context_size: int,
+        correct_indices: Iterable[int] | None = None,
+        query: str = "",
+    ) -> str:
         raise NotImplementedError
 
 
-class RandomRetriever(BaseRetriever):
+class RandomContextPipeline(BaseContextPipeline):
     def __init__(
         self,
         lines: list[str],
         rng: random.Random,
         ground_truth_indices_by_reaction: dict[str, list[int]] | None = None,
         ground_truth_fraction_per_context: float = 0.0,
+        min_selected_ground_truth: int = 1,
     ):
         super().__init__(name="random")
         self.lines = lines
         self.rng = rng
         self.ground_truth_indices_by_reaction = ground_truth_indices_by_reaction or {}
         self.ground_truth_fraction_per_context = min(1.0, max(0.0, ground_truth_fraction_per_context))
+        self.min_selected_ground_truth = max(1, int(min_selected_ground_truth))
         self.line_by_idx: dict[int, str] = {}
         for line in lines:
             idx_str, _ = line.split(" ", 1)
             self.line_by_idx[int(idx_str)] = line
 
-    def build_context(self, query: str, target_index: int, k: int) -> str:
-        if k < 0:
+    def _sample_with_seed(self, top_k: int, forced_indices: list[int]) -> str:
+        valid_forced = [idx for idx in forced_indices if 0 <= idx < len(self.lines)]
+        dedup_forced = list(dict.fromkeys(valid_forced))[:top_k]
+        forced_set = set(dedup_forced)
+        remainder_pool = [i for i in range(len(self.lines)) if i not in forced_set]
+        random_take = min(top_k - len(dedup_forced), len(remainder_pool))
+        random_indices = self.rng.sample(remainder_pool, k=random_take)
+        sampled = dedup_forced + random_indices
+        self.rng.shuffle(sampled)
+        return "\n".join(self.lines[i] for i in sampled)
+
+    def build_context(
+        self,
+        *,
+        context_size: int,
+        correct_indices: Iterable[int] | None = None,
+        query: str = "",
+    ) -> str:
+        if context_size < 0:
             return "\n".join(self.lines)
-        top_k = min(k, len(self.lines))
+        top_k = min(context_size, len(self.lines))
         if top_k == 0:
             return ""
 
-        # Task1 behavior: include the target index when provided.
-        if target_index >= 0:
-            other_indices = [i for i in range(len(self.lines)) if i != target_index]
-            sampled = self.rng.sample(other_indices, k=min(max(top_k - 1, 0), len(other_indices)))
-            sampled.append(target_index)
-            self.rng.shuffle(sampled)
-            return "\n".join(self.lines[i] for i in sampled)
+        if correct_indices is not None:
+            valid_correct = sorted(
+                {
+                    idx
+                    for idx in correct_indices
+                    if isinstance(idx, int) and 0 <= idx < len(self.lines)
+                }
+            )
+            answer_count = len(valid_correct)
+            if answer_count > 0:
+                ratio = answer_count / len(self.lines)
+                ratio_scaled = ratio * top_k
+                ratio_scaled_floor = int(ratio_scaled)
+                half_cap = top_k // 2
+                forced_count = min(
+                    answer_count,
+                    half_cap,
+                    max(self.min_selected_ground_truth, ratio_scaled_floor),
+                )
+                print(
+                    f"[PIPELINE] context_size_requested={context_size} context_size_effective={top_k} "
+                    f"answers_total={answer_count} dataset_size={len(self.lines)} "
+                    f"ratio={ratio:.6f} ratio_times_context={ratio_scaled:.4f} "
+                    f"ratio_floor={ratio_scaled_floor} half_cap={half_cap} "
+                    f"min_gt={self.min_selected_ground_truth} "
+                    f"selected_ground_truth={forced_count}"
+                )
+                if forced_count > 0:
+                    forced = self.rng.sample(valid_correct, k=forced_count)
+                    return self._sample_with_seed(top_k=top_k, forced_indices=forced)
+            else:
+                print(
+                    f"[PIPELINE] context_size_requested={context_size} context_size_effective={top_k} "
+                    f"answers_total=0 selected_ground_truth=0"
+                )
 
-        # Task6+ behavior: seed context with some reaction-key ground truth.
         reaction_key = query.strip()
         gt_indices = self.ground_truth_indices_by_reaction.get(reaction_key, [])
         gt_lines = [self.line_by_idx[idx] for idx in gt_indices if idx in self.line_by_idx]
@@ -81,21 +133,23 @@ class RandomRetriever(BaseRetriever):
         return "\n".join(sampled)
 
 
-def build_retriever(
+def build_context_pipeline(
     name: str,
     lines: list[str],
     rng: random.Random,
     ground_truth_indices_by_reaction: dict[str, list[int]] | None = None,
     ground_truth_fraction_per_context: float = 0.0,
-) -> BaseRetriever:
+    min_selected_ground_truth: int = 1,
+) -> BaseContextPipeline:
     if name == "random":
-        return RandomRetriever(
+        return RandomContextPipeline(
             lines=lines,
             rng=rng,
             ground_truth_indices_by_reaction=ground_truth_indices_by_reaction,
             ground_truth_fraction_per_context=ground_truth_fraction_per_context,
+            min_selected_ground_truth=min_selected_ground_truth,
         )
-    raise ValueError(f"Unsupported retriever: {name}")
+    raise ValueError(f"Unsupported context pipeline: {name}")
 
 
 def parse_count(response: str) -> Optional[int]:

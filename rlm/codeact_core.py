@@ -1,8 +1,10 @@
 from __future__ import annotations
 
 import ast
+import asyncio
 import contextlib
 import io
+import json
 import re
 import traceback
 from typing import Any, Callable, Dict, Optional
@@ -36,7 +38,7 @@ RULES:
 
 
 INDEX_CODEACT_SYSTEM_PROMPT = """
-You are a helpful assistant in a CodeAct (Code + Acting) loop that can execute Python code to help answer chemistry reaction indexing tasks.
+You are a helpful assistant in a CodeAct (Code + Acting) loop that can execute Python code to help answer chemistry tasks.
 You must follow this format for each step:
 
 1. THINK: Reason about what you need to do next
@@ -69,7 +71,7 @@ DEFAULT_FORCE_LOOP_MESSAGE = (
 INDEX_FORCE_LOOP_MESSAGE = (
     "You must follow THINK -> ACT.\n"
     "Write Python code to proceed.\n"
-    "Or finish with: ANSWER: <comma-separated indices> (or ANSWER: -1)."
+    "Or finish with: ANSWER: <comma-separated indices in ascending order> (or ANSWER: -1)."
 )
 
 DEFAULT_OBSERVATION_FOLLOWUP = (
@@ -102,18 +104,35 @@ class SimpleCodeExecutor:
         return_value = None
         try:
             with contextlib.redirect_stdout(stdout), contextlib.redirect_stderr(stderr):
-                try:
-                    tree = ast.parse(code)
-                    last_node = tree.body[-1] if tree.body else None
-                    if isinstance(last_node, ast.Expr):
-                        last_line = code.rstrip().split("\n")[-1]
-                        exec_code = code[: -len(last_line)] + "\n__result__ = " + last_line
-                        exec(exec_code, self.namespace, self.namespace)
-                        return_value = self.namespace.get("__result__")
-                    else:
-                        exec(code, self.namespace, self.namespace)
-                except Exception:
-                    exec(code, self.namespace, self.namespace)
+                tree = ast.parse(code, mode="exec")
+                if not tree.body:
+                    return ""
+
+                last_node = tree.body[-1]
+                if isinstance(last_node, ast.Expr):
+                    prefix_body = tree.body[:-1]
+                    if prefix_body:
+                        prefix_module = ast.Module(body=prefix_body, type_ignores=[])
+                        ast.fix_missing_locations(prefix_module)
+                        exec(
+                            compile(prefix_module, filename="<codeact>", mode="exec"),
+                            self.namespace,
+                            self.namespace,
+                        )
+
+                    expr = ast.Expression(last_node.value)
+                    ast.fix_missing_locations(expr)
+                    return_value = eval(
+                        compile(expr, filename="<codeact>", mode="eval"),
+                        self.namespace,
+                        self.namespace,
+                    )
+                else:
+                    exec(
+                        compile(tree, filename="<codeact>", mode="exec"),
+                        self.namespace,
+                        self.namespace,
+                    )
 
             output = stdout.getvalue()
             if stderr.getvalue():
@@ -160,6 +179,95 @@ def _extract_finish_reason(response: Any) -> Optional[str]:
     return str(reason) if reason is not None else None
 
 
+def _extract_answer_payload(content: str) -> str | None:
+    match = re.search(r"(?im)^\s*ANSWER:\s*(.*?)\s*$", content)
+    if not match:
+        return None
+    return match.group(1).strip()
+
+
+def _has_valid_index_answer(content: str) -> bool:
+    payload = _extract_answer_payload(content)
+    if payload is None:
+        return False
+    if payload == "-1":
+        return True
+    return bool(re.fullmatch(r"\d+(?:\s*,\s*\d+)*", payload))
+
+
+def _iter_exception_chain(exc: BaseException):
+    seen: set[int] = set()
+    current: BaseException | None = exc
+    while current is not None and id(current) not in seen:
+        seen.add(id(current))
+        yield current
+        current = current.__cause__ or current.__context__
+
+
+def _is_timeout_exception(exc: BaseException) -> bool:
+    timeout_type_names = {
+        "TimeoutError",
+        "ReadTimeout",
+        "ConnectTimeout",
+        "WriteTimeout",
+        "PoolTimeout",
+        "APITimeoutError",
+    }
+    for item in _iter_exception_chain(exc):
+        name = type(item).__name__
+        if name in timeout_type_names:
+            return True
+        msg = str(item).lower()
+        if "timed out" in msg or "timeout" in msg:
+            return True
+    return False
+
+
+def _is_retryable_llm_exception(exc: BaseException) -> bool:
+    if _is_timeout_exception(exc):
+        return True
+
+    retryable_type_names = {
+        "JSONDecodeError",
+        "APIConnectionError",
+        "InternalServerError",
+        "RateLimitError",
+        "ServiceUnavailableError",
+        "APITimeoutError",
+    }
+    retryable_status_codes = {408, 409, 425, 429, 500, 502, 503, 504}
+
+    for item in _iter_exception_chain(exc):
+        if isinstance(item, json.JSONDecodeError):
+            return True
+
+        name = type(item).__name__
+        if name in retryable_type_names:
+            return True
+
+        status_code = getattr(item, "status_code", None)
+        if isinstance(status_code, int) and status_code in retryable_status_codes:
+            return True
+
+        msg = str(item).lower()
+        if any(
+            token in msg
+            for token in (
+                "expecting value",
+                "connection reset",
+                "connection aborted",
+                "temporarily unavailable",
+                "bad gateway",
+                "upstream",
+                "server error",
+                "try again",
+            )
+        ):
+            return True
+
+    return False
+
+
 class CodeActAgent(Workflow):
     def __init__(
         self,
@@ -171,6 +279,8 @@ class CodeActAgent(Workflow):
         force_loop_message: str = DEFAULT_FORCE_LOOP_MESSAGE,
         observation_followup: str = DEFAULT_OBSERVATION_FOLLOWUP,
         observation_role: str = "user",
+        llm_timeout_retries: int = 2,
+        llm_timeout_retry_backoff_s: float = 2.0,
         **workflow_kwargs: Any,
     ) -> None:
         super().__init__(**workflow_kwargs)
@@ -180,6 +290,8 @@ class CodeActAgent(Workflow):
         self.force_loop_message = force_loop_message
         self.observation_followup = observation_followup
         self.observation_role = observation_role
+        self.llm_timeout_retries = max(0, llm_timeout_retries)
+        self.llm_timeout_retry_backoff_s = max(0.0, llm_timeout_retry_backoff_s)
         self.system_message = ChatMessage(role="system", content=system_prompt)
 
     async def _build_input_messages(self, ctx: Context) -> list[ChatMessage]:
@@ -224,7 +336,22 @@ class CodeActAgent(Workflow):
         iteration += 1
         await ctx.store.set("iteration", iteration)
 
-        response = await self.llm.achat(ev.input)
+        max_attempts = self.llm_timeout_retries + 1
+        response = None
+        for attempt in range(1, max_attempts + 1):
+            try:
+                response = await self.llm.achat(ev.input)
+                break
+            except Exception as exc:
+                if not _is_retryable_llm_exception(exc) or attempt >= max_attempts:
+                    raise
+                sleep_s = self.llm_timeout_retry_backoff_s * (2 ** (attempt - 1))
+                print(
+                    f"[LLM RETRY] Retryable {type(exc).__name__} on attempt {attempt}/{max_attempts}; "
+                    f"retrying in {sleep_s:.1f}s"
+                )
+                if sleep_s > 0:
+                    await asyncio.sleep(sleep_s)
         if response is None:
             raise ValueError("LLM returned no response")
         if response.message is None:
@@ -258,7 +385,7 @@ class CodeActAgent(Workflow):
         )
         await ctx.store.set("llm_turn_metrics", llm_turn_metrics)
 
-        if "ANSWER:" in content or iteration > self.max_iterations:
+        if _has_valid_index_answer(content) or iteration > self.max_iterations:
             return StopEvent(result=response)
 
         code = self._parse_code(content)
