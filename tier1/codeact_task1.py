@@ -17,34 +17,36 @@ from rlm.codeact_core import (
     run_agent_verbose,
 )
 from rlm.codeact_helpers import (
-    build_retriever,
+    build_context_pipeline,
     extract_response_text,
     load_lines,
     parse_indices,
+    precision_recall_f1,
+)
+from task1_hardcoded_cases import (
+    TASK1_HARDCODED_GROUND_TRUTH_INDICES,
+    TASK1_HARDCODED_PRODUCTS,
 )
 from rlm.tracing import get_tracer, init_tracing, using_tracing_attributes
 from rlm.utils.token_utils import count_tokens
 
 
-DATASET_PATH = "/home/bhagavan/rlms/datasets/reactionSmilesFigShareUSPTO2023.txt"
+DATASET_PATH = "/home/bhagavan/rlms/datasets/reactionSmilesFigShareUSPTO2023_cleaned.txt"
 MODEL_NAME = "openai/gpt-5-mini"
 OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
 ENABLE_TRACING = True
 WORKFLOW_TIMEOUT_S = 900.0
-NUM_QUESTIONS = 20
+NUM_QUESTIONS = 10
 SEED = 42
-CONTEXT_SIZE = 100
-RETRIEVER_NAME = "random"
-MAX_OUTPUT_TOKENS = 40_000
+CONTEXT_SIZE = 500
+CONTEXT_PIPELINE_NAME = "random"
+MIN_SELECTED_GROUND_TRUTH = 5
+MAX_OUTPUT_TOKENS = 20_000
 MAX_ITERATIONS = 8
-REASONING_EFFORT = "medium"
+REASONING_EFFORT = "low"
+LLM_TIMEOUT_RETRIES = 2
+LLM_TIMEOUT_RETRY_BACKOFF_S = 2.0
 # os.environ["WANDB_MODE"] = "disabled"
-
-
-def extract_product(indexed_line: str) -> str:
-    _, reaction_smiles = indexed_line.split(" ", 1)
-    return reaction_smiles.split(">")[-1].strip()
-
 
 def maybe_init_tracing() -> None:
     if not ENABLE_TRACING:
@@ -63,13 +65,13 @@ def maybe_init_tracing() -> None:
 
 def build_question(product: str) -> str:
     return f"""
-    There is a list of chemical reactions in SMILES format loaded into a variable `lines`.
+    There is a list of chemical reactions in SMILES format, separated by newlines.
     Each reaction is in one of these forms:
       - "index reactants>reagents>products"
       - "index reactants>>products"
 
     Task:
-    Find the index/indices of the reaction for the following PRODUCT
+    Find all the indices of the reactions for the following PRODUCT
     (and not the reactants/reagents): {product}
 
     Output format:
@@ -88,7 +90,6 @@ def build_code_executor(lines: list[str]):
             "np": __import__("numpy"),
         },
     )
-
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Run CodeAct task 1 evaluation.")
@@ -114,8 +115,21 @@ async def main(
     tracer = get_tracer("codeact-task1")
     lines = load_lines(dataset_path=dataset_path)
     rng = random.Random(SEED)
-    retriever = build_retriever(name=RETRIEVER_NAME, lines=lines, rng=rng)
-    sampled_indices = rng.sample(range(len(lines)), k=min(num_questions, len(lines)))
+    context_pipeline = build_context_pipeline(
+        name=CONTEXT_PIPELINE_NAME,
+        lines=lines,
+        rng=rng,
+        min_selected_ground_truth=MIN_SELECTED_GROUND_TRUTH,
+    )
+    if num_questions > len(TASK1_HARDCODED_PRODUCTS):
+        raise ValueError(
+            f"num_questions={num_questions} exceeds "
+            f"available hardcoded products={len(TASK1_HARDCODED_PRODUCTS)}"
+        )
+    selected_products = TASK1_HARDCODED_PRODUCTS[:num_questions]
+    selected_ground_truth = TASK1_HARDCODED_GROUND_TRUTH_INDICES[:num_questions]
+    questions = [build_question(product) for product in selected_products]
+    print(f"[QUESTION-SAMPLING] using_hardcoded_products={len(selected_products)}")
     run_session_id = f"codeact-task1-{uuid.uuid4()}"
 
     run = wandb.init(
@@ -127,32 +141,50 @@ async def main(
             "workflow_timeout_s": WORKFLOW_TIMEOUT_S,
             "seed": SEED,
             "context_size": context_size,
-            "retriever_name": RETRIEVER_NAME,
+            "context_pipeline_name": CONTEXT_PIPELINE_NAME,
+            "min_selected_ground_truth": MIN_SELECTED_GROUND_TRUTH,
             "reasoning_effort": REASONING_EFFORT,
+            "llm_timeout_retries": LLM_TIMEOUT_RETRIES,
+            "llm_timeout_retry_backoff_s": LLM_TIMEOUT_RETRY_BACKOFF_S,
         },
     )
     wandb.define_metric("sample_iteration")
     wandb.define_metric("sample/*", step_metric="sample_iteration")
 
-    correct = 0
+    precision_sum = 0.0
+    recall_sum = 0.0
+    f1_sum = 0.0
     retrieval_hits = 0
     total_cost_usd = 0.0
     samples_with_cost = 0
 
-    for i, target_index in enumerate(sampled_indices):
-        print(f"Question {i + 1}/{len(sampled_indices)}")
-        target_product = extract_product(lines[target_index])
-        question = build_question(target_product)
-        retrieved_context = retriever.build_context(
+    for i, question in enumerate(questions):
+        print(f"Question {i + 1}/{len(questions)}")
+        target_product = selected_products[i]
+        ground_truth_index_set = set(selected_ground_truth[i])
+        target_index = sorted(ground_truth_index_set)[0]
+        target_line = lines[target_index]
+        retrieved_context = context_pipeline.build_context(
+            context_size=context_size,
+            correct_indices=ground_truth_index_set,
             query=target_product,
-            target_index=target_index,
-            k=context_size,
         )
-        context_has_ground_truth = str(target_index) in retrieved_context
+        retrieved_lines = [line for line in retrieved_context.splitlines() if line.strip()]
+        retrieved_indices = {
+            int(line.split(" ", 1)[0])
+            for line in retrieved_lines
+            if " " in line and line.split(" ", 1)[0].isdigit()
+        }
+        ground_truth_in_context_set = ground_truth_index_set & retrieved_indices
+        gt_in_context_count = len(ground_truth_in_context_set)
+        print(
+            f"[CONTEXT] requested_size={context_size} actual_size={len(retrieved_lines)} "
+            f"ground_truth_in_context={gt_in_context_count}/{len(ground_truth_index_set)}"
+        )
+        context_has_ground_truth = bool(ground_truth_in_context_set)
         retrieval_hits += int(context_has_ground_truth)
         if not context_has_ground_truth:
             print(f"[WARNING] Ground truth missing from retrieved context for target_index={target_index}")
-        retrieved_lines = [line for line in retrieved_context.splitlines() if line.strip()]
         context_coverage = len(retrieved_lines) / len(lines) if lines else 0.0
         completion_prompt = f"""
         You are given a subset of chemical reactions in SMILES format and a question.
@@ -178,6 +210,8 @@ async def main(
             force_loop_message=INDEX_FORCE_LOOP_MESSAGE,
             observation_followup=INDEX_OBSERVATION_FOLLOWUP,
             timeout=WORKFLOW_TIMEOUT_S,
+            llm_timeout_retries=LLM_TIMEOUT_RETRIES,
+            llm_timeout_retry_backoff_s=LLM_TIMEOUT_RETRY_BACKOFF_S,
         )
         ctx = Context(agent)
 
@@ -185,7 +219,7 @@ async def main(
             sample_span.set_attributes(
                 {
                     "sample.index": i,
-                    "sample.count": len(sampled_indices),
+                    "sample.count": len(questions),
                     "target.index": target_index,
                     "agent.name": "codeact",
                 }
@@ -194,18 +228,18 @@ async def main(
                 session_id=run_session_id,
                 metadata={
                     "sample_index": i,
-                    "sample_count": len(sampled_indices),
+                    "sample_count": len(questions),
                     "target_index": target_index,
                     "agent": "codeact",
                 },
                 tags=["codeact", "sample"],
             ):
-                print(f"Prompt: {completion_prompt!r}")
+                # print(f"Prompt: {completion_prompt!r}")
                 response = await run_agent_verbose(agent, ctx, completion_prompt)
 
         response_text = extract_response_text(response)
-        print(f"Raw response: {response_text!r}")
-        print("-" * 60)
+        # print(f"Raw response: {response_text!r}")
+        # print("-" * 60)
         llm_turn_metrics = await ctx.store.get("llm_turn_metrics", default=[])
         if not llm_turn_metrics:
             estimated_prompt_tokens = count_tokens(
@@ -226,15 +260,23 @@ async def main(
             ]
 
         parsed_indices = parse_indices(response_text)
-        is_correct = target_index in parsed_indices
-        if is_correct:
-            correct += 1
-        else:
-            print(f"Error: {target_index} not in {parsed_indices}")
-            print(f"Line in context: {lines[target_index]}")
+        predicted_index_set = set(parsed_indices)
+        precision, recall, f1 = precision_recall_f1(predicted_index_set, ground_truth_in_context_set)
+        precision_sum += precision
+        recall_sum += recall
+        f1_sum += f1
+        if f1 < 1.0:
+            print(
+                f"Mismatch for target_index={target_index}: "
+                f"precision={precision:.4f}, recall={recall:.4f}, f1={f1:.4f}"
+            )
+            print(f"Line in context: {target_line}")
             print(f"Product: {target_product}")
-            print(f"Raw response: {response_text!r}")
-            print("-" * 60)
+            print(f"Predicted indices: {sorted(predicted_index_set)}")
+            print(f"Ground truth indices (in context): {sorted(ground_truth_in_context_set)}")
+            print("--------------------------------")
+        else:
+            print(f"F1 is 1.0 for target_index={target_index}")
 
         for metric in llm_turn_metrics:
             wandb.log(
@@ -273,11 +315,10 @@ async def main(
                 f"sample/{i}/final_total_output_tokens": final_output_tokens,
                 f"sample/{i}/final_total_tokens": final_total_tokens,
                 f"sample/{i}/iterations": len(llm_turn_metrics),
-                f"sample/{i}/is_correct": int(is_correct),
+                f"sample/{i}/precision": precision,
+                f"sample/{i}/recall": recall,
+                f"sample/{i}/f1": f1,
                 f"sample/{i}/target_index": target_index,
-                f"sample/{i}/target_product": target_product,
-                f"sample/{i}/response_raw": response_text,
-                f"sample/{i}/response_parsed": ",".join(str(x) for x in parsed_indices),
                 f"sample/{i}/completion_prompt_char_count": len(completion_prompt),
                 f"sample/{i}/context_char_count": len(retrieved_context),
                 f"sample/{i}/context_size": context_size,
@@ -289,21 +330,27 @@ async def main(
         )
         wandb.log(
             {
-                "running_accuracy": correct / (i + 1),
+                "running_precision": precision_sum / (i + 1),
+                "running_recall": recall_sum / (i + 1),
+                "running_f1": f1_sum / (i + 1),
                 "running_retrieval_hit_rate": retrieval_hits / (i + 1),
             }
         )
 
-    total = len(sampled_indices)
-    accuracy = (correct / total) if total else 0.0
+    total = len(questions)
+    avg_precision = (precision_sum / total) if total else 0.0
+    avg_recall = (recall_sum / total) if total else 0.0
+    avg_f1 = (f1_sum / total) if total else 0.0
     retrieval_hit_rate = (retrieval_hits / total) if total else 0.0
-    print(f"Correct: {correct}/{total}")
-    print(f"Accuracy: {accuracy:.4f}")
+    print(f"Macro Precision: {avg_precision:.4f}")
+    print(f"Macro Recall: {avg_recall:.4f}")
+    print(f"Macro F1: {avg_f1:.4f}")
     print(f"Retrieval hit-rate (ground truth in context): {retrieval_hit_rate:.4f}")
 
-    run.summary["correct"] = correct
     run.summary["total"] = total
-    run.summary["accuracy"] = accuracy
+    run.summary["macro_precision"] = avg_precision
+    run.summary["macro_recall"] = avg_recall
+    run.summary["macro_f1"] = avg_f1
     run.summary["retrieval_hits"] = retrieval_hits
     run.summary["retrieval_hit_rate"] = retrieval_hit_rate
     run.summary["samples_with_cost"] = samples_with_cost
