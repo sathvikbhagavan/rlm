@@ -281,6 +281,8 @@ class CodeActAgent(Workflow):
         observation_role: str = "user",
         llm_timeout_retries: int = 2,
         llm_timeout_retry_backoff_s: float = 2.0,
+        llm_request_timeout_s: float = 300.0,
+        memory_token_limit: int = 120_000,
         **workflow_kwargs: Any,
     ) -> None:
         super().__init__(**workflow_kwargs)
@@ -292,6 +294,10 @@ class CodeActAgent(Workflow):
         self.observation_role = observation_role
         self.llm_timeout_retries = max(0, llm_timeout_retries)
         self.llm_timeout_retry_backoff_s = max(0.0, llm_timeout_retry_backoff_s)
+        self.llm_request_timeout_s = (
+            float(llm_request_timeout_s) if llm_request_timeout_s > 0 else None
+        )
+        self.memory_token_limit = max(1024, memory_token_limit)
         self.system_message = ChatMessage(role="system", content=system_prompt)
 
     async def _build_input_messages(self, ctx: Context) -> list[ChatMessage]:
@@ -321,7 +327,19 @@ class CodeActAgent(Workflow):
     async def prepare_chat_history(self, ctx: Context, ev: StartEvent) -> InputEvent:
         memory = await ctx.store.get("memory", default=None)
         if not memory:
-            memory = ChatMemoryBuffer.from_defaults(llm=self.llm)
+            try:
+                memory = ChatMemoryBuffer.from_defaults(llm=self.llm)
+            except ValueError as exc:
+                # Some OpenAI-compatible providers use model IDs that LlamaIndex's OpenAI
+                # metadata mapper does not recognize (e.g., SwissAI Qwen identifiers).
+                # Fall back to an explicit token limit instead of model-name lookup.
+                if "Unknown model" not in str(exc):
+                    raise
+                print(
+                    f"[MEMORY] Unknown model metadata lookup; "
+                    f"falling back to token_limit={self.memory_token_limit}"
+                )
+                memory = ChatMemoryBuffer.from_defaults(token_limit=self.memory_token_limit)
         user_input = ev.get("user_input")
         if user_input is None:
             raise ValueError("user_input kwarg is required")
@@ -340,7 +358,12 @@ class CodeActAgent(Workflow):
         response = None
         for attempt in range(1, max_attempts + 1):
             try:
-                response = await self.llm.achat(ev.input)
+                if self.llm_request_timeout_s is not None:
+                    response = await asyncio.wait_for(
+                        self.llm.achat(ev.input), timeout=self.llm_request_timeout_s
+                    )
+                else:
+                    response = await self.llm.achat(ev.input)
                 break
             except Exception as exc:
                 if not _is_retryable_llm_exception(exc) or attempt >= max_attempts:

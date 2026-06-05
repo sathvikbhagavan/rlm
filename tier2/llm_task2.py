@@ -2,34 +2,36 @@ import asyncio
 import os
 import random
 import uuid
-from typing import Optional
 
 import wandb
 from llama_index.core.llms import ChatMessage
 from llama_index.llms.openrouter import OpenRouter
-from rdkit import Chem
-from rdkit.Chem import Descriptors
+from task2_hardcoded_ground_truth import (
+    TASK2_HARDCODED_GROUND_TRUTH_INDICES,
+    TASK2_THRESHOLDS,
+)
 
 from rlm.codeact_helpers import (
-    build_retriever,
+    build_context_pipeline,
     extract_response_text,
     extract_usage_metrics,
     load_lines,
-    parse_count,
-    parse_reaction_sides,
+    parse_indices,
+    precision_recall_f1,
 )
 from rlm.tracing import init_tracing, using_tracing_attributes
 from rlm.utils.token_utils import count_tokens
 
 
-DATASET_PATH = "/home/bhagavan/rlms/datasets/reactionSmilesFigShareUSPTO2023.txt"
+DATASET_PATH = "/home/bhagavan/rlms/datasets/reactionSmilesFigShareUSPTO2023_cleaned.txt"
 MODEL_NAME = "openai/gpt-5-mini"
 OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
 ENABLE_TRACING = True
-THRESHOLDS = list(range(100, 300, 10))
+THRESHOLDS = TASK2_THRESHOLDS
 SEED = 42
-CONTEXT_SIZE = 10
-RETRIEVER_NAME = "random"
+CONTEXT_SIZE = 500
+CONTEXT_PIPELINE_NAME = "random"
+REASONING_EFFORT = "high"
 MAX_OUTPUT_TOKENS = 30_000
 # os.environ["WANDB_MODE"] = "disabled"
 
@@ -48,53 +50,15 @@ def maybe_init_tracing() -> None:
             "Install with: pip install '.[tracing]'"
         )
 
-
-def heaviest_component_weight(side_smiles: str) -> Optional[float]:
-    if not side_smiles:
-        return None
-
-    weights: list[float] = []
-    for comp in side_smiles.split("."):
-        comp = comp.strip()
-        if not comp:
-            continue
-        mol = Chem.MolFromSmiles(comp)
-        if mol is None:
-            continue
-        weights.append(Descriptors.MolWt(mol))
-
-    if not weights:
-        return None
-    return max(weights)
-
-
-def reaction_delta_weight(indexed_line: str) -> Optional[float]:
-    reactants, products = parse_reaction_sides(indexed_line)
-    heaviest_reactant = heaviest_component_weight(reactants)
-    heaviest_product = heaviest_component_weight(products)
-    if heaviest_reactant is None or heaviest_product is None:
-        return None
-    return heaviest_product - heaviest_reactant
-
-
-def count_matches(lines: list[str], threshold: float) -> int:
-    total = 0
-    for line in lines:
-        delta = reaction_delta_weight(line)
-        if delta is not None and delta > threshold:
-            total += 1
-    return total
-
-
 def build_question(threshold: int) -> str:
     return f"""
-    There is a list of chemical reactions in SMILES format.
+    There is a list of chemical reactions in SMILES format, separated by newlines.
     Each reaction is in one of these forms:
       - "index reactants>reagents>products"
       - "index reactants>>products"
 
     Task:
-    Count how many reactions satisfy:
+    Find all the indices of the reactions that satisfy:
       weight(heaviest product) - weight(heaviest reactant) > {threshold} Da
 
     Guidance:
@@ -107,10 +71,9 @@ def build_question(threshold: int) -> str:
     - Do NOT assign 0.0 as a fallback for missing/invalid molecules.
 
     Output format:
-    - Final response must be exactly: ANSWER: <integer>
-      Example: ANSWER: 57
-    - Do not include additional prose in the final response.
-    - If no matching reaction exists, return: ANSWER: 0
+    - Report INDICES separated by commas.
+    - Do not include additional text, quotes, punctuation, or formatting.
+    - If no matching reaction exists, report: -1
 """
 
 
@@ -118,13 +81,18 @@ async def main() -> None:
     maybe_init_tracing()
     lines = load_lines(DATASET_PATH)
     rng = random.Random(SEED)
-    retriever = build_retriever(name=RETRIEVER_NAME, lines=lines, rng=rng)
+    context_pipeline = build_context_pipeline(
+        name=CONTEXT_PIPELINE_NAME,
+        lines=lines,
+        rng=rng,
+    )
     run_session_id = f"llm-task2-{uuid.uuid4()}"
 
     llm = OpenRouter(
         model=MODEL_NAME,
         api_key=OPENROUTER_API_KEY,
         max_tokens=MAX_OUTPUT_TOKENS,
+        reasoning_effort=REASONING_EFFORT,
         additional_kwargs={"max_completion_tokens": MAX_OUTPUT_TOKENS},
     )
 
@@ -136,26 +104,51 @@ async def main() -> None:
             "dataset_path": DATASET_PATH,
             "seed": SEED,
             "context_size": CONTEXT_SIZE,
-            "retriever_name": RETRIEVER_NAME,
+            "context_pipeline_name": CONTEXT_PIPELINE_NAME,
+            "reasoning_effort": REASONING_EFFORT,
             "mode": "llm_baseline_no_tools",
         },
     )
     wandb.define_metric("sample_iteration")
     wandb.define_metric("sample/*", step_metric="sample_iteration")
 
-    correct = 0
+    ground_truth_indices_by_threshold: dict[int, set[int]] = {
+        threshold: set(TASK2_HARDCODED_GROUND_TRUTH_INDICES.get(threshold, []))
+        for threshold in THRESHOLDS
+    }
+
+    precision_sum = 0.0
+    recall_sum = 0.0
+    f1_sum = 0.0
+    retrieval_hits = 0
+    total_input_tokens_sum = 0
+    total_output_tokens_sum = 0
     total_cost_usd = 0.0
     samples_with_cost = 0
 
     for i, threshold in enumerate(THRESHOLDS):
         print(f"Question {i + 1}/{len(THRESHOLDS)} for X={threshold}")
         question = build_question(threshold)
-        retrieved_context = retriever.build_context(
-            query=f"delta_weight_gt_{threshold}",
-            target_index=-1,
-            k=CONTEXT_SIZE,
+        ground_truth_index_set = ground_truth_indices_by_threshold[threshold]
+        retrieved_context = context_pipeline.build_context(
+            context_size=CONTEXT_SIZE,
+            correct_indices=ground_truth_index_set,
+            query=str(threshold),
         )
         retrieved_lines = [line for line in retrieved_context.splitlines() if line.strip()]
+        retrieved_indices = {
+            int(line.split(" ", 1)[0])
+            for line in retrieved_lines
+            if " " in line and line.split(" ", 1)[0].isdigit()
+        }
+        ground_truth_in_context_set = ground_truth_index_set & retrieved_indices
+        gt_in_context_count = len(ground_truth_in_context_set)
+        print(
+            f"[CONTEXT] requested_size={CONTEXT_SIZE} actual_size={len(retrieved_lines)} "
+            f"ground_truth_in_context={gt_in_context_count}/{len(ground_truth_index_set)}"
+        )
+        context_has_ground_truth = bool(ground_truth_in_context_set)
+        retrieval_hits += int(context_has_ground_truth)
         context_coverage = len(retrieved_lines) / len(lines) if lines else 0.0
         completion_prompt = f"""
         You are given a subset of chemical reactions in SMILES format and a question.
@@ -180,11 +173,23 @@ async def main() -> None:
             response = await llm.achat([ChatMessage(role="user", content=completion_prompt)])
 
         response_text = extract_response_text(response)
-        parsed_count = parse_count(response_text)
-        ground_truth_count = count_matches(retrieved_lines, float(threshold))
-        is_correct = parsed_count == ground_truth_count
-        if is_correct:
-            correct += 1
+        predicted_index_set = set(parse_indices(response_text))
+        precision, recall, f1 = precision_recall_f1(
+            predicted_index_set, ground_truth_in_context_set
+        )
+        precision_sum += precision
+        recall_sum += recall
+        f1_sum += f1
+        if f1 < 1.0:
+            print(f"Mismatch for X={threshold}")
+            print(f"Predicted indices: {sorted(predicted_index_set)}")
+            print(f"Ground truth indices (in context): {sorted(ground_truth_in_context_set)}")
+            print(
+                f"precision={precision:.4f}, recall={recall:.4f}, f1={f1:.4f}"
+            )
+            print("--------------------------------")
+        else:
+            print(f"F1 is 1.0 for X={threshold}")
 
         usage_metrics = extract_usage_metrics(response)
         prompt_tokens = int(usage_metrics.get("prompt_tokens", 0))
@@ -203,6 +208,8 @@ async def main() -> None:
         if sample_cost is not None:
             total_cost_usd += sample_cost
             samples_with_cost += 1
+        total_input_tokens_sum += prompt_tokens
+        total_output_tokens_sum += completion_tokens
 
         wandb.log(
             {
@@ -221,33 +228,51 @@ async def main() -> None:
                 f"sample/{i}/final_total_output_tokens": completion_tokens,
                 f"sample/{i}/final_total_tokens": total_tokens,
                 f"sample/{i}/iterations": 1,
-                f"sample/{i}/is_correct": int(is_correct),
-                f"sample/{i}/ground_truth_count": ground_truth_count,
-                f"sample/{i}/prediction_count": parsed_count if parsed_count is not None else -1,
-                f"sample/{i}/response_raw": response_text,
+                f"sample/{i}/precision": precision,
+                f"sample/{i}/recall": recall,
+                f"sample/{i}/f1": f1,
+                f"sample/{i}/ground_truth_count": len(ground_truth_in_context_set),
+                f"sample/{i}/predicted_count": len(predicted_index_set),
                 f"sample/{i}/completion_prompt_char_count": len(completion_prompt),
                 f"sample/{i}/context_char_count": len(retrieved_context),
                 f"sample/{i}/context_size": CONTEXT_SIZE,
                 f"sample/{i}/retrieved_line_count": len(retrieved_lines),
                 f"sample/{i}/context_coverage": context_coverage,
+                f"sample/{i}/context_has_ground_truth": int(context_has_ground_truth),
                 **({f"sample/{i}/final_total_cost_usd": sample_cost} if sample_cost is not None else {}),
             }
         )
         wandb.log(
             {
-                "running_accuracy": correct / (i + 1),
-                "running_context_coverage": context_coverage,
+                "running_precision": precision_sum / (i + 1),
+                "running_recall": recall_sum / (i + 1),
+                "running_f1": f1_sum / (i + 1),
+                "running_retrieval_hit_rate": retrieval_hits / (i + 1),
             }
         )
 
     total = len(THRESHOLDS)
-    accuracy = (correct / total) if total else 0.0
-    print(f"Correct: {correct}/{total}")
-    print(f"Accuracy: {accuracy:.4f}")
+    avg_precision = (precision_sum / total) if total else 0.0
+    avg_recall = (recall_sum / total) if total else 0.0
+    avg_f1 = (f1_sum / total) if total else 0.0
+    retrieval_hit_rate = (retrieval_hits / total) if total else 0.0
+    avg_total_input_tokens = (total_input_tokens_sum / total) if total else 0.0
+    avg_total_output_tokens = (total_output_tokens_sum / total) if total else 0.0
+    print(f"Macro Precision: {avg_precision:.4f}")
+    print(f"Macro Recall: {avg_recall:.4f}")
+    print(f"Macro F1: {avg_f1:.4f}")
+    print(f"Retrieval hit-rate (ground truth in context): {retrieval_hit_rate:.4f}")
+    print(f"Avg total input tokens/sample: {avg_total_input_tokens:.2f}")
+    print(f"Avg total output tokens/sample: {avg_total_output_tokens:.2f}")
 
-    run.summary["correct"] = correct
     run.summary["total"] = total
-    run.summary["accuracy"] = accuracy
+    run.summary["macro_precision"] = avg_precision
+    run.summary["macro_recall"] = avg_recall
+    run.summary["macro_f1"] = avg_f1
+    run.summary["retrieval_hits"] = retrieval_hits
+    run.summary["retrieval_hit_rate"] = retrieval_hit_rate
+    run.summary["avg_total_input_tokens_per_sample"] = avg_total_input_tokens
+    run.summary["avg_total_output_tokens_per_sample"] = avg_total_output_tokens
     run.summary["samples_with_cost"] = samples_with_cost
     if samples_with_cost > 0:
         run.summary["total_cost_usd"] = total_cost_usd

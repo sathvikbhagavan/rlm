@@ -1,4 +1,3 @@
-from typing import Optional
 import argparse
 import asyncio
 import os
@@ -6,34 +5,49 @@ import random
 import uuid
 
 import wandb
-from rdkit import Chem
-from rdkit.Chem import Descriptors, rdMolDescriptors
 from llama_index.core.workflow import Context
 from llama_index.llms.openrouter import OpenRouter
+from task5_hardcoded_ground_truth import (
+    TASK5_HARDCODED_GROUND_TRUTH_INDICES,
+    TASK5_RING_X_VALUES,
+    TASK5_WEIGHT_THRESHOLDS_DA,
+)
 
-from rlm.codeact_core import CodeActAgent, make_simple_code_executor, run_agent_verbose
+from rlm.codeact_core import (
+    CodeActAgent,
+    INDEX_CODEACT_SYSTEM_PROMPT,
+    INDEX_FORCE_LOOP_MESSAGE,
+    INDEX_OBSERVATION_FOLLOWUP,
+    make_simple_code_executor,
+    run_agent_verbose,
+)
 from rlm.codeact_helpers import (
-    build_retriever,
+    build_context_pipeline,
     extract_response_text,
     load_lines,
-    parse_count,
-    parse_reaction_sides,
+    parse_indices,
+    precision_recall_f1,
 )
-from rlm.tracing import init_tracing, using_tracing_attributes
+from rlm.tracing import get_tracer, init_tracing, using_tracing_attributes
 from rlm.utils.token_utils import count_tokens
 
 
-DATASET_PATH = "/home/bhagavan/rlms/datasets/reactionSmilesFigShareUSPTO2023.txt"
+DATASET_PATH = "/home/bhagavan/rlms/datasets/reactionSmilesFigShareUSPTO2023_cleaned.txt"
 MODEL_NAME = "openai/gpt-5-mini"
 OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
 ENABLE_TRACING = True
 WORKFLOW_TIMEOUT_S = 600.0
-WEIGHT_THRESHOLDS_DA = [100, 150]
-RING_X_VALUES = [1, 2]
+WEIGHT_THRESHOLDS_DA = TASK5_WEIGHT_THRESHOLDS_DA
+RING_X_VALUES = TASK5_RING_X_VALUES
 SEED = 42
-CONTEXT_SIZE = 100
-RETRIEVER_NAME = "random"
+CONTEXT_SIZE = 500
+CONTEXT_PIPELINE_NAME = "random"
 MAX_OUTPUT_TOKENS = 30_000
+MAX_ITERATIONS = 8
+REASONING_EFFORT = "high"
+LLM_TIMEOUT_RETRIES = 2
+LLM_TIMEOUT_RETRY_BACKOFF_S = 2.0
+LLM_REQUEST_TIMEOUT_S = 300.0
 # os.environ["WANDB_MODE"] = "disabled"
 
 
@@ -41,7 +55,7 @@ def maybe_init_tracing() -> None:
     if not ENABLE_TRACING:
         return
     initialized = init_tracing(
-        project_name="codeact-task5",
+        project_name="CodeAct-Task5",
         auto_instrument=True,
         batch=False,
     )
@@ -52,73 +66,6 @@ def maybe_init_tracing() -> None:
         )
 
 
-def heaviest_component_weight(side_smiles: str) -> Optional[float]:
-    if not side_smiles:
-        return None
-    weights: list[float] = []
-    for comp in side_smiles.split("."):
-        comp = comp.strip()
-        if not comp:
-            continue
-        mol = Chem.MolFromSmiles(comp)
-        if mol is None:
-            continue
-        weights.append(Descriptors.MolWt(mol))
-    if not weights:
-        return None
-    return max(weights)
-
-
-def component_ring_counts(side_smiles: str) -> list[int]:
-    if not side_smiles:
-        return []
-    ring_counts: list[int] = []
-    for comp in side_smiles.split("."):
-        comp = comp.strip()
-        if not comp:
-            continue
-        mol = Chem.MolFromSmiles(comp)
-        if mol is None:
-            continue
-        ring_counts.append(int(rdMolDescriptors.CalcNumRings(mol)))
-    return ring_counts
-
-
-def reaction_delta_weight(indexed_line: str) -> Optional[float]:
-    reactants, products = parse_reaction_sides(indexed_line)
-    heaviest_reactant = heaviest_component_weight(reactants)
-    heaviest_product = heaviest_component_weight(products)
-    if heaviest_reactant is None or heaviest_product is None:
-        return None
-    return heaviest_product - heaviest_reactant
-
-
-def reaction_delta_rings(indexed_line: str) -> Optional[int]:
-    reactants, products = parse_reaction_sides(indexed_line)
-    reactant_ring_counts = component_ring_counts(reactants)
-    product_ring_counts = component_ring_counts(products)
-    if not reactant_ring_counts or not product_ring_counts:
-        return None
-    pairwise_deltas = [
-        product_rings - reactant_rings
-        for product_rings in product_ring_counts
-        for reactant_rings in reactant_ring_counts
-    ]
-    return max(pairwise_deltas)
-
-
-def count_matches_combo(lines: list[str], weight_threshold: int, ring_x: int) -> int:
-    total = 0
-    for line in lines:
-        w_delta = reaction_delta_weight(line)
-        r_delta = reaction_delta_rings(line)
-        if w_delta is None or r_delta is None:
-            continue
-        if w_delta > weight_threshold and r_delta == ring_x:
-            total += 1
-    return total
-
-
 def build_question(weight_threshold: int, ring_x: int) -> str:
     return f"""
     Above is a list of chemical reactions in SMILES format. Each reaction is in one of these forms:
@@ -126,7 +73,7 @@ def build_question(weight_threshold: int, ring_x: int) -> str:
       - "index reactants>>products"
 
     Task:
-    Count how many reactions satisfy BOTH conditions:
+    Find all the indices of the reactions that satisfy BOTH conditions:
       1) weight(heaviest product) - weight(heaviest reactant) > {weight_threshold} Da
       2) max over all pairs [rings(product_component) - rings(reactant_component)] == {ring_x}
 
@@ -144,14 +91,13 @@ def build_question(weight_threshold: int, ring_x: int) -> str:
       use a raw string (for example, r\"\"\"...\"\"\") or escape backslashes as "\\\\".
 
     Output format:
-    - Final response must be exactly: ANSWER: <integer>
-      Example: ANSWER: 57
-    - Do not include additional prose in the final response.
-    - If no matching reaction exists, return: ANSWER: 0
+    - Report INDICES separated by commas.
+    - Do not include additional text, quotes, punctuation, or formatting.
+    - If no matching reaction exists, report: -1
 """
 
 
-def build_code_executor() -> object:
+def build_code_executor(lines: list[str]) -> object:
     return make_simple_code_executor(
         extra_globals={
             "np": __import__("numpy"),
@@ -182,9 +128,14 @@ def parse_args() -> argparse.Namespace:
 
 async def main(model_name: str, context_size: int) -> None:
     maybe_init_tracing()
-    lines = load_lines()
+    tracer = get_tracer("codeact-task5")
+    lines = load_lines(DATASET_PATH)
     rng = random.Random(SEED)
-    retriever = build_retriever(name=RETRIEVER_NAME, lines=lines, rng=rng)
+    context_pipeline = build_context_pipeline(
+        name=CONTEXT_PIPELINE_NAME,
+        lines=lines,
+        rng=rng,
+    )
     run_session_id = f"codeact-task5-{uuid.uuid4()}"
 
     combinations = [
@@ -203,13 +154,28 @@ async def main(model_name: str, context_size: int) -> None:
             "workflow_timeout_s": WORKFLOW_TIMEOUT_S,
             "seed": SEED,
             "context_size": context_size,
-            "retriever_name": RETRIEVER_NAME,
+            "context_pipeline_name": CONTEXT_PIPELINE_NAME,
+            "reasoning_effort": REASONING_EFFORT,
+            "llm_timeout_retries": LLM_TIMEOUT_RETRIES,
+            "llm_timeout_retry_backoff_s": LLM_TIMEOUT_RETRY_BACKOFF_S,
+            "llm_request_timeout_s": LLM_REQUEST_TIMEOUT_S,
         },
     )
     wandb.define_metric("sample_iteration")
     wandb.define_metric("sample/*", step_metric="sample_iteration")
 
-    correct = 0
+    ground_truth_indices_by_combo: dict[tuple[int, int], set[int]] = {}
+    for weight_threshold, ring_x in combinations:
+        indices = set(
+            TASK5_HARDCODED_GROUND_TRUTH_INDICES.get((weight_threshold, ring_x), [])
+        )
+        ground_truth_indices_by_combo[(weight_threshold, ring_x)] = indices
+
+    precision_sum = 0.0
+    recall_sum = 0.0
+    f1_sum = 0.0
+    total_input_tokens_sum = 0
+    total_output_tokens_sum = 0
     total_cost_usd = 0.0
     samples_with_cost = 0
 
@@ -219,12 +185,24 @@ async def main(model_name: str, context_size: int) -> None:
             f"weight>{weight_threshold} and ring=={ring_x}"
         )
         question = build_question(weight_threshold, ring_x)
-        retrieved_context = retriever.build_context(
-            query=f"weight_gt_{weight_threshold}_ring_eq_{ring_x}",
-            target_index=-1,
-            k=context_size,
+        ground_truth_index_set = ground_truth_indices_by_combo[(weight_threshold, ring_x)]
+        retrieved_context = context_pipeline.build_context(
+            context_size=context_size,
+            correct_indices=ground_truth_index_set,
+            query=f"{weight_threshold}:{ring_x}",
         )
         retrieved_lines = [line for line in retrieved_context.splitlines() if line.strip()]
+        retrieved_indices = {
+            int(line.split(" ", 1)[0])
+            for line in retrieved_lines
+            if " " in line and line.split(" ", 1)[0].isdigit()
+        }
+        ground_truth_in_context_set = ground_truth_index_set & retrieved_indices
+        gt_in_context_count = len(ground_truth_in_context_set)
+        print(
+            f"[CONTEXT] requested_size={context_size} actual_size={len(retrieved_lines)} "
+            f"ground_truth_in_context={gt_in_context_count}/{len(ground_truth_index_set)}"
+        )
         context_coverage = len(retrieved_lines) / len(lines) if lines else 0.0
         completion_prompt = f"""
         You are given a subset of chemical reactions in SMILES format and a question.
@@ -235,36 +213,54 @@ async def main(model_name: str, context_size: int) -> None:
         {question}
         </question>
         """
-        executor = build_code_executor()
+        executor = build_code_executor(lines=retrieved_lines)
         agent = CodeActAgent(
             code_execute_fn=executor.execute,
             llm=OpenRouter(
                 model=model_name,
                 api_key=OPENROUTER_API_KEY,
                 max_tokens=MAX_OUTPUT_TOKENS,
+                reasoning_effort=REASONING_EFFORT,
                 additional_kwargs={"max_completion_tokens": MAX_OUTPUT_TOKENS},
             ),
+            system_prompt=INDEX_CODEACT_SYSTEM_PROMPT,
+            max_iterations=MAX_ITERATIONS,
+            force_loop_message=INDEX_FORCE_LOOP_MESSAGE,
+            observation_followup=INDEX_OBSERVATION_FOLLOWUP,
             timeout=WORKFLOW_TIMEOUT_S,
+            llm_timeout_retries=LLM_TIMEOUT_RETRIES,
+            llm_timeout_retry_backoff_s=LLM_TIMEOUT_RETRY_BACKOFF_S,
+            llm_request_timeout_s=LLM_REQUEST_TIMEOUT_S,
         )
         ctx = Context(agent)
 
-        with using_tracing_attributes(
-            session_id=run_session_id,
-            metadata={
-                "sample_index": i,
-                "sample_count": len(combinations),
-                "weight_threshold_da": weight_threshold,
-                "ring_x": ring_x,
-                "agent": "codeact",
-            },
-            tags=["codeact", "sample", "task5_combined"],
-        ):
-            print(f"Prompt: {completion_prompt!r}")
-            response = await run_agent_verbose(agent, ctx, completion_prompt)
+        with tracer.start_as_current_span(f"codeact_task5_sample_{i}") as sample_span:
+            sample_span.set_attributes(
+                {
+                    "sample.index": i,
+                    "sample.count": len(combinations),
+                    "sample.weight_threshold_da": weight_threshold,
+                    "sample.ring_x": ring_x,
+                    "agent.name": "codeact",
+                }
+            )
+            with using_tracing_attributes(
+                session_id=run_session_id,
+                metadata={
+                    "sample_index": i,
+                    "sample_count": len(combinations),
+                    "weight_threshold_da": weight_threshold,
+                    "ring_x": ring_x,
+                    "agent": "codeact",
+                },
+                tags=["codeact", "sample", "task5_combined"],
+            ):
+                # print(f"Prompt: {completion_prompt!r}")
+                response = await run_agent_verbose(agent, ctx, completion_prompt)
 
         response_text = extract_response_text(response)
-        print(f"Raw response: {response_text!r}")
-        print("-" * 60)
+        # print(f"Raw response: {response_text!r}")
+        # print("-" * 60)
         llm_turn_metrics = await ctx.store.get("llm_turn_metrics", default=[])
         if not llm_turn_metrics:
             estimated_prompt_tokens = count_tokens(
@@ -284,19 +280,21 @@ async def main(model_name: str, context_size: int) -> None:
                 }
             ]
 
-        parsed_count = parse_count(response_text)
-        ground_truth_count = count_matches_combo(
-            retrieved_lines, weight_threshold=weight_threshold, ring_x=ring_x
-        )
-        is_correct = parsed_count == ground_truth_count
-        if is_correct:
-            correct += 1
-        else:
+        predicted_index_set = set(parse_indices(response_text))
+        precision, recall, f1 = precision_recall_f1(predicted_index_set, ground_truth_in_context_set)
+        precision_sum += precision
+        recall_sum += recall
+        f1_sum += f1
+        if f1 < 1.0:
             print(f"Mismatch for weight>{weight_threshold} and ring=={ring_x}")
-            print(f"Predicted count: {parsed_count}")
-            print(f"Ground truth count (retrieved context): {ground_truth_count}")
-            print(f"Raw response: {response_text!r}")
-            print("-" * 60)
+            print(f"Predicted indices: {sorted(predicted_index_set)}")
+            print(f"Ground truth indices (in context): {sorted(ground_truth_in_context_set)}")
+            print(
+                f"precision={precision:.4f}, recall={recall:.4f}, f1={f1:.4f}"
+            )
+            print("--------------------------------")
+        else:
+            print(f"F1 is 1.0 for weight>{weight_threshold} and ring=={ring_x}")
 
         for metric in llm_turn_metrics:
             wandb.log(
@@ -322,6 +320,8 @@ async def main(model_name: str, context_size: int) -> None:
         final_total_tokens = sum(
             int(metric.get("iteration_total_tokens", 0)) for metric in llm_turn_metrics
         )
+        total_input_tokens_sum += final_input_tokens
+        total_output_tokens_sum += final_output_tokens
         final_cost = sum(float(metric.get("iteration_cost_usd", 0.0)) for metric in llm_turn_metrics)
         has_cost = any("iteration_cost_usd" in metric for metric in llm_turn_metrics)
         if has_cost:
@@ -337,10 +337,11 @@ async def main(model_name: str, context_size: int) -> None:
                 f"sample/{i}/final_total_output_tokens": final_output_tokens,
                 f"sample/{i}/final_total_tokens": final_total_tokens,
                 f"sample/{i}/iterations": len(llm_turn_metrics),
-                f"sample/{i}/is_correct": int(is_correct),
-                f"sample/{i}/ground_truth_count": ground_truth_count,
-                f"sample/{i}/prediction_count": parsed_count if parsed_count is not None else -1,
-                f"sample/{i}/response_raw": response_text,
+                f"sample/{i}/precision": precision,
+                f"sample/{i}/recall": recall,
+                f"sample/{i}/f1": f1,
+                f"sample/{i}/ground_truth_count": len(ground_truth_in_context_set),
+                f"sample/{i}/predicted_count": len(predicted_index_set),
                 f"sample/{i}/completion_prompt_char_count": len(completion_prompt),
                 f"sample/{i}/context_char_count": len(retrieved_context),
                 f"sample/{i}/context_size": context_size,
@@ -351,19 +352,31 @@ async def main(model_name: str, context_size: int) -> None:
         )
         wandb.log(
             {
-                "running_accuracy": correct / (i + 1),
+                "running_precision": precision_sum / (i + 1),
+                "running_recall": recall_sum / (i + 1),
+                "running_f1": f1_sum / (i + 1),
                 "running_context_coverage": context_coverage,
             }
         )
 
     total = len(combinations)
-    accuracy = (correct / total) if total else 0.0
-    print(f"Correct: {correct}/{total}")
-    print(f"Accuracy: {accuracy:.4f}")
+    avg_precision = (precision_sum / total) if total else 0.0
+    avg_recall = (recall_sum / total) if total else 0.0
+    avg_f1 = (f1_sum / total) if total else 0.0
+    avg_total_input_tokens = (total_input_tokens_sum / total) if total else 0.0
+    avg_total_output_tokens = (total_output_tokens_sum / total) if total else 0.0
+    print(f"Macro Precision: {avg_precision:.4f}")
+    print(f"Macro Recall: {avg_recall:.4f}")
+    print(f"Macro F1: {avg_f1:.4f}")
+    print(f"Avg total input tokens/sample: {avg_total_input_tokens:.2f}")
+    print(f"Avg total output tokens/sample: {avg_total_output_tokens:.2f}")
 
-    run.summary["correct"] = correct
     run.summary["total"] = total
-    run.summary["accuracy"] = accuracy
+    run.summary["macro_precision"] = avg_precision
+    run.summary["macro_recall"] = avg_recall
+    run.summary["macro_f1"] = avg_f1
+    run.summary["avg_total_input_tokens_per_sample"] = avg_total_input_tokens
+    run.summary["avg_total_output_tokens_per_sample"] = avg_total_output_tokens
     run.summary["samples_with_cost"] = samples_with_cost
     if samples_with_cost > 0:
         run.summary["total_cost_usd"] = total_cost_usd

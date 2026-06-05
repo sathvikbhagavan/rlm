@@ -52,11 +52,23 @@ class RandomContextPipeline(BaseContextPipeline):
             idx_str, _ = line.split(" ", 1)
             self.line_by_idx[int(idx_str)] = line
 
-    def _sample_with_seed(self, top_k: int, forced_indices: list[int]) -> str:
+    def _sample_with_seed(
+        self,
+        top_k: int,
+        forced_indices: list[int],
+        excluded_indices: Iterable[int] | None = None,
+    ) -> str:
         valid_forced = [idx for idx in forced_indices if 0 <= idx < len(self.lines)]
         dedup_forced = list(dict.fromkeys(valid_forced))[:top_k]
         forced_set = set(dedup_forced)
-        remainder_pool = [i for i in range(len(self.lines)) if i not in forced_set]
+        excluded_set = {
+            idx
+            for idx in (excluded_indices or [])
+            if isinstance(idx, int) and 0 <= idx < len(self.lines)
+        }
+        remainder_pool = [
+            i for i in range(len(self.lines)) if i not in forced_set and i not in excluded_set
+        ]
         random_take = min(top_k - len(dedup_forced), len(remainder_pool))
         random_indices = self.rng.sample(remainder_pool, k=random_take)
         sampled = dedup_forced + random_indices
@@ -105,7 +117,12 @@ class RandomContextPipeline(BaseContextPipeline):
                 )
                 if forced_count > 0:
                     forced = self.rng.sample(valid_correct, k=forced_count)
-                    return self._sample_with_seed(top_k=top_k, forced_indices=forced)
+                    non_forced_correct = set(valid_correct) - set(forced)
+                    return self._sample_with_seed(
+                        top_k=top_k,
+                        forced_indices=forced,
+                        excluded_indices=non_forced_correct,
+                    )
             else:
                 print(
                     f"[PIPELINE] context_size_requested={context_size} context_size_effective={top_k} "

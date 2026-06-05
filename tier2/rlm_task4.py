@@ -1,111 +1,45 @@
-import os
-import uuid
 import argparse
-from typing import Optional
+import os
+import random
+import uuid
 
 import wandb
-from rdkit import Chem
-from rdkit.Chem import rdMolDescriptors
 from rlm import RLM
+from rlm.codeact_helpers import build_context_pipeline, parse_indices, precision_recall_f1
 from rlm.tracing import init_tracing, using_tracing_attributes
+from task4_hardcoded_ground_truth import (
+    TASK4_HARDCODED_GROUND_TRUTH_INDICES,
+    TASK4_THRESHOLDS,
+)
 
 # os.environ["WANDB_MODE"] = "disabled"
 
-DATASET_PATH = "/home/bhagavan/rlms/datasets/reactionSmilesFigShareUSPTO2023.txt"
+DATASET_PATH = "/home/bhagavan/rlms/datasets/reactionSmilesFigShareUSPTO2023_cleaned.txt"
 BACKEND = "openrouter"
 MODEL_NAME = "openai/gpt-5-mini"
 ENABLE_TRACING = True
-THRESHOLDS = [1, 2, 3, 4, 5]
+THRESHOLDS = TASK4_THRESHOLDS
+SEED = 42
+CONTEXT_SIZE = -1
+CONTEXT_PIPELINE_NAME = "random"
 
 RLM_INIT_KWARGS = {
     "backend": BACKEND,
     "backend_kwargs": {"model_name": MODEL_NAME},
     "verbose": True,
-    "max_depth": 1,
+    "max_depth": 2,
 }
-
-
-def parse_count(response: str) -> Optional[int]:
-    response = response.strip().replace('"', "").replace("'", "")
-    if response.isdigit():
-        return int(response)
-    for token in response.replace(",", " ").split():
-        if token.isdigit():
-            return int(token)
-    return None
-
-
-def parse_reaction_sides(indexed_line: str) -> tuple[str, str]:
-    _, reaction_smiles = indexed_line.split(" ", 1)
-    parts = reaction_smiles.split(">")
-    reactant_side = parts[0].strip()
-    product_side = parts[-1].strip()
-    return reactant_side, product_side
-
-
-def component_aromatic_ring_counts(side_smiles: str) -> list[int]:
-    if not side_smiles:
-        return []
-
-    aromatic_ring_counts: list[int] = []
-    for comp in side_smiles.split("."):
-        comp = comp.strip()
-        if not comp:
-            continue
-        mol = Chem.MolFromSmiles(comp)
-        if mol is None:
-            continue
-        aromatic_ring_counts.append(int(rdMolDescriptors.CalcNumAromaticRings(mol)))
-    return aromatic_ring_counts
-
-
-def reaction_delta_aromatic_rings(indexed_line: str) -> Optional[int]:
-    reactants, products = parse_reaction_sides(indexed_line)
-    reactant_counts = component_aromatic_ring_counts(reactants)
-    product_counts = component_aromatic_ring_counts(products)
-    if not reactant_counts or not product_counts:
-        return None
-    aromatic_rings_reactants = sum(reactant_counts)
-    aromatic_rings_products = sum(product_counts)
-    new_aromatic_rings = aromatic_rings_products - aromatic_rings_reactants
-    return new_aromatic_rings
-
-
-def ground_truth_count_for_x(deltas: list[int], x: int) -> int:
-    """
-    Ground truth for the exact-X task:
-    Count reactions where new_aromatic_rings == X.
-    """
-    return sum(1 for delta in deltas if delta == x)
-
-
-def run_pre_experiment_x_scan(deltas: list[int], x_max: int = 12) -> Optional[int]:
-    """
-    Print exact-X ground truth counts for X in [0, x_max] and
-    return the largest X with non-zero count.
-    """
-    max_exact_x_nonzero: Optional[int] = None
-    print(f"Ground truth count for exact-X aromatic task (X=0..{x_max}):")
-    for x in range(0, x_max + 1):
-        count = ground_truth_count_for_x(deltas, x)
-        print(f"  X={x}: {count}")
-        if count > 0:
-            max_exact_x_nonzero = x
-    print(
-        f"Max exact X in [0,{x_max}] with non-zero ground truth: {max_exact_x_nonzero}"
-    )
-    return max_exact_x_nonzero
 
 
 def build_question(threshold: int) -> str:
     return f"""
-    Context is a big string of chemical reactions in SMILES format, separated by newlines.
+    There is a list of chemical reactions in SMILES format, separated by newlines.
     Each reaction is in one of these forms:
       - "index reactants>reagents>products"
       - "index reactants>>products"
 
     Task:
-    Count how many reactions satisfy:
+    Find all the indices of the reactions that satisfy:
       new_aromatic_rings == {threshold}
 
     Guidance:
@@ -120,9 +54,9 @@ def build_question(threshold: int) -> str:
     - Skip a reaction only if reactant side or product side has no valid molecules left after filtering.
 
     Output format:
-    - Report ONLY the INTEGER COUNT of matching reactions (e.g., 57)
-    - No other text, quotes, labels, punctuation, or formatting.
-    - If no matching reaction exists, report 0.
+    - Report INDICES separated by commas.
+    - Do not include additional text, quotes, punctuation, or formatting.
+    - If no matching reaction exists, report: -1
     """
 
 
@@ -130,7 +64,7 @@ def maybe_init_tracing() -> None:
     if not ENABLE_TRACING:
         return
     initialized = init_tracing(
-        project_name="rlm-tracing-dev",
+        project_name="RLMs-Task4",
         auto_instrument=True,
         batch=False,
     )
@@ -144,64 +78,86 @@ def maybe_init_tracing() -> None:
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Run RLM task 4 evaluation.")
     parser.add_argument(
-        "--model-name",
-        type=str,
-        default=MODEL_NAME,
-        help=f"Model identifier for backend (default: {MODEL_NAME}).",
+        "--context-size",
+        type=int,
+        default=CONTEXT_SIZE,
+        help=(
+            "Number of retrieved reactions to include in context "
+            f"(default: {CONTEXT_SIZE}; use -1 for all lines)."
+        ),
     )
     return parser.parse_args()
 
 
-def main(model_name: str) -> None:
+def main(context_size: int) -> None:
     maybe_init_tracing()
-    rlm_init_kwargs = dict(RLM_INIT_KWARGS)
-    rlm_init_kwargs["backend_kwargs"] = {"model_name": model_name}
-    rlm = RLM(**rlm_init_kwargs)
+    rlm = RLM(**RLM_INIT_KWARGS)
     run_session_id = f"run-rlms-{uuid.uuid4()}"
 
     with open(DATASET_PATH, "r") as f:
         raw_lines = [line.strip() for line in f.readlines() if line.strip()]
         lines = [f"{i} {line}" for i, line in enumerate(raw_lines)]
+    context_pipeline = build_context_pipeline(
+        name=CONTEXT_PIPELINE_NAME,
+        lines=lines,
+        rng=random.Random(SEED),
+    )
 
-    delta_by_index: dict[int, int] = {}
-    for i, line in enumerate(lines):
-        delta = reaction_delta_aromatic_rings(line)
-        if delta is not None:
-            delta_by_index[i] = delta
-
-    valid_deltas = list(delta_by_index.values())
-
-    ground_truth_count_by_threshold: dict[int, int] = {}
+    ground_truth_indices_by_threshold: dict[int, set[int]] = {}
     for x in THRESHOLDS:
-        count = sum(1 for delta in valid_deltas if delta == x)
-        ground_truth_count_by_threshold[x] = count
+        indices = set(TASK4_HARDCODED_GROUND_TRUTH_INDICES.get(x, []))
+        ground_truth_indices_by_threshold[x] = indices
 
     questions = [build_question(x) for x in THRESHOLDS]
-    context = "\n".join(lines)
 
     run = wandb.init(
         project="RLMs-Task4",
         config={
-            "MODEL_NAME": model_name,
+            "MODEL_NAME": MODEL_NAME,
             "thresholds": THRESHOLDS,
             "backend": BACKEND,
-            "model_name": model_name,
+            "model_name": MODEL_NAME,
             "dataset_path": DATASET_PATH,
+            "seed": SEED,
+            "context_size": context_size,
+            "context_pipeline_name": CONTEXT_PIPELINE_NAME,
             "num_questions": len(questions),
-            "rlm_init_kwargs": rlm_init_kwargs,
+            "rlm_init_kwargs": RLM_INIT_KWARGS,
         },
     )
     wandb.define_metric("sample_iteration")
     wandb.define_metric("sample/*", step_metric="sample_iteration")
 
-    correct = 0
+    precision_sum = 0.0
+    recall_sum = 0.0
+    f1_sum = 0.0
+    total_input_tokens_sum = 0
+    total_output_tokens_sum = 0
     total_cost_usd = 0.0
     samples_with_cost = 0
 
     for i, threshold in enumerate(THRESHOLDS):
         question = questions[i]
         print(f"Question {i + 1}/{len(questions)} for X={threshold}")
-        completion_kwargs = {"prompt": context, "root_prompt": question}
+        ground_truth_index_set = ground_truth_indices_by_threshold[threshold]
+        sample_context = context_pipeline.build_context(
+            context_size=context_size,
+            correct_indices=ground_truth_index_set,
+            query=str(threshold),
+        )
+        context_lines = [line for line in sample_context.splitlines() if line.strip()]
+        context_indices = {
+            int(line.split(" ", 1)[0])
+            for line in context_lines
+            if " " in line and line.split(" ", 1)[0].isdigit()
+        }
+        ground_truth_in_context_set = ground_truth_index_set & context_indices
+        gt_in_context_count = len(ground_truth_in_context_set)
+        print(
+            f"[CONTEXT] requested_size={context_size} actual_size={len(context_lines)} "
+            f"ground_truth_in_context={gt_in_context_count}/{len(ground_truth_index_set)}"
+        )
+        completion_kwargs = {"prompt": sample_context, "root_prompt": question}
         with using_tracing_attributes(
             session_id=run_session_id,
             metadata={
@@ -214,22 +170,29 @@ def main(model_name: str) -> None:
             completion = rlm.completion(**completion_kwargs)
             response = completion.response
         iteration_metrics = rlm.get_last_iteration_metrics()
-        parsed_count = parse_count(response)
+        parsed_indices = parse_indices(response)
         sample_cost_usd = completion.usage_summary.total_cost
         if sample_cost_usd is not None:
             total_cost_usd += sample_cost_usd
             samples_with_cost += 1
 
-        ground_truth_count = ground_truth_count_by_threshold[threshold]
-        is_correct = parsed_count == ground_truth_count
-        if is_correct:
-            correct += 1
-        else:
+        predicted_index_set = set(parsed_indices)
+        precision, recall, f1 = precision_recall_f1(
+            predicted_index_set, ground_truth_in_context_set
+        )
+        precision_sum += precision
+        recall_sum += recall
+        f1_sum += f1
+        if f1 < 1.0:
             print(f"Mismatch for X={threshold}")
-            print(f"Predicted count: {parsed_count}")
-            print(f"Ground truth count: {ground_truth_count}")
-            print(f"Raw response: {response}")
+            print(f"Predicted indices: {sorted(predicted_index_set)}")
+            print(f"Ground truth indices (in context): {sorted(ground_truth_in_context_set)}")
+            print(
+                f"precision={precision:.4f}, recall={recall:.4f}, f1={f1:.4f}"
+            )
             print("--------------------------------")
+        else:
+            print(f"F1 is 1.0 for X={threshold}")
 
         for metric in iteration_metrics:
             wandb.log(
@@ -243,6 +206,8 @@ def main(model_name: str) -> None:
 
         if iteration_metrics:
             last_metric = iteration_metrics[-1]
+            total_input_tokens_sum += int(last_metric["total_input_tokens"])
+            total_output_tokens_sum += int(last_metric["total_output_tokens"])
             wandb.log(
                 {
                     "sample_idx": i,
@@ -251,17 +216,13 @@ def main(model_name: str) -> None:
                     f"sample/{i}/final_total_output_tokens": last_metric["total_output_tokens"],
                     f"sample/{i}/final_total_tokens": last_metric["total_tokens"],
                     f"sample/{i}/iterations": len(iteration_metrics),
-                    f"sample/{i}/is_correct": int(is_correct),
-                    f"sample/{i}/ground_truth_count": ground_truth_count,
-                    f"sample/{i}/prediction_count": parsed_count
-                    if parsed_count is not None
-                    else -1,
-                    f"sample/{i}/response_raw": response,
-                    f"sample/{i}/response_parsed_count": parsed_count
-                    if parsed_count is not None
-                    else -1,
-                    f"sample/{i}/completion_root_prompt": question,
-                    f"sample/{i}/completion_prompt_char_count": len(context),
+                    f"sample/{i}/precision": precision,
+                    f"sample/{i}/recall": recall,
+                    f"sample/{i}/f1": f1,
+                    f"sample/{i}/ground_truth_count": len(ground_truth_in_context_set),
+                    f"sample/{i}/predicted_count": len(predicted_index_set),
+                    f"sample/{i}/completion_prompt_char_count": len(sample_context),
+                    f"sample/{i}/context_size": context_size,
                     **(
                         {f"sample/{i}/final_total_cost_usd": sample_cost_usd}
                         if sample_cost_usd is not None
@@ -270,20 +231,35 @@ def main(model_name: str) -> None:
                 }
             )
 
-        wandb.log({"running_accuracy": correct / (i + 1)})
+        wandb.log(
+            {
+                "running_precision": precision_sum / (i + 1),
+                "running_recall": recall_sum / (i + 1),
+                "running_f1": f1_sum / (i + 1),
+            }
+        )
 
     total = len(questions)
-    accuracy = (correct / total) if total else 0.0
-    print(f"Correct: {correct}/{total}")
-    print(f"Accuracy: {accuracy:.4f}")
+    avg_precision = (precision_sum / total) if total else 0.0
+    avg_recall = (recall_sum / total) if total else 0.0
+    avg_f1 = (f1_sum / total) if total else 0.0
+    avg_total_input_tokens = (total_input_tokens_sum / total) if total else 0.0
+    avg_total_output_tokens = (total_output_tokens_sum / total) if total else 0.0
+    print(f"Macro Precision: {avg_precision:.4f}")
+    print(f"Macro Recall: {avg_recall:.4f}")
+    print(f"Macro F1: {avg_f1:.4f}")
+    print(f"Avg total input tokens/sample: {avg_total_input_tokens:.2f}")
+    print(f"Avg total output tokens/sample: {avg_total_output_tokens:.2f}")
 
     for x in THRESHOLDS:
-        run.summary[f"ground_truth/x_{x}/count"] = ground_truth_count_by_threshold[x]
+        run.summary[f"ground_truth/x_{x}/count"] = len(ground_truth_indices_by_threshold[x])
 
-    run.summary["valid_reaction_count"] = len(valid_deltas)
-    run.summary["correct"] = correct
     run.summary["total"] = total
-    run.summary["accuracy"] = accuracy
+    run.summary["macro_precision"] = avg_precision
+    run.summary["macro_recall"] = avg_recall
+    run.summary["macro_f1"] = avg_f1
+    run.summary["avg_total_input_tokens_per_sample"] = avg_total_input_tokens
+    run.summary["avg_total_output_tokens_per_sample"] = avg_total_output_tokens
     run.summary["samples_with_cost"] = samples_with_cost
     if samples_with_cost > 0:
         run.summary["total_cost_usd"] = total_cost_usd
@@ -292,16 +268,5 @@ def main(model_name: str) -> None:
 
 
 if __name__ == "__main__":
-    # with open(DATASET_PATH, "r") as f:
-    #     raw_lines = [line.strip() for line in f.readlines() if line.strip()]
-    #     lines = [f"{i} {line}" for i, line in enumerate(raw_lines)]
-    
-    # valid_deltas: list[int] = []
-    # for line in lines:
-    #     delta = reaction_delta_aromatic_rings(line)
-    #     if delta is not None:
-    #         valid_deltas.append(delta)
-    
-    # run_pre_experiment_x_scan(valid_deltas, x_max=12)
     args = parse_args()
-    main(model_name=args.model_name)
+    main(context_size=args.context_size)
