@@ -17,51 +17,59 @@ from rlm.codeact_core import (
     run_agent_verbose,
 )
 from rlm.codeact_helpers import (
-    build_reaction_query,
-    build_retriever,
+    build_context_pipeline,
     extract_response_text,
-    ground_truth_indices,
     load_lines,
     parse_indices,
     precision_recall_f1,
 )
 from rlm.tracing import get_tracer, init_tracing, using_tracing_attributes
 from rlm.utils.token_utils import count_tokens
+from task8_hardcoded_ground_truth import (
+    TASK8_BOC_SMIRKS,
+    TASK8_GROUND_TRUTH_DEFINITION,
+    TASK8_HARDCODED_GROUND_TRUTH_INDICES_BY_REACTION,
+    TASK8_POSITIVE_REACTIONS_BY_KEY,
+    TASK8_SKIPPED_REACTIONS,
+    TASK8_TOTAL_REACTIONS,
+    TASK8_VALID_REACTIONS,
+)
 
-
-DATASET_PATH = "/home/bhagavan/rlms/datasets/reactionSmilesFigShareUSPTO2023.txt"
+DATASET_PATH = "/home/bhagavan/rlms/datasets/reactionSmilesFigShareUSPTO2023_cleaned.txt"
 MODEL_NAME = "openai/gpt-5-mini"
 OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
 ENABLE_TRACING = True
-WORKFLOW_TIMEOUT_S = 1200.0
+WORKFLOW_TIMEOUT_S = 900.0
 SEED = 42
-CONTEXT_SIZE = 500
-GROUND_TRUTH_FRACTION_PER_CONTEXT = 0.2
-RETRIEVER_NAME = "random"
-MAX_OUTPUT_TOKENS = 50_000
+CONTEXT_SIZE = 100
+CONTEXT_PIPELINE_NAME = "random"
+MIN_SELECTED_GROUND_TRUTH = 5
+MAX_OUTPUT_TOKENS = 30_000
 REASONING_EFFORT = "high"
 MAX_ITERATIONS = 8
+LLM_TIMEOUT_RETRIES = 2
+LLM_TIMEOUT_RETRY_BACKOFF_S = 2.0
+LLM_REQUEST_TIMEOUT_S = 300.0
+CODE_EXECUTION_TIMEOUT_S = 300.0
 # os.environ["WANDB_MODE"] = "disabled"
 
-BOC_SMIRKS: dict[str, str] = {
-    "boc_primary_amine_deprotection": "[C;H3;D1;+0]-[C;H0;D4;+0](-[C;H3;D1;+0])(-[C;H3;D1;+0])-[O;H0;D2;+0]-[C;H0;D3;+0](=[O;H0;D1;+0])-[#7;H1;+0:1]>>[#7;H2;+0:1]",
-    "boc_secondary_amine_deprotection": "[C;H3;D1;+0]-[C;H0;D4;+0](-[C;H3;D1;+0])(-[C;H3;D1;+0])-[O;H0;D2;+0]-[C;H0;D3;+0](=[O;H0;D1;+0])-[#7;H0;+0:1]>>[#7;H1;+0:1]",
-    "boc_amine_protection_of_secondary_amine": "[C;H3;D1;+0:1]-[C;H0;D4;+0:2](-[C;H3;D1;+0:3])(-[C;H3;D1;+0:4])-[O;H0;D2;+0:5]-[C;H0;D3;+0:6](=[O;H0;D1;+0:7])-[O;H0;D2;+0].[#7;H1;+0:8]>>[C;H3;D1;+0:1]-[C;H0;D4;+0:2](-[C;H3;D1;+0:3])(-[C;H3;D1;+0:4])-[O;H0;D2;+0:5]-[C;H0;D3;+0:6](=[O;H0;D1;+0:7])-[#7;H0;+0:8]",
-    "boc_amine_protection_of_primary_amine": "[C;H3;D1;+0:1]-[C;H0;D4;+0:2](-[C;H3;D1;+0:3])(-[C;H3;D1;+0:4])-[O;H0;D2;+0:5]-[C;H0;D3;+0:6](=[O;H0;D1;+0:7])-[O;H0;D2;+0].[#7;H2;+0:8]>>[C;H3;D1;+0:1]-[C;H0;D4;+0:2](-[C;H3;D1;+0:3])(-[C;H3;D1;+0:4])-[O;H0;D2;+0:5]-[C;H0;D3;+0:6](=[O;H0;D1;+0:7])-[#7;H1;+0:8]"
-}
+SKIPPED_REACTION_KEYS = frozenset({
+    "boc_primary_amine_deprotection",
+    "boc_amine_protection_of_secondary_amine",
+})
 
 BOC_LABELS: dict[str, str] = {
-    "boc_primary_amine_deprotection": "BOC deprotection of primary amine",
+    # "boc_primary_amine_deprotection": "BOC deprotection of primary amine",
     "boc_secondary_amine_deprotection": "BOC deprotection of secondary amine",
-    "boc_amine_protection_of_secondary_amine": "BOC amine protection of secondary amine",
-    "boc_amine_protection_of_primary_amine": "BOC amine protection of primary amine"
+    # "boc_amine_protection_of_secondary_amine": "BOC amine protection of secondary amine",
+    "boc_amine_protection_of_primary_amine": "BOC amine protection of primary amine",
 }
 
 BOC_DESCRIPTIONS: dict[str, str] = {
-    "boc_primary_amine_deprotection": "Acid-mediated removal of a tert-butyloxycarbonyl (Boc) protecting group from a nitrogen atom, regenerating a primary amine. The reactant contains the full Boc group — a tert-butyl moiety consisting of a quaternary carbon with no hydrogens and four connections bearing three methyl groups, connected through a neutral oxygen with no hydrogens and two connections to a carbonyl carbon with no hydrogens and three connections, double-bonded to an oxygen with no hydrogens and one connection. The carbonyl is bonded to the protected nitrogen which has one hydrogen and is neutral. The entire Boc group is unmapped and fully cleaved off, and the nitrogen gains a hydrogen (going from one to two), regenerating a free primary amine.",
+    # "boc_primary_amine_deprotection": "Acid-mediated removal of a tert-butyloxycarbonyl (Boc) protecting group from a nitrogen atom, regenerating a primary amine. The reactant contains the full Boc group — a tert-butyl moiety consisting of a quaternary carbon with no hydrogens and four connections bearing three methyl groups, connected through a neutral oxygen with no hydrogens and two connections to a carbonyl carbon with no hydrogens and three connections, double-bonded to an oxygen with no hydrogens and one connection. The carbonyl is bonded to the protected nitrogen which has one hydrogen and is neutral. The entire Boc group is unmapped and fully cleaved off, and the nitrogen gains a hydrogen (going from one to two), regenerating a free primary amine.",
     "boc_secondary_amine_deprotection": "Acid-mediated removal of a tert-butyloxycarbonyl (Boc) protecting group from a nitrogen atom, regenerating a secondary amine. The reactant contains the full Boc group — a tert-butyl moiety consisting of a quaternary carbon with no hydrogens and four connections bearing three methyl groups, connected through a neutral oxygen with no hydrogens and two connections to a carbonyl carbon with no hydrogens and three connections, double-bonded to an oxygen with no hydrogens and one connection. The carbonyl is bonded to the protected nitrogen which has no hydrogens and is neutral. The entire Boc group is unmapped and fully cleaved off, and the nitrogen gains a hydrogen (going from zero to one), regenerating a free secondary amine.",
-    "boc_amine_protection_of_secondary_amine": "Protection of a secondary amine with a tert-butyloxycarbonyl (Boc) group. The reactant side contains a Boc reagent — a tert-butyl moiety (quaternary carbon bearing three methyl groups) connected through an oxygen to a carbonyl, which has a second oxygen acting as the leaving group (unmapped). The secondary amine, bearing one hydrogen on nitrogen, attacks the carbonyl carbon, displacing the leaving group oxygen. In the product, the nitrogen loses its hydrogen (going from H1 to H0) and is now bonded to the Boc carbonyl, forming a carbamate linkage. The full Boc group — tert-butyl, oxygen, and carbonyl — is preserved intact in the product.",
-    "boc_amine_protection_of_primary_amine": "Protection of a primary amine with a tert-butyloxycarbonyl (Boc) group. The reactant side contains a Boc reagent — a tert-butyl moiety consisting of a quaternary carbon with no hydrogens and four connections, bearing three methyl groups each with three hydrogens and one connection — connected through a neutral oxygen with no hydrogens and two connections to a carbonyl carbon with no hydrogens and three connections, which is double-bonded to an oxygen with no hydrogens and one connection. A second unmapped oxygen on the carbonyl acts as the leaving group. The primary amine nitrogen, bearing two hydrogens and neutral charge, attacks the carbonyl carbon, displacing the leaving group oxygen. In the product, the nitrogen loses one hydrogen (going from two to one), forming a new bond to the Boc carbonyl, while the full Boc group is preserved intact."
+    # "boc_amine_protection_of_secondary_amine": "Protection of a secondary amine with a tert-butyloxycarbonyl (Boc) group. The reactant side contains a Boc reagent — a tert-butyl moiety (quaternary carbon bearing three methyl groups) connected through an oxygen to a carbonyl, which has a second oxygen acting as the leaving group (unmapped). The secondary amine, bearing one hydrogen on nitrogen, attacks the carbonyl carbon, displacing the leaving group oxygen. In the product, the nitrogen loses its hydrogen (going from H1 to H0) and is now bonded to the Boc carbonyl, forming a carbamate linkage. The full Boc group — tert-butyl, oxygen, and carbonyl — is preserved intact in the product.",
+    "boc_amine_protection_of_primary_amine": "Protection of a primary amine with a tert-butyloxycarbonyl (Boc) group. The reactant side contains a Boc reagent — a tert-butyl moiety consisting of a quaternary carbon with no hydrogens and four connections, bearing three methyl groups each with three hydrogens and one connection — connected through a neutral oxygen with no hydrogens and two connections to a carbonyl carbon with no hydrogens and three connections, which is double-bonded to an oxygen with no hydrogens and one connection. A second unmapped oxygen on the carbonyl acts as the leaving group. The primary amine nitrogen, bearing two hydrogens and neutral charge, attacks the carbonyl carbon, displacing the leaving group oxygen. In the product, the nitrogen loses one hydrogen (going from two to one), forming a new bond to the Boc carbonyl, while the full Boc group is preserved intact.",
 }
 
 
@@ -73,25 +81,21 @@ def build_question(reaction_label: str, reaction_description: str) -> str:
     - "index reactants>>products"
 
     Task:
-    Count how many reactions are of the following type:
+    Return all reaction indices that match this reaction type:
     - {reaction_label}
 
-    Here is a detailed description of the reaction type:
+    Description:
     - {reaction_description}
 
     Guidance:
-    - Define a single Reaction SMIRKS pattern encoding the full transformation (reactants >> products) with atom mapping to classify reactions. DO NOT match functional groups independently on reactants and products using individual SMARTS patterns.
-    - You may reason about a few candidate SMIRKS, but commit to exactly one for the final answer. DO NOT aggregate counts from multiple patterns.
-    - Use RdKit for all analysis and counting.
-    - DO NOT count other reaction types for this question.
+    - Use RDKit for parsing reactions and programmatic classification.
+    - Represent the transformation as a reaction-level pattern (for example, reaction SMIRKS or reaction SMARTS with atom mapping) that encodes reactants and products together.
+    - Pattern matching and substructure checks on mapped reaction templates are appropriate ways to decide membership.
     - Ignore reagents (middle field).
     - Handle multi-component sides separated by dots (.).
-    - Skip malformed reactions.
-    - Skip reactions that errors out while matching the SMIRKS pattern with RDKit.
-    - DO NOT assume/simulate output of the code. Wait for the code to get executed and only then return the final answer.
-    - DO NOT USE `FINAL` for writing a comment/thought. Only use this for the final answer.
-    - DO NOT WRITE `FINAL` without observing the output of the code.
-    - DO NOT do `exit()` in the code in any case.
+    - Skip malformed reactions and matching failures.
+    - If you copy SMILES text into a Python string literal, handle backslashes safely:
+      use a raw string (for example, r\"\"\"...\"\"\") or escape backslashes as "\\\\".
 
     Output format:
     - Return ONLY the matching reaction INDICES.
@@ -119,18 +123,20 @@ def maybe_init_tracing() -> None:
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Run CodeAct task 8 evaluation.")
     parser.add_argument("--model-name", type=str, default=MODEL_NAME)
-    parser.add_argument("--context-size", type=int, default=CONTEXT_SIZE)
     parser.add_argument(
-        "--ground-truth-fraction-per-context",
-        type=float,
-        default=GROUND_TRUTH_FRACTION_PER_CONTEXT,
+        "--context-size",
+        type=int,
+        default=CONTEXT_SIZE,
+        help=(
+            "Number of retrieved reactions to include in context "
+            f"(default: {CONTEXT_SIZE}; use -1 for all lines)."
+        ),
     )
     return parser.parse_args()
 
 
-def build_code_executor(lines: list[str]):
+def build_code_executor():
     return make_simple_code_executor(
-        extra_locals={"lines": lines},
         extra_globals={
             "np": __import__("numpy"),
             "rdkit": __import__("rdkit"),
@@ -138,32 +144,29 @@ def build_code_executor(lines: list[str]):
     )
 
 
-async def main(
-    model_name: str,
-    context_size: int,
-    ground_truth_fraction_per_context: float,
-) -> None:
+async def main(model_name: str, context_size: int) -> None:
     maybe_init_tracing()
     tracer = get_tracer("codeact-task8")
-    lines = load_lines()
-    context = "\n".join(lines)
-    rng = random.Random(SEED)
-    reaction_keys = list(BOC_SMIRKS.keys())
+    lines = load_lines(DATASET_PATH)
+    reaction_keys = list(TASK8_HARDCODED_GROUND_TRUTH_INDICES_BY_REACTION.keys())
+    context_pipeline = build_context_pipeline(
+        name=CONTEXT_PIPELINE_NAME,
+        lines=lines,
+        rng=random.Random(SEED),
+        min_selected_ground_truth=MIN_SELECTED_GROUND_TRUTH,
+    )
     run_session_id = f"codeact-task8-{uuid.uuid4()}"
 
-    full_gt_indices_by_reaction: dict[str, list[int]] = {}
     for reaction_key in reaction_keys:
-        query_reaction = build_reaction_query(BOC_SMIRKS[reaction_key])
-        full_gt_indices_by_reaction[reaction_key] = ground_truth_indices(lines, query_reaction)
-
-    retriever = build_retriever(
-        name=RETRIEVER_NAME,
-        lines=lines,
-        rng=rng,
-        ground_truth_indices_by_reaction=full_gt_indices_by_reaction,
-        ground_truth_fraction_per_context=ground_truth_fraction_per_context,
-    )
-    retriever_name = RETRIEVER_NAME if context_size >= 0 else "all_lines"
+        if reaction_key in SKIPPED_REACTION_KEYS:
+            continue
+        print(
+            f"Ground truth [{reaction_key}] "
+            f"count={TASK8_POSITIVE_REACTIONS_BY_KEY[reaction_key]} "
+            f"valid={TASK8_VALID_REACTIONS} "
+            f"skipped={TASK8_SKIPPED_REACTIONS} "
+            f"definition={TASK8_GROUND_TRUTH_DEFINITION}"
+        )
 
     run = wandb.init(
         project="CodeAct-Task8",
@@ -173,12 +176,21 @@ async def main(
             "workflow_timeout_s": WORKFLOW_TIMEOUT_S,
             "seed": SEED,
             "context_size": context_size,
-            "ground_truth_fraction_per_context": ground_truth_fraction_per_context,
-            "retriever_name": retriever_name,
+            "context_pipeline_name": CONTEXT_PIPELINE_NAME,
+            "min_selected_ground_truth": MIN_SELECTED_GROUND_TRUTH,
             "reasoning_effort": REASONING_EFFORT,
-            "task_description": "Return reaction indices for BOC-protection/deprotection subtypes.",
-            "BOC_SMIRKS": BOC_SMIRKS,
-            "full_ground_truth_indices_by_reaction": full_gt_indices_by_reaction,
+            "llm_timeout_retries": LLM_TIMEOUT_RETRIES,
+            "llm_timeout_retry_backoff_s": LLM_TIMEOUT_RETRY_BACKOFF_S,
+            "llm_request_timeout_s": LLM_REQUEST_TIMEOUT_S,
+            "code_execution_timeout_s": CODE_EXECUTION_TIMEOUT_S,
+            "num_questions": len(reaction_keys),
+            "task_description": "Return reaction indices for BOC protection/deprotection subtypes.",
+            "ground_truth_definition": TASK8_GROUND_TRUTH_DEFINITION,
+            "boc_smirks": TASK8_BOC_SMIRKS,
+            "ground_truth_positive_reactions_by_key": TASK8_POSITIVE_REACTIONS_BY_KEY,
+            "ground_truth_total_reactions": TASK8_TOTAL_REACTIONS,
+            "ground_truth_valid_reactions": TASK8_VALID_REACTIONS,
+            "ground_truth_skipped_reactions": TASK8_SKIPPED_REACTIONS,
         },
     )
     wandb.define_metric("sample_iteration")
@@ -190,27 +202,37 @@ async def main(
     macro_f1 = 0.0
     total_cost_usd = 0.0
     samples_with_cost = 0
+    total_input_tokens = 0
+    total_output_tokens = 0
+    samples_run = 0
 
     for i, reaction_key in enumerate(reaction_keys):
+        if reaction_key in SKIPPED_REACTION_KEYS:
+            continue
         reaction_label = BOC_LABELS[reaction_key]
         reaction_description = BOC_DESCRIPTIONS[reaction_key]
-        reaction_smirks = BOC_SMIRKS[reaction_key]
-        query_reaction = build_reaction_query(reaction_smirks)
-        question = build_question(reaction_label=reaction_label, reaction_description=reaction_description)
+        reaction_smirks = TASK8_BOC_SMIRKS[reaction_key]
+        question = build_question(
+            reaction_label=reaction_label,
+            reaction_description=reaction_description,
+        )
+        full_gt_set = set(TASK8_HARDCODED_GROUND_TRUTH_INDICES_BY_REACTION[reaction_key])
 
-        if context_size < 0:
-            retrieved_context = context
-            retrieved_lines = lines
-        else:
-            retrieved_context = retriever.build_context(query=reaction_key, target_index=-1, k=context_size)
-            retrieved_lines = [line for line in retrieved_context.splitlines() if line.strip()]
+        retrieved_context = context_pipeline.build_context(
+            context_size=context_size,
+            correct_indices=full_gt_set,
+            query=reaction_key,
+        )
+        retrieved_lines = [line for line in retrieved_context.splitlines() if line.strip()]
+        retrieved_indices = {
+            int(line.split(" ", 1)[0])
+            for line in retrieved_lines
+            if " " in line and line.split(" ", 1)[0].isdigit()
+        }
+        ground_truth_in_context_set = full_gt_set & retrieved_indices
+        ground_truth_count = len(ground_truth_in_context_set)
+        context_has_ground_truth = bool(ground_truth_in_context_set)
         context_coverage = len(retrieved_lines) / len(lines) if lines else 0.0
-        gt_indices_full = full_gt_indices_by_reaction[reaction_key]
-        gt_indices_in_context = ground_truth_indices(retrieved_lines, query_reaction)
-        # Evaluate against only the ground-truth reactions present in retrieved context.
-        gt_indices = gt_indices_in_context
-        gt_set = set(gt_indices)
-        total_gt_count = len(gt_indices_full)
 
         completion_prompt = f"""
         You are given a subset of chemical reactions in SMILES format and a question.
@@ -221,13 +243,15 @@ async def main(
         {question}
         </question>
         """
-        print(f"Question {i + 1}/{len(reaction_keys)} for reaction_key={reaction_key}")
+
+        print(f"Question {i + 1}/{len(reaction_keys)} task={reaction_key}")
         print(
-            f"Ground truth count (full dataset): {len(gt_indices_full)}/{total_gt_count}, "
-            f"in-context: {len(gt_indices_in_context)} (context lines: {len(retrieved_lines)})"
+            f"[CONTEXT] requested_size={context_size} actual_size={len(retrieved_lines)} "
+            f"ground_truth_in_context={ground_truth_count}/{len(full_gt_set)} "
+            f"coverage={context_coverage:.4f}"
         )
 
-        executor = build_code_executor(lines=retrieved_lines)
+        executor = build_code_executor()
         agent = CodeActAgent(
             code_execute_fn=executor.execute,
             llm=OpenRouter(
@@ -242,6 +266,10 @@ async def main(
             force_loop_message=INDEX_FORCE_LOOP_MESSAGE,
             observation_followup=INDEX_OBSERVATION_FOLLOWUP,
             timeout=WORKFLOW_TIMEOUT_S,
+            llm_timeout_retries=LLM_TIMEOUT_RETRIES,
+            llm_timeout_retry_backoff_s=LLM_TIMEOUT_RETRY_BACKOFF_S,
+            llm_request_timeout_s=LLM_REQUEST_TIMEOUT_S,
+            code_execution_timeout_s=CODE_EXECUTION_TIMEOUT_S,
         )
         ctx = Context(agent)
 
@@ -263,6 +291,7 @@ async def main(
                     "reaction_key": reaction_key,
                     "reaction_smirks": reaction_smirks,
                     "agent": "codeact",
+                    "ground_truth_definition": TASK8_GROUND_TRUTH_DEFINITION,
                 },
                 tags=["codeact", "sample", "task8_boc"],
             ):
@@ -290,13 +319,25 @@ async def main(
 
         parsed_indices = parse_indices(response_text)
         pred_set = set(parsed_indices)
-        precision, recall, f1 = precision_recall_f1(pred_set, gt_set)
-        is_exact_match = pred_set == gt_set
+        precision, recall, f1 = precision_recall_f1(pred_set, ground_truth_in_context_set)
+        predicted_count = len(pred_set)
+        count_error = abs(predicted_count - ground_truth_count)
+        count_exact = int(predicted_count == ground_truth_count)
+        is_exact_match = pred_set == ground_truth_in_context_set
+
         if is_exact_match:
             exact_match_count += 1
         macro_precision += precision
         macro_recall += recall
         macro_f1 += f1
+
+        print(f"Predicted [{reaction_key}] count: {predicted_count}")
+        print(f"Ground truth [{reaction_key}] count: {ground_truth_count}")
+        print(
+            f"Metrics [{reaction_key}] -> "
+            f"precision={precision:.4f} recall={recall:.4f} f1={f1:.4f} "
+            f"exact_match={is_exact_match} count_error={count_error} count_exact={count_exact}"
+        )
 
         for metric in llm_turn_metrics:
             wandb.log(
@@ -313,14 +354,23 @@ async def main(
                 }
             )
 
-        final_input_tokens = sum(int(m.get("iteration_input_tokens", 0)) for m in llm_turn_metrics)
-        final_output_tokens = sum(int(m.get("iteration_output_tokens", 0)) for m in llm_turn_metrics)
-        final_total_tokens = sum(int(m.get("iteration_total_tokens", 0)) for m in llm_turn_metrics)
-        final_cost = sum(float(m.get("iteration_cost_usd", 0.0)) for m in llm_turn_metrics)
-        has_cost = any("iteration_cost_usd" in m for m in llm_turn_metrics)
+        final_input_tokens = sum(
+            int(metric.get("iteration_input_tokens", 0)) for metric in llm_turn_metrics
+        )
+        final_output_tokens = sum(
+            int(metric.get("iteration_output_tokens", 0)) for metric in llm_turn_metrics
+        )
+        final_total_tokens = sum(
+            int(metric.get("iteration_total_tokens", 0)) for metric in llm_turn_metrics
+        )
+        final_cost = sum(float(metric.get("iteration_cost_usd", 0.0)) for metric in llm_turn_metrics)
+        has_cost = any("iteration_cost_usd" in metric for metric in llm_turn_metrics)
         if has_cost:
             total_cost_usd += final_cost
             samples_with_cost += 1
+        total_input_tokens += final_input_tokens
+        total_output_tokens += final_output_tokens
+        samples_run += 1
 
         wandb.log(
             {
@@ -335,37 +385,35 @@ async def main(
                 f"sample/{i}/precision": precision,
                 f"sample/{i}/recall": recall,
                 f"sample/{i}/f1": f1,
-                f"sample/{i}/ground_truth_count": len(gt_indices),
-                f"sample/{i}/ground_truth_in_context_count": len(gt_indices_in_context),
-                f"sample/{i}/ground_truth_full_count": len(gt_indices_full),
-                f"sample/{i}/prediction_count": len(parsed_indices),
-                f"sample/{i}/ground_truth_indices": ",".join(str(x) for x in gt_indices),
-                f"sample/{i}/ground_truth_in_context_indices": ",".join(
-                    str(x) for x in gt_indices_in_context
-                ),
-                f"sample/{i}/predicted_indices": ",".join(str(x) for x in parsed_indices),
-                f"sample/{i}/response_raw": response_text,
+                f"sample/{i}/predicted_count": predicted_count,
+                f"sample/{i}/ground_truth_count": ground_truth_count,
+                f"sample/{i}/ground_truth_full_count": len(full_gt_set),
+                f"sample/{i}/count_error": count_error,
+                f"sample/{i}/count_exact": count_exact,
                 f"sample/{i}/completion_prompt_char_count": len(completion_prompt),
                 f"sample/{i}/context_char_count": len(retrieved_context),
                 f"sample/{i}/retrieved_line_count": len(retrieved_lines),
+                f"sample/{i}/context_size": context_size,
                 f"sample/{i}/context_coverage": context_coverage,
+                f"sample/{i}/context_has_ground_truth": int(context_has_ground_truth),
                 **({f"sample/{i}/final_total_cost_usd": final_cost} if has_cost else {}),
             }
         )
         wandb.log(
             {
-                "running_exact_match_accuracy": exact_match_count / (i + 1),
-                "running_macro_precision": macro_precision / (i + 1),
-                "running_macro_recall": macro_recall / (i + 1),
-                "running_macro_f1": macro_f1 / (i + 1),
+                "running_exact_match_accuracy": exact_match_count / samples_run,
+                "running_macro_precision": macro_precision / samples_run,
+                "running_macro_recall": macro_recall / samples_run,
+                "running_macro_f1": macro_f1 / samples_run,
             }
         )
 
-    total = len(reaction_keys)
+    total = samples_run
     exact_match_accuracy = (exact_match_count / total) if total else 0.0
     macro_precision = (macro_precision / total) if total else 0.0
     macro_recall = (macro_recall / total) if total else 0.0
     macro_f1 = (macro_f1 / total) if total else 0.0
+
     print(f"Exact match: {exact_match_count}/{total}")
     print(f"Exact match accuracy: {exact_match_accuracy:.4f}")
     print(f"Macro precision: {macro_precision:.4f}")
@@ -378,17 +426,26 @@ async def main(
     run.summary["macro_precision"] = macro_precision
     run.summary["macro_recall"] = macro_recall
     run.summary["macro_f1"] = macro_f1
+    run.summary["avg_total_input_tokens_per_sample"] = (
+        total_input_tokens / total if total else 0.0
+    )
+    run.summary["avg_total_output_tokens_per_sample"] = (
+        total_output_tokens / total if total else 0.0
+    )
+    run.summary["ground_truth/definition"] = TASK8_GROUND_TRUTH_DEFINITION
+    run.summary["ground_truth/total_reactions"] = TASK8_TOTAL_REACTIONS
+    run.summary["ground_truth/valid_reactions"] = TASK8_VALID_REACTIONS
+    run.summary["ground_truth/skipped_reactions"] = TASK8_SKIPPED_REACTIONS
     run.summary["samples_with_cost"] = samples_with_cost
     if samples_with_cost > 0:
         run.summary["total_cost_usd"] = total_cost_usd
         run.summary["avg_cost_per_sample_usd"] = total_cost_usd / samples_with_cost
+
     for reaction_key in reaction_keys:
-        run.summary[f"full_ground_truth/{reaction_key}/count"] = len(
-            full_gt_indices_by_reaction[reaction_key]
+        run.summary[f"full_ground_truth/{reaction_key}/count"] = (
+            TASK8_POSITIVE_REACTIONS_BY_KEY[reaction_key]
         )
-        run.summary[f"full_ground_truth/{reaction_key}/indices"] = ",".join(
-            str(x) for x in full_gt_indices_by_reaction[reaction_key]
-        )
+
     wandb.finish()
 
 
@@ -398,6 +455,5 @@ if __name__ == "__main__":
         main(
             model_name=args.model_name,
             context_size=args.context_size,
-            ground_truth_fraction_per_context=args.ground_truth_fraction_per_context,
         )
     )

@@ -1,14 +1,10 @@
 import argparse
 import asyncio
-import math
 import os
 import random
 import uuid
-from dataclasses import dataclass
 
 import wandb
-from rdkit import Chem
-from rdkit.Chem import rdFMCS
 from llama_index.core.workflow import Context
 from llama_index.llms.openrouter import OpenRouter
 
@@ -21,7 +17,7 @@ from rlm.codeact_core import (
     run_agent_verbose,
 )
 from rlm.codeact_helpers import (
-    build_retriever,
+    build_context_pipeline,
     extract_response_text,
     load_lines,
     parse_indices,
@@ -29,45 +25,47 @@ from rlm.codeact_helpers import (
 )
 from rlm.tracing import get_tracer, init_tracing, using_tracing_attributes
 from rlm.utils.token_utils import count_tokens
-
+from task15_hardcoded_ground_truth import (
+    TASK15_HARDCODED_GROUND_TRUTH_INDICES,
+    TASK15_POSITIVE_REACTIONS,
+    TASK15_SKIPPED_REACTIONS,
+    TASK15_TOTAL_REACTIONS,
+    TASK15_VALID_REACTIONS,
+)
 
 DATASET_PATH = "/home/bhagavan/rlms/datasets/reactionSmilesFigShareUSPTO2023_cleaned.txt"
 MODEL_NAME = "openai/gpt-5-mini"
 OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
 ENABLE_TRACING = True
-WORKFLOW_TIMEOUT_S = 1200.0
+WORKFLOW_TIMEOUT_S = 900.0
 SEED = 42
 CONTEXT_SIZE = 500
-GROUND_TRUTH_FRACTION_PER_CONTEXT = 0.2
-RETRIEVER_NAME = "random"
-MAX_OUTPUT_TOKENS = 50_000
+CONTEXT_PIPELINE_NAME = "random"
+MIN_SELECTED_GROUND_TRUTH = 5
+MAX_OUTPUT_TOKENS = 30_000
 REASONING_EFFORT = "high"
 MAX_ITERATIONS = 8
-MIN_CORE_ATOMS = 3
-MIN_CORE_FRACTION = 0.5
-MCS_TIMEOUT_SECONDS = 2
+LLM_TIMEOUT_RETRIES = 2
+LLM_TIMEOUT_RETRY_BACKOFF_S = 2.0
+LLM_REQUEST_TIMEOUT_S = 300.0
+CODE_EXECUTION_TIMEOUT_S = 300.0
+# os.environ["WANDB_MODE"] = "disabled"
 
-REACTION_KEY = "achiral_to_chiral"
-REACTION_LABEL = "Achiral substrates to chiral products"
-REACTION_DESCRIPTION = (
-    "A reaction matches when all reactant-side molecules are achiral and at least one "
-    "stereocenter exists in the largest product on the atoms belonging to the preserved "
-    "core of the largest reactant."
+REACTION_KEY = "exactly_one_cc_formed"
+TASK_LABEL = "Reactions that form exactly one C-C bond with no other carbon-carbon bond changes"
+TASK_DESCRIPTION = (
+    "A reaction forms exactly one C-C bond with no other carbon-carbon bond changes "
+    "when exactly one carbon-carbon bond is formed and zero carbon-carbon bonds are "
+    "broken. Bond type matters: single, double, triple, and aromatic C-C bonds are "
+    "distinct types. Ignore the reagent field."
 )
-
-
-@dataclass
-class AchiralToChiralResult:
-    index: int
-    is_valid: bool
-    is_positive: bool
 
 
 def maybe_init_tracing() -> None:
     if not ENABLE_TRACING:
         return
     initialized = init_tracing(
-        project_name="CodeAct-Task15",
+        project_name="CodeAct-Task15_tier3",
         auto_instrument=True,
         batch=False,
     )
@@ -81,110 +79,16 @@ def maybe_init_tracing() -> None:
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Run CodeAct task 15 evaluation.")
     parser.add_argument("--model-name", type=str, default=MODEL_NAME)
-    parser.add_argument("--dataset-path", type=str, default=DATASET_PATH)
-    parser.add_argument("--context-size", type=int, default=CONTEXT_SIZE)
     parser.add_argument(
-        "--ground-truth-fraction-per-context",
-        type=float,
-        default=GROUND_TRUTH_FRACTION_PER_CONTEXT,
+        "--context-size",
+        type=int,
+        default=CONTEXT_SIZE,
+        help=(
+            "Number of retrieved reactions to include in context "
+            f"(default: {CONTEXT_SIZE}; use -1 for all lines)."
+        ),
     )
     return parser.parse_args()
-
-
-def parse_reaction_sides(indexed_line: str) -> tuple[int, list[str], list[str]]:
-    idx_str, reaction_smiles = indexed_line.split(" ", 1)
-    parts = reaction_smiles.split(">")
-    if len(parts) != 3:
-        raise ValueError("Reaction must have reactants>reagents>products format.")
-    reactant_smiles = [s.strip() for s in parts[0].split(".") if s.strip()]
-    product_smiles = [s.strip() for s in parts[2].split(".") if s.strip()]
-    return int(idx_str), reactant_smiles, product_smiles
-
-
-def mols_from_smiles(smiles_list: list[str]) -> list[Chem.Mol]:
-    mols: list[Chem.Mol] = []
-    for smiles in smiles_list:
-        mol = Chem.MolFromSmiles(smiles)
-        if mol is None:
-            raise ValueError(f"Could not parse SMILES: {smiles}")
-        mols.append(mol)
-    return mols
-
-
-def find_chiral_centers(mol: Chem.Mol) -> list[tuple[int, str]]:
-    return Chem.FindMolChiralCenters(
-        mol,
-        includeUnassigned=True,
-        useLegacyImplementation=False,
-    )
-
-
-def get_preserved_core_product_atoms(substrate: Chem.Mol, product: Chem.Mol) -> set[int]:
-    substrate_heavy = substrate.GetNumHeavyAtoms()
-    if substrate_heavy == 0:
-        return set()
-
-    mcs_params = rdFMCS.MCSParameters()
-    mcs_params.Timeout = MCS_TIMEOUT_SECONDS
-    mcs_params.AtomCompareParameters.MatchChiralTag = False
-    mcs = rdFMCS.FindMCS([substrate, product], parameters=mcs_params)
-    if mcs.canceled or mcs.numAtoms == 0:
-        return set()
-
-    min_core_atoms = max(MIN_CORE_ATOMS, math.ceil(MIN_CORE_FRACTION * substrate_heavy))
-    if mcs.numAtoms < min_core_atoms:
-        return set()
-
-    core_pattern = Chem.MolFromSmarts(mcs.smartsString)
-    if core_pattern is None:
-        return set()
-    matches = product.GetSubstructMatches(core_pattern, useChirality=False)
-    if not matches:
-        return set()
-
-    atom_indices: set[int] = set()
-    for match in matches:
-        atom_indices.update(match)
-    return atom_indices
-
-
-def analyze_achiral_to_chiral(indexed_line: str) -> AchiralToChiralResult:
-    idx = -1
-    try:
-        idx, reactant_smiles, product_smiles = parse_reaction_sides(indexed_line)
-        reactants = mols_from_smiles(reactant_smiles)
-        products = mols_from_smiles(product_smiles)
-        if not reactants or not products:
-            raise ValueError("Reaction must contain at least one reactant and product.")
-
-        all_reactants_achiral = all(len(find_chiral_centers(mol)) == 0 for mol in reactants)
-        substrate = max(reactants, key=lambda mol: mol.GetNumHeavyAtoms())
-        product = max(products, key=lambda mol: mol.GetNumHeavyAtoms())
-        product_chiral_centers = find_chiral_centers(product)
-        preserved_core_atoms = get_preserved_core_product_atoms(substrate, product)
-        preserved_core_chiral_centers = [
-            atom_idx for atom_idx, _ in product_chiral_centers if atom_idx in preserved_core_atoms
-        ]
-
-        is_positive = (
-            all_reactants_achiral
-            and len(product_chiral_centers) > 0
-            and len(preserved_core_atoms) > 0
-            and len(preserved_core_chiral_centers) > 0
-        )
-        return AchiralToChiralResult(index=idx, is_valid=True, is_positive=is_positive)
-    except Exception:
-        return AchiralToChiralResult(index=idx, is_valid=False, is_positive=False)
-
-
-def ground_truth_indices(lines: list[str]) -> list[int]:
-    indices: list[int] = []
-    for line in lines:
-        result = analyze_achiral_to_chiral(line)
-        if result.is_valid and result.is_positive:
-            indices.append(result.index)
-    indices.sort()
-    return indices
 
 
 def build_question() -> str:
@@ -196,24 +100,23 @@ def build_question() -> str:
 
     Task:
     Return all reaction indices that match this reaction type:
-    - {REACTION_LABEL}
+    - {TASK_LABEL}
 
     Description:
-    - {REACTION_DESCRIPTION}
+    - {TASK_DESCRIPTION}
 
     Guidance:
-    - Use RDKit for parsing and stereochemistry analysis.
-    - Ignore reagents (middle field).
-    - All reactant-side molecules must be achiral (no assigned or unassigned stereocenters).
-    - Select largest reactant and largest product by heavy atom count.
-    - Largest product must have at least one stereocenter.
-    - Confirm substrate continuity by MCS between largest reactant and largest product.
-    - At least one largest-product stereocenter must lie on atoms in that preserved core.
+    - Use RDKit for all parsing and bond analysis.
+    - Convert reactants and products to RDKit molecules; do not count by string matching.
+    - Ignore reagents in the middle field.
+    - For each molecule, iterate through bonds with RDKit.
+    - A C-C bond is any bond where both endpoint atoms are carbon.
+    - When comparing reactants and products, treat bonds of different order or aromaticity as different bond types.
+    - Count how many C-C bonds of each type are formed and how many are broken.
+    - A reaction matches when exactly one C-C bond is formed in total and zero C-C bonds are broken, with no other carbon-carbon bond changes.
     - Skip malformed reactions.
-    - DO NOT assume/simulate output of the code. Wait for code execution and then return the final answer.
-    - DO NOT USE `FINAL` for writing a comment/thought. Only use this for the final answer.
-    - DO NOT WRITE `FINAL` without observing the output of the code.
-    - DO NOT do `exit()` in the code in any case.
+    - If you copy SMILES text into a Python string literal, handle backslashes safely:
+      use a raw string (for example, r\"\"\"...\"\"\") or escape backslashes as "\\\\".
 
     Output format:
     - Return ONLY the matching reaction INDICES.
@@ -223,9 +126,8 @@ def build_question() -> str:
     """
 
 
-def build_code_executor(lines: list[str]):
+def build_code_executor():
     return make_simple_code_executor(
-        extra_locals={"lines": lines},
         extra_globals={
             "np": __import__("numpy"),
             "rdkit": __import__("rdkit"),
@@ -233,61 +135,74 @@ def build_code_executor(lines: list[str]):
     )
 
 
-async def main(
-    model_name: str,
-    dataset_path: str,
-    context_size: int,
-    ground_truth_fraction_per_context: float,
-) -> None:
+async def main(model_name: str, context_size: int) -> None:
     maybe_init_tracing()
     tracer = get_tracer("codeact-task15")
-    lines = load_lines(dataset_path)
-    context = "\n".join(lines)
-    rng = random.Random(SEED)
-    run_session_id = f"codeact-task15-{uuid.uuid4()}"
-
-    full_gt_indices = ground_truth_indices(lines)
-    full_gt_by_reaction = {REACTION_KEY: full_gt_indices}
-    retriever = build_retriever(
-        name=RETRIEVER_NAME,
+    lines = load_lines(DATASET_PATH)
+    context_pipeline = build_context_pipeline(
+        name=CONTEXT_PIPELINE_NAME,
         lines=lines,
-        rng=rng,
-        ground_truth_indices_by_reaction=full_gt_by_reaction,
-        ground_truth_fraction_per_context=ground_truth_fraction_per_context,
+        rng=random.Random(SEED),
+        min_selected_ground_truth=MIN_SELECTED_GROUND_TRUTH,
     )
-    retriever_name = RETRIEVER_NAME if context_size >= 0 else "all_lines"
+    run_session_id = f"codeact-task15-{uuid.uuid4()}"
+    question = build_question()
+    full_gt_set = set(TASK15_HARDCODED_GROUND_TRUTH_INDICES)
+
+    print(
+        "Ground truth [exactly_one_cc_formed] "
+        f"count={TASK15_POSITIVE_REACTIONS} "
+        f"valid={TASK15_VALID_REACTIONS} "
+        f"skipped={TASK15_SKIPPED_REACTIONS}"
+    )
 
     run = wandb.init(
-        project="CodeAct-Task15",
+        project="CodeAct-Task15_tier3",
         config={
             "MODEL_NAME": model_name,
-            "dataset_path": dataset_path,
+            "dataset_path": DATASET_PATH,
             "workflow_timeout_s": WORKFLOW_TIMEOUT_S,
             "seed": SEED,
             "context_size": context_size,
-            "ground_truth_fraction_per_context": ground_truth_fraction_per_context,
-            "retriever_name": retriever_name,
+            "context_pipeline_name": CONTEXT_PIPELINE_NAME,
+            "min_selected_ground_truth": MIN_SELECTED_GROUND_TRUTH,
             "reasoning_effort": REASONING_EFFORT,
-            "task_label": REACTION_LABEL,
-            "task_description": REACTION_DESCRIPTION,
-            "full_ground_truth_indices_by_reaction": full_gt_by_reaction,
-            "full_ground_truth_count": len(full_gt_indices),
+            "llm_timeout_retries": LLM_TIMEOUT_RETRIES,
+            "llm_timeout_retry_backoff_s": LLM_TIMEOUT_RETRY_BACKOFF_S,
+            "llm_request_timeout_s": LLM_REQUEST_TIMEOUT_S,
+            "code_execution_timeout_s": CODE_EXECUTION_TIMEOUT_S,
+            "task_label": TASK_LABEL,
+            "task_description": TASK_DESCRIPTION,
+            "ground_truth_count": TASK15_POSITIVE_REACTIONS,
+            "ground_truth_total_reactions": TASK15_TOTAL_REACTIONS,
+            "ground_truth_valid_reactions": TASK15_VALID_REACTIONS,
+            "ground_truth_skipped_reactions": TASK15_SKIPPED_REACTIONS,
+            "ground_truth_definition": (
+                "bond-change signature: exactly one C-C bond formed and zero C-C bonds broken"
+            ),
         },
     )
     wandb.define_metric("sample_iteration")
     wandb.define_metric("sample/*", step_metric="sample_iteration")
 
-    question = build_question()
-    if context_size < 0:
-        retrieved_context = context
-        retrieved_lines = lines
-    else:
-        retrieved_context = retriever.build_context(query=REACTION_KEY, target_index=-1, k=context_size)
-        retrieved_lines = [line for line in retrieved_context.splitlines() if line.strip()]
+    retrieved_context = context_pipeline.build_context(
+        context_size=context_size,
+        correct_indices=full_gt_set,
+        query=REACTION_KEY,
+    )
+    retrieved_lines = [line for line in retrieved_context.splitlines() if line.strip()]
+    retrieved_indices = {
+        int(line.split(" ", 1)[0])
+        for line in retrieved_lines
+        if " " in line and line.split(" ", 1)[0].isdigit()
+    }
+    ground_truth_in_context_set = full_gt_set & retrieved_indices
+    ground_truth_count = len(ground_truth_in_context_set)
+    print(
+        f"[CONTEXT] requested_size={context_size} actual_size={len(retrieved_lines)} "
+        f"ground_truth_in_context={ground_truth_count}/{len(full_gt_set)}"
+    )
     context_coverage = len(retrieved_lines) / len(lines) if lines else 0.0
-    gt_indices_in_context = ground_truth_indices(retrieved_lines)
-    gt_set = set(gt_indices_in_context)
-
     completion_prompt = f"""
     You are given a subset of chemical reactions in SMILES format and a question.
     <context>
@@ -297,13 +212,9 @@ async def main(
     {question}
     </question>
     """
-    print("Question 1/1 task=achiral_to_chiral")
-    print(
-        f"Ground truth count (full dataset): {len(full_gt_indices)}, "
-        f"in-context: {len(gt_indices_in_context)} (context lines: {len(retrieved_lines)})"
-    )
+    print("Question 1/1 task=exactly_one_cc_formed")
 
-    executor = build_code_executor(lines=retrieved_lines)
+    executor = build_code_executor()
     agent = CodeActAgent(
         code_execute_fn=executor.execute,
         llm=OpenRouter(
@@ -318,6 +229,10 @@ async def main(
         force_loop_message=INDEX_FORCE_LOOP_MESSAGE,
         observation_followup=INDEX_OBSERVATION_FOLLOWUP,
         timeout=WORKFLOW_TIMEOUT_S,
+        llm_timeout_retries=LLM_TIMEOUT_RETRIES,
+        llm_timeout_retry_backoff_s=LLM_TIMEOUT_RETRY_BACKOFF_S,
+        llm_request_timeout_s=LLM_REQUEST_TIMEOUT_S,
+        code_execution_timeout_s=CODE_EXECUTION_TIMEOUT_S,
     )
     ctx = Context(agent)
 
@@ -338,7 +253,7 @@ async def main(
                 "reaction_key": REACTION_KEY,
                 "agent": "codeact",
             },
-            tags=["codeact", "sample", "task15_achiral_to_chiral"],
+            tags=["codeact", "sample", "task15_exactly_one_cc_formed"],
         ):
             response = await run_agent_verbose(agent, ctx, completion_prompt)
 
@@ -364,8 +279,19 @@ async def main(
 
     parsed_indices = parse_indices(response_text)
     pred_set = set(parsed_indices)
-    precision, recall, f1 = precision_recall_f1(pred_set, gt_set)
-    is_exact_match = pred_set == gt_set
+    precision, recall, f1 = precision_recall_f1(pred_set, ground_truth_in_context_set)
+    predicted_count = len(pred_set)
+    count_error = abs(predicted_count - ground_truth_count)
+    count_exact = int(predicted_count == ground_truth_count)
+    is_exact_match = pred_set == ground_truth_in_context_set
+
+    print(f"Predicted [exactly_one_cc_formed] count: {predicted_count}")
+    print(f"Ground truth [exactly_one_cc_formed] count: {ground_truth_count}")
+    print(
+        "Metrics [exactly_one_cc_formed] -> "
+        f"precision={precision:.4f} recall={recall:.4f} f1={f1:.4f} "
+        f"exact_match={is_exact_match} count_error={count_error} count_exact={count_exact}"
+    )
 
     for metric in llm_turn_metrics:
         wandb.log(
@@ -396,38 +322,23 @@ async def main(
             "sample/0/final_total_output_tokens": final_output_tokens,
             "sample/0/final_total_tokens": final_total_tokens,
             "sample/0/iterations": len(llm_turn_metrics),
-            "sample/0/is_exact_match": int(is_exact_match),
             "sample/0/precision": precision,
             "sample/0/recall": recall,
             "sample/0/f1": f1,
-            "sample/0/ground_truth_count": len(gt_indices_in_context),
-            "sample/0/ground_truth_in_context_count": len(gt_indices_in_context),
-            "sample/0/ground_truth_full_count": len(full_gt_indices),
-            "sample/0/prediction_count": len(parsed_indices),
-            "sample/0/ground_truth_indices": ",".join(str(x) for x in gt_indices_in_context),
-            "sample/0/predicted_indices": ",".join(str(x) for x in parsed_indices),
-            "sample/0/response_raw": response_text,
+            "sample/0/is_exact_match": int(is_exact_match),
+            "sample/0/predicted_count": predicted_count,
+            "sample/0/ground_truth_count": ground_truth_count,
+            "sample/0/ground_truth_full_count": len(full_gt_set),
+            "sample/0/count_error": count_error,
+            "sample/0/count_exact": count_exact,
             "sample/0/completion_prompt_char_count": len(completion_prompt),
             "sample/0/context_char_count": len(retrieved_context),
             "sample/0/retrieved_line_count": len(retrieved_lines),
+            "sample/0/context_size": context_size,
             "sample/0/context_coverage": context_coverage,
             **({"sample/0/final_total_cost_usd": final_cost} if has_cost else {}),
         }
     )
-    wandb.log(
-        {
-            "running_exact_match_accuracy": float(is_exact_match),
-            "running_macro_precision": precision,
-            "running_macro_recall": recall,
-            "running_macro_f1": f1,
-        }
-    )
-
-    print(f"Exact match: {int(is_exact_match)}/1")
-    print(f"Exact match accuracy: {float(is_exact_match):.4f}")
-    print(f"Macro precision: {precision:.4f}")
-    print(f"Macro recall: {recall:.4f}")
-    print(f"Macro F1: {f1:.4f}")
 
     run.summary["exact_match_correct"] = int(is_exact_match)
     run.summary["total"] = 1
@@ -435,12 +346,20 @@ async def main(
     run.summary["macro_precision"] = precision
     run.summary["macro_recall"] = recall
     run.summary["macro_f1"] = f1
+    run.summary["avg_total_input_tokens_per_sample"] = final_input_tokens
+    run.summary["avg_total_output_tokens_per_sample"] = final_output_tokens
+    run.summary["predicted_count"] = predicted_count
+    run.summary["count_error"] = count_error
+    run.summary["count_exact"] = count_exact
+    run.summary["ground_truth/exactly_one_cc_formed/count"] = ground_truth_count
+    run.summary["ground_truth/exactly_one_cc_formed/full_count"] = len(full_gt_set)
+    run.summary["ground_truth/total_reactions"] = TASK15_TOTAL_REACTIONS
+    run.summary["ground_truth/valid_reactions"] = TASK15_VALID_REACTIONS
+    run.summary["ground_truth/skipped_reactions"] = TASK15_SKIPPED_REACTIONS
     run.summary["samples_with_cost"] = int(has_cost)
     if has_cost:
         run.summary["total_cost_usd"] = final_cost
         run.summary["avg_cost_per_sample_usd"] = final_cost
-    run.summary["full_ground_truth/achiral_to_chiral/count"] = len(full_gt_indices)
-    run.summary["full_ground_truth/achiral_to_chiral/indices"] = ",".join(str(x) for x in full_gt_indices)
     wandb.finish()
 
 
@@ -449,8 +368,6 @@ if __name__ == "__main__":
     asyncio.run(
         main(
             model_name=args.model_name,
-            dataset_path=args.dataset_path,
             context_size=args.context_size,
-            ground_truth_fraction_per_context=args.ground_truth_fraction_per_context,
         )
     )

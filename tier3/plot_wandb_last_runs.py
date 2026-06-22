@@ -1,133 +1,227 @@
+"""Plot tier3 overall F1/cost/token trends from latest W&B runs.
+
+Averages the last N runs per task/family/model/context, then aggregates across
+the selected tasks with question-count weighting (using each run's summary total).
+"""
+
+from __future__ import annotations
+
 import argparse
-import csv
+import json
 import math
+import os
+import re
 from collections import defaultdict
+from dataclasses import dataclass
 from pathlib import Path
 from statistics import mean, pstdev
 from typing import Optional
 
+import wandb
+
 try:
     import matplotlib.pyplot as plt  # type: ignore[import-not-found]
-    from matplotlib.lines import Line2D  # type: ignore[import-not-found]
-    from matplotlib.ticker import FormatStrFormatter, MaxNLocator  # type: ignore[import-not-found]
-except ImportError:  # pragma: no cover - runtime environment dependent
+except ImportError:  # pragma: no cover
     plt = None
-    Line2D = None
-    FormatStrFormatter = None
-    MaxNLocator = None
+
+
+TASK_IDS = (
+    "6",
+    "7",
+    "8",
+    "9",
+    "10",
+    "10b",
+    "13",
+    "14",
+    "15",
+    "17",
+    "18",
+    "20",
+    "21",
+    "22",
+    "23",
+    "24",
+)
+TASK_IDS_WITHOUT_TIER3_SUFFIX = frozenset({"6", "7", "8", "9", "10", "10b"})
+FAMILY_PREFIX = {"LLM": "LLM", "CodeAct": "CodeAct", "RLM": "RLMs"}
+FAMILY_COLORS = {"LLM": "#1f77b4", "CodeAct": "#d62728", "RLM": "#2ca02c"}
+PROJECT_PATTERN = re.compile(r'project\s*=\s*"([^"]+)"')
+TASK_SCRIPT_PATTERN = re.compile(r"(?:rlm|llm|codeact)_task(\d+b?)\.py$")
+CONFIG_FIELD_PATTERN = re.compile(r"^(\w+):\s*(.+)$", re.MULTILINE)
+
+
+@dataclass
+class RunRecord:
+    family: str
+    task_id: str
+    model_name: str
+    context_size: int
+    question_count: float
+    f1: float
+    cost_per_sample_usd: Optional[float]
+    input_tokens_per_sample: Optional[float]
+    output_tokens_per_sample: Optional[float]
 
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="Create F1-focused publication figures from tabulated CSV outputs."
+        description="Plot tier3 overall F1/cost/token trends vs context from latest W&B runs."
+    )
+    parser.add_argument("--entity", type=str, default=os.getenv("WANDB_ENTITY", ""))
+    parser.add_argument(
+        "--tier3-dir",
+        type=str,
+        default="/home/bhagavan/rlms/rlm/tier3",
+        help="Directory containing tier3 task scripts (used to discover W&B project names).",
     )
     parser.add_argument(
-        "--tables-dir",
+        "--models",
         type=str,
-        default="/home/bhagavan/rlms/rlm/tier3/wandb_last_runs_report_tables",
-        help="Directory containing tabulated CSV files.",
+        default="openai/gpt-5-mini",
+        help="Comma-separated model names, or 'all'.",
+    )
+    parser.add_argument(
+        "--last-n-runs",
+        type=int,
+        default=5,
+        help="Take last N runs for each task/family/model/context.",
+    )
+    parser.add_argument(
+        "--source",
+        type=str,
+        choices=("api", "local"),
+        default="api",
+        help="Read runs from W&B API (default) or local tier3/wandb offline runs.",
+    )
+    parser.add_argument(
+        "--local-wandb-dir",
+        type=str,
+        default="/home/bhagavan/rlms/rlm/tier3/wandb",
+        help="Directory of local offline W&B run folders when --source local.",
     )
     parser.add_argument(
         "--output-dir",
         type=str,
-        default="",
-        help="Directory for figures (defaults to <tables-dir>/figures).",
+        default="/home/bhagavan/rlms/rlm/tier3/plots_last5",
     )
     parser.add_argument(
-        "--metric",
-        type=str,
-        default="f1",
-        choices=("accuracy", "precision", "recall", "f1"),
-        help="Metric to visualize.",
-    )
-    parser.add_argument(
-        "--context-sizes",
-        type=str,
-        default="all",
-        help="Optional comma-separated context sizes to include (e.g. '0,100,500').",
-    )
-    parser.add_argument(
-        "--min-task-number",
-        type=int,
-        default=None,
-        help="Optional minimum task number to include.",
-    )
-    parser.add_argument(
-        "--max-task-number",
-        type=int,
-        default=None,
-        help="Optional maximum task number to include.",
+        "--allow-partial",
+        action="store_true",
+        help="Plot with available runs instead of failing when a group has < last-n-runs.",
     )
     return parser.parse_args()
 
 
-def read_csv_rows(path: Path) -> list[dict[str, str]]:
-    if not path.exists():
-        raise FileNotFoundError(f"Required table missing: {path}")
-    with path.open("r", encoding="utf-8", newline="") as fh:
-        return [dict(r) for r in csv.DictReader(fh)]
+def task_sort_key(task_id: str) -> tuple[int, str]:
+    m = re.match(r"^(\d+)(.*)$", task_id)
+    if not m:
+        return (10**9, task_id)
+    return (int(m.group(1)), m.group(2))
 
 
-def parse_int(value: object) -> Optional[int]:
-    if value is None:
-        return None
-    text = str(value).strip()
-    if not text:
-        return None
-    try:
-        return int(text)
-    except ValueError:
-        return None
+def parse_task_id(project: str) -> Optional[str]:
+    match = re.match(r"^(?:LLM|CodeAct|RLMs)-Task(\d+b?)(?:_tier3)?$", project)
+    if match:
+        return match.group(1)
+    return None
 
 
-def parse_float(value: object) -> Optional[float]:
-    if value is None:
-        return None
-    text = str(value).strip().lower()
-    if not text or text == "nan":
-        return None
-    try:
-        out = float(text)
-    except ValueError:
-        return None
-    if math.isnan(out):
-        return None
-    return out
-
-
-def classify_family(task_family: str) -> str:
-    lowered = task_family.lower()
-    if "codeact" in lowered:
+def parse_family(project: str) -> Optional[str]:
+    if project.startswith("LLM-"):
+        return "LLM"
+    if project.startswith("CodeAct-"):
         return "CodeAct"
-    if "rlm" in lowered:
+    if project.startswith("RLMs-"):
         return "RLM"
-    return task_family
+    return None
 
 
-def short_model(model_name: str) -> str:
-    return model_name.split("/")[-1]
+def project_name(family: str, task_id: str) -> str:
+    prefix = FAMILY_PREFIX[family]
+    if task_id in TASK_IDS_WITHOUT_TIER3_SUFFIX:
+        return f"{prefix}-Task{task_id}"
+    return f"{prefix}-Task{task_id}_tier3"
 
 
-def compact_model(model_name: str) -> str:
-    name = short_model(model_name)
-    replacements = {
-        "gpt-5-mini": "gpt5-mini",
-        "grok-4-fast": "grok4-fast",
-    }
-    return replacements.get(name, name)
+def discover_projects(tier3_dir: Path, task_ids: tuple[str, ...]) -> dict[str, dict[str, str]]:
+    discovered: dict[str, dict[str, str]] = defaultdict(dict)
+    wanted = set(task_ids)
+    for pattern in ("rlm_task*.py", "llm_task*.py", "codeact_task*.py"):
+        for path in sorted(tier3_dir.glob(pattern)):
+            text = path.read_text(encoding="utf-8")
+            for match in PROJECT_PATTERN.finditer(text):
+                project = match.group(1)
+                family = parse_family(project)
+                task_id = parse_task_id(project)
+                if family is None or task_id is None or task_id not in wanted:
+                    continue
+                discovered[task_id][family] = project
+    return discovered
 
 
-def compact_family(family: str) -> str:
-    if family == "CodeAct":
-        return "CA"
-    return family
+def normalize_model_name(config: dict) -> str:
+    for key in ("MODEL_NAME", "model_name", "model", "llm_model"):
+        value = config.get(key)
+        if isinstance(value, str) and value.strip():
+            return value.strip()
+    return "unknown_model"
 
 
-def config_label(row: dict[str, object]) -> str:
-    return (
-        f"{compact_family(str(row['family']))} | {compact_model(str(row['model_name']))} | "
-        f"ctx={row['context_size']}"
-    )
+def normalize_context_size(config: dict) -> Optional[int]:
+    for key in ("CONTEXT_SIZE", "context_size"):
+        value = config.get(key)
+        if isinstance(value, bool):
+            continue
+        if isinstance(value, (int, float)):
+            return int(value)
+        if isinstance(value, str) and value.strip():
+            try:
+                return int(value.strip())
+            except ValueError:
+                continue
+    return None
+
+
+def safe_float(value: object) -> Optional[float]:
+    if isinstance(value, (int, float)):
+        out = float(value)
+        if not math.isnan(out):
+            return out
+    return None
+
+
+def question_count_from_run(config: dict, summary: dict) -> Optional[float]:
+    for source in (summary, config):
+        value = safe_float(source.get("total"))
+        if value is not None and value > 0:
+            return value
+    value = safe_float(config.get("num_questions"))
+    if value is not None and value > 0:
+        return value
+    return None
+
+
+def context_allowed(family: str, context_size: int) -> bool:
+    if family in {"LLM", "CodeAct"}:
+        return context_size in {100, 500}
+    if family == "RLM":
+        return context_size in {100, 500, -1}
+    return False
+
+
+def context_sort_key(context_size: int) -> int:
+    if context_size == -1:
+        return 10_000
+    return context_size
+
+
+def context_label(context_size: int) -> str:
+    return "full" if context_size == -1 else str(context_size)
+
+
+def model_slug(model_name: str) -> str:
+    return model_name.replace("/", "_").replace("-", "_")
 
 
 def setup_style() -> None:
@@ -135,469 +229,518 @@ def setup_style() -> None:
         {
             "font.family": "serif",
             "font.size": 11,
-            "axes.titlesize": 12,
+            "axes.titlesize": 13,
             "axes.labelsize": 11,
-            "legend.fontsize": 8.5,
-            "xtick.labelsize": 9,
-            "ytick.labelsize": 9,
+            "legend.fontsize": 9,
+            "xtick.labelsize": 10,
+            "ytick.labelsize": 10,
             "axes.grid": True,
             "grid.alpha": 0.25,
             "grid.linestyle": "--",
-            "axes.facecolor": "white",
-            "figure.facecolor": "white",
             "axes.spines.top": False,
             "axes.spines.right": False,
             "legend.frameon": True,
             "legend.framealpha": 0.95,
-            "legend.facecolor": "white",
         }
     )
 
 
-def save_figure(fig, out_dir: Path, stem: str) -> None:
+def weighted_mean(values: list[tuple[float, float]]) -> Optional[float]:
+    if not values:
+        return None
+    total_weight = sum(weight for _, weight in values)
+    if total_weight <= 0:
+        return None
+    return sum(value * weight for value, weight in values) / total_weight
+
+
+def mean_or_nan(values: list[float]) -> float:
+    return mean(values) if values else float("nan")
+
+
+def bounded_f1_yerr(
+    means: list[float], stds: list[float], lower_bound: float = 0.0, upper_bound: float = 1.0
+) -> list[list[float]]:
+    lower_errors: list[float] = []
+    upper_errors: list[float] = []
+    for m, s in zip(means, stds):
+        lower_errors.append(min(s, max(0.0, m - lower_bound)))
+        upper_errors.append(min(s, max(0.0, upper_bound - m)))
+    return [lower_errors, upper_errors]
+
+
+def parse_flat_config_yaml(path: Path) -> dict[str, object]:
+    if not path.exists():
+        return {}
+    text = path.read_text(encoding="utf-8")
+    config: dict[str, object] = {}
+
+    for match in re.finditer(r"^([\w_]+):\s*\n\s*value:\s*(.+)$", text, re.MULTILINE):
+        key = match.group(1)
+        raw = match.group(2).strip()
+        if raw.startswith('"') and raw.endswith('"'):
+            config[key] = raw[1:-1]
+        elif raw.lower() in {"true", "false"}:
+            config[key] = raw.lower() == "true"
+        else:
+            try:
+                if "." in raw:
+                    config[key] = float(raw)
+                else:
+                    config[key] = int(raw)
+            except ValueError:
+                config[key] = raw
+
+    if config:
+        return config
+
+    for match in CONFIG_FIELD_PATTERN.finditer(text):
+        key = match.group(1)
+        raw = match.group(2).strip()
+        if raw.startswith('"') and raw.endswith('"'):
+            config[key] = raw[1:-1]
+        elif raw.lower() in {"true", "false"}:
+            config[key] = raw.lower() == "true"
+        else:
+            try:
+                if "." in raw:
+                    config[key] = float(raw)
+                else:
+                    config[key] = int(raw)
+            except ValueError:
+                config[key] = raw
+    return config
+
+
+def family_from_script_name(script_name: str) -> Optional[str]:
+    if script_name.startswith("rlm_task"):
+        return "RLM"
+    if script_name.startswith("llm_task"):
+        return "LLM"
+    if script_name.startswith("codeact_task"):
+        return "CodeAct"
+    return None
+
+
+def task_id_from_script_name(script_name: str) -> Optional[str]:
+    match = TASK_SCRIPT_PATTERN.search(script_name)
+    if match:
+        return match.group(1)
+    return None
+
+
+def run_sort_key(run_dir: Path) -> str:
+    return run_dir.name
+
+
+def append_record(
+    records: list[RunRecord],
+    seen_counts: dict[tuple[str, str, str, int], int],
+    *,
+    family: str,
+    task_id: str,
+    model_name: str,
+    context_size: int,
+    question_count: float,
+    f1: float,
+    cost_per_sample_usd: Optional[float],
+    input_tokens_per_sample: Optional[float],
+    output_tokens_per_sample: Optional[float],
+    last_n_runs: int,
+    models_filter: set[str],
+) -> bool:
+    if task_id not in TASK_IDS:
+        return False
+    if models_filter and model_name not in models_filter:
+        return False
+    if not context_allowed(family, context_size):
+        return False
+    key = (family, task_id, model_name, context_size)
+    if seen_counts[key] >= last_n_runs:
+        return False
+    seen_counts[key] += 1
+    records.append(
+        RunRecord(
+            family=family,
+            task_id=task_id,
+            model_name=model_name,
+            context_size=context_size,
+            question_count=question_count,
+            f1=f1,
+            cost_per_sample_usd=cost_per_sample_usd,
+            input_tokens_per_sample=input_tokens_per_sample,
+            output_tokens_per_sample=output_tokens_per_sample,
+        )
+    )
+    return True
+
+
+def finalize_collection(
+    seen_counts: dict[tuple[str, str, str, int], int],
+    last_n_runs: int,
+    allow_partial: bool,
+) -> None:
+    if allow_partial:
+        return
+    insufficient_groups = [key for key, count in seen_counts.items() if count < last_n_runs]
+    if insufficient_groups:
+        formatted = ", ".join(
+            [
+                (
+                    f"{family}/task{task}/model={model}/ctx={context} "
+                    f"(found {seen_counts[(family, task, model, context)]}, need {last_n_runs})"
+                )
+                for (family, task, model, context) in sorted(
+                    insufficient_groups, key=lambda x: (x[0], task_sort_key(x[1]), x[2], x[3])
+                )
+            ]
+        )
+        raise RuntimeError(
+            "Not enough runs for strict averaging across last "
+            f"{last_n_runs} runs. Missing groups: {formatted}"
+        )
+
+
+def collect_records(
+    entity: str,
+    projects_by_task: dict[str, dict[str, str]],
+    models_filter: set[str],
+    last_n_runs: int,
+    allow_partial: bool,
+) -> list[RunRecord]:
+    api = wandb.Api()
+    records: list[RunRecord] = []
+    seen_counts: dict[tuple[str, str, str, int], int] = defaultdict(int)
+
+    for task_id in TASK_IDS:
+        family_projects = projects_by_task.get(task_id, {})
+        for family in ("LLM", "CodeAct", "RLM"):
+            project = family_projects.get(family) or project_name(family, task_id)
+            runs = api.runs(f"{entity}/{project}", order="-created_at")
+            for run in runs:
+                config = dict(run.config or {})
+                summary = dict(run.summary or {})
+                model_name = normalize_model_name(config)
+                context_size = normalize_context_size(config)
+                if context_size is None:
+                    continue
+                question_count = question_count_from_run(config, summary)
+                f1 = safe_float(summary.get("macro_f1"))
+                if question_count is None or f1 is None:
+                    continue
+                append_record(
+                    records,
+                    seen_counts,
+                    family=family,
+                    task_id=task_id,
+                    model_name=model_name,
+                    context_size=context_size,
+                    question_count=question_count,
+                    f1=f1,
+                    cost_per_sample_usd=safe_float(summary.get("avg_cost_per_sample_usd")),
+                    input_tokens_per_sample=safe_float(
+                        summary.get("avg_total_input_tokens_per_sample")
+                    ),
+                    output_tokens_per_sample=safe_float(
+                        summary.get("avg_total_output_tokens_per_sample")
+                    ),
+                    last_n_runs=last_n_runs,
+                    models_filter=models_filter,
+                )
+
+    finalize_collection(seen_counts, last_n_runs, allow_partial)
+    return records
+
+
+def collect_records_from_local(
+    local_wandb_dir: Path,
+    models_filter: set[str],
+    last_n_runs: int,
+    allow_partial: bool,
+) -> list[RunRecord]:
+    records: list[RunRecord] = []
+    seen_counts: dict[tuple[str, str, str, int], int] = defaultdict(int)
+    run_dirs = sorted(
+        [path for path in local_wandb_dir.glob("run-*") if path.is_dir()],
+        key=run_sort_key,
+        reverse=True,
+    )
+
+    for run_dir in run_dirs:
+        metadata_path = run_dir / "files" / "wandb-metadata.json"
+        summary_path = run_dir / "files" / "wandb-summary.json"
+        config_path = run_dir / "files" / "config.yaml"
+        if not metadata_path.exists() or not summary_path.exists():
+            continue
+
+        metadata = json.loads(metadata_path.read_text(encoding="utf-8"))
+        summary = json.loads(summary_path.read_text(encoding="utf-8"))
+        config = parse_flat_config_yaml(config_path)
+
+        code_path = str(metadata.get("codePathLocal") or metadata.get("codePath") or "")
+        script_name = Path(code_path).name
+        family = family_from_script_name(script_name)
+        task_id = task_id_from_script_name(script_name)
+        if family is None or task_id is None:
+            continue
+
+        model_name = normalize_model_name(config)
+        context_size = normalize_context_size(config)
+        if context_size is None:
+            continue
+        question_count = question_count_from_run(config, summary)
+        f1 = safe_float(summary.get("macro_f1"))
+        if question_count is None or f1 is None:
+            continue
+
+        append_record(
+            records,
+            seen_counts,
+            family=family,
+            task_id=task_id,
+            model_name=model_name,
+            context_size=context_size,
+            question_count=question_count,
+            f1=f1,
+            cost_per_sample_usd=safe_float(summary.get("avg_cost_per_sample_usd")),
+            input_tokens_per_sample=safe_float(summary.get("avg_total_input_tokens_per_sample")),
+            output_tokens_per_sample=safe_float(summary.get("avg_total_output_tokens_per_sample")),
+            last_n_runs=last_n_runs,
+            models_filter=models_filter,
+        )
+
+    finalize_collection(seen_counts, last_n_runs, allow_partial)
+    return records
+
+
+def aggregate_task(records: list[RunRecord]) -> dict[tuple[str, str, int], dict[str, float]]:
+    grouped: dict[tuple[str, str, int], list[RunRecord]] = defaultdict(list)
+    for row in records:
+        grouped[(row.family, row.task_id, row.context_size)].append(row)
+
+    out: dict[tuple[str, str, int], dict[str, float]] = {}
+    for key, rows in grouped.items():
+        f1_values = [r.f1 for r in rows]
+        out[key] = {
+            "question_count": mean([r.question_count for r in rows]),
+            "f1": mean(f1_values),
+            "f1_std": pstdev(f1_values) if len(f1_values) > 1 else 0.0,
+            "cost": mean_or_nan(
+                [r.cost_per_sample_usd for r in rows if r.cost_per_sample_usd is not None]
+            ),
+            "input_tokens": mean_or_nan(
+                [r.input_tokens_per_sample for r in rows if r.input_tokens_per_sample is not None]
+            ),
+            "output_tokens": mean_or_nan(
+                [r.output_tokens_per_sample for r in rows if r.output_tokens_per_sample is not None]
+            ),
+        }
+    return out
+
+
+def aggregate_overall(
+    task_agg: dict[tuple[str, str, int], dict[str, float]]
+) -> dict[tuple[str, int], dict[str, Optional[float]]]:
+    grouped: dict[tuple[str, int], list[tuple[str, dict[str, float]]]] = defaultdict(list)
+    for (family, task_id, context), stats in task_agg.items():
+        grouped[(family, context)].append((task_id, stats))
+
+    out: dict[tuple[str, int], dict[str, Optional[float]]] = {}
+    for key, rows in grouped.items():
+        f1_pairs = [(stats["f1"], stats["question_count"]) for _, stats in rows]
+        total_weight = sum(stats["question_count"] for _, stats in rows)
+        f1_var = 0.0
+        if total_weight > 0:
+            for _, stats in rows:
+                w_norm = stats["question_count"] / total_weight
+                f1_var += (w_norm**2) * (float(stats.get("f1_std", 0.0)) ** 2)
+        cost_pairs = [
+            (stats["cost"], stats["question_count"])
+            for _, stats in rows
+            if not math.isnan(stats["cost"])
+        ]
+        input_pairs = [
+            (stats["input_tokens"], stats["question_count"])
+            for _, stats in rows
+            if not math.isnan(stats["input_tokens"])
+        ]
+        output_pairs = [
+            (stats["output_tokens"], stats["question_count"])
+            for _, stats in rows
+            if not math.isnan(stats["output_tokens"])
+        ]
+        out[key] = {
+            "f1": weighted_mean(f1_pairs),
+            "f1_std": math.sqrt(f1_var) if total_weight > 0 else None,
+            "cost": weighted_mean(cost_pairs),
+            "input_tokens": weighted_mean(input_pairs),
+            "output_tokens": weighted_mean(output_pairs),
+            "task_count": len(rows),
+            "question_count": total_weight,
+        }
+    return out
+
+
+def save_plot(fig, out_dir: Path, stem: str) -> None:
     fig.savefig(out_dir / f"{stem}.png", dpi=320, bbox_inches="tight")
     fig.savefig(out_dir / f"{stem}.pdf", bbox_inches="tight")
     plt.close(fig)
 
 
-def include_row(
-    row: dict[str, object],
-    allowed_contexts: set[int],
-    min_task: Optional[int],
-    max_task: Optional[int],
-) -> bool:
-    context_size = parse_int(row.get("context_size"))
-    task_number = parse_int(row.get("task_number"))
-    if context_size is None or task_number is None:
-        return False
-    if allowed_contexts and context_size not in allowed_contexts:
-        return False
-    if min_task is not None and task_number < min_task:
-        return False
-    if max_task is not None and task_number > max_task:
-        return False
-    return True
-
-
-def load_task_rows(
-    tables_dir: Path,
-    metric: str,
-    allowed_contexts: set[int],
-    min_task: Optional[int],
-    max_task: Optional[int],
-) -> list[dict[str, object]]:
-    task_perf_rows = read_csv_rows(tables_dir / "task_averages.csv")
-    task_cost_rows = read_csv_rows(tables_dir / "task_cost_averages.csv")
-
-    cost_index: dict[tuple[str, str, int, str, int], float] = {}
-    for row in task_cost_rows:
-        task_number = parse_int(row.get("task_number"))
-        context_size = parse_int(row.get("context_size"))
-        if task_number is None or context_size is None:
-            continue
-        key = (
-            str(row.get("project", "")),
-            str(row.get("task_family", "")),
-            task_number,
-            str(row.get("model_name", "")),
-            context_size,
+def plot_overall_f1_line(
+    out_dir: Path, model_name: str, overall: dict[tuple[str, int], dict[str, Optional[float]]]
+) -> None:
+    fig, ax = plt.subplots(figsize=(8, 5), constrained_layout=True)
+    for family in ("LLM", "CodeAct", "RLM"):
+        points = sorted(
+            [
+                (context, stats["f1"], stats.get("f1_std"))
+                for (fam, context), stats in overall.items()
+                if fam == family and stats["f1"] is not None
+            ],
+            key=lambda x: context_sort_key(x[0]),
         )
-        cost = parse_float(row.get("avg_total_cost_per_run_usd"))
-        if cost is not None and cost > 0.0:
-            cost_index[key] = cost
-
-    merged: list[dict[str, object]] = []
-    for row in task_perf_rows:
-        if row.get("metric") != metric:
+        if not points:
             continue
-        if not include_row(row, allowed_contexts, min_task, max_task):
-            continue
-        task_number = parse_int(row.get("task_number"))
-        context_size = parse_int(row.get("context_size"))
-        score = parse_float(row.get("task_avg_over_samples"))
-        if task_number is None or context_size is None or score is None:
-            continue
-        key = (
-            str(row.get("project", "")),
-            str(row.get("task_family", "")),
-            task_number,
-            str(row.get("model_name", "")),
-            context_size,
-        )
-        cost_usd = cost_index.get(key)
-        if cost_usd is None:
-            continue
-        family = classify_family(str(row.get("task_family", "unknown")))
-        merged.append(
-            {
-                "project": str(row.get("project", "")),
-                "task_number": task_number,
-                "model_name": str(row.get("model_name", "")),
-                "context_size": context_size,
-                "family": family,
-                "score": score,
-                "cost_usd": cost_usd,
-            }
-        )
-    return merged
-
-
-def plot_f1_heatmap(out_dir: Path, rows: list[dict[str, object]], metric: str) -> None:
-    tasks = sorted({int(r["task_number"]) for r in rows})
-    configs = sorted(
-        {
-            (str(r["family"]), str(r["model_name"]), int(r["context_size"]))
-            for r in rows
-        },
-        key=lambda x: (x[0], x[1], x[2]),
-    )
-    config_to_col = {cfg: i for i, cfg in enumerate(configs)}
-    task_to_row = {task: i for i, task in enumerate(tasks)}
-    matrix = [[float("nan") for _ in configs] for _ in tasks]
-
-    for row in rows:
-        cfg = (str(row["family"]), str(row["model_name"]), int(row["context_size"]))
-        matrix[task_to_row[int(row["task_number"])]] [config_to_col[cfg]] = float(row["score"])
-
-    fig, ax = plt.subplots(figsize=(max(9.0, len(configs) * 1.4), 5.0), constrained_layout=True)
-    im = ax.imshow(matrix, vmin=0.0, vmax=1.0, cmap="viridis", aspect="auto")
-    cbar = fig.colorbar(im, ax=ax, fraction=0.035, pad=0.03)
-    cbar.set_label(metric.upper())
-
-    xticklabels = [f"{compact_family(cfg[0])}\n{compact_model(cfg[1])}\nctx={cfg[2]}" for cfg in configs]
-    ax.set_xticks(list(range(len(configs))))
-    ax.set_xticklabels(xticklabels, rotation=12, ha="right", rotation_mode="anchor")
-    ax.set_yticks(list(range(len(tasks))))
-    ax.set_yticklabels([f"Task {t}" for t in tasks])
-    ax.set_title(f"{metric.upper()} by task and configuration")
-    ax.set_xlabel("Configuration")
-    ax.set_ylabel("Task")
-    ax.set_xticks([x - 0.5 for x in range(1, len(configs))], minor=True)
-    ax.set_yticks([y - 0.5 for y in range(1, len(tasks))], minor=True)
-    ax.grid(which="minor", color="white", linewidth=1.0, alpha=0.4)
-    ax.tick_params(which="minor", bottom=False, left=False)
-
-    for i in range(len(tasks)):
-        for j in range(len(configs)):
-            value = matrix[i][j]
-            if not math.isnan(value):
-                text_color = "white" if value < 0.55 else "black"
-                ax.text(j, i, f"{value:.2f}", ha="center", va="center", fontsize=8, color=text_color)
-
-    save_figure(fig, out_dir, f"{metric}_task_configuration_heatmap")
-
-
-def plot_task_trends(out_dir: Path, rows: list[dict[str, object]], metric: str) -> None:
-    family_colors = {"RLM": "#0072B2", "CodeAct": "#D55E00"}
-    model_markers = {"gpt-5-mini": "o", "grok-4-fast": "s"}
-    context_linestyles = {0: "-", 100: "--", 500: ":"}
-
-    grouped: dict[tuple[str, str, int], list[tuple[int, float]]] = defaultdict(list)
-    for row in rows:
-        key = (str(row["family"]), str(row["model_name"]), int(row["context_size"]))
-        grouped[key].append((int(row["task_number"]), float(row["score"])))
-
-    fig, ax = plt.subplots(figsize=(9.2, 4.8), constrained_layout=True)
-    config_handles: list[Line2D] = []
-    for (family, model_name, context_size), values in sorted(grouped.items()):
-        values_sorted = sorted(values)
-        xs = [v[0] for v in values_sorted]
-        ys = [v[1] for v in values_sorted]
-        line = ax.plot(
+        xs = [context_label(c) for c, _, _ in points]
+        ys = [float(v) for _, v, _ in points]
+        ystd = [float(e) if e is not None else 0.0 for _, _, e in points]
+        yerr = bounded_f1_yerr(ys, ystd)
+        ax.errorbar(
             xs,
             ys,
-            color=family_colors.get(family, "#444444"),
-            marker=model_markers.get(short_model(model_name), "D"),
-            linestyle=context_linestyles.get(context_size, "-."),
-            linewidth=1.8,
-            markersize=5.5,
-        )[0]
-        config_handles.append(
-            Line2D(
-                [0],
-                [0],
-                color=line.get_color(),
-                marker=line.get_marker(),
-                linestyle=line.get_linestyle(),
-                linewidth=1.8,
-                markersize=5.5,
-                label=f"{compact_family(family)} | {compact_model(model_name)} | ctx={context_size}",
-            )
-        )
-
-    ax.set_ylim(0.0, 1.0)
-    ax.set_xlabel("Task number")
-    ax.set_ylabel(metric.upper())
-    ax.set_title(f"{metric.upper()} trend across tasks")
-    ax.set_xticks(sorted({int(r['task_number']) for r in rows}))
-    ax.legend(
-        handles=config_handles,
-        title="Configuration",
-        loc="upper center",
-        bbox_to_anchor=(0.5, -0.21),
-        ncol=2,
-        borderaxespad=0.0,
-    )
-    save_figure(fig, out_dir, f"{metric}_task_trends")
-
-
-def plot_mean_f1_vs_cost(out_dir: Path, rows: list[dict[str, object]], metric: str) -> None:
-    grouped_scores: dict[tuple[str, str, int], list[float]] = defaultdict(list)
-    grouped_costs: dict[tuple[str, str, int], list[float]] = defaultdict(list)
-    for row in rows:
-        key = (str(row["family"]), str(row["model_name"]), int(row["context_size"]))
-        grouped_scores[key].append(float(row["score"]))
-        grouped_costs[key].append(float(row["cost_usd"]))
-
-    family_colors = {"RLM": "#0072B2", "CodeAct": "#D55E00"}
-    context_markers = {0: "o", 100: "s", 500: "^"}
-    model_fill = {"gpt-5-mini": "filled", "grok-4-fast": "hollow"}
-
-    fig, ax = plt.subplots(figsize=(8.2, 5.0), constrained_layout=True)
-    x_values: list[float] = []
-    y_values: list[float] = []
-    present_contexts: set[int] = set()
-    for key in sorted(grouped_scores):
-        family, model_name, context_size = key
-        scores = grouped_scores[key]
-        costs = grouped_costs[key]
-        y = mean(scores)
-        yerr = pstdev(scores) if len(scores) > 1 else 0.0
-        x = mean(costs)
-        x_values.append(x)
-        y_values.append(y)
-        present_contexts.add(context_size)
-        marker = context_markers.get(context_size, "D")
-        short = short_model(model_name)
-        face_color = (
-            family_colors.get(family, "#444444")
-            if model_fill.get(short, "filled") == "filled"
-            else "white"
-        )
-        edge_color = family_colors.get(family, "#444444")
-        ax.errorbar(
-            [x],
-            [y],
-            yerr=[yerr],
-            fmt="none",
-            ecolor=edge_color,
-            elinewidth=1.0,
+            yerr=yerr,
+            marker="o",
+            linewidth=2,
             capsize=3,
-            zorder=2,
-        )
-        ax.scatter(
-            [x],
-            [y],
-            marker=marker,
-            s=85,
-            facecolors=face_color,
-            edgecolors=edge_color,
-            linewidths=1.4,
-            zorder=3,
-        )
-    if x_values:
-        x_min = min(x_values)
-        x_max = max(x_values)
-        x_pad = max(0.01, (x_max - x_min) * 0.10)
-        ax.set_xlim(max(0.0, x_min - x_pad), x_max + x_pad)
-    if MaxNLocator is not None and FormatStrFormatter is not None:
-        ax.xaxis.set_major_locator(MaxNLocator(nbins=6))
-        ax.xaxis.set_major_formatter(FormatStrFormatter("%.2f"))
-    if y_values:
-        y_min = min(y_values)
-        y_max = max(y_values)
-        lower = max(0.0, y_min - 0.12)
-        upper = min(1.05, y_max + 0.10)
-        if upper - lower < 0.35:
-            center = (upper + lower) / 2
-            lower = max(0.0, center - 0.18)
-            upper = min(1.05, center + 0.18)
-        ax.set_ylim(lower, upper)
-    else:
-        ax.set_ylim(0.0, 1.05)
-    ax.set_xlabel("Mean cost per run (USD)")
-    ax.set_ylabel(f"Mean {metric.upper()} across tasks")
-    ax.set_title(f"Mean {metric.upper()} vs cost (error bars = across-task std)")
-
-    family_handles = [
-        Line2D(
-            [0], [0],
-            marker="o",
-            linestyle="None",
-            markerfacecolor=color,
-            markeredgecolor=color,
-            markersize=7,
             label=family,
+            color=FAMILY_COLORS[family],
         )
-        for family, color in sorted(family_colors.items())
-    ]
-    context_handles = [
-        Line2D(
-            [0], [0],
-            marker=marker,
-            linestyle="None",
-            markerfacecolor="white",
-            markeredgecolor="black",
-            markersize=7,
-            label=f"ctx={ctx}",
-        )
-        for ctx, marker in sorted(context_markers.items())
-        if ctx in present_contexts
-    ]
-    model_handles = [
-        Line2D(
-            [0], [0],
-            marker="o",
-            linestyle="None",
-            markerfacecolor="black",
-            markeredgecolor="black",
-            markersize=7,
-            label="gpt5-mini (filled)",
-        ),
-        Line2D(
-            [0], [0],
-            marker="o",
-            linestyle="None",
-            markerfacecolor="white",
-            markeredgecolor="black",
-            markersize=7,
-            label="grok4-fast (hollow)",
-        ),
-    ]
-
-    legend1 = ax.legend(
-        handles=family_handles,
-        title="Family",
-        loc="upper left",
-        bbox_to_anchor=(0.0, -0.14),
-        borderaxespad=0.0,
-    )
-    ax.add_artist(legend1)
-    if context_handles:
-        legend2 = ax.legend(
-            handles=context_handles,
-            title="Context",
-            loc="upper right",
-            bbox_to_anchor=(1.0, -0.14),
-            borderaxespad=0.0,
-        )
-        ax.add_artist(legend2)
-    ax.legend(
-        handles=model_handles,
-        title="Model fill",
-        loc="upper center",
-        bbox_to_anchor=(0.5, -0.30),
-        ncol=2,
-        borderaxespad=0.0,
-    )
-    save_figure(fig, out_dir, f"{metric}_mean_vs_cost")
+    ax.set_ylim(0.0, 1.05)
+    ax.set_yticks([i / 10 for i in range(0, 11)])
+    ax.grid(which="major", axis="both", alpha=0.35)
+    ax.minorticks_on()
+    ax.grid(which="minor", axis="y", alpha=0.18, linestyle=":")
+    ax.set_xlabel("Context length")
+    ax.set_ylabel("Question-weighted average F1")
+    ax.set_title(f"Tier3 overall F1 vs context ({model_name})")
+    ax.legend()
+    save_plot(fig, out_dir, f"{model_slug(model_name)}_1_overall_f1_vs_context")
 
 
-def plot_efficiency_bars(out_dir: Path, rows: list[dict[str, object]], metric: str) -> None:
-    grouped_scores: dict[str, list[float]] = defaultdict(list)
-    grouped_costs: dict[str, list[float]] = defaultdict(list)
-    group_family: dict[str, str] = {}
+def plot_overall_cost_bar(
+    out_dir: Path, model_name: str, overall: dict[tuple[str, int], dict[str, Optional[float]]]
+) -> None:
+    context_values = sorted({ctx for (_, ctx) in overall.keys()}, key=context_sort_key)
+    families = ("LLM", "CodeAct", "RLM")
+    width = 0.24
+    x = list(range(len(context_values)))
+    fig, ax = plt.subplots(figsize=(9, 5), constrained_layout=True)
+    for i, family in enumerate(families):
+        ys = []
+        for context in context_values:
+            metric = overall.get((family, context), {}).get("cost")
+            ys.append(float(metric) if metric is not None else math.nan)
+        positions = [v + (i - 1) * width for v in x]
+        ax.bar(positions, ys, width=width, label=family, color=FAMILY_COLORS[family], alpha=0.85)
+    ax.set_xticks(x)
+    ax.set_xticklabels([context_label(c) for c in context_values])
+    ax.set_xlabel("Context length")
+    ax.set_ylabel("Question-weighted avg cost per sample (USD)")
+    ax.set_title(f"Tier3 overall cost vs context ({model_name})")
+    ax.legend()
+    save_plot(fig, out_dir, f"{model_slug(model_name)}_3_overall_cost_vs_context")
 
-    for row in rows:
-        label = config_label(row)
-        grouped_scores[label].append(float(row["score"]))
-        grouped_costs[label].append(float(row["cost_usd"]))
-        group_family[label] = str(row["family"])
 
-    summary: list[dict[str, object]] = []
-    for label in grouped_scores:
-        avg_score = mean(grouped_scores[label])
-        avg_cost = mean(grouped_costs[label])
-        if avg_cost <= 0.0:
-            continue
-        summary.append(
-            {
-                "label": label,
-                "family": group_family[label],
-                "avg_score": avg_score,
-                "avg_cost": avg_cost,
-                "efficiency": avg_score / avg_cost,
-            }
-        )
-    summary.sort(key=lambda r: float(r["efficiency"]), reverse=True)
-
-    colors = {"RLM": "#0072B2", "CodeAct": "#D55E00"}
-    fig, ax = plt.subplots(figsize=(10.8, max(4.6, 0.6 * len(summary))), constrained_layout=True)
-    y_pos = list(range(len(summary)))
-    ax.barh(
-        y_pos,
-        [float(r["efficiency"]) for r in summary],
-        color=[colors.get(str(r["family"]), "#888888") for r in summary],
-        alpha=0.85,
-    )
-    ax.set_yticks(y_pos)
-    ax.set_yticklabels([str(r["label"]) for r in summary])
-    ax.invert_yaxis()
-    ax.set_xlabel(f"{metric.upper()} per USD (higher is better)")
-    ax.set_title(f"Cost efficiency ranking ({metric.upper()})")
-
-    for idx, row in enumerate(summary):
-        ax.text(
-            float(row["efficiency"]),
-            idx,
-            f"  {float(row['avg_score']):.3f} @ ${float(row['avg_cost']):.3f}",
-            va="center",
-            fontsize=8,
-        )
-
-    ax.legend(
-        handles=[
-            Line2D([0], [0], color=colors["RLM"], lw=6, label="RLM"),
-            Line2D([0], [0], color=colors["CodeAct"], lw=6, label="CodeAct"),
-        ],
-        title="Family",
-        loc="lower right",
-    )
-    save_figure(fig, out_dir, f"{metric}_efficiency_ranking")
+def plot_overall_tokens_bar(
+    out_dir: Path, model_name: str, overall: dict[tuple[str, int], dict[str, Optional[float]]]
+) -> None:
+    contexts = sorted({ctx for (_, ctx) in overall}, key=context_sort_key)
+    families = ("LLM", "CodeAct", "RLM")
+    fig, axes = plt.subplots(1, 2, figsize=(13, 5), constrained_layout=True)
+    metrics = [("input_tokens", "Input tokens"), ("output_tokens", "Output tokens")]
+    width = 0.24
+    x = list(range(len(contexts)))
+    for ax, (metric_key, title) in zip(axes, metrics):
+        for i, family in enumerate(families):
+            ys = []
+            for context in contexts:
+                metric = overall.get((family, context), {}).get(metric_key)
+                ys.append(float(metric) if metric is not None else math.nan)
+            ax.bar(
+                [v + (i - 1) * width for v in x],
+                ys,
+                width=width,
+                label=family,
+                color=FAMILY_COLORS[family],
+                alpha=0.85,
+            )
+        ax.set_xticks(x)
+        ax.set_xticklabels([context_label(c) for c in contexts])
+        ax.set_xlabel("Context length")
+        ax.set_ylabel(f"Question-weighted avg {title.lower()} / sample")
+        ax.set_title(f"{title} ({model_name})")
+    handles, labels = axes[0].get_legend_handles_labels()
+    if handles:
+        fig.legend(handles, labels, loc="upper center", ncol=3)
+    save_plot(fig, out_dir, f"{model_slug(model_name)}_5_overall_tokens_vs_context")
 
 
 def main() -> None:
     args = parse_args()
-    if plt is None or Line2D is None:
+    if plt is None:
         raise RuntimeError("matplotlib is not installed. Install it with: pip install matplotlib")
+    if args.source == "api" and not args.entity:
+        raise ValueError("Missing W&B entity. Pass --entity or set WANDB_ENTITY.")
 
-    tables_dir = Path(args.tables_dir)
-    output_dir = Path(args.output_dir) if args.output_dir else tables_dir / "figures"
-    output_dir.mkdir(parents=True, exist_ok=True)
+    requested_models = set()
+    if args.models.strip().lower() != "all":
+        requested_models = {m.strip() for m in args.models.split(",") if m.strip()}
 
-    allowed_contexts: set[int] = set()
-    if args.context_sizes.strip().lower() != "all":
-        allowed_contexts = {
-            int(v.strip())
-            for v in args.context_sizes.split(",")
-            if v.strip()
-        }
-
+    out_dir = Path(args.output_dir)
+    out_dir.mkdir(parents=True, exist_ok=True)
     setup_style()
-    rows = load_task_rows(
-        tables_dir=tables_dir,
-        metric=args.metric,
-        allowed_contexts=allowed_contexts,
-        min_task=args.min_task_number,
-        max_task=args.max_task_number,
-    )
-    if not rows:
-        raise RuntimeError("No rows available for plotting after filters.")
-    family_counts = defaultdict(int)
-    for row in rows:
-        family_counts[str(row["family"])] += 1
-    print("Loaded rows by family:", dict(sorted(family_counts.items())))
 
-    plot_f1_heatmap(output_dir, rows, args.metric)
-    plot_task_trends(output_dir, rows, args.metric)
-    plot_mean_f1_vs_cost(output_dir, rows, args.metric)
-    plot_efficiency_bars(output_dir, rows, args.metric)
+    if args.source == "local":
+        records = collect_records_from_local(
+            local_wandb_dir=Path(args.local_wandb_dir),
+            models_filter=requested_models,
+            last_n_runs=args.last_n_runs,
+            allow_partial=args.allow_partial,
+        )
+    else:
+        tier3_dir = Path(args.tier3_dir)
+        projects_by_task = discover_projects(tier3_dir, TASK_IDS)
+        missing_tasks = [task_id for task_id in TASK_IDS if not projects_by_task.get(task_id)]
+        if missing_tasks:
+            print(f"Warning: no project names discovered for tasks: {', '.join(missing_tasks)}")
+        records = collect_records(
+            entity=args.entity,
+            projects_by_task=projects_by_task,
+            models_filter=requested_models,
+            last_n_runs=args.last_n_runs,
+            allow_partial=args.allow_partial,
+        )
+    if not records:
+        raise RuntimeError("No matching runs found for the requested filters.")
 
-    print(f"Wrote figures to: {output_dir}")
-    print(f"  - {output_dir / f'{args.metric}_task_configuration_heatmap.png'}")
-    print(f"  - {output_dir / f'{args.metric}_task_trends.png'}")
-    print(f"  - {output_dir / f'{args.metric}_mean_vs_cost.png'}")
-    print(f"  - {output_dir / f'{args.metric}_efficiency_ranking.png'}")
+    by_model: dict[str, list[RunRecord]] = defaultdict(list)
+    for row in records:
+        by_model[row.model_name].append(row)
+
+    for model_name, model_rows in sorted(by_model.items()):
+        task_agg = aggregate_task(model_rows)
+        overall = aggregate_overall(task_agg)
+        plot_overall_f1_line(out_dir, model_name, overall)
+        plot_overall_cost_bar(out_dir, model_name, overall)
+        plot_overall_tokens_bar(out_dir, model_name, overall)
+        print(
+            f"[{model_name}] tasks={len({r.task_id for r in model_rows})} "
+            f"records={len(model_rows)} contexts="
+            f"{sorted({r.context_size for r in model_rows}, key=context_sort_key)}"
+        )
+
+    print(f"Wrote figures to: {out_dir}")
 
 
 if __name__ == "__main__":
