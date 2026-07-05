@@ -44,6 +44,14 @@ TASK_IDS = (
     "24",
 )
 TASK_IDS_WITHOUT_TIER3_SUFFIX = frozenset({"6", "7", "8", "9", "10", "10b"})
+SUBCATEGORIES: tuple[tuple[str, tuple[str, ...]], ...] = (
+    ("Bond-level", ("13", "14", "15")),
+    ("Scaffold", ("17", "18", "20")),
+    ("Reagent", ("21", "22")),
+    ("Stereo", ("23", "24")),
+    ("Functional Group", ("6", "7", "8", "9")),
+    ("Mechanism", ("10", "10b")),
+)
 FAMILY_PREFIX = {"LLM": "LLM", "CodeAct": "CodeAct", "RLM": "RLMs"}
 FAMILY_COLORS = {"LLM": "#1f77b4", "CodeAct": "#d62728", "RLM": "#2ca02c"}
 PROJECT_PATTERN = re.compile(r'project\s*=\s*"([^"]+)"')
@@ -539,10 +547,14 @@ def aggregate_task(records: list[RunRecord]) -> dict[tuple[str, str, int], dict[
 
 
 def aggregate_overall(
-    task_agg: dict[tuple[str, str, int], dict[str, float]]
+    task_agg: dict[tuple[str, str, int], dict[str, float]],
+    *,
+    task_filter: Optional[frozenset[str]] = None,
 ) -> dict[tuple[str, int], dict[str, Optional[float]]]:
     grouped: dict[tuple[str, int], list[tuple[str, dict[str, float]]]] = defaultdict(list)
     for (family, task_id, context), stats in task_agg.items():
+        if task_filter is not None and task_id not in task_filter:
+            continue
         grouped[(family, context)].append((task_id, stats))
 
     out: dict[tuple[str, int], dict[str, Optional[float]]] = {}
@@ -581,22 +593,54 @@ def aggregate_overall(
     return out
 
 
-def save_plot(fig, out_dir: Path, stem: str) -> None:
-    fig.savefig(out_dir / f"{stem}.png", dpi=320, bbox_inches="tight")
-    fig.savefig(out_dir / f"{stem}.pdf", bbox_inches="tight")
-    plt.close(fig)
+def question_count_for_tasks(
+    task_agg: dict[tuple[str, str, int], dict[str, float]], task_ids: tuple[str, ...]
+) -> int:
+    per_task: dict[str, float] = {}
+    for (_, task_id, _), stats in task_agg.items():
+        if task_id in task_ids and task_id not in per_task:
+            per_task[task_id] = stats["question_count"]
+    if per_task:
+        return int(round(sum(per_task.values())))
+    return 0
 
 
-def plot_overall_f1_line(
-    out_dir: Path, model_name: str, overall: dict[tuple[str, int], dict[str, Optional[float]]]
+def series_for_task(
+    task_agg: dict[tuple[str, str, int], dict[str, float]], task_id: str
+) -> dict[tuple[str, int], dict[str, Optional[float]]]:
+    out: dict[tuple[str, int], dict[str, Optional[float]]] = {}
+    for (family, tid, context), stats in task_agg.items():
+        if tid != task_id:
+            continue
+        out[(family, context)] = {
+            "f1": stats["f1"],
+            "f1_std": stats.get("f1_std"),
+            "cost": stats["cost"] if not math.isnan(stats["cost"]) else None,
+            "input_tokens": stats["input_tokens"]
+            if not math.isnan(stats["input_tokens"])
+            else None,
+            "output_tokens": stats["output_tokens"]
+            if not math.isnan(stats["output_tokens"])
+            else None,
+        }
+    return out
+
+
+def plot_f1_lines_on_ax(
+    ax,
+    series: dict[tuple[str, int], dict[str, Optional[float]]],
+    *,
+    title: str,
+    subtitle: Optional[str] = None,
+    show_legend: bool = False,
+    show_ylabel: bool = True,
 ) -> None:
-    fig, ax = plt.subplots(figsize=(8, 5), constrained_layout=True)
     for family in ("LLM", "CodeAct", "RLM"):
         points = sorted(
             [
                 (context, stats["f1"], stats.get("f1_std"))
-                for (fam, context), stats in overall.items()
-                if fam == family and stats["f1"] is not None
+                for (fam, context), stats in series.items()
+                if fam == family and stats.get("f1") is not None
             ],
             key=lambda x: context_sort_key(x[0]),
         )
@@ -611,8 +655,8 @@ def plot_overall_f1_line(
             ys,
             yerr=yerr,
             marker="o",
-            linewidth=2,
-            capsize=3,
+            linewidth=1.6,
+            capsize=2.5,
             label=family,
             color=FAMILY_COLORS[family],
         )
@@ -621,10 +665,144 @@ def plot_overall_f1_line(
     ax.grid(which="major", axis="both", alpha=0.35)
     ax.minorticks_on()
     ax.grid(which="minor", axis="y", alpha=0.18, linestyle=":")
+    ax.set_xlabel("Context")
+    if show_ylabel:
+        ax.set_ylabel("F1")
+    full_title = f"{title}\n{subtitle}" if subtitle else title
+    ax.set_title(full_title, fontsize=10, pad=8)
+    if show_legend:
+        ax.legend()
+
+
+def shared_family_legend(
+    fig, *, y: float = 0.01, loc: str = "lower center"
+) -> None:
+    from matplotlib.lines import Line2D
+
+    handles = [
+        Line2D(
+            [0],
+            [0],
+            color=FAMILY_COLORS[family],
+            marker="o",
+            linewidth=1.6,
+            label=family,
+        )
+        for family in ("LLM", "CodeAct", "RLM")
+    ]
+    fig.legend(
+        handles=handles,
+        loc=loc,
+        bbox_to_anchor=(0.5, y),
+        ncol=3,
+        frameon=True,
+        framealpha=0.95,
+    )
+
+
+def plot_subcategory_f1_panels(
+    out_dir: Path,
+    model_name: str,
+    task_agg: dict[tuple[str, str, int], dict[str, float]],
+    subcategories: tuple[tuple[str, tuple[str, ...]], ...],
+    *,
+    tier_label: str,
+    nrows: int,
+    ncols: int,
+) -> None:
+    if nrows == 1:
+        fig, axes = plt.subplots(
+            nrows, ncols, figsize=(3.4 * ncols, 4.6), sharey=True
+        )
+    else:
+        fig, axes = plt.subplots(nrows, ncols, figsize=(4.6 * ncols, 3.9 * nrows))
+    axes_flat = list(axes.flatten()) if hasattr(axes, "flatten") else [axes]
+    for index, (ax, (name, task_ids)) in enumerate(
+        zip(axes_flat, subcategories)
+    ):
+        subset = aggregate_overall(task_agg, task_filter=frozenset(task_ids))
+        qcount = question_count_for_tasks(task_agg, task_ids)
+        panel_title = f"{name} ({qcount}Q)" if qcount else name
+        plot_f1_lines_on_ax(
+            ax,
+            subset,
+            title=panel_title,
+            show_ylabel=index % ncols == 0,
+        )
+    for ax in axes_flat[len(subcategories) :]:
+        ax.set_visible(False)
+    if nrows == 1:
+        fig.subplots_adjust(top=0.90, bottom=0.20, left=0.10, right=0.99, wspace=0.22)
+        fig.suptitle(
+            f"{tier_label} sub-category F1 vs context ({model_name})",
+            y=0.97,
+            fontsize=13,
+        )
+        shared_family_legend(fig, y=0.06)
+    else:
+        fig.subplots_adjust(
+            left=0.08, right=0.98, top=0.92, bottom=0.12, hspace=0.42, wspace=0.28
+        )
+        fig.suptitle(
+            f"{tier_label} sub-category F1 vs context ({model_name})",
+            y=0.98,
+            fontsize=14,
+        )
+        shared_family_legend(fig)
+    save_plot(fig, out_dir, f"{model_slug(model_name)}_2_subcategory_f1_vs_context")
+
+
+def plot_task_f1_panels(
+    out_dir: Path,
+    model_name: str,
+    task_agg: dict[tuple[str, str, int], dict[str, float]],
+    task_ids: tuple[str, ...],
+    *,
+    tier_label: str,
+    nrows: int,
+    ncols: int,
+) -> None:
+    sorted_tasks = sorted(task_ids, key=task_sort_key)
+    fig, axes = plt.subplots(
+        nrows, ncols, figsize=(4.2 * ncols, 3.5 * nrows), constrained_layout=True
+    )
+    axes_flat = list(axes.flatten()) if hasattr(axes, "flatten") else [axes]
+    for ax, task_id in zip(axes_flat, sorted_tasks):
+        series = series_for_task(task_agg, task_id)
+        qcount = question_count_for_tasks(task_agg, (task_id,))
+        subtitle = f"{qcount}Q" if qcount else None
+        plot_f1_lines_on_ax(ax, series, title=f"Task {task_id}", subtitle=subtitle)
+    for ax in axes_flat[len(sorted_tasks) :]:
+        ax.set_visible(False)
+    handles, labels = axes_flat[0].get_legend_handles_labels()
+    if handles:
+        fig.legend(handles, labels, loc="upper center", ncol=3, bbox_to_anchor=(0.5, 1.02))
+    fig.suptitle(
+        f"{tier_label} per-task F1 vs context ({model_name})",
+        y=1.04,
+        fontsize=14,
+    )
+    save_plot(fig, out_dir, f"{model_slug(model_name)}_4_task_f1_vs_context")
+
+
+def save_plot(fig, out_dir: Path, stem: str) -> None:
+    fig.savefig(out_dir / f"{stem}.png", dpi=320, bbox_inches="tight")
+    fig.savefig(out_dir / f"{stem}.pdf", bbox_inches="tight")
+    plt.close(fig)
+
+
+def plot_overall_f1_line(
+    out_dir: Path, model_name: str, overall: dict[tuple[str, int], dict[str, Optional[float]]]
+) -> None:
+    fig, ax = plt.subplots(figsize=(8, 5), constrained_layout=True)
+    plot_f1_lines_on_ax(
+        ax,
+        overall,
+        title=f"Tier3 overall F1 vs context ({model_name})",
+        show_legend=True,
+    )
     ax.set_xlabel("Context length")
     ax.set_ylabel("Question-weighted average F1")
-    ax.set_title(f"Tier3 overall F1 vs context ({model_name})")
-    ax.legend()
     save_plot(fig, out_dir, f"{model_slug(model_name)}_1_overall_f1_vs_context")
 
 
@@ -732,6 +910,24 @@ def main() -> None:
         task_agg = aggregate_task(model_rows)
         overall = aggregate_overall(task_agg)
         plot_overall_f1_line(out_dir, model_name, overall)
+        plot_subcategory_f1_panels(
+            out_dir,
+            model_name,
+            task_agg,
+            SUBCATEGORIES,
+            tier_label="Tier3",
+            nrows=2,
+            ncols=3,
+        )
+        plot_task_f1_panels(
+            out_dir,
+            model_name,
+            task_agg,
+            TASK_IDS,
+            tier_label="Tier3",
+            nrows=4,
+            ncols=4,
+        )
         plot_overall_cost_bar(out_dir, model_name, overall)
         plot_overall_tokens_bar(out_dir, model_name, overall)
         print(
