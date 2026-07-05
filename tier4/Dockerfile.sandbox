@@ -1,0 +1,27 @@
+# RLM Docker REPL sandbox — stdlib + numpy + rdkit (versions pinned from rlms/.rlm).
+#
+# Refresh + build from tier4:
+#   ./build_rlm_sandbox.sh
+#
+FROM python:3.11-slim
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PIP_NO_CACHE_DIR=1
+
+WORKDIR /workspace
+
+# Chemistry / numeric wheels need runtime libs on slim images.
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends \
+        libxrender1 \
+        libxext6 \
+        libgomp1 \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY rlm-sandbox-requirements.txt /tmp/rlm-sandbox-requirements.txt
+RUN pip install --upgrade pip \
+    && pip install -r /tmp/rlm-sandbox-requirements.txt \
+    && rm /tmp/rlm-sandbox-requirements.txt
+
+CMD ["tail", "-f", "/dev/null"]

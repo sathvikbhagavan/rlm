@@ -146,6 +146,29 @@ class SimpleCodeExecutor:
         return output
 
 
+def format_code_execution_timeout_error(timeout_s: float) -> str:
+    return (
+        f"Error: TimeoutError: Code execution exceeded {timeout_s:.1f}s timeout.\n"
+        "The code likely blocked on I/O (e.g., sys.stdin.read()) or ran too long.\n"
+        "Traceback (most recent call last):\n"
+        '  File "<codeact>", line ?, in <module>\n'
+        f"TimeoutError: Code execution exceeded {timeout_s:.1f}s timeout"
+    )
+
+
+async def execute_code_with_timeout(
+    code_execute_fn: Callable[[str], str],
+    code: str,
+    timeout_s: float | None,
+) -> str:
+    if timeout_s is None:
+        return code_execute_fn(code)
+    try:
+        return await asyncio.wait_for(asyncio.to_thread(code_execute_fn, code), timeout=timeout_s)
+    except asyncio.TimeoutError:
+        return format_code_execution_timeout_error(timeout_s)
+
+
 def make_simple_code_executor(
     extra_locals: Optional[dict[str, Any]] = None,
     extra_globals: Optional[dict[str, Any]] = None,
@@ -282,6 +305,7 @@ class CodeActAgent(Workflow):
         llm_timeout_retries: int = 2,
         llm_timeout_retry_backoff_s: float = 2.0,
         llm_request_timeout_s: float = 300.0,
+        code_execution_timeout_s: float = 300.0,
         memory_token_limit: int = 120_000,
         **workflow_kwargs: Any,
     ) -> None:
@@ -296,6 +320,9 @@ class CodeActAgent(Workflow):
         self.llm_timeout_retry_backoff_s = max(0.0, llm_timeout_retry_backoff_s)
         self.llm_request_timeout_s = (
             float(llm_request_timeout_s) if llm_request_timeout_s > 0 else None
+        )
+        self.code_execution_timeout_s = (
+            float(code_execution_timeout_s) if code_execution_timeout_s > 0 else None
         )
         self.memory_token_limit = max(1024, memory_token_limit)
         self.system_message = ChatMessage(role="system", content=system_prompt)
@@ -423,7 +450,13 @@ class CodeActAgent(Workflow):
         print("\n[CODE]")
         print(ev.code)
         print("[END CODE]\n")
-        output = self.code_execute_fn(ev.code)
+        output = await execute_code_with_timeout(
+            self.code_execute_fn,
+            ev.code,
+            self.code_execution_timeout_s,
+        )
+        if output.startswith("Error: TimeoutError: Code execution exceeded"):
+            print(f"[CODE EXEC TIMEOUT] exceeded {self.code_execution_timeout_s:.1f}s")
         print("[OUTPUT]")
         print(output)
         print("[END OUTPUT]\n")

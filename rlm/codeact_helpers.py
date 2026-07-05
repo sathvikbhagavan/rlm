@@ -28,6 +28,7 @@ class BaseContextPipeline:
         context_size: int,
         correct_indices: Iterable[int] | None = None,
         query: str = "",
+        excluded_indices: Iterable[int] | None = None,
     ) -> str:
         raise NotImplementedError
 
@@ -52,6 +53,13 @@ class RandomContextPipeline(BaseContextPipeline):
             idx_str, _ = line.split(" ", 1)
             self.line_by_idx[int(idx_str)] = line
 
+    def _valid_line_indices(self, indices: Iterable[int] | None) -> set[int]:
+        return {
+            idx
+            for idx in (indices or [])
+            if isinstance(idx, int) and 0 <= idx < len(self.lines)
+        }
+
     def _sample_with_seed(
         self,
         top_k: int,
@@ -61,11 +69,7 @@ class RandomContextPipeline(BaseContextPipeline):
         valid_forced = [idx for idx in forced_indices if 0 <= idx < len(self.lines)]
         dedup_forced = list(dict.fromkeys(valid_forced))[:top_k]
         forced_set = set(dedup_forced)
-        excluded_set = {
-            idx
-            for idx in (excluded_indices or [])
-            if isinstance(idx, int) and 0 <= idx < len(self.lines)
-        }
+        excluded_set = self._valid_line_indices(excluded_indices)
         remainder_pool = [
             i for i in range(len(self.lines)) if i not in forced_set and i not in excluded_set
         ]
@@ -81,9 +85,17 @@ class RandomContextPipeline(BaseContextPipeline):
         context_size: int,
         correct_indices: Iterable[int] | None = None,
         query: str = "",
+        excluded_indices: Iterable[int] | None = None,
     ) -> str:
+        pipeline_excluded = self._valid_line_indices(excluded_indices)
         if context_size < 0:
-            return "\n".join(self.lines)
+            if not pipeline_excluded:
+                return "\n".join(self.lines)
+            return "\n".join(
+                line
+                for idx, line in enumerate(self.lines)
+                if idx not in pipeline_excluded
+            )
         top_k = min(context_size, len(self.lines))
         if top_k == 0:
             return ""
@@ -121,7 +133,7 @@ class RandomContextPipeline(BaseContextPipeline):
                     return self._sample_with_seed(
                         top_k=top_k,
                         forced_indices=forced,
-                        excluded_indices=non_forced_correct,
+                        excluded_indices=non_forced_correct | pipeline_excluded,
                     )
             else:
                 print(
@@ -131,7 +143,11 @@ class RandomContextPipeline(BaseContextPipeline):
 
         reaction_key = query.strip()
         gt_indices = self.ground_truth_indices_by_reaction.get(reaction_key, [])
-        gt_lines = [self.line_by_idx[idx] for idx in gt_indices if idx in self.line_by_idx]
+        gt_lines = [
+            self.line_by_idx[idx]
+            for idx in gt_indices
+            if idx in self.line_by_idx and idx not in pipeline_excluded
+        ]
         if gt_lines and self.ground_truth_fraction_per_context > 0:
             desired_gt = int(round(top_k * self.ground_truth_fraction_per_context))
             if desired_gt == 0:
@@ -139,15 +155,22 @@ class RandomContextPipeline(BaseContextPipeline):
             gt_take = min(top_k, len(gt_lines), desired_gt)
             seeded_gt_lines = self.rng.sample(gt_lines, k=gt_take)
             seeded_gt_set = set(seeded_gt_lines)
-            remainder_pool = [line for line in self.lines if line not in seeded_gt_set]
+            remainder_pool = [
+                line
+                for idx, line in enumerate(self.lines)
+                if line not in seeded_gt_set and idx not in pipeline_excluded
+            ]
             random_take = top_k - gt_take
             random_lines = self.rng.sample(remainder_pool, k=random_take)
             sampled = seeded_gt_lines + random_lines
             self.rng.shuffle(sampled)
             return "\n".join(sampled)
 
-        sampled = self.rng.sample(self.lines, k=top_k)
-        return "\n".join(sampled)
+        return self._sample_with_seed(
+            top_k=top_k,
+            forced_indices=[],
+            excluded_indices=pipeline_excluded,
+        )
 
 
 def build_context_pipeline(

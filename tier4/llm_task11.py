@@ -1,9 +1,12 @@
 import argparse
-import random
+import asyncio
 import os
+import random
 import re
 import uuid
 
+from llama_index.core.llms import ChatMessage
+from llama_index.llms.openrouter import OpenRouter
 from task11_synthetic_chain_graph import ground_truth_chains_in_context
 from task11_synthetic_chain_ground_truth import (
     FIXED_QUESTIONS,
@@ -16,26 +19,27 @@ from task11_synthetic_chain_ground_truth import (
 )
 
 import wandb
-from rlm import RLM
-from rlm.codeact_helpers import build_context_pipeline, load_lines, precision_recall_f1
+from rlm.codeact_helpers import (
+    build_context_pipeline,
+    extract_response_text,
+    extract_usage_metrics,
+    load_lines,
+    precision_recall_f1,
+)
 from rlm.tracing import init_tracing, using_tracing_attributes
+from rlm.utils.token_utils import count_tokens
 
 # os.environ["WANDB_MODE"] = "disabled"
 
 DATASET_PATH = "/home/bhagavan/rlms/datasets/reactionSmilesFigShareUSPTO2023_cleaned.txt"
-BACKEND = "openrouter"
 MODEL_NAME = "openai/gpt-5-mini"
+OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
 ENABLE_TRACING = True
 SEED = 42
 CONTEXT_SIZE = 100
 CONTEXT_PIPELINE_NAME = "random"
-
-RLM_INIT_KWARGS = {
-    "backend": BACKEND,
-    "backend_kwargs": {"model_name": MODEL_NAME},
-    "verbose": True,
-    "max_depth": 2,
-}
+REASONING_EFFORT = "high"
+MAX_OUTPUT_TOKENS = 30_000
 
 
 def parse_chains(response: str, chain_length: int) -> list[tuple[int, ...]]:
@@ -65,10 +69,10 @@ def parse_chains(response: str, chain_length: int) -> list[tuple[int, ...]]:
 
 def build_question(start_index: int, chain_length: int) -> str:
     return f"""
-    Context: You are given a large string of chemical reactions in SMILES format, separated by newlines.
+    There is a list of chemical reactions in SMILES format, separated by newlines.
     Each reaction is in one of these forms:
-    - "index reactants>reagents>products"
-    - "index reactants>>products"
+      - "index reactants>reagents>products"
+      - "index reactants>>products"
 
     Each side (reactants / products) may contain multiple molecules separated by dots (.).
     Ignore reagents (middle field between the two > delimiters).
@@ -80,20 +84,16 @@ def build_question(start_index: int, chain_length: int) -> str:
     [r_0, r_1, ..., r_{chain_length - 1}] where r_0 = {start_index} and for every consecutive pair (r_k, r_{{k+1}}),
     at least one PRODUCT of reaction r_k is identical to at least one REACTANT of reaction r_{{k+1}}.
 
-    Molecule identity must be determined by canonical SMILES.
-    Do NOT use substructure matching — only exact canonical SMILES equality counts as a match.
+    Molecule identity must be determined by exact SMILES string equality on each component after splitting on dots (.).
+    Do NOT use substructure matching — only exact equality counts as a match.
     A reaction must NOT appear more than once in the same chain.
     Only consider reactions that appear in the provided context string.
     Do not infer links through molecules from reactions outside the context.
 
     Guidance:
-    - Use RDKit for all SMILES canonicalization and parsing.
-    - Split multi-component sides on dots (.) and canonicalize each component independently.
-    - Skip malformed reactions or molecules that RDKit cannot parse.
+    - Split multi-component sides on dots (.).
+    - Skip malformed reactions.
     - Systematically build the product-to-reactant connections from reaction {start_index} outward.
-    - DO NOT assume/simulate output of the code. Wait for the code to get executed and only then return the final answer.
-    - DO NOT USE `FINAL` for writing a comment/thought. Only use this for the final answer.
-    - DO NOT WRITE `FINAL` without observing the output of the code.
 
     Output format:
     - Return each chain as a comma-separated sequence of {chain_length} reaction indices, one chain per line.
@@ -107,7 +107,7 @@ def maybe_init_tracing() -> None:
     if not ENABLE_TRACING:
         return
     initialized = init_tracing(
-        project_name="RLMs-Task11",
+        project_name="LLM-Task11",
         auto_instrument=True,
         batch=False,
     )
@@ -120,13 +120,13 @@ def maybe_init_tracing() -> None:
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="Run RLM task 11 — synthetic chain evaluation."
+        description="Run LLM task 11 — synthetic chain evaluation."
     )
     parser.add_argument(
         "--model-name",
         type=str,
         default=MODEL_NAME,
-        help=f"Model identifier for backend (default: {MODEL_NAME}).",
+        help=f"Model identifier for OpenRouter (default: {MODEL_NAME}).",
     )
     parser.add_argument(
         "--context-size",
@@ -146,9 +146,10 @@ def _fmt_chains(chains: list[tuple[int, ...]], limit: int = 20) -> str:
     return "; ".join(shown) + suffix
 
 
-def main(model_name: str, context_size: int) -> None:
+async def main(model_name: str, context_size: int) -> None:
     maybe_init_tracing()
     lines = load_lines(DATASET_PATH)
+    run_session_id = f"llm-task11-{uuid.uuid4()}"
 
     for start_idx, q_chain_length in FIXED_QUESTIONS:
         full_gt = HARDCODED_GT_CHAINS[(start_idx, q_chain_length)]
@@ -158,28 +159,30 @@ def main(model_name: str, context_size: int) -> None:
             f"support_indices={len(chain_indices_for_question(start_idx, q_chain_length))}"
         )
 
-    rlm_init_kwargs = dict(RLM_INIT_KWARGS)
-    rlm_init_kwargs["backend_kwargs"] = {"model_name": model_name}
-    rlm = RLM(**rlm_init_kwargs)
-    run_session_id = f"run-rlms-{uuid.uuid4()}"
+    llm = OpenRouter(
+        model=model_name,
+        api_key=OPENROUTER_API_KEY,
+        max_tokens=MAX_OUTPUT_TOKENS,
+        reasoning_effort=REASONING_EFFORT,
+        additional_kwargs={"max_completion_tokens": MAX_OUTPUT_TOKENS},
+    )
 
     run = wandb.init(
-        project="RLMs-Task11",
+        project="LLM-Task11",
         config={
             "MODEL_NAME": model_name,
-            "backend": BACKEND,
-            "model_name": model_name,
             "dataset_path": DATASET_PATH,
             "seed": SEED,
             "context_size": context_size,
             "context_pipeline_name": CONTEXT_PIPELINE_NAME,
             "min_selected_ground_truth": TASK11_MIN_SELECTED_GROUND_TRUTH,
+            "reasoning_effort": REASONING_EFFORT,
             "num_questions": len(FIXED_QUESTIONS),
             "fixed_questions": FIXED_QUESTIONS,
-            "rlm_init_kwargs": rlm_init_kwargs,
             "task_description": "Synthetic chain identification — pairwise reaction analysis.",
             "ground_truth_definition": TASK11_GROUND_TRUTH_DEFINITION,
             "ground_truth_total_reactions": TASK11_TOTAL_REACTIONS,
+            "mode": "llm_baseline_no_tools",
         },
     )
     wandb.define_metric("sample_iteration")
@@ -208,32 +211,43 @@ def main(model_name: str, context_size: int) -> None:
             rng=random.Random(SEED + i),
             min_selected_ground_truth=TASK11_MIN_SELECTED_GROUND_TRUTH,
         )
-        sample_context = context_pipeline.build_context(
+        retrieved_context = context_pipeline.build_context(
             context_size=context_size,
             correct_indices=support_indices,
             query=f"synthetic_chain_{start_idx}_L{q_chain_length}",
         )
-        context_lines = [line for line in sample_context.splitlines() if line.strip()]
+        retrieved_lines = [line for line in retrieved_context.splitlines() if line.strip()]
         context_indices = {
             int(line.split(" ", 1)[0])
-            for line in context_lines
+            for line in retrieved_lines
             if " " in line and line.split(" ", 1)[0].isdigit()
         }
         gt_chains = ground_truth_chains_in_context(
-            context_lines,
+            retrieved_lines,
             start_index=start_idx,
             chain_length=q_chain_length,
         )
         gt_set = set(gt_chains)
-        context_coverage = len(context_lines) / len(lines) if lines else 0.0
+        context_coverage = len(retrieved_lines) / len(lines) if lines else 0.0
         support_in_context = len(support_indices & context_indices)
+        context_has_ground_truth = bool(gt_chains)
+
+        completion_prompt = f"""
+        You are given a subset of chemical reactions in SMILES format and a question.
+        <context>
+        {retrieved_context}
+        </context>
+        <question>
+        {question}
+        </question>
+        """
 
         print(
             f"\nQuestion {i + 1}/{len(FIXED_QUESTIONS)}: start_idx={start_idx}, "
             f"chain_length={q_chain_length}"
         )
         print(
-            f"[CONTEXT] requested_size={context_size} actual_size={len(context_lines)} "
+            f"[CONTEXT] requested_size={context_size} actual_size={len(retrieved_lines)} "
             f"selected_chains={sampling.selected_chain_count}/{len(full_gt_chains)} "
             f"forced_count={sampling.forced_count} "
             f"support_in_context={support_in_context}/{len(support_indices)} "
@@ -241,8 +255,6 @@ def main(model_name: str, context_size: int) -> None:
             f"gt_in_context={len(gt_chains)}/{sampling.selected_chain_count} "
             f"coverage={context_coverage:.4f}"
         )
-
-        completion_kwargs = {"prompt": sample_context, "root_prompt": question}
 
         with using_tracing_attributes(
             session_id=run_session_id,
@@ -252,18 +264,17 @@ def main(model_name: str, context_size: int) -> None:
                 "task": "synthetic_chain",
                 "start_idx": start_idx,
                 "chain_length": q_chain_length,
+                "agent": "llm_baseline",
                 "ground_truth_definition": TASK11_GROUND_TRUTH_DEFINITION,
             },
-            tags=["run_rlms", "sample", "task11_SYNTHETIC_CHAIN"],
+            tags=["llm-baseline", "sample", "task11_SYNTHETIC_CHAIN"],
         ):
-            completion = rlm.completion(**completion_kwargs)
-            response = completion.response
+            response = await llm.achat([ChatMessage(role="user", content=completion_prompt)])
 
-        iteration_metrics = rlm.get_last_iteration_metrics()
-        parsed_chains = parse_chains(response, q_chain_length)
+        response_text = extract_response_text(response)
+        parsed_chains = parse_chains(response_text, q_chain_length)
         pred_set = set(parsed_chains)
         precision, recall, f1 = precision_recall_f1(pred_set, gt_set)
-        sample_cost_usd = completion.usage_summary.total_cost
         is_exact_match = pred_set == gt_set
 
         if is_exact_match:
@@ -271,13 +282,10 @@ def main(model_name: str, context_size: int) -> None:
         macro_precision += precision
         macro_recall += recall
         macro_f1 += f1
-        if sample_cost_usd is not None:
-            total_cost_usd += sample_cost_usd
-            samples_with_cost += 1
 
         print(
             f"Response [start={start_idx}]: "
-            f"{response[:500]}{'…' if len(response) > 500 else ''}"
+            f"{response_text[:500]}{'…' if len(response_text) > 500 else ''}"
         )
         print(f"Predicted [start={start_idx}]: {len(parsed_chains)} chains")
         print(f"Ground truth [start={start_idx}]: {len(gt_chains)} chains")
@@ -286,38 +294,47 @@ def main(model_name: str, context_size: int) -> None:
             f"recall={recall:.4f} f1={f1:.4f} exact_match={is_exact_match}"
         )
 
-        for metric in iteration_metrics:
-            wandb.log(
-                {
-                    "sample_iteration": metric["iteration"],
-                    f"sample/{i}/iteration_input_tokens": metric["iteration_input_tokens"],
-                    f"sample/{i}/iteration_output_tokens": metric["iteration_output_tokens"],
-                    f"sample/{i}/iteration_total_tokens": metric["iteration_total_tokens"],
-                }
+        usage_metrics = extract_usage_metrics(response)
+        prompt_tokens = int(usage_metrics.get("prompt_tokens", 0))
+        completion_tokens = int(usage_metrics.get("completion_tokens", 0))
+        total_tokens = int(usage_metrics.get("total_tokens", 0))
+        sample_cost = float(usage_metrics["cost_usd"]) if "cost_usd" in usage_metrics else None
+        if total_tokens == 0:
+            prompt_tokens = count_tokens(
+                [{"role": "user", "content": completion_prompt}],
+                model_name,
             )
-
-        final_input_tokens = 0
-        final_output_tokens = 0
-        final_total_tokens = 0
-        if iteration_metrics:
-            last_metric = iteration_metrics[-1]
-            final_input_tokens = int(last_metric["total_input_tokens"])
-            final_output_tokens = int(last_metric["total_output_tokens"])
-            final_total_tokens = int(last_metric["total_tokens"])
-            total_input_tokens += final_input_tokens
-            total_output_tokens += final_output_tokens
+            completion_tokens = count_tokens(
+                [{"role": "assistant", "content": response_text}],
+                model_name,
+            )
+            total_tokens = prompt_tokens + completion_tokens
+        total_input_tokens += prompt_tokens
+        total_output_tokens += completion_tokens
+        if sample_cost is not None:
+            total_cost_usd += sample_cost
+            samples_with_cost += 1
         samples_run += 1
 
+        wandb.log(
+            {
+                "sample_iteration": 1,
+                f"sample/{i}/iteration_input_tokens": prompt_tokens,
+                f"sample/{i}/iteration_output_tokens": completion_tokens,
+                f"sample/{i}/iteration_total_tokens": total_tokens,
+                **({f"sample/{i}/iteration_cost_usd": sample_cost} if sample_cost is not None else {}),
+            }
+        )
         wandb.log(
             {
                 "sample_idx": i,
                 f"sample/{i}/start_idx": start_idx,
                 f"sample/{i}/chain_length": q_chain_length,
-                f"sample/{i}/final_total_input_tokens": final_input_tokens,
-                f"sample/{i}/final_total_output_tokens": final_output_tokens,
-                f"sample/{i}/final_total_tokens": final_total_tokens,
-                f"sample/{i}/iterations": len(iteration_metrics),
-                f"sample/{i}/response_raw": response,
+                f"sample/{i}/final_total_input_tokens": prompt_tokens,
+                f"sample/{i}/final_total_output_tokens": completion_tokens,
+                f"sample/{i}/final_total_tokens": total_tokens,
+                f"sample/{i}/iterations": 1,
+                f"sample/{i}/response_raw": response_text,
                 f"sample/{i}/response_parsed_chains": _fmt_chains(parsed_chains),
                 f"sample/{i}/response_parsed_count": len(parsed_chains),
                 f"sample/{i}/ground_truth_chains": _fmt_chains(gt_chains),
@@ -328,20 +345,17 @@ def main(model_name: str, context_size: int) -> None:
                 f"sample/{i}/support_indices_in_context": support_in_context,
                 f"sample/{i}/support_indices_full_count": len(full_support_indices),
                 f"sample/{i}/support_indices_selected_count": len(support_indices),
+                f"sample/{i}/is_exact_match": int(is_exact_match),
                 f"sample/{i}/precision": precision,
                 f"sample/{i}/recall": recall,
                 f"sample/{i}/f1": f1,
-                f"sample/{i}/is_exact_match": int(is_exact_match),
-                f"sample/{i}/completion_root_prompt": question,
-                f"sample/{i}/completion_prompt_char_count": len(sample_context),
+                f"sample/{i}/completion_prompt_char_count": len(completion_prompt),
+                f"sample/{i}/context_char_count": len(retrieved_context),
+                f"sample/{i}/retrieved_line_count": len(retrieved_lines),
                 f"sample/{i}/context_size": context_size,
                 f"sample/{i}/context_coverage": context_coverage,
-                f"sample/{i}/retrieved_line_count": len(context_lines),
-                **(
-                    {f"sample/{i}/final_total_cost_usd": sample_cost_usd}
-                    if sample_cost_usd is not None
-                    else {}
-                ),
+                f"sample/{i}/context_has_ground_truth": int(context_has_ground_truth),
+                **({f"sample/{i}/final_total_cost_usd": sample_cost} if sample_cost is not None else {}),
             }
         )
         wandb.log(
@@ -392,7 +406,9 @@ def main(model_name: str, context_size: int) -> None:
 
 if __name__ == "__main__":
     args = parse_args()
-    main(
-        model_name=args.model_name,
-        context_size=args.context_size,
+    asyncio.run(
+        main(
+            model_name=args.model_name,
+            context_size=args.context_size,
+        )
     )

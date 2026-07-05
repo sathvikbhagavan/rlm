@@ -1,9 +1,12 @@
 import argparse
-import random
+import asyncio
 import os
+import random
 import re
 import uuid
 
+from llama_index.core.llms import ChatMessage
+from llama_index.llms.openrouter import OpenRouter
 from task12_longest_chain_graph import ground_truth_longest_chain_in_context
 from task12_longest_chain_ground_truth import (
     FIXED_TARGET_PRODUCTS,
@@ -15,26 +18,27 @@ from task12_longest_chain_ground_truth import (
 )
 
 import wandb
-from rlm import RLM
-from rlm.codeact_helpers import build_context_pipeline, load_lines, precision_recall_f1
+from rlm.codeact_helpers import (
+    build_context_pipeline,
+    extract_response_text,
+    extract_usage_metrics,
+    load_lines,
+    precision_recall_f1,
+)
 from rlm.tracing import init_tracing, using_tracing_attributes
+from rlm.utils.token_utils import count_tokens
 
 # os.environ["WANDB_MODE"] = "disabled"
 
 DATASET_PATH = "/home/bhagavan/rlms/datasets/reactionSmilesFigShareUSPTO2023_cleaned.txt"
-BACKEND = "openrouter"
 MODEL_NAME = "openai/gpt-5-mini"
+OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
 ENABLE_TRACING = True
 SEED = 42
 CONTEXT_SIZE = 100
 CONTEXT_PIPELINE_NAME = "random"
-
-RLM_INIT_KWARGS = {
-    "backend": BACKEND,
-    "backend_kwargs": {"model_name": MODEL_NAME},
-    "verbose": True,
-    "max_depth": 2,
-}
+REASONING_EFFORT = "high"
+MAX_OUTPUT_TOKENS = 30_000
 
 
 def parse_chain(response: str) -> tuple[int, ...]:
@@ -109,10 +113,10 @@ def normalized_edit_distance(pred: tuple[int, ...], gt: tuple[int, ...]) -> floa
 
 def build_question(target_product_smiles: str) -> str:
     return f"""
-    Context: You are given a large string of chemical reactions in SMILES format, separated by newlines.
+    There is a list of chemical reactions in SMILES format, separated by newlines.
     Each reaction is in one of these forms:
-    - "index reactants>reagents>products"
-    - "index reactants>>products"
+      - "index reactants>reagents>products"
+      - "index reactants>>products"
 
     Each side (reactants / products) may contain multiple molecules separated by dots (.).
     Ignore reagents (middle field between the two > delimiters).
@@ -123,17 +127,18 @@ def build_question(target_product_smiles: str) -> str:
 
     A synthetic chain is an ordered sequence of DISTINCT reaction indices [r_0, r_1, ..., r_k]
     where for every consecutive pair (r_i, r_{{i+1}}), at least one PRODUCT of reaction r_i
-    is identical to at least one REACTANT of reaction r_{{i+1}} by canonical SMILES equality.
+    is identical to at least one REACTANT of reaction r_{{i+1}} by exact SMILES equality.
 
     A chain "produces the target product" if the final reaction r_k has the target product
-    among its products (canonical SMILES match).
+    among its products (exact SMILES match).
 
     IMPORTANT DAG RULE:
     - To avoid cycles, only allow links from lower index to higher index (index_asc):
       r_i < r_{{i+1}}.
 
-    Molecule identity must use canonical SMILES.
-    Do NOT use substructure matching — only exact canonical SMILES equality counts as a match.
+    Molecule identity must be determined by exact SMILES string equality on each component
+    after splitting on dots (.).
+    Do NOT use substructure matching — only exact equality counts as a match.
     Only consider reactions that appear in the provided context string.
     Do not infer links through molecules from reactions outside the context.
 
@@ -141,11 +146,8 @@ def build_question(target_product_smiles: str) -> str:
     smallest chain of indices.
 
     Guidance:
-    - Use RDKit for SMILES canonicalization.
-    - Skip malformed reactions or malformed molecules.
-    - DO NOT assume/simulate output of the code. Wait for the code to get executed and only then return the final answer.
-    - DO NOT USE `FINAL` for writing a comment/thought. Only use this for the final answer.
-    - DO NOT WRITE `FINAL` without observing the output of the code.
+    - Split multi-component sides on dots (.).
+    - Skip malformed reactions.
 
     Output format:
     - Return ONLY one comma-separated sequence of reaction indices for the longest chain.
@@ -158,7 +160,7 @@ def maybe_init_tracing() -> None:
     if not ENABLE_TRACING:
         return
     initialized = init_tracing(
-        project_name="RLMs-Task12",
+        project_name="LLM-Task12",
         auto_instrument=True,
         batch=False,
     )
@@ -171,13 +173,13 @@ def maybe_init_tracing() -> None:
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="Run RLM task 12 — longest product chain (DAG) evaluation."
+        description="Run LLM task 12 — longest product chain (DAG) evaluation."
     )
     parser.add_argument(
         "--model-name",
         type=str,
         default=MODEL_NAME,
-        help=f"Model identifier for backend (default: {MODEL_NAME}).",
+        help=f"Model identifier for OpenRouter (default: {MODEL_NAME}).",
     )
     parser.add_argument(
         "--context-size",
@@ -191,9 +193,10 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
-def main(model_name: str, context_size: int) -> None:
+async def main(model_name: str, context_size: int) -> None:
     maybe_init_tracing()
     lines = load_lines(DATASET_PATH)
+    run_session_id = f"llm-task12-{uuid.uuid4()}"
 
     for target_product in FIXED_TARGET_PRODUCTS:
         full_gt = HARDCODED_GT_LONGEST_CHAIN[target_product]
@@ -203,28 +206,30 @@ def main(model_name: str, context_size: int) -> None:
             f"support_indices={len(chain_indices_for_product(target_product))}"
         )
 
-    rlm_init_kwargs = dict(RLM_INIT_KWARGS)
-    rlm_init_kwargs["backend_kwargs"] = {"model_name": model_name}
-    rlm = RLM(**rlm_init_kwargs)
-    run_session_id = f"run-rlms-{uuid.uuid4()}"
+    llm = OpenRouter(
+        model=model_name,
+        api_key=OPENROUTER_API_KEY,
+        max_tokens=MAX_OUTPUT_TOKENS,
+        reasoning_effort=REASONING_EFFORT,
+        additional_kwargs={"max_completion_tokens": MAX_OUTPUT_TOKENS},
+    )
 
     run = wandb.init(
-        project="RLMs-Task12",
+        project="LLM-Task12",
         config={
             "MODEL_NAME": model_name,
-            "backend": BACKEND,
-            "model_name": model_name,
             "dataset_path": DATASET_PATH,
             "seed": SEED,
             "context_size": context_size,
             "context_pipeline_name": CONTEXT_PIPELINE_NAME,
+            "reasoning_effort": REASONING_EFFORT,
             "num_questions": len(FIXED_TARGET_PRODUCTS),
             "fixed_target_products": FIXED_TARGET_PRODUCTS,
             "dag_mode": TASK12_DAG_MODE,
-            "rlm_init_kwargs": rlm_init_kwargs,
             "task_description": "Find longest DAG chain that produces a target product.",
             "ground_truth_definition": TASK12_GROUND_TRUTH_DEFINITION,
             "ground_truth_total_reactions": TASK12_TOTAL_REACTIONS,
+            "mode": "llm_baseline_no_tools",
         },
     )
     wandb.define_metric("sample_iteration")
@@ -255,37 +260,47 @@ def main(model_name: str, context_size: int) -> None:
             rng=random.Random(SEED + i),
             min_selected_ground_truth=len(support_indices),
         )
-        sample_context = context_pipeline.build_context(
+        retrieved_context = context_pipeline.build_context(
             context_size=context_size,
             correct_indices=support_indices,
             query=f"longest_product_chain_{i}",
         )
-        context_lines = [line for line in sample_context.splitlines() if line.strip()]
+        retrieved_lines = [line for line in retrieved_context.splitlines() if line.strip()]
         context_indices = {
             int(line.split(" ", 1)[0])
-            for line in context_lines
+            for line in retrieved_lines
             if " " in line and line.split(" ", 1)[0].isdigit()
         }
         gt_chain = ground_truth_longest_chain_in_context(
-            context_lines,
+            retrieved_lines,
             target_product,
             dag_mode=TASK12_DAG_MODE,
         )
-        context_coverage = len(context_lines) / len(lines) if lines else 0.0
+        gt_set = set(gt_chain)
+        context_coverage = len(retrieved_lines) / len(lines) if lines else 0.0
         support_in_context = len(support_indices & context_indices)
+        context_has_ground_truth = bool(gt_chain)
+
+        completion_prompt = f"""
+        You are given a subset of chemical reactions in SMILES format and a question.
+        <context>
+        {retrieved_context}
+        </context>
+        <question>
+        {question}
+        </question>
+        """
 
         print(
             f"\nQuestion {i + 1}/{len(FIXED_TARGET_PRODUCTS)}: "
             f"target_product={target_product}"
         )
         print(
-            f"[CONTEXT] requested_size={context_size} actual_size={len(context_lines)} "
+            f"[CONTEXT] requested_size={context_size} actual_size={len(retrieved_lines)} "
             f"support_in_context={support_in_context}/{len(support_indices)} "
             f"gt_in_context={len(gt_chain)}/{len(full_gt_chain)} "
             f"coverage={context_coverage:.4f}"
         )
-
-        completion_kwargs = {"prompt": sample_context, "root_prompt": question}
 
         with using_tracing_attributes(
             session_id=run_session_id,
@@ -295,17 +310,16 @@ def main(model_name: str, context_size: int) -> None:
                 "task": "longest_product_chain_dag",
                 "target_product": target_product,
                 "gt_chain_length": len(gt_chain),
+                "agent": "llm_baseline",
                 "ground_truth_definition": TASK12_GROUND_TRUTH_DEFINITION,
             },
-            tags=["run_rlms", "sample", "task12_LONGEST_PRODUCT_CHAIN"],
+            tags=["llm-baseline", "sample", "task12_LONGEST_PRODUCT_CHAIN"],
         ):
-            completion = rlm.completion(**completion_kwargs)
-            response = completion.response
+            response = await llm.achat([ChatMessage(role="user", content=completion_prompt)])
 
-        iteration_metrics = rlm.get_last_iteration_metrics()
-        pred_chain = parse_chain(response)
+        response_text = extract_response_text(response)
+        pred_chain = parse_chain(response_text)
         pred_set = set(pred_chain)
-        gt_set = set(gt_chain)
         precision, recall, f1 = precision_recall_f1(pred_set, gt_set)
         prefix_len = common_prefix_len(pred_chain, gt_chain)
         prefix_ratio = prefix_len / len(gt_chain) if gt_chain else 0.0
@@ -313,7 +327,6 @@ def main(model_name: str, context_size: int) -> None:
         lcs_len = lcs_length(pred_chain, gt_chain)
         lcs_ratio = lcs_len / len(gt_chain) if gt_chain else 0.0
         norm_edit_distance = normalized_edit_distance(pred_chain, gt_chain)
-        sample_cost_usd = completion.usage_summary.total_cost
         is_exact_match = pred_chain == gt_chain
 
         if is_exact_match:
@@ -325,13 +338,10 @@ def main(model_name: str, context_size: int) -> None:
         macro_position_accuracy += pos_acc
         macro_lcs_ratio += lcs_ratio
         macro_norm_edit_distance += norm_edit_distance
-        if sample_cost_usd is not None:
-            total_cost_usd += sample_cost_usd
-            samples_with_cost += 1
 
         print(
             f"Response [target={target_product}]: "
-            f"{response[:500]}{'…' if len(response) > 500 else ''}"
+            f"{response_text[:500]}{'…' if len(response_text) > 500 else ''}"
         )
         print(f"Predicted chain length [target={target_product}]: {len(pred_chain)}")
         print(f"Ground truth chain length [target={target_product}]: {len(gt_chain)}")
@@ -342,31 +352,40 @@ def main(model_name: str, context_size: int) -> None:
             f"lcs_ratio={lcs_ratio:.4f} norm_edit_dist={norm_edit_distance:.4f}"
         )
 
+        usage_metrics = extract_usage_metrics(response)
+        prompt_tokens = int(usage_metrics.get("prompt_tokens", 0))
+        completion_tokens = int(usage_metrics.get("completion_tokens", 0))
+        total_tokens = int(usage_metrics.get("total_tokens", 0))
+        sample_cost = float(usage_metrics["cost_usd"]) if "cost_usd" in usage_metrics else None
+        if total_tokens == 0:
+            prompt_tokens = count_tokens(
+                [{"role": "user", "content": completion_prompt}],
+                model_name,
+            )
+            completion_tokens = count_tokens(
+                [{"role": "assistant", "content": response_text}],
+                model_name,
+            )
+            total_tokens = prompt_tokens + completion_tokens
+        total_input_tokens += prompt_tokens
+        total_output_tokens += completion_tokens
+        if sample_cost is not None:
+            total_cost_usd += sample_cost
+            samples_with_cost += 1
+        samples_run += 1
+
         gt_str = ",".join(str(x) for x in gt_chain)
         pred_str = ",".join(str(x) for x in pred_chain)
 
-        for metric in iteration_metrics:
-            wandb.log(
-                {
-                    "sample_iteration": metric["iteration"],
-                    f"sample/{i}/iteration_input_tokens": metric["iteration_input_tokens"],
-                    f"sample/{i}/iteration_output_tokens": metric["iteration_output_tokens"],
-                    f"sample/{i}/iteration_total_tokens": metric["iteration_total_tokens"],
-                }
-            )
-
-        final_input_tokens = 0
-        final_output_tokens = 0
-        final_total_tokens = 0
-        if iteration_metrics:
-            last_metric = iteration_metrics[-1]
-            final_input_tokens = int(last_metric["total_input_tokens"])
-            final_output_tokens = int(last_metric["total_output_tokens"])
-            final_total_tokens = int(last_metric["total_tokens"])
-            total_input_tokens += final_input_tokens
-            total_output_tokens += final_output_tokens
-        samples_run += 1
-
+        wandb.log(
+            {
+                "sample_iteration": 1,
+                f"sample/{i}/iteration_input_tokens": prompt_tokens,
+                f"sample/{i}/iteration_output_tokens": completion_tokens,
+                f"sample/{i}/iteration_total_tokens": total_tokens,
+                **({f"sample/{i}/iteration_cost_usd": sample_cost} if sample_cost is not None else {}),
+            }
+        )
         wandb.log(
             {
                 "sample_idx": i,
@@ -376,11 +395,11 @@ def main(model_name: str, context_size: int) -> None:
                 f"sample/{i}/predicted_chain_length": len(pred_chain),
                 f"sample/{i}/support_indices_in_context": support_in_context,
                 f"sample/{i}/support_indices_full_count": len(support_indices),
-                f"sample/{i}/final_total_input_tokens": final_input_tokens,
-                f"sample/{i}/final_total_output_tokens": final_output_tokens,
-                f"sample/{i}/final_total_tokens": final_total_tokens,
-                f"sample/{i}/iterations": len(iteration_metrics),
-                f"sample/{i}/response_raw": response,
+                f"sample/{i}/final_total_input_tokens": prompt_tokens,
+                f"sample/{i}/final_total_output_tokens": completion_tokens,
+                f"sample/{i}/final_total_tokens": total_tokens,
+                f"sample/{i}/iterations": 1,
+                f"sample/{i}/response_raw": response_text,
                 f"sample/{i}/response_parsed_chain": pred_str,
                 f"sample/{i}/ground_truth_chain": gt_str,
                 f"sample/{i}/precision": precision,
@@ -393,16 +412,13 @@ def main(model_name: str, context_size: int) -> None:
                 f"sample/{i}/lcs_ratio": lcs_ratio,
                 f"sample/{i}/normalized_edit_distance": norm_edit_distance,
                 f"sample/{i}/is_exact_match": int(is_exact_match),
-                f"sample/{i}/completion_root_prompt": question,
-                f"sample/{i}/completion_prompt_char_count": len(sample_context),
+                f"sample/{i}/completion_prompt_char_count": len(completion_prompt),
+                f"sample/{i}/context_char_count": len(retrieved_context),
+                f"sample/{i}/retrieved_line_count": len(retrieved_lines),
                 f"sample/{i}/context_size": context_size,
                 f"sample/{i}/context_coverage": context_coverage,
-                f"sample/{i}/retrieved_line_count": len(context_lines),
-                **(
-                    {f"sample/{i}/final_total_cost_usd": sample_cost_usd}
-                    if sample_cost_usd is not None
-                    else {}
-                ),
+                f"sample/{i}/context_has_ground_truth": int(context_has_ground_truth),
+                **({f"sample/{i}/final_total_cost_usd": sample_cost} if sample_cost is not None else {}),
             }
         )
         wandb.log(
@@ -471,7 +487,9 @@ def main(model_name: str, context_size: int) -> None:
 
 if __name__ == "__main__":
     args = parse_args()
-    main(
-        model_name=args.model_name,
-        context_size=args.context_size,
+    asyncio.run(
+        main(
+            model_name=args.model_name,
+            context_size=args.context_size,
+        )
     )

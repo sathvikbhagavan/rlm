@@ -1,6 +1,7 @@
 import argparse
 import random
-import os
+import shutil
+import subprocess
 import uuid
 
 import wandb
@@ -8,31 +9,29 @@ from rlm import RLM
 from rlm.codeact_helpers import build_context_pipeline, load_lines
 from rlm.tracing import init_tracing, using_tracing_attributes
 
-from task14_protecting_group_graph import (
-    MAX_HEAVY_ATOMS,
-    MIN_HEAVY_ATOMS,
+from task17b_smirks_sequential_graph import (
     build_rlm_question,
-    ground_truth_pairs_in_context,
-    parse_response,
+    parse_chain_response,
     precision_recall_f1,
 )
-from task14_protecting_group_ground_truth import (
+from task17b_ground_truth import (
     FIXED_QUESTIONS,
-    TASK14_GROUND_TRUTH_DEFINITION,
-    TASK14_MIN_SELECTED_GROUND_TRUTH,
-    TASK14_TOTAL_REACTIONS,
-    build_task14_wandb_sample_log,
-    full_dataset_pair_count,
+    TASK17B_FORCED_CHAIN_COUNT,
+    TASK17B_GROUND_TRUTH_DEFINITION,
+    TASK17B_TOTAL_REACTIONS,
+    build_task17b_wandb_sample_log,
+    chains_for_context_sampling,
+    full_dataset_chain_count,
     full_support_indices_for_question,
-    pairs_for_context_sampling,
-    print_task14_run_summary,
-    print_task14_sample_context,
-    print_task14_sample_metrics,
-    print_task14_startup_banner,
-    update_task14_run_summary,
+    ground_truth_chains_in_context,
+    min_selected_ground_truth_for_spec,
+    random_pool_excluded_indices,
+    print_task17b_run_summary,
+    print_task17b_sample_context,
+    print_task17b_sample_metrics,
+    print_task17b_startup_banner,
+    update_task17b_run_summary,
 )
-
-# os.environ["WANDB_MODE"] = "disabled"
 
 DATASET_PATH = "/home/bhagavan/rlms/datasets/reactionSmilesFigShareUSPTO2023_cleaned.txt"
 BACKEND = "openrouter"
@@ -41,21 +40,46 @@ ENABLE_TRACING = True
 SEED = 42
 CONTEXT_SIZE = 100
 CONTEXT_PIPELINE_NAME = "random"
-MAX_PAIRS_PER_GROUP = 0
+MAX_CHAINS_PER_QUESTION = 0
+ENVIRONMENT = "docker"
+DOCKER_IMAGE = "rlm-sandbox"
+DOCKER_MEMORY_LIMIT = "20g"
 
-RLM_INIT_KWARGS = {
-    "backend": BACKEND,
-    "backend_kwargs": {"model_name": MODEL_NAME},
-    "verbose": True,
-    "max_depth": 2,
-}
+
+def docker_is_available() -> bool:
+    if not shutil.which("docker"):
+        return False
+    try:
+        result = subprocess.run(
+            ["docker", "info"],
+            capture_output=True,
+            text=True,
+            timeout=10,
+            check=False,
+        )
+    except (OSError, subprocess.TimeoutExpired):
+        return False
+    return result.returncode == 0
+
+
+def resolve_environment(requested: str) -> str:
+    if requested != "docker":
+        return requested
+    if docker_is_available():
+        return "docker"
+    print(
+        "WARNING: Docker is unavailable in this session "
+        "(permission denied or daemon not running). "
+        "Falling back to environment=local."
+    )
+    return "local"
 
 
 def maybe_init_tracing() -> None:
     if not ENABLE_TRACING:
         return
     initialized = init_tracing(
-        project_name="RLMs-Task14",
+        project_name="RLMs-Task17b",
         auto_instrument=True,
         batch=False,
     )
@@ -68,14 +92,9 @@ def maybe_init_tracing() -> None:
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="Run RLM task 14 — protecting-group install/remove pairs."
+        description="Run RLM task 17b — SMIRKS sequential 2- or 3-reaction chains."
     )
-    parser.add_argument(
-        "--model-name",
-        type=str,
-        default=MODEL_NAME,
-        help=f"Model identifier for backend (default: {MODEL_NAME}).",
-    )
+    parser.add_argument("--model-name", type=str, default=MODEL_NAME)
     parser.add_argument(
         "--context-size",
         type=int,
@@ -86,38 +105,77 @@ def parse_args() -> argparse.Namespace:
         ),
     )
     parser.add_argument(
-        "--max-pairs-per-group",
+        "--max-chains-per-question",
         type=int,
-        default=MAX_PAIRS_PER_GROUP,
+        default=MAX_CHAINS_PER_QUESTION,
         help=(
-            "Maximum ground-truth pairs per protecting group; use 0 for all "
-            f"pairs in context (default: {MAX_PAIRS_PER_GROUP})."
+            "Maximum ground-truth chains per question; use 0 for all "
+            f"chains in context (default: {MAX_CHAINS_PER_QUESTION})."
+        ),
+    )
+    parser.add_argument(
+        "--environment",
+        choices=["local", "docker"],
+        default=ENVIRONMENT,
+        help=(
+            "RLM code-execution environment (default: docker). "
+            "Use local when Docker is unavailable."
         ),
     )
     return parser.parse_args()
 
 
-def main(model_name: str, context_size: int, max_pairs_per_group: int) -> None:
-    if max_pairs_per_group < 0:
-        raise ValueError("--max-pairs-per-group must be non-negative.")
+def build_rlm_init_kwargs(*, model_name: str, environment: str) -> dict:
+    kwargs = {
+        "backend": BACKEND,
+        "backend_kwargs": {"model_name": model_name},
+        "verbose": False,
+        "max_depth": 2,
+        "environment": environment,
+    }
+    if environment == "docker":
+        kwargs["environment_kwargs"] = {
+            "image": DOCKER_IMAGE,
+            "memory_limit": DOCKER_MEMORY_LIMIT,
+            "bootstrap_packages": False,
+        }
+    return kwargs
 
+
+def parse_predictions(response: str, chain_length: int) -> list[tuple[int, ...]]:
+    return [
+        chain
+        for chain in parse_chain_response(response, chain_length=chain_length)
+        if len(chain) == chain_length
+    ]
+
+
+def main(
+    model_name: str,
+    context_size: int,
+    max_chains_per_question: int,
+    environment: str,
+) -> None:
+    if max_chains_per_question < 0:
+        raise ValueError("--max-chains-per-question must be non-negative.")
+
+    environment = resolve_environment(environment)
     maybe_init_tracing()
     lines = load_lines(DATASET_PATH)
     evaluated_specs = [
-        spec for spec in FIXED_QUESTIONS if full_dataset_pair_count(spec) > 0
+        spec for spec in FIXED_QUESTIONS if full_dataset_chain_count(spec) > 0
     ]
     if not evaluated_specs:
-        raise ValueError("No protecting-group questions have non-empty ground truth.")
+        raise ValueError("No task17b questions have non-empty ground truth.")
 
-    print_task14_startup_banner(max_pairs_per_group=max_pairs_per_group)
+    print_task17b_startup_banner(max_chains_per_question=max_chains_per_question)
 
-    rlm_init_kwargs = dict(RLM_INIT_KWARGS)
-    rlm_init_kwargs["backend_kwargs"] = {"model_name": model_name}
+    rlm_init_kwargs = build_rlm_init_kwargs(model_name=model_name, environment=environment)
     rlm = RLM(**rlm_init_kwargs)
     run_session_id = f"run-rlms-{uuid.uuid4()}"
 
     run = wandb.init(
-        project="RLMs-Task14",
+        project="RLMs-Task17b",
         config={
             "MODEL_NAME": model_name,
             "backend": BACKEND,
@@ -127,15 +185,17 @@ def main(model_name: str, context_size: int, max_pairs_per_group: int) -> None:
             "context_size": context_size,
             "context_pipeline_name": CONTEXT_PIPELINE_NAME,
             "num_questions": len(evaluated_specs),
-            "protecting_groups": [spec.label for spec in evaluated_specs],
-            "max_pairs_per_group": max_pairs_per_group,
-            "min_selected_ground_truth": TASK14_MIN_SELECTED_GROUND_TRUTH,
-            "min_heavy_atoms": MIN_HEAVY_ATOMS,
-            "max_heavy_atoms": MAX_HEAVY_ATOMS,
+            "question_ids": [spec.question_id for spec in evaluated_specs],
+            "chain_lengths": [spec.chain_length for spec in evaluated_specs],
+            "forced_chain_count": TASK17B_FORCED_CHAIN_COUNT,
+            "max_chains_per_question": max_chains_per_question,
+            "environment": environment,
+            "docker_image": DOCKER_IMAGE if environment == "docker" else None,
+            "docker_memory_limit": DOCKER_MEMORY_LIMIT if environment == "docker" else None,
             "rlm_init_kwargs": rlm_init_kwargs,
-            "task_description": "Protecting-group install/remove pair discovery via RDKit SMARTS.",
-            "ground_truth_definition": TASK14_GROUND_TRUTH_DEFINITION,
-            "ground_truth_total_reactions": TASK14_TOTAL_REACTIONS,
+            "task_description": "SMIRKS sequential 2- or 3-reaction chain discovery.",
+            "ground_truth_definition": TASK17B_GROUND_TRUTH_DEFINITION,
+            "ground_truth_total_reactions": TASK17B_TOTAL_REACTIONS,
         },
     )
     wandb.define_metric("sample_iteration")
@@ -153,19 +213,24 @@ def main(model_name: str, context_size: int, max_pairs_per_group: int) -> None:
 
     for i, spec in enumerate(evaluated_specs):
         full_support_indices = full_support_indices_for_question(spec)
-        sampling = pairs_for_context_sampling(spec, context_size)
+        sampling = chains_for_context_sampling(spec, context_size)
         support_indices = set(sampling.support_indices)
+        sampling_excluded = random_pool_excluded_indices(
+            spec, support_indices, context_size=context_size
+        )
+        min_selected = min_selected_ground_truth_for_spec(spec)
 
         context_pipeline = build_context_pipeline(
             name=CONTEXT_PIPELINE_NAME,
             lines=lines,
             rng=random.Random(SEED + i),
-            min_selected_ground_truth=TASK14_MIN_SELECTED_GROUND_TRUTH,
+            min_selected_ground_truth=min_selected,
         )
         sample_context = context_pipeline.build_context(
             context_size=context_size,
             correct_indices=support_indices,
-            query=f"pg_pairs_{spec.label}",
+            query=f"task17b_{spec.question_id}",
+            excluded_indices=sampling_excluded,
         )
         context_lines = [line for line in sample_context.splitlines() if line.strip()]
         context_indices = {
@@ -176,21 +241,23 @@ def main(model_name: str, context_size: int, max_pairs_per_group: int) -> None:
         support_in_context = len(support_indices & context_indices)
         context_coverage = len(context_lines) / len(lines) if lines else 0.0
 
-        gt_pairs = ground_truth_pairs_in_context(
+        gt_chains = ground_truth_chains_in_context(
             context_lines,
-            spec.label,
-            max_pairs_per_group=max_pairs_per_group,
+            spec,
+            max_chains_per_question=max_chains_per_question,
         )
-        if not gt_pairs:
-            raise ValueError(f"No ground-truth pairs in context for pg_label={spec.label}")
+        if not gt_chains:
+            raise ValueError(
+                f"No ground-truth chains in context for question_id={spec.question_id}"
+            )
 
-        gt_set = {(pair.install_index, pair.remove_index) for pair in gt_pairs}
-        prompt_question = build_rlm_question(spec=spec, max_pairs=max_pairs_per_group)
+        gt_set = {tuple(chain) for chain in gt_chains}
+        prompt_question = build_rlm_question(spec)
 
-        print_task14_sample_context(
+        print_task17b_sample_context(
             sample_index=i,
             spec=spec,
-            gt_pairs=gt_pairs,
+            gt_chains=gt_chains,
             sampling=sampling,
             full_support_indices=full_support_indices,
             support_indices=support_indices,
@@ -205,12 +272,13 @@ def main(model_name: str, context_size: int, max_pairs_per_group: int) -> None:
             metadata={
                 "sample_index": i,
                 "sample_count": len(evaluated_specs),
-                "task": "protecting_group_pairs",
-                "pg_label": spec.label,
-                "functional_group": spec.functional_group,
-                "gt_pair_count": len(gt_pairs),
+                "task": "smirks_sequential_chains_17b",
+                "question_id": spec.question_id,
+                "label": spec.label,
+                "chain_length": spec.chain_length,
+                "gt_chain_count": len(gt_chains),
             },
-            tags=["run_rlms", "sample", "task14_PROTECTING_GROUP_PAIRS"],
+            tags=["run_rlms", "sample", "task17b_SMIRKS_SEQUENTIAL_CHAINS"],
         ):
             completion = rlm.completion(
                 prompt=sample_context,
@@ -219,7 +287,8 @@ def main(model_name: str, context_size: int, max_pairs_per_group: int) -> None:
             response = completion.response
 
         iteration_metrics = rlm.get_last_iteration_metrics()
-        predicted = parse_response(response)
+        predicted_list = parse_predictions(response, spec.chain_length)
+        predicted = {tuple(chain) for chain in predicted_list}
         precision, recall, f1 = precision_recall_f1(predicted=predicted, ground_truth=gt_set)
         is_exact_match = predicted == gt_set
         sample_cost_usd = completion.usage_summary.total_cost
@@ -234,7 +303,7 @@ def main(model_name: str, context_size: int, max_pairs_per_group: int) -> None:
         macro_f1 += f1
         samples_run += 1
 
-        print_task14_sample_metrics(
+        print_task17b_sample_metrics(
             sample_index=i,
             spec=spec,
             response=response,
@@ -268,10 +337,10 @@ def main(model_name: str, context_size: int, max_pairs_per_group: int) -> None:
             total_output_tokens += final_output_tokens
 
         wandb.log(
-            build_task14_wandb_sample_log(
+            build_task17b_wandb_sample_log(
                 sample_index=i,
                 spec=spec,
-                gt_pairs=gt_pairs,
+                gt_chains=gt_chains,
                 sampling=sampling,
                 full_support_indices=full_support_indices,
                 support_indices=support_indices,
@@ -307,7 +376,7 @@ def main(model_name: str, context_size: int, max_pairs_per_group: int) -> None:
     macro_recall = macro_recall / total if total else 0.0
     macro_f1 = macro_f1 / total if total else 0.0
 
-    print_task14_run_summary(
+    print_task17b_run_summary(
         total=total,
         exact_match_count=exact_match_count,
         macro_precision=macro_precision,
@@ -315,7 +384,7 @@ def main(model_name: str, context_size: int, max_pairs_per_group: int) -> None:
         macro_f1=macro_f1,
     )
 
-    update_task14_run_summary(
+    update_task17b_run_summary(
         run,
         total=total,
         exact_match_count=exact_match_count,
@@ -335,5 +404,6 @@ if __name__ == "__main__":
     main(
         model_name=args.model_name,
         context_size=args.context_size,
-        max_pairs_per_group=args.max_pairs_per_group,
+        max_chains_per_question=args.max_chains_per_question,
+        environment=args.environment,
     )

@@ -1,18 +1,16 @@
 import argparse
-import random
+import asyncio
 import os
+import random
 import uuid
 
-import wandb
-from rlm import RLM
-from rlm.codeact_helpers import build_context_pipeline, load_lines
-from rlm.tracing import init_tracing, using_tracing_attributes
-
+from llama_index.core.llms import ChatMessage
+from llama_index.llms.openrouter import OpenRouter
 from task15_ring_chain_graph import (
     MAX_HEAVY_ATOMS,
     MIN_HEAVY_ATOMS,
     PATH_LENGTH,
-    build_rlm_question,
+    build_question,
     ground_truth_ring_path_in_context,
     parse_records_from_lines,
     parse_response,
@@ -35,29 +33,34 @@ from task15_ring_chain_ground_truth import (
     update_task15_run_summary,
 )
 
+import wandb
+from rlm.codeact_helpers import (
+    build_context_pipeline,
+    extract_response_text,
+    extract_usage_metrics,
+    load_lines,
+)
+from rlm.tracing import init_tracing, using_tracing_attributes
+from rlm.utils.token_utils import count_tokens
+
 # os.environ["WANDB_MODE"] = "disabled"
 
 DATASET_PATH = "/home/bhagavan/rlms/datasets/reactionSmilesFigShareUSPTO2023_cleaned.txt"
-BACKEND = "openrouter"
 MODEL_NAME = "openai/gpt-5-mini"
+OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
 ENABLE_TRACING = True
 SEED = 42
 CONTEXT_SIZE = 100
 CONTEXT_PIPELINE_NAME = "random"
-
-RLM_INIT_KWARGS = {
-    "backend": BACKEND,
-    "backend_kwargs": {"model_name": MODEL_NAME},
-    "verbose": True,
-    "max_depth": 2,
-}
+REASONING_EFFORT = "high"
+MAX_OUTPUT_TOKENS = 30_000
 
 
 def maybe_init_tracing() -> None:
     if not ENABLE_TRACING:
         return
     initialized = init_tracing(
-        project_name="RLMs-Task15",
+        project_name="LLM-Task15",
         auto_instrument=True,
         batch=False,
     )
@@ -70,14 +73,9 @@ def maybe_init_tracing() -> None:
 
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="Run RLM task 15 — ring-construction chains from acyclic precursors."
+        description="Run LLM task 15 — ring-construction chains from acyclic precursors."
     )
-    parser.add_argument(
-        "--model-name",
-        type=str,
-        default=MODEL_NAME,
-        help=f"Model identifier for backend (default: {MODEL_NAME}).",
-    )
+    parser.add_argument("--model-name", type=str, default=MODEL_NAME)
     parser.add_argument(
         "--context-size",
         type=int,
@@ -90,7 +88,7 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
-def main(model_name: str, context_size: int) -> None:
+async def main(model_name: str, context_size: int) -> None:
     maybe_init_tracing()
     lines = load_lines(DATASET_PATH)
     evaluated_questions = [
@@ -100,32 +98,35 @@ def main(model_name: str, context_size: int) -> None:
         raise ValueError("No ring-system questions have non-empty ground truth.")
 
     print_task15_startup_banner()
+    run_session_id = f"llm-task15-{uuid.uuid4()}"
 
-    rlm_init_kwargs = dict(RLM_INIT_KWARGS)
-    rlm_init_kwargs["backend_kwargs"] = {"model_name": model_name}
-    rlm = RLM(**rlm_init_kwargs)
-    run_session_id = f"run-rlms-{uuid.uuid4()}"
+    llm = OpenRouter(
+        model=model_name,
+        api_key=OPENROUTER_API_KEY,
+        max_tokens=MAX_OUTPUT_TOKENS,
+        reasoning_effort=REASONING_EFFORT,
+        additional_kwargs={"max_completion_tokens": MAX_OUTPUT_TOKENS},
+    )
 
     run = wandb.init(
-        project="RLMs-Task15",
+        project="LLM-Task15",
         config={
             "MODEL_NAME": model_name,
-            "backend": BACKEND,
-            "model_name": model_name,
             "dataset_path": DATASET_PATH,
             "seed": SEED,
             "context_size": context_size,
             "context_pipeline_name": CONTEXT_PIPELINE_NAME,
+            "reasoning_effort": REASONING_EFFORT,
             "num_questions": len(evaluated_questions),
             "ring_questions": [q.ring_system for q in evaluated_questions],
             "path_length": PATH_LENGTH,
             "min_selected_ground_truth": TASK15_MIN_SELECTED_GROUND_TRUTH,
             "min_heavy_atoms": MIN_HEAVY_ATOMS,
             "max_heavy_atoms": MAX_HEAVY_ATOMS,
-            "rlm_init_kwargs": rlm_init_kwargs,
             "task_description": "Ring-construction chains from acyclic precursors via RDKit SMARTS.",
             "ground_truth_definition": TASK15_GROUND_TRUTH_DEFINITION,
             "ground_truth_total_reactions": TASK15_TOTAL_REACTIONS,
+            "mode": "llm_baseline_no_tools",
         },
     )
     wandb.define_metric("sample_iteration")
@@ -157,22 +158,22 @@ def main(model_name: str, context_size: int) -> None:
                 len(support_indices),
             ),
         )
-        sample_context = context_pipeline.build_context(
+        retrieved_context = context_pipeline.build_context(
             context_size=context_size,
             correct_indices=support_indices,
             query=f"ring_chain_{question.ring_system}",
         )
-        context_lines = [line for line in sample_context.splitlines() if line.strip()]
+        retrieved_lines = [line for line in retrieved_context.splitlines() if line.strip()]
         context_indices = {
             int(line.split(" ", 1)[0])
-            for line in context_lines
+            for line in retrieved_lines
             if " " in line and line.split(" ", 1)[0].isdigit()
         }
         support_in_context = len(support_indices & context_indices)
-        context_coverage = len(context_lines) / len(lines) if lines else 0.0
+        context_coverage = len(retrieved_lines) / len(lines) if lines else 0.0
 
         gt, filters = ground_truth_ring_path_in_context(
-            context_lines,
+            retrieved_lines,
             question.ring_system,
         )
         if gt is None:
@@ -181,11 +182,21 @@ def main(model_name: str, context_size: int) -> None:
                 f"ring_system={question.ring_system}"
             )
 
-        prompt_question = build_rlm_question(
+        prompt_question = build_question(
             spec=spec,
             context_reaction_count=filters.context_reaction_count,
             molecule_freq_cap=filters.molecule_freq_cap,
         )
+
+        completion_prompt = f"""
+        You are given a subset of chemical reactions in SMILES format and a question.
+        <context>
+        {retrieved_context}
+        </context>
+        <question>
+        {prompt_question}
+        </question>
+        """
 
         print_task15_sample_context(
             sample_index=i,
@@ -196,7 +207,7 @@ def main(model_name: str, context_size: int) -> None:
             support_indices=support_indices,
             support_in_context=support_in_context,
             context_size=context_size,
-            context_line_count=len(context_lines),
+            context_line_count=len(retrieved_lines),
             context_coverage=context_coverage,
             filters=filters,
         )
@@ -206,22 +217,17 @@ def main(model_name: str, context_size: int) -> None:
             metadata={
                 "sample_index": i,
                 "sample_count": len(evaluated_questions),
-                "task": "ring_construction_chain",
                 "ring_system": question.ring_system,
                 "path_length": PATH_LENGTH,
-                "gt_chain_count": len(gt.accepted_reaction_indices or (gt.reaction_indices,)),
+                "agent": "llm_baseline",
             },
-            tags=["run_rlms", "sample", "task15_RING_CONSTRUCTION_CHAIN"],
+            tags=["llm-baseline", "sample", "task15_RING_CONSTRUCTION_CHAIN"],
         ):
-            completion = rlm.completion(
-                prompt=sample_context,
-                root_prompt=prompt_question,
-            )
-            response = completion.response
+            response = await llm.achat([ChatMessage(role="user", content=completion_prompt)])
 
-        iteration_metrics = rlm.get_last_iteration_metrics()
-        pred_rxns = parse_response(response)
-        records = parse_records_from_lines(context_lines)
+        response_text = extract_response_text(response)
+        records = parse_records_from_lines(retrieved_lines)
+        pred_rxns = parse_response(response_text)
         scores = score_prediction(
             pred_rxns=pred_rxns,
             gt=gt,
@@ -229,11 +235,6 @@ def main(model_name: str, context_size: int) -> None:
             filters=filters,
             min_path_reactions=PATH_LENGTH,
         )
-        sample_cost_usd = completion.usage_summary.total_cost
-        if sample_cost_usd is not None:
-            total_cost_usd += sample_cost_usd
-            samples_with_cost += 1
-
         macro_accuracy += float(scores["is_correct"])
         macro_valid_path += float(scores["valid_path"])
         macro_objective_length += float(scores["objective_length_match"])
@@ -244,32 +245,41 @@ def main(model_name: str, context_size: int) -> None:
         print_task15_sample_metrics(
             sample_index=i,
             question=question,
-            response=response,
+            response=response_text,
             pred_rxns=pred_rxns,
             scores=scores,
         )
 
-        for metric in iteration_metrics:
-            wandb.log(
-                {
-                    "sample_iteration": metric["iteration"],
-                    f"sample/{i}/iteration_input_tokens": metric["iteration_input_tokens"],
-                    f"sample/{i}/iteration_output_tokens": metric["iteration_output_tokens"],
-                    f"sample/{i}/iteration_total_tokens": metric["iteration_total_tokens"],
-                }
+        usage_metrics = extract_usage_metrics(response)
+        prompt_tokens = int(usage_metrics.get("prompt_tokens", 0))
+        completion_tokens = int(usage_metrics.get("completion_tokens", 0))
+        total_tokens = int(usage_metrics.get("total_tokens", 0))
+        sample_cost = float(usage_metrics["cost_usd"]) if "cost_usd" in usage_metrics else None
+        if total_tokens == 0:
+            prompt_tokens = count_tokens(
+                [{"role": "user", "content": completion_prompt}],
+                model_name,
             )
+            completion_tokens = count_tokens(
+                [{"role": "assistant", "content": response_text}],
+                model_name,
+            )
+            total_tokens = prompt_tokens + completion_tokens
+        total_input_tokens += prompt_tokens
+        total_output_tokens += completion_tokens
+        if sample_cost is not None:
+            total_cost_usd += sample_cost
+            samples_with_cost += 1
 
-        final_input_tokens = 0
-        final_output_tokens = 0
-        final_total_tokens = 0
-        if iteration_metrics:
-            last_metric = iteration_metrics[-1]
-            final_input_tokens = int(last_metric["total_input_tokens"])
-            final_output_tokens = int(last_metric["total_output_tokens"])
-            final_total_tokens = int(last_metric["total_tokens"])
-            total_input_tokens += final_input_tokens
-            total_output_tokens += final_output_tokens
-
+        wandb.log(
+            {
+                "sample_iteration": 1,
+                f"sample/{i}/iteration_input_tokens": prompt_tokens,
+                f"sample/{i}/iteration_output_tokens": completion_tokens,
+                f"sample/{i}/iteration_total_tokens": total_tokens,
+                **({f"sample/{i}/iteration_cost_usd": sample_cost} if sample_cost is not None else {}),
+            }
+        )
         wandb.log(
             build_task15_wandb_sample_log(
                 sample_index=i,
@@ -282,16 +292,16 @@ def main(model_name: str, context_size: int) -> None:
                 filters=filters,
                 pred_rxns=pred_rxns,
                 scores=scores,
-                response=response,
+                response=response_text,
                 context_size=context_size,
                 context_coverage=context_coverage,
-                context_line_count=len(context_lines),
-                completion_prompt_char_count=len(sample_context),
-                final_input_tokens=final_input_tokens,
-                final_output_tokens=final_output_tokens,
-                final_total_tokens=final_total_tokens,
-                iterations=len(iteration_metrics),
-                sample_cost_usd=sample_cost_usd,
+                context_line_count=len(retrieved_lines),
+                completion_prompt_char_count=len(completion_prompt),
+                final_input_tokens=prompt_tokens,
+                final_output_tokens=completion_tokens,
+                final_total_tokens=total_tokens,
+                iterations=1,
+                sample_cost_usd=sample_cost,
             )
         )
         wandb.log(
@@ -336,7 +346,9 @@ def main(model_name: str, context_size: int) -> None:
 
 if __name__ == "__main__":
     args = parse_args()
-    main(
-        model_name=args.model_name,
-        context_size=args.context_size,
+    asyncio.run(
+        main(
+            model_name=args.model_name,
+            context_size=args.context_size,
+        )
     )

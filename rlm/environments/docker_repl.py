@@ -2,7 +2,7 @@
 Docker REPL environment that runs Python code in a Docker container.
 
 Setup:
-    docker build -t rlm-sandbox -f Dockerfile.sandbox .
+    cd tier4 && ./build_rlm_sandbox.sh
 
 Or use any Python 3.11+ image with: pip install dill requests
 """
@@ -190,6 +190,8 @@ class DockerREPL(NonIsolatedEnv):
     Docker REPL - runs Python in a Docker container with LLM support.
 
     Requires: Docker with a Python 3.11+ image (default: python:3.11-slim).
+    For tier4 chemistry tasks, build the preconfigured sandbox image:
+        cd tier4 && ./build_rlm_sandbox.sh
     """
 
     def __init__(
@@ -200,6 +202,8 @@ class DockerREPL(NonIsolatedEnv):
         setup_code: str | None = None,
         persistent: bool = False,
         depth: int = 1,
+        memory_limit: str | None = None,
+        bootstrap_packages: bool = True,
         **kwargs,
     ):
         if persistent:
@@ -209,6 +213,8 @@ class DockerREPL(NonIsolatedEnv):
         super().__init__(persistent=persistent, depth=depth, **kwargs)
 
         self.image = image
+        self.memory_limit = memory_limit
+        self.bootstrap_packages = bootstrap_packages
         self.lm_handler_address = lm_handler_address
         self.container_id: str | None = None
         self.proxy_server: HTTPServer | None = None
@@ -248,21 +254,23 @@ class DockerREPL(NonIsolatedEnv):
         self.proxy_thread.start()
 
         # Start Docker container
+        run_cmd = [
+            "docker",
+            "run",
+            "-d",
+            "--rm",
+            "-v",
+            f"{self.temp_dir}:/workspace",
+            "--add-host",
+            "host.docker.internal:host-gateway",
+        ]
+        if self.memory_limit:
+            # Hard RAM cap: disable swap so OOM kills the container process instead of spilling.
+            run_cmd.extend(["--memory", self.memory_limit, "--memory-swap", self.memory_limit])
+        run_cmd.extend([self.image, "tail", "-f", "/dev/null"])
+
         result = subprocess.run(
-            [
-                "docker",
-                "run",
-                "-d",
-                "--rm",
-                "-v",
-                f"{self.temp_dir}:/workspace",
-                "--add-host",
-                "host.docker.internal:host-gateway",
-                self.image,
-                "tail",
-                "-f",
-                "/dev/null",
-            ],
+            run_cmd,
             capture_output=True,
             text=True,
         )
@@ -271,11 +279,11 @@ class DockerREPL(NonIsolatedEnv):
 
         self.container_id = result.stdout.strip()
 
-        # Install dependencies
-        subprocess.run(
-            ["docker", "exec", self.container_id, "pip", "install", "-q", "dill", "requests"],
-            capture_output=True,
-        )
+        if self.bootstrap_packages:
+            subprocess.run(
+                ["docker", "exec", self.container_id, "pip", "install", "-q", "dill", "requests"],
+                capture_output=True,
+            )
 
     def load_context(self, context_payload: dict | list | str):
         """Load context by writing to a file in the mounted workspace."""
@@ -311,12 +319,20 @@ class DockerREPL(NonIsolatedEnv):
             calls = self.pending_calls.copy()
             self.pending_calls.clear()
 
+        stderr = result.stderr or ""
+        if result.returncode != 0:
+            oom_hint = ""
+            if result.returncode == 137 or "Killed" in stderr:
+                limit = self.memory_limit or "container memory limit"
+                oom_hint = f"Container process was OOM-killed (memory limit: {limit}).\n"
+            stderr = oom_hint + stderr
+
         try:
             lines = result.stdout.strip().split("\n")
             data = json.loads(lines[-1]) if lines else {}
             return REPLResult(
                 stdout=data.get("stdout", ""),
-                stderr=data.get("stderr", "") + result.stderr,
+                stderr=data.get("stderr", "") + stderr,
                 locals=data.get("locals", {}),
                 execution_time=time.perf_counter() - start,
                 rlm_calls=calls,
@@ -324,7 +340,7 @@ class DockerREPL(NonIsolatedEnv):
         except json.JSONDecodeError:
             return REPLResult(
                 stdout=result.stdout,
-                stderr=result.stderr or "Parse error",
+                stderr=stderr or "Parse error",
                 locals={},
                 execution_time=time.perf_counter() - start,
                 rlm_calls=calls,

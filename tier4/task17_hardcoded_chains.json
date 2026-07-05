@@ -1,0 +1,5322 @@
+{
+  "boc_buchwald": {
+    "question_id": "boc_buchwald",
+    "label": "Boc protect \u2192 Buchwald-Hartwig",
+    "path_length": 2,
+    "chain_count": 30,
+    "chain_count_no_persistence": 30,
+    "support_index_count": 46,
+    "example_chain": [
+      4789,
+      4790
+    ],
+    "chains": [
+      [
+        4789,
+        4790
+      ],
+      [
+        4789,
+        48529
+      ],
+      [
+        23737,
+        109626
+      ],
+      [
+        51778,
+        80585
+      ],
+      [
+        51778,
+        80587
+      ],
+      [
+        51778,
+        80588
+      ],
+      [
+        51778,
+        89783
+      ],
+      [
+        51778,
+        109891
+      ],
+      [
+        51778,
+        109893
+      ],
+      [
+        51778,
+        109902
+      ],
+      [
+        51778,
+        109925
+      ],
+      [
+        51778,
+        111885
+      ],
+      [
+        82713,
+        82714
+      ],
+      [
+        82713,
+        82716
+      ],
+      [
+        82713,
+        82729
+      ],
+      [
+        82713,
+        82732
+      ],
+      [
+        82713,
+        82744
+      ],
+      [
+        82713,
+        82748
+      ],
+      [
+        82724,
+        82725
+      ],
+      [
+        94608,
+        94609
+      ],
+      [
+        94627,
+        94628
+      ],
+      [
+        94661,
+        94662
+      ],
+      [
+        94678,
+        94679
+      ],
+      [
+        94727,
+        94728
+      ],
+      [
+        94737,
+        94738
+      ],
+      [
+        94761,
+        96198
+      ],
+      [
+        94769,
+        96199
+      ],
+      [
+        102445,
+        102446
+      ],
+      [
+        106769,
+        106770
+      ],
+      [
+        109077,
+        109078
+      ]
+    ],
+    "chain_details": [
+      {
+        "reaction_indices": [
+          4789,
+          4790
+        ],
+        "spine_smiles": [
+          "CC(C)(C)OC(=O)N1CCc2cc(Br)ccc2C1",
+          "CC(C)N1CCN(c2ccc3c(c2)CCN(C(=O)OC(C)(C)C)C3)CC1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          4789,
+          48529
+        ],
+        "spine_smiles": [
+          "CC(C)(C)OC(=O)N1CCc2cc(Br)ccc2C1",
+          "CC(C)(C)OC(=O)N1CCc2cc(N3CCC(c4ccc([N+](=O)[O-])cc4)CC3)ccc2C1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          23737,
+          109626
+        ],
+        "spine_smiles": [
+          "CC(C)(C)OC(=O)N1Cc2cccc(Br)c2C1",
+          "CC(C)(C)OC(=O)N1Cc2cccc(N3CCCC(O)C3)c2C1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          51778,
+          80585
+        ],
+        "spine_smiles": [
+          "CC(C)(C)OC(=O)N1CCCNCC1",
+          "CC(C)(C)OC(=O)N1CCCN(c2ccc(F)cn2)CC1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          51778,
+          80587
+        ],
+        "spine_smiles": [
+          "CC(C)(C)OC(=O)N1CCCNCC1",
+          "CC(C)(C)OC(=O)N1CCCN(c2ccc(C(F)(F)F)cn2)CC1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          51778,
+          80588
+        ],
+        "spine_smiles": [
+          "CC(C)(C)OC(=O)N1CCCNCC1",
+          "CC(C)(C)OC(=O)N1CCCN(c2ccc(F)c(F)c2)CC1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          51778,
+          89783
+        ],
+        "spine_smiles": [
+          "CC(C)(C)OC(=O)N1CCCNCC1",
+          "C[C@@H]1CNc2c(sc3ccc4nc(N5CCCN(C(=O)OC(C)(C)C)CC5)ccc4c23)C(=O)N1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          51778,
+          109891
+        ],
+        "spine_smiles": [
+          "CC(C)(C)OC(=O)N1CCCNCC1",
+          "COc1cc2ncnc(N3CCCN(C(=O)OC(C)(C)C)CC3)c2cc1OC"
+        ]
+      },
+      {
+        "reaction_indices": [
+          51778,
+          109893
+        ],
+        "spine_smiles": [
+          "CC(C)(C)OC(=O)N1CCCNCC1",
+          "COc1cc2ncc(C#N)c(N3CCCN(C(=O)OC(C)(C)C)CC3)c2cc1OC"
+        ]
+      },
+      {
+        "reaction_indices": [
+          51778,
+          109902
+        ],
+        "spine_smiles": [
+          "CC(C)(C)OC(=O)N1CCCNCC1",
+          "CCOC(=O)c1cnc2cc(OC)c(OC)cc2c1N1CCCN(C(=O)OC(C)(C)C)CC1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          51778,
+          109925
+        ],
+        "spine_smiles": [
+          "CC(C)(C)OC(=O)N1CCCNCC1",
+          "COc1cc2ncc(C#N)c(N3CCCN(C(=O)OC(C)(C)C)CC3)c2cc1OC"
+        ]
+      },
+      {
+        "reaction_indices": [
+          51778,
+          111885
+        ],
+        "spine_smiles": [
+          "CC(C)(C)OC(=O)N1CCCNCC1",
+          "CC(C)(C)OC(=O)N1CCCN(c2ccc(C#N)cn2)CC1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          82713,
+          82714
+        ],
+        "spine_smiles": [
+          "CC(C)(C)OC(=O)N1CCN(c2nnc(-c3cnc(Cl)cc3Cl)s2)CC1",
+          "CC(C)(C)OC(=O)N1CCN(c2nnc(-c3cnc(Cl)cc3NC3CC3)s2)CC1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          82713,
+          82716
+        ],
+        "spine_smiles": [
+          "CC(C)(C)OC(=O)N1CCN(c2nnc(-c3cnc(Cl)cc3Cl)s2)CC1",
+          "CCNc1cc(Cl)ncc1-c1nnc(N2CCN(C(=O)OC(C)(C)C)CC2)s1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          82713,
+          82729
+        ],
+        "spine_smiles": [
+          "CC(C)(C)OC(=O)N1CCN(c2nnc(-c3cnc(Cl)cc3Cl)s2)CC1",
+          "CC(C)(C)OC(=O)N1CCN(c2nnc(-c3cnc(Cl)cc3N[C@H]3CCOC3)s2)CC1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          82713,
+          82732
+        ],
+        "spine_smiles": [
+          "CC(C)(C)OC(=O)N1CCN(c2nnc(-c3cnc(Cl)cc3Cl)s2)CC1",
+          "CC(C)(C)OC(=O)N1CCN(c2nnc(-c3cnc(Cl)cc3N[C@@H]3CCOC3)s2)CC1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          82713,
+          82744
+        ],
+        "spine_smiles": [
+          "CC(C)(C)OC(=O)N1CCN(c2nnc(-c3cnc(Cl)cc3Cl)s2)CC1",
+          "CC(C)(C)OC(=O)N1CCN(c2nnc(-c3cnc(Cl)cc3NC3CCC3)s2)CC1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          82713,
+          82748
+        ],
+        "spine_smiles": [
+          "CC(C)(C)OC(=O)N1CCN(c2nnc(-c3cnc(Cl)cc3Cl)s2)CC1",
+          "CC(C)(C)Nc1cc(Cl)ncc1-c1nnc(N2CCN(C(=O)OC(C)(C)C)CC2)s1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          82724,
+          82725
+        ],
+        "spine_smiles": [
+          "CC(C)(C)OC(=O)N1C2CCC1CN(c1nnc(-c3cnc(Cl)cc3Cl)s1)C2",
+          "CC(C)(C)OC(=O)N1C2CCC1CN(c1nnc(-c3cnc(Cl)cc3N[C@H]3CCOC3)s1)C2"
+        ]
+      },
+      {
+        "reaction_indices": [
+          94608,
+          94609
+        ],
+        "spine_smiles": [
+          "CC(C)c1cnn2c(N(Cc3ccc4ccccc4n3)C(=O)OC(C)(C)C)cc(Cl)nc12",
+          "CC(C)c1cnn2c(N(Cc3ccc4ccccc4n3)C(=O)OC(C)(C)C)cc(NC[C@H]3CCN(C(=O)OC(C)(C)C)C[C@@H]3O)nc12"
+        ]
+      },
+      {
+        "reaction_indices": [
+          94627,
+          94628
+        ],
+        "spine_smiles": [
+          "CC(C)c1cnn2c(N(C(=O)OC(C)(C)C)C(C)c3cn4ccccc4n3)cc(Cl)nc12",
+          "CC(C)c1cnn2c(N(C(=O)OC(C)(C)C)C(C)c3cn4ccccc4n3)cc(NC[C@H]3CCN(C(=O)OC(C)(C)C)C[C@@H]3O)nc12"
+        ]
+      },
+      {
+        "reaction_indices": [
+          94661,
+          94662
+        ],
+        "spine_smiles": [
+          "COc1cccc2nc(CN(C(=O)OC(C)(C)C)c3cc(Cl)nc4c(C5CC5)cnn34)cn12",
+          "COc1cccc2nc(CN(C(=O)OC(C)(C)C)c3cc(NC[C@H]4CCN(C(=O)OC(C)(C)C)C[C@@H]4O)nc4c(C5CC5)cnn34)cn12"
+        ]
+      },
+      {
+        "reaction_indices": [
+          94678,
+          94679
+        ],
+        "spine_smiles": [
+          "Cc1cccn2cc(CN(C(=O)OC(C)(C)C)c3cc(Cl)nc4c(I)cnn34)nc12",
+          "Cc1cccn2cc(CN(C(=O)OC(C)(C)C)c3cc(NC[C@H]4CCN(C(=O)OC(C)(C)C)C[C@@H]4O)nc4c(I)cnn34)nc12"
+        ]
+      },
+      {
+        "reaction_indices": [
+          94727,
+          94728
+        ],
+        "spine_smiles": [
+          "CCc1cnn2c(N(Cc3cn4cc(C5CC5)cc(C(F)(F)F)c4n3)C(=O)OC(C)(C)C)cc(Cl)nc12",
+          "CCc1cnn2c(N(Cc3cn4cc(C5CC5)cc(C(F)(F)F)c4n3)C(=O)OC(C)(C)C)cc(NC[C@H]3CCN(C(=O)OC(C)(C)C)C[C@@H]3O)nc12"
+        ]
+      },
+      {
+        "reaction_indices": [
+          94737,
+          94738
+        ],
+        "spine_smiles": [
+          "Cc1cn2cc(CN(C(=O)OC(C)(C)C)c3cc(Cl)nc4c(C5CC5)cnn34)nc2cc1C(F)(F)F",
+          "Cc1cn2cc(CN(C(=O)OC(C)(C)C)c3cc(NC[C@H]4CCN(C(=O)OC(C)(C)C)C[C@@H]4O)nc4c(C5CC5)cnn34)nc2cc1C(F)(F)F"
+        ]
+      },
+      {
+        "reaction_indices": [
+          94761,
+          96198
+        ],
+        "spine_smiles": [
+          "CC(C)c1cnn2c(N(Cc3nc4cc(C5CC5)ccn4n3)C(=O)OC(C)(C)C)cc(Cl)nc12",
+          "CC(C)c1cnn2c(N(Cc3nc4cc(C5CC5)ccn4n3)C(=O)OC(C)(C)C)cc(NC[C@H]3CCN(C(=O)OC(C)(C)C)C[C@@H]3O)nc12"
+        ]
+      },
+      {
+        "reaction_indices": [
+          94769,
+          96199
+        ],
+        "spine_smiles": [
+          "CC(C)(C)OC(=O)N(Cc1cn2ccc(-c3ccccc3)cc2n1)c1cc(Cl)nc2c(C3CC3)cnn12",
+          "CC(C)(C)OC(=O)N1CC[C@H](CNc2cc(N(Cc3cn4ccc(-c5ccccc5)cc4n3)C(=O)OC(C)(C)C)n3ncc(C4CC4)c3n2)[C@@H](O)C1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          102445,
+          102446
+        ],
+        "spine_smiles": [
+          "CC[C@@H]1CN[C@@H](CO)CN1C(=O)OC(C)(C)C",
+          "CC[C@@H]1CN(c2nc(=O)n(C)c3ccc(Cl)nc23)[C@@H](CO)CN1C(=O)OC(C)(C)C"
+        ]
+      },
+      {
+        "reaction_indices": [
+          106769,
+          106770
+        ],
+        "spine_smiles": [
+          "CC(C)(C)OC(=O)N1CCN(c2ccc(Br)cc2F)CC1",
+          "CC(C)(C)OC(=O)N1CCN(c2ccc(N3CCSCC3)cc2F)CC1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          109077,
+          109078
+        ],
+        "spine_smiles": [
+          "CC(C)(C)OC(=O)N1CCc2nc(Cl)ccc2C1",
+          "COc1ccc(CNc2ccc3c(n2)CCN(C(=O)OC(C)(C)C)C3)c(OC)c1"
+        ]
+      }
+    ],
+    "step1_reaction_count": 585,
+    "step2_reaction_count": 4119,
+    "smirks": {
+      "step1_template_name": "Boc amine protection with Boc anhydride",
+      "step1_template_occurrence": 0,
+      "step1_smirks": "[#7;H1,H2;!$(N~C(=O));+0:1].[C;H3;D1;+0]-[C;H0;D4;+0](-[C;H3;D1;+0])(-[C;H3;D1;+0])-[O;H0;D2;+0]-[C;H0;D3;+0](=[O;H0;D1;+0])-[O;H0;D2;+0]-[C;H0;D3;+0:2](=[O;H0;D1;+0:3])-[O;H0;D2;+0:4]-[C;H0;D4;+0:5](-[C;H3;D1;+0:6])(-[C;H3;D1;+0:7])-[C;H3;D1;+0:8]>>[#7;H0,H1;+0:1]-[C;H0;D3;+0:2](=[O;H0;D1;+0:3])-[O;H0;D2;+0:4]-[C;H0;D4;+0:5](-[C;H3;D1;+0:6])(-[C;H3;D1;+0:7])-[C;H3;D1;+0:8]",
+      "step2_template_name": "{Buchwald-Hartwig}",
+      "step2_template_occurrence": 0,
+      "step2_smirks": "[Cl,Br,I][c;$(c1:[c,n]:[c,n]:[c,n]:[c,n]:[c,n]:1):1].[N;$(NC)&!$(N=*)&!$([N-])&!$(N#*)&!$([ND3])&!$([ND4])&!$(N[c,O])&!$(N[C,S]=[S,O,N]),H2&$(Nc1:[c,n]:[c,n]:[c,n]:[c,n]:[c,n]:1):2]>>[c:1][N:2]"
+    },
+    "step1_template_key": "Boc amine protection with Boc anhydride::68",
+    "step2_template_key": "{Buchwald-Hartwig}::461"
+  },
+  "nitro_reduction_amide": {
+    "question_id": "nitro_reduction_amide",
+    "label": "Nitro reduction \u2192 Schotten-Baumann acylation",
+    "path_length": 2,
+    "chain_count": 190,
+    "chain_count_no_persistence": 190,
+    "support_index_count": 372,
+    "example_chain": [
+      5107,
+      5108
+    ],
+    "chains": [
+      [
+        5107,
+        5108
+      ],
+      [
+        8266,
+        8269
+      ],
+      [
+        9926,
+        4059
+      ],
+      [
+        14945,
+        14946
+      ],
+      [
+        17821,
+        17822
+      ],
+      [
+        18655,
+        18740
+      ],
+      [
+        18697,
+        18698
+      ],
+      [
+        18725,
+        18808
+      ],
+      [
+        18749,
+        18757
+      ],
+      [
+        22063,
+        74094
+      ],
+      [
+        23138,
+        23171
+      ],
+      [
+        27096,
+        27097
+      ],
+      [
+        29577,
+        29603
+      ],
+      [
+        29734,
+        29735
+      ],
+      [
+        29746,
+        29747
+      ],
+      [
+        29756,
+        29757
+      ],
+      [
+        31890,
+        31891
+      ],
+      [
+        31898,
+        31899
+      ],
+      [
+        31903,
+        31904
+      ],
+      [
+        31910,
+        31911
+      ],
+      [
+        31916,
+        31917
+      ],
+      [
+        31925,
+        31926
+      ],
+      [
+        31930,
+        31931
+      ],
+      [
+        31936,
+        31937
+      ],
+      [
+        31954,
+        31955
+      ],
+      [
+        31956,
+        31957
+      ],
+      [
+        31958,
+        31959
+      ],
+      [
+        31964,
+        31965
+      ],
+      [
+        31967,
+        31968
+      ],
+      [
+        38851,
+        38852
+      ],
+      [
+        41487,
+        41488
+      ],
+      [
+        44361,
+        84046
+      ],
+      [
+        47733,
+        61253
+      ],
+      [
+        47840,
+        61253
+      ],
+      [
+        53446,
+        53466
+      ],
+      [
+        53452,
+        53465
+      ],
+      [
+        54359,
+        54361
+      ],
+      [
+        54833,
+        54834
+      ],
+      [
+        59322,
+        59323
+      ],
+      [
+        59334,
+        59335
+      ],
+      [
+        59406,
+        59407
+      ],
+      [
+        70212,
+        70222
+      ],
+      [
+        70219,
+        70222
+      ],
+      [
+        73928,
+        73929
+      ],
+      [
+        73933,
+        73934
+      ],
+      [
+        73935,
+        73936
+      ],
+      [
+        73937,
+        73938
+      ],
+      [
+        73937,
+        77238
+      ],
+      [
+        73947,
+        73948
+      ],
+      [
+        73951,
+        73952
+      ],
+      [
+        73958,
+        73959
+      ],
+      [
+        73963,
+        73964
+      ],
+      [
+        73966,
+        73967
+      ],
+      [
+        73972,
+        73973
+      ],
+      [
+        73980,
+        73981
+      ],
+      [
+        73983,
+        73984
+      ],
+      [
+        73986,
+        73987
+      ],
+      [
+        73990,
+        73991
+      ],
+      [
+        73999,
+        74000
+      ],
+      [
+        74005,
+        74006
+      ],
+      [
+        74010,
+        74011
+      ],
+      [
+        74022,
+        74023
+      ],
+      [
+        74025,
+        74026
+      ],
+      [
+        74028,
+        74029
+      ],
+      [
+        74031,
+        74032
+      ],
+      [
+        74035,
+        74036
+      ],
+      [
+        74038,
+        74039
+      ],
+      [
+        74038,
+        78634
+      ],
+      [
+        74047,
+        74048
+      ],
+      [
+        74052,
+        74053
+      ],
+      [
+        74056,
+        74057
+      ],
+      [
+        74059,
+        74060
+      ],
+      [
+        74062,
+        74063
+      ],
+      [
+        74068,
+        74069
+      ],
+      [
+        74071,
+        74072
+      ],
+      [
+        74074,
+        74075
+      ],
+      [
+        74077,
+        74078
+      ],
+      [
+        74080,
+        74081
+      ],
+      [
+        74083,
+        74084
+      ],
+      [
+        74089,
+        74090
+      ],
+      [
+        74092,
+        74093
+      ],
+      [
+        74100,
+        74101
+      ],
+      [
+        74103,
+        74104
+      ],
+      [
+        74106,
+        74107
+      ],
+      [
+        74109,
+        74110
+      ],
+      [
+        74112,
+        74113
+      ],
+      [
+        74115,
+        74116
+      ],
+      [
+        74118,
+        74119
+      ],
+      [
+        74121,
+        74122
+      ],
+      [
+        74130,
+        74131
+      ],
+      [
+        74133,
+        74134
+      ],
+      [
+        74144,
+        74145
+      ],
+      [
+        74162,
+        74163
+      ],
+      [
+        74168,
+        74169
+      ],
+      [
+        74177,
+        74178
+      ],
+      [
+        74190,
+        74191
+      ],
+      [
+        74197,
+        74198
+      ],
+      [
+        74202,
+        74203
+      ],
+      [
+        74211,
+        74212
+      ],
+      [
+        74228,
+        74229
+      ],
+      [
+        74230,
+        74231
+      ],
+      [
+        74251,
+        74252
+      ],
+      [
+        74254,
+        74255
+      ],
+      [
+        74260,
+        74261
+      ],
+      [
+        74263,
+        74264
+      ],
+      [
+        74266,
+        74267
+      ],
+      [
+        74280,
+        74281
+      ],
+      [
+        74286,
+        74287
+      ],
+      [
+        74288,
+        74289
+      ],
+      [
+        74291,
+        74292
+      ],
+      [
+        74293,
+        74294
+      ],
+      [
+        74296,
+        74297
+      ],
+      [
+        74300,
+        74301
+      ],
+      [
+        74307,
+        74308
+      ],
+      [
+        74310,
+        74311
+      ],
+      [
+        74314,
+        74315
+      ],
+      [
+        74326,
+        74327
+      ],
+      [
+        74328,
+        74329
+      ],
+      [
+        74330,
+        74331
+      ],
+      [
+        74332,
+        74333
+      ],
+      [
+        74334,
+        74335
+      ],
+      [
+        74337,
+        74338
+      ],
+      [
+        74343,
+        74344
+      ],
+      [
+        74345,
+        74346
+      ],
+      [
+        74348,
+        74349
+      ],
+      [
+        74352,
+        74353
+      ],
+      [
+        74354,
+        74355
+      ],
+      [
+        74356,
+        74357
+      ],
+      [
+        74359,
+        74360
+      ],
+      [
+        74362,
+        74363
+      ],
+      [
+        74370,
+        74371
+      ],
+      [
+        77041,
+        77042
+      ],
+      [
+        77234,
+        77235
+      ],
+      [
+        77244,
+        77245
+      ],
+      [
+        79587,
+        79588
+      ],
+      [
+        79601,
+        79602
+      ],
+      [
+        79607,
+        79608
+      ],
+      [
+        79613,
+        79614
+      ],
+      [
+        79616,
+        79617
+      ],
+      [
+        79637,
+        79638
+      ],
+      [
+        79643,
+        79644
+      ],
+      [
+        79677,
+        79678
+      ],
+      [
+        79680,
+        79681
+      ],
+      [
+        79688,
+        79689
+      ],
+      [
+        79691,
+        79692
+      ],
+      [
+        79698,
+        79699
+      ],
+      [
+        79705,
+        79706
+      ],
+      [
+        79708,
+        79709
+      ],
+      [
+        79723,
+        79724
+      ],
+      [
+        79739,
+        79740
+      ],
+      [
+        79748,
+        79749
+      ],
+      [
+        79752,
+        79753
+      ],
+      [
+        79756,
+        79757
+      ],
+      [
+        84111,
+        84197
+      ],
+      [
+        84225,
+        91299
+      ],
+      [
+        85243,
+        34189
+      ],
+      [
+        87681,
+        14893
+      ],
+      [
+        87681,
+        87663
+      ],
+      [
+        87681,
+        87682
+      ],
+      [
+        90761,
+        90762
+      ],
+      [
+        90761,
+        90786
+      ],
+      [
+        90783,
+        90784
+      ],
+      [
+        90794,
+        90795
+      ],
+      [
+        90804,
+        90805
+      ],
+      [
+        90809,
+        90810
+      ],
+      [
+        91306,
+        91307
+      ],
+      [
+        91780,
+        91781
+      ],
+      [
+        91794,
+        91795
+      ],
+      [
+        91830,
+        91831
+      ],
+      [
+        91834,
+        91835
+      ],
+      [
+        92147,
+        92148
+      ],
+      [
+        92186,
+        92187
+      ],
+      [
+        92195,
+        92196
+      ],
+      [
+        92201,
+        92202
+      ],
+      [
+        92259,
+        92260
+      ],
+      [
+        96549,
+        60180
+      ],
+      [
+        97418,
+        57484
+      ],
+      [
+        106333,
+        106334
+      ],
+      [
+        106767,
+        13675
+      ],
+      [
+        107237,
+        107238
+      ],
+      [
+        108410,
+        108411
+      ],
+      [
+        109233,
+        109234
+      ],
+      [
+        109813,
+        109814
+      ],
+      [
+        112432,
+        10409
+      ],
+      [
+        112439,
+        10409
+      ],
+      [
+        113484,
+        113512
+      ],
+      [
+        113711,
+        113712
+      ],
+      [
+        113725,
+        113726
+      ],
+      [
+        113749,
+        113750
+      ],
+      [
+        117821,
+        74170
+      ]
+    ],
+    "chain_details": [
+      {
+        "reaction_indices": [
+          5107,
+          5108
+        ],
+        "spine_smiles": [
+          "NC(=O)c1c(-c2ccc(Oc3ccccc3)cc2)nn2c1[nH]c1ccc(N)cc12",
+          "C=CC(=O)Nc1ccc2[nH]c3c(C(N)=O)c(-c4ccc(Oc5ccccc5)cc4)nn3c2c1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          8266,
+          8269
+        ],
+        "spine_smiles": [
+          "C#C[C@@]1(OC(C)=O)[C@@H](COC(Cc2ccc(N)cc2)(C(=O)OCC)C(=O)OCC)O[C@@H](n2cnc3c(NC(=O)OC(C)(C)C)nc(Cl)nc32)[C@@H]1OC(C)=O",
+          "C#C[C@@]1(OC(C)=O)[C@@H](COC(Cc2ccc(NC(=O)CCCCCl)cc2)(C(=O)OCC)C(=O)OCC)O[C@@H](n2cnc3c(NC(=O)OC(C)(C)C)nc(Cl)nc32)[C@@H]1OC(C)=O"
+        ]
+      },
+      {
+        "reaction_indices": [
+          9926,
+          4059
+        ],
+        "spine_smiles": [
+          "Cc1ccnc(C(C)C)c1N",
+          "Cc1ccnc(C(C)C)c1NC(=O)CC#N"
+        ]
+      },
+      {
+        "reaction_indices": [
+          14945,
+          14946
+        ],
+        "spine_smiles": [
+          "Cc1cc(Cl)nc2c(N)c[nH]c12",
+          "CC(=O)Nc1c[nH]c2c(C)cc(Cl)nc12"
+        ]
+      },
+      {
+        "reaction_indices": [
+          17821,
+          17822
+        ],
+        "spine_smiles": [
+          "CC(C)(C)OC(=O)N1C[C@@H]2C[C@H]1CN2c1ccc(N)cc1",
+          "COC(=O)Nc1ccc(N2C[C@@H]3C[C@H]2CN3C(=O)OC(C)(C)C)cc1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          18655,
+          18740
+        ],
+        "spine_smiles": [
+          "C[C@@H]1CN(c2cc(F)c(-c3cnc(N4CCOCC4)nc3)cc2N)C[C@H](C)N1C",
+          "C[C@@H]1CN(c2cc(F)c(-c3cnc(N4CCOCC4)nc3)cc2NC(=O)c2ccc(F)cc2C(F)(F)F)C[C@H](C)N1C"
+        ]
+      },
+      {
+        "reaction_indices": [
+          18697,
+          18698
+        ],
+        "spine_smiles": [
+          "C[C@H]1CN(c2cc(F)c(-c3cnc(N4CCOCC4)nc3)cc2N)CCN1C",
+          "C[C@H]1CN(c2cc(F)c(-c3cnc(N4CCOCC4)nc3)cc2NC(=O)c2ccccc2)CCN1C"
+        ]
+      },
+      {
+        "reaction_indices": [
+          18725,
+          18808
+        ],
+        "spine_smiles": [
+          "C[C@H]1CN(c2cc(F)c(Br)cc2N)CCN1C",
+          "C[C@H]1CN(c2cc(F)c(Br)cc2NC(=O)c2ccc(F)cc2C(F)(F)F)CCN1C"
+        ]
+      },
+      {
+        "reaction_indices": [
+          18749,
+          18757
+        ],
+        "spine_smiles": [
+          "CN(C(=O)OC(C)(C)C)C1CCN(c2cc(F)c(-c3cnc(N4CCOCC4)nc3)cc2N)C1",
+          "CN(C(=O)OC(C)(C)C)C1CCN(c2cc(F)c(-c3cnc(N4CCOCC4)nc3)cc2NC(=O)c2cc(Cl)cc(Cl)c2)C1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          22063,
+          74094
+        ],
+        "spine_smiles": [
+          "Nc1ccc2c(c1)OC(F)(F)O2",
+          "O=C(Nc1ccc2c(c1)OC(F)(F)O2)Oc1ccccc1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          23138,
+          23171
+        ],
+        "spine_smiles": [
+          "Nc1cnn2ccc(N3CCC[C@@H]3c3cc(F)ccc3F)nc12",
+          "COC(=O)C(=O)Nc1cnn2ccc(N3CCC[C@@H]3c3cc(F)ccc3F)nc12"
+        ]
+      },
+      {
+        "reaction_indices": [
+          27096,
+          27097
+        ],
+        "spine_smiles": [
+          "Nc1ccc2c(c1)[C@@H](Nc1cccc(C(F)(F)F)c1)[C@H](O)C2",
+          "C=CC(=O)Nc1ccc2c(c1)[C@@H](Nc1cccc(C(F)(F)F)c1)[C@H](O)C2"
+        ]
+      },
+      {
+        "reaction_indices": [
+          29577,
+          29603
+        ],
+        "spine_smiles": [
+          "COC(=O)c1cc(N)ccc1-c1cc2ccccc2s1",
+          "COC(=O)c1cc(NC(=O)C2(c3ccc(C(F)(F)F)cc3F)CC2)ccc1-c1cc2ccccc2s1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          29734,
+          29735
+        ],
+        "spine_smiles": [
+          "Nc1cc2c(Nc3cccc(-c4ccc(F)cc4F)c3)ncnc2cc1OCCCN1CCOCC1",
+          "C=CC(=O)Nc1cc2c(Nc3cccc(-c4ccc(F)cc4F)c3)ncnc2cc1OCCCN1CCOCC1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          29746,
+          29747
+        ],
+        "spine_smiles": [
+          "Nc1cc2c(Nc3ccnc(-c4ccccc4F)c3)ncnc2cc1F",
+          "C=CC(=O)Nc1cc2c(Nc3ccnc(-c4ccccc4F)c3)ncnc2cc1F"
+        ]
+      },
+      {
+        "reaction_indices": [
+          29756,
+          29757
+        ],
+        "spine_smiles": [
+          "Nc1cc2c(Nc3ccnc(-c4ccccc4F)c3)ncnc2cc1O[C@@H]1CCN(C2CC2)C1",
+          "C=CC(=O)Nc1cc2c(Nc3ccnc(-c4ccccc4F)c3)ncnc2cc1O[C@@H]1CCN(C2CC2)C1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          31890,
+          31891
+        ],
+        "spine_smiles": [
+          "CCCCCn1ccc(-c2ccc(N)cc2)n1",
+          "C=CC(=O)Nc1ccc(-c2ccn(CCCCC)n2)cc1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          31898,
+          31899
+        ],
+        "spine_smiles": [
+          "CCCCc1cc(-c2ccc(N)cc2)no1",
+          "C=CC(=O)Nc1ccc(-c2cc(CCCC)on2)cc1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          31903,
+          31904
+        ],
+        "spine_smiles": [
+          "Nc1ccc(-c2cc(C(F)(F)F)on2)cc1",
+          "C=CC(=O)Nc1ccc(-c2cc(C(F)(F)F)on2)cc1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          31910,
+          31911
+        ],
+        "spine_smiles": [
+          "Nc1ccc(-c2cc(C3CC3)on2)cc1",
+          "C=CC(=O)Nc1ccc(-c2cc(C3CC3)on2)cc1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          31916,
+          31917
+        ],
+        "spine_smiles": [
+          "Nc1ccc(-c2cc(C(F)(F)F)no2)c(Cl)c1",
+          "C=CC(=O)Nc1ccc(-c2cc(C(F)(F)F)no2)c(Cl)c1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          31925,
+          31926
+        ],
+        "spine_smiles": [
+          "Nc1cc(F)cc(Oc2cccc(C(F)(F)F)c2)c1",
+          "C=CC(=O)Nc1cc(F)cc(Oc2cccc(C(F)(F)F)c2)c1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          31930,
+          31931
+        ],
+        "spine_smiles": [
+          "Nc1cccc(Oc2ccc(C(F)(F)F)cc2)c1",
+          "C=CC(=O)Nc1cccc(Oc2ccc(C(F)(F)F)cc2)c1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          31936,
+          31937
+        ],
+        "spine_smiles": [
+          "Nc1cccc(OC2CCC(F)(F)CC2)c1",
+          "C=CC(=O)Nc1cccc(OC2CCC(F)(F)CC2)c1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          31954,
+          31955
+        ],
+        "spine_smiles": [
+          "Nc1ccc(-c2cc(C(F)(F)F)ccn2)cc1",
+          "C=CC(=O)Nc1ccc(-c2cc(C(F)(F)F)ccn2)cc1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          31956,
+          31957
+        ],
+        "spine_smiles": [
+          "Nc1ccc(-c2cncc(C(F)(F)F)c2)cc1",
+          "C=CC(=O)Nc1ccc(-c2cncc(C(F)(F)F)c2)cc1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          31958,
+          31959
+        ],
+        "spine_smiles": [
+          "Nc1ccc(-c2cc(C(F)(F)F)cnn2)cc1",
+          "C=CC(=O)Nc1ccc(-c2cc(C(F)(F)F)cnn2)cc1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          31964,
+          31965
+        ],
+        "spine_smiles": [
+          "Nc1ccc(-c2cc(C(F)(F)F)sn2)cc1",
+          "C=CC(=O)Nc1ccc(-c2cc(C(F)(F)F)sn2)cc1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          31967,
+          31968
+        ],
+        "spine_smiles": [
+          "Nc1ccc(-c2ccn(CC(F)(F)F)n2)cc1",
+          "C=CC(=O)Nc1ccc(-c2ccn(CC(F)(F)F)n2)cc1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          38851,
+          38852
+        ],
+        "spine_smiles": [
+          "CN1CCC(NC(=O)c2cc(N)cc(Cl)n2)CC1",
+          "CC(=O)Nc1cc(Cl)nc(C(=O)NC2CCN(C)CC2)c1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          41487,
+          41488
+        ],
+        "spine_smiles": [
+          "Nc1cccc(Nc2ncc3c(n2)N2CCN=C2C(Oc2ccc(F)cc2F)=C3)c1",
+          "C=CC(=O)Nc1cccc(Nc2ncc3c(n2)N2CCN=C2C(Oc2ccc(F)cc2F)=C3)c1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          44361,
+          84046
+        ],
+        "spine_smiles": [
+          "Nc1ccc(C(F)F)nc1",
+          "CC(C)(C)c1cc(Cl)nc(C(=O)Nc2ccc(C(F)F)nc2)n1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          47733,
+          61253
+        ],
+        "spine_smiles": [
+          "CC(C)(C)OC(=O)N1CCC(n2cc(N)cn2)CC1",
+          "CC(C)(C)OC(=O)N1CCC(n2cc(NC(=O)OCc3ccccc3)cn2)CC1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          47840,
+          61253
+        ],
+        "spine_smiles": [
+          "CC(C)(C)OC(=O)N1CCC(n2cc(N)cn2)CC1",
+          "CC(C)(C)OC(=O)N1CCC(n2cc(NC(=O)OCc3ccccc3)cn2)CC1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          53446,
+          53466
+        ],
+        "spine_smiles": [
+          "Nc1ccc(-c2cnco2)c(C(F)(F)F)c1",
+          "O=C(Nc1ccc(-c2cnco2)c(C(F)(F)F)c1)C1COc2ccccc2C1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          53452,
+          53465
+        ],
+        "spine_smiles": [
+          "CN(C)CCOc1cc(-c2cnco2)ccc1N",
+          "CN(C)CCOc1cc(-c2cnco2)ccc1NC(=O)C1COc2ccccc2C1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          54359,
+          54361
+        ],
+        "spine_smiles": [
+          "Nc1ccc2nc(-c3ccccc3C(F)(F)F)[nH]c2c1",
+          "Cn1nccc1C(=O)Nc1ccc2nc(-c3ccccc3C(F)(F)F)[nH]c2c1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          54833,
+          54834
+        ],
+        "spine_smiles": [
+          "CCOc1cc([C@@H](CS(C)(=O)=O)N2C(=O)c3cc(I)cc(N)c3C2=O)ccc1OC",
+          "CCOc1cc([C@@H](CS(C)(=O)=O)N2C(=O)c3cc(I)cc(NC(C)=O)c3C2=O)ccc1OC"
+        ]
+      },
+      {
+        "reaction_indices": [
+          59322,
+          59323
+        ],
+        "spine_smiles": [
+          "CCOC(=O)c1cc(-c2nc3cc(N)cc(F)c3o2)ccn1",
+          "CCOC(=O)c1cc(-c2nc3cc(NC(C)=O)cc(F)c3o2)ccn1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          59334,
+          59335
+        ],
+        "spine_smiles": [
+          "CCOC(=O)c1cc(-c2nc3ccc(N)cc3o2)ccn1",
+          "CCOC(=O)c1cc(-c2nc3ccc(NC(C)=O)cc3o2)ccn1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          59406,
+          59407
+        ],
+        "spine_smiles": [
+          "COC(=O)c1cc(N2Cc3ccc(N)cc3C2=O)ccn1",
+          "COC(=O)c1cc(N2Cc3ccc(NC(C)=O)cc3C2=O)ccn1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          70212,
+          70222
+        ],
+        "spine_smiles": [
+          "COc1cc(C(C)C)c(Oc2cnc(N)nc2N)cc1N",
+          "COc1cc(C(C)C)c(Oc2cnc(N)nc2N)cc1NC(=O)CCCCl"
+        ]
+      },
+      {
+        "reaction_indices": [
+          70219,
+          70222
+        ],
+        "spine_smiles": [
+          "COc1cc(C(C)C)c(Oc2cnc(N)nc2N)cc1N",
+          "COc1cc(C(C)C)c(Oc2cnc(N)nc2N)cc1NC(=O)CCCCl"
+        ]
+      },
+      {
+        "reaction_indices": [
+          73928,
+          73929
+        ],
+        "spine_smiles": [
+          "Cc1c(Cl)cc(N)cc1CN1CCOCC1",
+          "Cc1c(Cl)cc(NC(=O)Oc2ccccc2)cc1CN1CCOCC1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          73933,
+          73934
+        ],
+        "spine_smiles": [
+          "Nc1cc(CN2CCOCC2)cc(OC(F)(F)F)c1",
+          "O=C(Nc1cc(CN2CCOCC2)cc(OC(F)(F)F)c1)Oc1ccccc1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          73935,
+          73936
+        ],
+        "spine_smiles": [
+          "Nc1cccc(OC(F)F)c1",
+          "O=C(Nc1cccc(OC(F)F)c1)Oc1ccccc1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          73937,
+          73938
+        ],
+        "spine_smiles": [
+          "Cc1ncc(N)cc1Cl",
+          "Cc1ncc(NC(=O)Oc2ccccc2)cc1Cl"
+        ]
+      },
+      {
+        "reaction_indices": [
+          73937,
+          77238
+        ],
+        "spine_smiles": [
+          "Cc1ncc(N)cc1Cl",
+          "COC(=O)C(=O)Nc1cnc(C)c(Cl)c1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          73947,
+          73948
+        ],
+        "spine_smiles": [
+          "Nc1ccc(N2CCCCC2)nc1",
+          "O=C(Nc1ccc(N2CCCCC2)nc1)Oc1ccccc1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          73951,
+          73952
+        ],
+        "spine_smiles": [
+          "CC(C)(C)OC(=O)N1CCC(COc2cc(N)cc(Cl)c2)C1",
+          "CC(C)(C)OC(=O)N1CCC(COc2cc(Cl)cc(NC(=O)Oc3ccccc3)c2)C1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          73958,
+          73959
+        ],
+        "spine_smiles": [
+          "Nc1cc(Cl)cc(OC(F)F)c1",
+          "O=C(Nc1cc(Cl)cc(OC(F)F)c1)Oc1ccccc1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          73963,
+          73964
+        ],
+        "spine_smiles": [
+          "Cc1c(Cl)cc(N)cc1CN1CC2CCC(C1)O2",
+          "Cc1c(Cl)cc(NC(=O)Oc2ccccc2)cc1CN1CC2CCC(C1)O2"
+        ]
+      },
+      {
+        "reaction_indices": [
+          73966,
+          73967
+        ],
+        "spine_smiles": [
+          "Cc1ccc(N)cc1OC(F)F",
+          "Cc1ccc(NC(=O)Oc2ccccc2)cc1OC(F)F"
+        ]
+      },
+      {
+        "reaction_indices": [
+          73972,
+          73973
+        ],
+        "spine_smiles": [
+          "Cc1c(CN2CCOCC2)cc(N)cc1OC(F)F",
+          "Cc1c(CN2CCOCC2)cc(NC(=O)Oc2ccccc2)cc1OC(F)F"
+        ]
+      },
+      {
+        "reaction_indices": [
+          73980,
+          73981
+        ],
+        "spine_smiles": [
+          "Nc1cc(F)cc(OC(F)F)c1",
+          "O=C(Nc1cc(F)cc(OC(F)F)c1)Oc1ccccc1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          73983,
+          73984
+        ],
+        "spine_smiles": [
+          "Nc1ccc(F)c(OC(F)F)c1",
+          "O=C(Nc1ccc(F)c(OC(F)F)c1)Oc1ccccc1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          73986,
+          73987
+        ],
+        "spine_smiles": [
+          "CCOc1cc(N)ccc1C",
+          "CCOc1cc(NC(=O)Oc2ccccc2)ccc1C"
+        ]
+      },
+      {
+        "reaction_indices": [
+          73990,
+          73991
+        ],
+        "spine_smiles": [
+          "Cc1c(CN2CCOCC2)cc(N)cc1OC(F)(F)F",
+          "Cc1c(CN2CCOCC2)cc(NC(=O)Oc2ccccc2)cc1OC(F)(F)F"
+        ]
+      },
+      {
+        "reaction_indices": [
+          73999,
+          74000
+        ],
+        "spine_smiles": [
+          "CN1CCC(COc2cc(N)cc(Cl)c2)C1",
+          "CN1CCC(COc2cc(Cl)cc(NC(=O)Oc3ccccc3)c2)C1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          74005,
+          74006
+        ],
+        "spine_smiles": [
+          "Cc1c(F)cc(N)cc1CN1CCOCC1",
+          "Cc1c(F)cc(NC(=O)Oc2ccccc2)cc1CN1CCOCC1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          74010,
+          74011
+        ],
+        "spine_smiles": [
+          "Cc1c(Cl)cc(N)cc1OC1CCN(C(=O)OC(C)(C)C)C1",
+          "Cc1c(Cl)cc(NC(=O)Oc2ccccc2)cc1OC1CCN(C(=O)OC(C)(C)C)C1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          74022,
+          74023
+        ],
+        "spine_smiles": [
+          "Cc1c(Cl)cc(N)cc1OCCN1CCOCC1",
+          "Cc1c(Cl)cc(NC(=O)Oc2ccccc2)cc1OCCN1CCOCC1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          74025,
+          74026
+        ],
+        "spine_smiles": [
+          "CCc1ncc(N)cc1C",
+          "CCc1ncc(NC(=O)Oc2ccccc2)cc1C"
+        ]
+      },
+      {
+        "reaction_indices": [
+          74028,
+          74029
+        ],
+        "spine_smiles": [
+          "Nc1ccc(-c2ccccn2)cc1",
+          "O=C(Nc1ccc(-c2ccccn2)cc1)Oc1ccccc1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          74031,
+          74032
+        ],
+        "spine_smiles": [
+          "COc1cc(N)cnc1C",
+          "COc1cc(NC(=O)Oc2ccccc2)cnc1C"
+        ]
+      },
+      {
+        "reaction_indices": [
+          74035,
+          74036
+        ],
+        "spine_smiles": [
+          "Cc1c(Cl)cc(N)cc1OCC1CCN(C(=O)OC(C)(C)C)C1",
+          "Cc1c(Cl)cc(NC(=O)Oc2ccccc2)cc1OCC1CCN(C(=O)OC(C)(C)C)C1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          74038,
+          74039
+        ],
+        "spine_smiles": [
+          "CCc1cc(N)cnc1C",
+          "CCc1cc(NC(=O)Oc2ccccc2)cnc1C"
+        ]
+      },
+      {
+        "reaction_indices": [
+          74038,
+          78634
+        ],
+        "spine_smiles": [
+          "CCc1cc(N)cnc1C",
+          "CCc1cc(NC(=O)C(=O)OCc2ccccc2)cnc1C"
+        ]
+      },
+      {
+        "reaction_indices": [
+          74047,
+          74048
+        ],
+        "spine_smiles": [
+          "Nc1ccc(N2CCCC2)nc1",
+          "O=C(Nc1ccc(N2CCCC2)nc1)Oc1ccccc1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          74052,
+          74053
+        ],
+        "spine_smiles": [
+          "CC1(c2ccc(N)cc2)COC1",
+          "CC1(c2ccc(NC(=O)Oc3ccccc3)cc2)COC1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          74056,
+          74057
+        ],
+        "spine_smiles": [
+          "Nc1cnc(N2CCCCC2)nc1",
+          "O=C(Nc1cnc(N2CCCCC2)nc1)Oc1ccccc1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          74059,
+          74060
+        ],
+        "spine_smiles": [
+          "Nc1ccc(N2CC3CCC(C2)O3)nc1",
+          "O=C(Nc1ccc(N2CC3CCC(C2)O3)nc1)Oc1ccccc1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          74062,
+          74063
+        ],
+        "spine_smiles": [
+          "Nc1ccc2c(c1)CCCO2",
+          "O=C(Nc1ccc2c(c1)CCCO2)Oc1ccccc1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          74068,
+          74069
+        ],
+        "spine_smiles": [
+          "CC1CCN(c2ccc(N)cn2)C1",
+          "CC1CCN(c2ccc(NC(=O)Oc3ccccc3)cn2)C1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          74071,
+          74072
+        ],
+        "spine_smiles": [
+          "Cc1c(Cl)cc(N)cc1OCC1CCN(C)C1",
+          "Cc1c(Cl)cc(NC(=O)Oc2ccccc2)cc1OCC1CCN(C)C1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          74074,
+          74075
+        ],
+        "spine_smiles": [
+          "CCc1cc(N)cc(C)n1",
+          "CCc1cc(NC(=O)Oc2ccccc2)cc(C)n1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          74077,
+          74078
+        ],
+        "spine_smiles": [
+          "Nc1cnc(N2CCCCC2)c(F)c1",
+          "O=C(Nc1cnc(N2CCCCC2)c(F)c1)Oc1ccccc1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          74080,
+          74081
+        ],
+        "spine_smiles": [
+          "Nc1ccc(N2CCCC(F)(F)C2)nc1",
+          "O=C(Nc1ccc(N2CCCC(F)(F)C2)nc1)Oc1ccccc1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          74083,
+          74084
+        ],
+        "spine_smiles": [
+          "CC1CCCN1c1ccc(N)cn1",
+          "CC1CCCN1c1ccc(NC(=O)Oc2ccccc2)cn1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          74089,
+          74090
+        ],
+        "spine_smiles": [
+          "CC1CCCCN1c1ccc(N)cn1",
+          "CC1CCCCN1c1ccc(NC(=O)Oc2ccccc2)cn1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          74092,
+          74093
+        ],
+        "spine_smiles": [
+          "Nc1ccc(N2CCC(F)(F)CC2)nc1",
+          "O=C(Nc1ccc(N2CCC(F)(F)CC2)nc1)Oc1ccccc1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          74100,
+          74101
+        ],
+        "spine_smiles": [
+          "CC1(C)COc2cc(N)ccc21",
+          "CC1(C)COc2cc(NC(=O)Oc3ccccc3)ccc21"
+        ]
+      },
+      {
+        "reaction_indices": [
+          74103,
+          74104
+        ],
+        "spine_smiles": [
+          "Nc1ccc(-c2ccccc2F)nc1",
+          "O=C(Nc1ccc(-c2ccccc2F)nc1)Oc1ccccc1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          74106,
+          74107
+        ],
+        "spine_smiles": [
+          "Nc1cnc(-c2ccccc2)c(F)c1",
+          "O=C(Nc1cnc(-c2ccccc2)c(F)c1)Oc1ccccc1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          74109,
+          74110
+        ],
+        "spine_smiles": [
+          "Cc1ccccc1-c1ccc(N)cn1",
+          "Cc1ccccc1-c1ccc(NC(=O)Oc2ccccc2)cn1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          74112,
+          74113
+        ],
+        "spine_smiles": [
+          "COc1ccccc1-c1ccc(N)cn1",
+          "COc1ccccc1-c1ccc(NC(=O)Oc2ccccc2)cn1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          74115,
+          74116
+        ],
+        "spine_smiles": [
+          "Cc1cc(N)cnc1-c1ccccc1",
+          "Cc1cc(NC(=O)Oc2ccccc2)cnc1-c1ccccc1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          74118,
+          74119
+        ],
+        "spine_smiles": [
+          "CN(C)C1CN(c2ccc(N)cn2)C1",
+          "CN(C)C1CN(c2ccc(NC(=O)Oc3ccccc3)cn2)C1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          74121,
+          74122
+        ],
+        "spine_smiles": [
+          "COc1cc(N)cnc1-c1ccccc1",
+          "COc1cc(NC(=O)Oc2ccccc2)cnc1-c1ccccc1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          74130,
+          74131
+        ],
+        "spine_smiles": [
+          "Nc1ccc2c(c1)OCCC2",
+          "O=C(Nc1ccc2c(c1)OCCC2)Oc1ccccc1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          74133,
+          74134
+        ],
+        "spine_smiles": [
+          "Nc1cccc(OC2CC2)c1",
+          "O=C(Nc1cccc(OC2CC2)c1)Oc1ccccc1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          74144,
+          74145
+        ],
+        "spine_smiles": [
+          "Nc1cc(OCCN2CCOCC2)cc(OC(F)F)c1",
+          "O=C(Nc1cc(OCCN2CCOCC2)cc(OC(F)F)c1)Oc1ccccc1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          74162,
+          74163
+        ],
+        "spine_smiles": [
+          "Nc1ccc(C2CCC2)nc1",
+          "O=C(Nc1ccc(C2CCC2)nc1)Oc1ccccc1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          74168,
+          74169
+        ],
+        "spine_smiles": [
+          "Nc1ccc(N2CCC2)nc1",
+          "O=C(Nc1ccc(N2CCC2)nc1)Oc1ccccc1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          74177,
+          74178
+        ],
+        "spine_smiles": [
+          "Cc1cc(N)cc(C#N)c1",
+          "Cc1cc(C#N)cc(NC(=O)Oc2ccccc2)c1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          74190,
+          74191
+        ],
+        "spine_smiles": [
+          "Cc1c(F)cc(N)cc1Cl",
+          "Cc1c(F)cc(NC(=O)Oc2ccccc2)cc1Cl"
+        ]
+      },
+      {
+        "reaction_indices": [
+          74197,
+          74198
+        ],
+        "spine_smiles": [
+          "Cc1cc(Cl)c(N)cc1Cl",
+          "Cc1cc(Cl)c(NC(=O)Oc2ccccc2)cc1Cl"
+        ]
+      },
+      {
+        "reaction_indices": [
+          74202,
+          74203
+        ],
+        "spine_smiles": [
+          "Cc1c(F)cc(N)cc1F",
+          "Cc1c(F)cc(NC(=O)Oc2ccccc2)cc1F"
+        ]
+      },
+      {
+        "reaction_indices": [
+          74211,
+          74212
+        ],
+        "spine_smiles": [
+          "Nc1cc(F)c(F)c(Cl)c1",
+          "O=C(Nc1cc(F)c(F)c(Cl)c1)Oc1ccccc1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          74228,
+          74229
+        ],
+        "spine_smiles": [
+          "Nc1cccc(OC2CC2(F)F)c1",
+          "O=C(Nc1cccc(OC2CC2(F)F)c1)Oc1ccccc1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          74230,
+          74231
+        ],
+        "spine_smiles": [
+          "Cc1cc(F)c(N)cc1Cl",
+          "Cc1cc(F)c(NC(=O)Oc2ccccc2)cc1Cl"
+        ]
+      },
+      {
+        "reaction_indices": [
+          74251,
+          74252
+        ],
+        "spine_smiles": [
+          "Cc1c(Cl)cc(N)cc1CC1COCCN1C",
+          "Cc1c(Cl)cc(NC(=O)Oc2ccccc2)cc1CC1COCCN1C"
+        ]
+      },
+      {
+        "reaction_indices": [
+          74254,
+          74255
+        ],
+        "spine_smiles": [
+          "CC1(c2ccc(N)cn2)CC1",
+          "CC1(c2ccc(NC(=O)Oc3ccccc3)cn2)CC1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          74260,
+          74261
+        ],
+        "spine_smiles": [
+          "C[C@H]1CCCN1c1ccc(N)cn1",
+          "C[C@H]1CCCN1c1ccc(NC(=O)Oc2ccccc2)cn1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          74263,
+          74264
+        ],
+        "spine_smiles": [
+          "C[C@@H]1CCCN1c1ccc(N)cn1",
+          "C[C@@H]1CCCN1c1ccc(NC(=O)Oc2ccccc2)cn1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          74266,
+          74267
+        ],
+        "spine_smiles": [
+          "Nc1ccc(C2CCC2)cc1F",
+          "O=C(Nc1ccc(C2CCC2)cc1F)Oc1ccccc1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          74280,
+          74281
+        ],
+        "spine_smiles": [
+          "Nc1ccc(C2CCC2)cn1",
+          "O=C(Nc1ccc(C2CCC2)cn1)Oc1ccccc1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          74286,
+          74287
+        ],
+        "spine_smiles": [
+          "Cc1cc(N)cc(C#N)c1C",
+          "Cc1cc(NC(=O)Oc2ccccc2)cc(C#N)c1C"
+        ]
+      },
+      {
+        "reaction_indices": [
+          74288,
+          74289
+        ],
+        "spine_smiles": [
+          "Nc1cc(F)cc2c1OCC2",
+          "O=C(Nc1cc(F)cc2c1OCC2)Oc1ccccc1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          74291,
+          74292
+        ],
+        "spine_smiles": [
+          "CC1(c2ccc(N)nc2)CC1",
+          "CC1(c2ccc(NC(=O)Oc3ccccc3)nc2)CC1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          74293,
+          74294
+        ],
+        "spine_smiles": [
+          "Nc1cc(Cl)cc2c1OCC2",
+          "O=C(Nc1cc(Cl)cc2c1OCC2)Oc1ccccc1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          74296,
+          74297
+        ],
+        "spine_smiles": [
+          "Nc1ccc(F)c(OC(F)F)c1F",
+          "O=C(Nc1ccc(F)c(OC(F)F)c1F)Oc1ccccc1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          74300,
+          74301
+        ],
+        "spine_smiles": [
+          "Cc1cc(N)ncc1N1CCCC1",
+          "Cc1cc(NC(=O)Oc2ccccc2)ncc1N1CCCC1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          74307,
+          74308
+        ],
+        "spine_smiles": [
+          "Cc1cc(F)c(N)cc1OC(F)F",
+          "Cc1cc(F)c(NC(=O)Oc2ccccc2)cc1OC(F)F"
+        ]
+      },
+      {
+        "reaction_indices": [
+          74310,
+          74311
+        ],
+        "spine_smiles": [
+          "Cc1cc(F)c(N)cc1OC(F)(F)F",
+          "Cc1cc(F)c(NC(=O)Oc2ccccc2)cc1OC(F)(F)F"
+        ]
+      },
+      {
+        "reaction_indices": [
+          74314,
+          74315
+        ],
+        "spine_smiles": [
+          "Nc1cc(F)c(OC(F)F)c(F)c1",
+          "O=C(Nc1cc(F)c(OC(F)F)c(F)c1)Oc1ccccc1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          74326,
+          74327
+        ],
+        "spine_smiles": [
+          "Nc1cc(F)c2c(c1)CCO2",
+          "O=C(Nc1cc(F)c2c(c1)CCO2)Oc1ccccc1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          74328,
+          74329
+        ],
+        "spine_smiles": [
+          "Nc1cc(OC(F)F)c(F)cc1F",
+          "O=C(Nc1cc(OC(F)F)c(F)cc1F)Oc1ccccc1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          74330,
+          74331
+        ],
+        "spine_smiles": [
+          "CC(C)Oc1ccc(F)c(N)c1",
+          "CC(C)Oc1ccc(F)c(NC(=O)Oc2ccccc2)c1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          74332,
+          74333
+        ],
+        "spine_smiles": [
+          "CC(C)(C)Oc1ccc(F)c(N)c1",
+          "CC(C)(C)Oc1ccc(F)c(NC(=O)Oc2ccccc2)c1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          74334,
+          74335
+        ],
+        "spine_smiles": [
+          "CCOc1ccc(F)c(N)c1",
+          "CCOc1ccc(F)c(NC(=O)Oc2ccccc2)c1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          74337,
+          74338
+        ],
+        "spine_smiles": [
+          "CCCOc1ccc(F)c(N)c1",
+          "CCCOc1ccc(F)c(NC(=O)Oc2ccccc2)c1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          74343,
+          74344
+        ],
+        "spine_smiles": [
+          "CCOc1cc(N)c(F)cc1C",
+          "CCOc1cc(NC(=O)Oc2ccccc2)c(F)cc1C"
+        ]
+      },
+      {
+        "reaction_indices": [
+          74345,
+          74346
+        ],
+        "spine_smiles": [
+          "COc1cc(N)c(F)cc1C",
+          "COc1cc(NC(=O)Oc2ccccc2)c(F)cc1C"
+        ]
+      },
+      {
+        "reaction_indices": [
+          74348,
+          74349
+        ],
+        "spine_smiles": [
+          "CCCOc1cc(N)c(F)cc1C",
+          "CCCOc1cc(NC(=O)Oc2ccccc2)c(F)cc1C"
+        ]
+      },
+      {
+        "reaction_indices": [
+          74352,
+          74353
+        ],
+        "spine_smiles": [
+          "Cc1cc(F)c(N)cc1C(F)(F)F",
+          "Cc1cc(F)c(NC(=O)Oc2ccccc2)cc1C(F)(F)F"
+        ]
+      },
+      {
+        "reaction_indices": [
+          74354,
+          74355
+        ],
+        "spine_smiles": [
+          "CC(F)(F)c1ccc(F)c(N)c1",
+          "CC(F)(F)c1ccc(F)c(NC(=O)Oc2ccccc2)c1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          74356,
+          74357
+        ],
+        "spine_smiles": [
+          "CC(C)(C)c1ccc(F)c(N)c1",
+          "CC(C)(C)c1ccc(F)c(NC(=O)Oc2ccccc2)c1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          74359,
+          74360
+        ],
+        "spine_smiles": [
+          "CC1(c2ccc(N)cc2Cl)COC1",
+          "CC1(c2ccc(NC(=O)Oc3ccccc3)cc2Cl)COC1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          74362,
+          74363
+        ],
+        "spine_smiles": [
+          "Cc1cc(N)ncc1N1CCC[C@H]1C",
+          "Cc1cc(NC(=O)Oc2ccccc2)ncc1N1CCC[C@H]1C"
+        ]
+      },
+      {
+        "reaction_indices": [
+          74370,
+          74371
+        ],
+        "spine_smiles": [
+          "CC1(c2ccc(N)cc2F)COC1",
+          "CC1(c2ccc(NC(=O)Oc3ccccc3)cc2F)COC1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          77041,
+          77042
+        ],
+        "spine_smiles": [
+          "Nc1ccc2c(c1)NC(=O)CC(c1cccc(Br)c1)=N2",
+          "O=C1CC(c2cccc(Br)c2)=Nc2ccc(NC(=O)OCc3ccccc3)cc2N1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          77234,
+          77235
+        ],
+        "spine_smiles": [
+          "Cc1cc(N)cnc1NC(=O)OC(C)(C)C",
+          "Cc1cc(NC(=O)C(=O)OCC(F)(F)F)cnc1NC(=O)OC(C)(C)C"
+        ]
+      },
+      {
+        "reaction_indices": [
+          77244,
+          77245
+        ],
+        "spine_smiles": [
+          "Cc1ncc(N)cc1C(F)(F)F",
+          "CCOC(=O)C(=O)Nc1cnc(C)c(C(F)(F)F)c1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          79587,
+          79588
+        ],
+        "spine_smiles": [
+          "Nc1ccc(OCc2cccc(F)c2)c(C2CC2)c1",
+          "C=CC(=O)Nc1ccc(OCc2cccc(F)c2)c(C2CC2)c1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          79601,
+          79602
+        ],
+        "spine_smiles": [
+          "Nc1ccc(O)c(C(F)(F)F)c1",
+          "C=CC(=O)Nc1ccc(O)c(C(F)(F)F)c1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          79607,
+          79608
+        ],
+        "spine_smiles": [
+          "Nc1ccc2c(c1)NCC(c1cccc(F)c1)O2",
+          "C=CC(=O)Nc1ccc2c(c1)NCC(c1cccc(F)c1)O2"
+        ]
+      },
+      {
+        "reaction_indices": [
+          79613,
+          79614
+        ],
+        "spine_smiles": [
+          "NC(=O)Cc1cc(OCc2cccc(F)c2)ccc1N",
+          "C=CC(=O)Nc1ccc(OCc2cccc(F)c2)cc1CC(N)=O"
+        ]
+      },
+      {
+        "reaction_indices": [
+          79616,
+          79617
+        ],
+        "spine_smiles": [
+          "CN1CC(c2cccc(F)c2)Oc2ccc(N)cc21",
+          "C=CC(=O)Nc1ccc2c(c1)N(C)CC(c1cccc(F)c1)O2"
+        ]
+      },
+      {
+        "reaction_indices": [
+          79637,
+          79638
+        ],
+        "spine_smiles": [
+          "Nc1ccc(N(Cc2cccc(F)c2)CC2CC2)c(F)c1",
+          "C=CC(=O)Nc1ccc(N(Cc2cccc(F)c2)CC2CC2)c(F)c1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          79643,
+          79644
+        ],
+        "spine_smiles": [
+          "N#Cc1cc(OCC2CCC(F)(F)CC2)ccc1N",
+          "C=CC(=O)Nc1ccc(OCC2CCC(F)(F)CC2)cc1C#N"
+        ]
+      },
+      {
+        "reaction_indices": [
+          79677,
+          79678
+        ],
+        "spine_smiles": [
+          "Nc1ccc(/C=C/c2cccc(F)c2)c(F)c1",
+          "C=CC(=O)Nc1ccc(/C=C/c2cccc(F)c2)c(F)c1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          79680,
+          79681
+        ],
+        "spine_smiles": [
+          "Nc1ccc(COc2cccc(F)c2)c(F)c1",
+          "C=CC(=O)Nc1ccc(COc2cccc(F)c2)c(F)c1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          79688,
+          79689
+        ],
+        "spine_smiles": [
+          "Nc1ccc(COc2cccc(C(F)(F)F)c2)c(F)c1",
+          "C=CC(=O)Nc1ccc(COc2cccc(C(F)(F)F)c2)c(F)c1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          79691,
+          79692
+        ],
+        "spine_smiles": [
+          "Nc1ccc(NC(=O)C2CCC(F)(F)CC2)c(F)c1",
+          "C=CC(=O)Nc1ccc(NC(=O)C2CCC(F)(F)CC2)c(F)c1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          79698,
+          79699
+        ],
+        "spine_smiles": [
+          "N#Cc1cc(N)ccc1OCc1cccc(C(F)(F)F)c1",
+          "C=CC(=O)Nc1ccc(OCc2cccc(C(F)(F)F)c2)c(C#N)c1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          79705,
+          79706
+        ],
+        "spine_smiles": [
+          "Nc1ccc(NCc2cccc(F)c2)c(F)c1",
+          "C=CC(=O)Nc1ccc(NCc2cccc(F)c2)c(F)c1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          79708,
+          79709
+        ],
+        "spine_smiles": [
+          "Nc1ccc(C(=O)Nc2cccc(F)c2)c(F)c1",
+          "C=CC(=O)Nc1ccc(C(=O)Nc2cccc(F)c2)c(F)c1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          79723,
+          79724
+        ],
+        "spine_smiles": [
+          "Nc1ccc(C2COc3ccccc3O2)c(F)c1",
+          "C=CC(=O)Nc1ccc(C2COc3ccccc3O2)c(F)c1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          79739,
+          79740
+        ],
+        "spine_smiles": [
+          "N#Cc1cc(N)ccc1OCc1cccc(F)c1",
+          "C=CC(=O)Nc1ccc(OCc2cccc(F)c2)c(C#N)c1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          79748,
+          79749
+        ],
+        "spine_smiles": [
+          "CC(C)CCc1nc2cc(N)c(F)cc2o1",
+          "C=CC(=O)Nc1cc2nc(CCC(C)C)oc2cc1F"
+        ]
+      },
+      {
+        "reaction_indices": [
+          79752,
+          79753
+        ],
+        "spine_smiles": [
+          "Nc1ccc2c(c1)OC(c1cccc(C(F)(F)F)c1)O2",
+          "C=CC(=O)Nc1ccc2c(c1)OC(c1cccc(C(F)(F)F)c1)O2"
+        ]
+      },
+      {
+        "reaction_indices": [
+          79756,
+          79757
+        ],
+        "spine_smiles": [
+          "CC1(c2cccc(C(F)(F)F)c2)Oc2ccc(N)cc2O1",
+          "C=CC(=O)Nc1ccc2c(c1)OC(C)(c1cccc(C(F)(F)F)c1)O2"
+        ]
+      },
+      {
+        "reaction_indices": [
+          84111,
+          84197
+        ],
+        "spine_smiles": [
+          "CN(CC1CCC(n2cc(N)c(C(F)(F)F)n2)CC1)C1CCN(c2cccc3c2n(C)c(=O)n3C2CCC(=O)NC2=O)CC1",
+          "CN(CC1CCC(n2cc(NC(=O)c3cnn4cccnc34)c(C(F)(F)F)n2)CC1)C1CCN(c2cccc3c2n(C)c(=O)n3C2CCC(=O)NC2=O)CC1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          84225,
+          91299
+        ],
+        "spine_smiles": [
+          "Nc1ccc(C=O)cc1",
+          "O=Cc1ccc(NC(=O)Oc2ccccc2)cc1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          85243,
+          34189
+        ],
+        "spine_smiles": [
+          "COC(=O)c1ccc(N)c(NC[C@@H]2CCO2)n1",
+          "COC(=O)c1ccc(NC(=O)Cc2ccc(-c3cccc4c3OCC(c3ccc(Cl)cc3F)O4)cc2)c(NC[C@@H]2CCO2)n1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          87681,
+          14893
+        ],
+        "spine_smiles": [
+          "Nc1c[nH]c2ccc(Br)cc12",
+          "CC(=O)Nc1c[nH]c2ccc(Br)cc12"
+        ]
+      },
+      {
+        "reaction_indices": [
+          87681,
+          87663
+        ],
+        "spine_smiles": [
+          "Nc1c[nH]c2ccc(Br)cc12",
+          "CCC(=O)Nc1c[nH]c2ccc(Br)cc12"
+        ]
+      },
+      {
+        "reaction_indices": [
+          87681,
+          87682
+        ],
+        "spine_smiles": [
+          "Nc1c[nH]c2ccc(Br)cc12",
+          "CCC(=O)Nc1c[nH]c2ccc(Br)cc12"
+        ]
+      },
+      {
+        "reaction_indices": [
+          90761,
+          90762
+        ],
+        "spine_smiles": [
+          "COc1cc(N(C)CCN(C)C)c(N)cc1Nc1ncc(C#N)c(NC23CC(C2)C3)n1",
+          "C=CC(=O)Nc1cc(Nc2ncc(C#N)c(NC34CC(C3)C4)n2)c(OC)cc1N(C)CCN(C)C"
+        ]
+      },
+      {
+        "reaction_indices": [
+          90761,
+          90786
+        ],
+        "spine_smiles": [
+          "COc1cc(N(C)CCN(C)C)c(N)cc1Nc1ncc(C#N)c(NC23CC(C2)C3)n1",
+          "CCC(=O)Nc1cc(Nc2ncc(C#N)c(NC34CC(C3)C4)n2)c(OC)cc1N(C)CCN(C)C"
+        ]
+      },
+      {
+        "reaction_indices": [
+          90783,
+          90784
+        ],
+        "spine_smiles": [
+          "COc1cc(N(C)CCN(C)C)c(N)cc1Nc1ncc(C#N)c(N2CCC2)n1",
+          "C=CC(=O)Nc1cc(Nc2ncc(C#N)c(N3CCC3)n2)c(OC)cc1N(C)CCN(C)C"
+        ]
+      },
+      {
+        "reaction_indices": [
+          90794,
+          90795
+        ],
+        "spine_smiles": [
+          "COc1cc(N(C)CCN(C)C)c(N)cc1Nc1ncc(C#N)c(NC23CCC(C(F)F)(CC2)CC3)n1",
+          "C=CC(=O)Nc1cc(Nc2ncc(C#N)c(NC34CCC(C(F)F)(CC3)CC4)n2)c(OC)cc1N(C)CCN(C)C"
+        ]
+      },
+      {
+        "reaction_indices": [
+          90804,
+          90805
+        ],
+        "spine_smiles": [
+          "COc1cc(N(C)CCN(C)C)c(N)cc1Nc1cc(NC23CC(C2)C3)c(C#N)cn1",
+          "C=CC(=O)Nc1cc(Nc2cc(NC34CC(C3)C4)c(C#N)cn2)c(OC)cc1N(C)CCN(C)C"
+        ]
+      },
+      {
+        "reaction_indices": [
+          90809,
+          90810
+        ],
+        "spine_smiles": [
+          "COc1cc(N(C)CCN(C)C)c(N)cc1Nc1ncc(C(=O)OC(C)C)c(NC23CC(C2)C3)n1",
+          "C=CC(=O)Nc1cc(Nc2ncc(C(=O)OC(C)C)c(NC34CC(C3)C4)n2)c(OC)cc1N(C)CCN(C)C"
+        ]
+      },
+      {
+        "reaction_indices": [
+          91306,
+          91307
+        ],
+        "spine_smiles": [
+          "CC(C)(C)OC(=O)NCCS(=O)(=O)CC(=O)c1ccc(N)cc1",
+          "CC(C)(C)OC(=O)NCCS(=O)(=O)CC(=O)c1ccc(NC(=O)Oc2ccccc2)cc1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          91780,
+          91781
+        ],
+        "spine_smiles": [
+          "Nc1ccc2c(ccn2CCCN2CCC(F)(F)C2)c1",
+          "C=CC(=O)Nc1ccc2c(ccn2CCCN2CCC(F)(F)C2)c1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          91794,
+          91795
+        ],
+        "spine_smiles": [
+          "Nc1ccc2c(ccn2Cc2ccc(C(F)(F)F)o2)c1",
+          "C=CC(=O)Nc1ccc2c(ccn2Cc2ccc(C(F)(F)F)o2)c1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          91830,
+          91831
+        ],
+        "spine_smiles": [
+          "Nc1ccc2c(c1)c(CO)cn2-c1ccc(C(F)(F)F)cc1",
+          "C=CC(=O)Nc1ccc2c(c1)c(CO)cn2-c1ccc(C(F)(F)F)cc1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          91834,
+          91835
+        ],
+        "spine_smiles": [
+          "NC(=O)c1cn(Cc2cccc(C(F)(F)F)c2)c2ccc(N)cc12",
+          "C=CC(=O)Nc1ccc2c(c1)c(C(N)=O)cn2Cc1cccc(C(F)(F)F)c1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          92147,
+          92148
+        ],
+        "spine_smiles": [
+          "CP(C)(=O)c1cc(N)ccc1Br",
+          "CC(C)OC(=O)Nc1ccc(Br)c(P(C)(C)=O)c1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          92186,
+          92187
+        ],
+        "spine_smiles": [
+          "CCP(=O)(CC)c1cc(N)ccc1Br",
+          "CCP(=O)(CC)c1cc(NC(=O)OC(C)C)ccc1Br"
+        ]
+      },
+      {
+        "reaction_indices": [
+          92195,
+          92196
+        ],
+        "spine_smiles": [
+          "Nc1cccc(P2(=O)CCCC2)c1",
+          "CC(C)OC(=O)Nc1cccc(P2(=O)CCCC2)c1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          92201,
+          92202
+        ],
+        "spine_smiles": [
+          "CC(C)P(C)(=O)c1cccc(N)c1",
+          "CC(C)OC(=O)Nc1cccc(P(C)(=O)C(C)C)c1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          92259,
+          92260
+        ],
+        "spine_smiles": [
+          "Nc1ccc(-c2ncc(Br)s2)cc1",
+          "CC(C)OC(=O)Nc1ccc(-c2ncc(Br)s2)cc1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          96549,
+          60180
+        ],
+        "spine_smiles": [
+          "Nc1ccc(N2CCCC2)cn1",
+          "COc1ccc(-c2ccnc3cc(C(=O)Nc4ccc(N5CCCC5)cn4)nn23)cc1OC"
+        ]
+      },
+      {
+        "reaction_indices": [
+          97418,
+          57484
+        ],
+        "spine_smiles": [
+          "Nc1ccc2[nH]nc(-c3cnn(C(F)F)c3)c2c1",
+          "Cc1ccc(Br)c(C)c1C(=O)Nc1ccc2[nH]nc(-c3cnn(C(F)F)c3)c2c1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          106333,
+          106334
+        ],
+        "spine_smiles": [
+          "COc1cc(N2CCC(N3CCN(C)CC3)CC2)c(N)cc1Nc1ncc(Cl)c(Nc2ccc(O)cc2N(C)S(C)(=O)=O)n1",
+          "COc1cc(N2CCC(N3CCN(C)CC3)CC2)c(NC(=O)CCCBr)cc1Nc1ncc(Cl)c(Nc2ccc(O)cc2N(C)S(C)(=O)=O)n1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          106767,
+          13675
+        ],
+        "spine_smiles": [
+          "Nc1ccc(Br)cc1F",
+          "Cc1cnn(CCOCc2ccccc2)c1C(=O)Nc1ccc(Br)cc1F"
+        ]
+      },
+      {
+        "reaction_indices": [
+          107237,
+          107238
+        ],
+        "spine_smiles": [
+          "C[C@H]1CN(C2CCOCC2)CCN1c1ccc(Nc2nc(Br)cn(C)c2=O)cc1N",
+          "C=CC(=O)Nc1cc(Nc2nc(Br)cn(C)c2=O)ccc1N1CCN(C2CCOCC2)C[C@@H]1C"
+        ]
+      },
+      {
+        "reaction_indices": [
+          108410,
+          108411
+        ],
+        "spine_smiles": [
+          "CC(C)(C)OC(=O)Nc1ccc(-c2cccs2)cc1N",
+          "CC(C)(C)OC(=O)Nc1ccc(-c2cccs2)cc1NC(=O)c1cc2cc(S(C)(=N)=O)ccc2s1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          109233,
+          109234
+        ],
+        "spine_smiles": [
+          "Cn1cc2c3cc(N)ccc3n(-c3ccc(C(F)(F)F)cc3)c2n1",
+          "C=CC(=O)Nc1ccc2c(c1)c1cn(C)nc1n2-c1ccc(C(F)(F)F)cc1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          109813,
+          109814
+        ],
+        "spine_smiles": [
+          "C=CCOc1cccc(C(=O)O)c1N",
+          "C=CCOc1cccc(C(=O)O)c1NC(C)=O"
+        ]
+      },
+      {
+        "reaction_indices": [
+          112432,
+          10409
+        ],
+        "spine_smiles": [
+          "Nc1cnc(-n2nccn2)c(C(F)(F)F)c1",
+          "CCOC(=O)C(=O)Nc1cnc(-n2nccn2)c(C(F)(F)F)c1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          112439,
+          10409
+        ],
+        "spine_smiles": [
+          "Nc1cnc(-n2nccn2)c(C(F)(F)F)c1",
+          "CCOC(=O)C(=O)Nc1cnc(-n2nccn2)c(C(F)(F)F)c1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          113484,
+          113512
+        ],
+        "spine_smiles": [
+          "Cc1cc(-c2cc(F)ccc2F)c(N)c(N2CCC(F)(F)C2)n1",
+          "Cc1cc(-c2cc(F)ccc2F)c(NC(=O)c2ccc(C#N)cc2)c(N2CCC(F)(F)C2)n1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          113711,
+          113712
+        ],
+        "spine_smiles": [
+          "COc1nc(N[C@@H]2CCC[C@H](n3ncc4c(N)cccc43)C2)ncc1C#N",
+          "C=CC(=O)Nc1cccc2c1cnn2[C@H]1CCC[C@@H](Nc2ncc(C#N)c(OC)n2)C1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          113725,
+          113726
+        ],
+        "spine_smiles": [
+          "Nc1ccc2c(c1)C(=O)N([C@H]1CCC[C@@H](Nc3ncc(C(F)(F)F)s3)C1)C2",
+          "C=CC(=O)Nc1ccc2c(c1)C(=O)N([C@H]1CCC[C@@H](Nc3ncc(C(F)(F)F)s3)C1)C2"
+        ]
+      },
+      {
+        "reaction_indices": [
+          113749,
+          113750
+        ],
+        "spine_smiles": [
+          "Cn1c(N2C[C@H](O)C[C@@H](Nc3ncc(C(F)(F)F)cn3)C2)nc2cc(N)ccc21",
+          "C=CC(=O)Nc1ccc2c(c1)nc(N1C[C@H](O)C[C@@H](Nc3ncc(C(F)(F)F)cn3)C1)n2C"
+        ]
+      },
+      {
+        "reaction_indices": [
+          117821,
+          74170
+        ],
+        "spine_smiles": [
+          "Cc1cc(N)cc(C)c1C#N",
+          "Cc1cc(NC(=O)Oc2ccccc2)cc(C)c1C#N"
+        ]
+      }
+    ],
+    "step1_reaction_count": 2053,
+    "step2_reaction_count": 1347,
+    "smirks": {
+      "step1_template_name": "Reduction of nitro groups to amines",
+      "step1_template_occurrence": 0,
+      "step1_smirks": "[N;H0;D3;+1:1](=[O;H0;D1;+0])-[O;H0;D1;-1]>>[N;H2;D1;+0:1]",
+      "step2_template_name": "Acyl chloride with primary amine to amide (Schotten-Baumann)",
+      "step2_template_occurrence": 0,
+      "step2_smirks": "[*:1]-[C;H0;D3;+0:2](=[O;H0;D1;+0:3])-[Cl].[#7;H2;!$(N[O,N]);D1;+0:5]>>[*:1]-[C;H0;D3;+0:2](=[O;H0;D1;+0:3])-[#7;H1;D2;+0:5]"
+    },
+    "step1_template_key": "Reduction of nitro groups to amines::119",
+    "step2_template_key": "Acyl chloride with primary amine to amide (Schotten-Baumann)::150"
+  },
+  "suzuki_carbonyl_reduction": {
+    "question_id": "suzuki_carbonyl_reduction",
+    "label": "Suzuki coupling \u2192 ester reduction",
+    "path_length": 2,
+    "chain_count": 14,
+    "chain_count_no_persistence": 19,
+    "support_index_count": 27,
+    "example_chain": [
+      19676,
+      24317
+    ],
+    "chains": [
+      [
+        19676,
+        24317
+      ],
+      [
+        24250,
+        24251
+      ],
+      [
+        24250,
+        24266
+      ],
+      [
+        24283,
+        24284
+      ],
+      [
+        24334,
+        24335
+      ],
+      [
+        24342,
+        24343
+      ],
+      [
+        24346,
+        24347
+      ],
+      [
+        42169,
+        42170
+      ],
+      [
+        65866,
+        65867
+      ],
+      [
+        92938,
+        92939
+      ],
+      [
+        92946,
+        92947
+      ],
+      [
+        97259,
+        97260
+      ],
+      [
+        118143,
+        118144
+      ],
+      [
+        118259,
+        118260
+      ]
+    ],
+    "chain_details": [
+      {
+        "reaction_indices": [
+          19676,
+          24317
+        ],
+        "spine_smiles": [
+          "CCOC(=O)CC1CCN(c2ccc(-c3ccc(OCc4ccccc4)nc3OCc3ccccc3)cc2F)CC1",
+          "OCCC1CCN(c2ccc(-c3ccc(OCc4ccccc4)nc3OCc3ccccc3)cc2F)CC1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          24250,
+          24251
+        ],
+        "spine_smiles": [
+          "CCOC(=O)C1CCN(c2ccc(-c3ccc(OCc4ccccc4)nc3OCc3ccccc3)cc2F)CC1",
+          "OCC1CCN(c2ccc(-c3ccc(OCc4ccccc4)nc3OCc3ccccc3)cc2F)CC1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          24250,
+          24266
+        ],
+        "spine_smiles": [
+          "CCOC(=O)C1CCN(c2ccc(-c3ccc(OCc4ccccc4)nc3OCc3ccccc3)cc2F)CC1",
+          "OCC1CCN(c2ccc(-c3ccc(OCc4ccccc4)nc3OCc3ccccc3)cc2F)CC1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          24283,
+          24284
+        ],
+        "spine_smiles": [
+          "CCOC(=O)C1CCN(c2ccc(-c3ccc(OCc4ccccc4)nc3OCc3ccccc3)cc2)CC1",
+          "OCC1CCN(c2ccc(-c3ccc(OCc4ccccc4)nc3OCc3ccccc3)cc2)CC1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          24334,
+          24335
+        ],
+        "spine_smiles": [
+          "COC(=O)c1ccc(-c2ccc(OCc3ccccc3)nc2OCc2ccccc2)cc1F",
+          "OCc1ccc(-c2ccc(OCc3ccccc3)nc2OCc2ccccc2)cc1F"
+        ]
+      },
+      {
+        "reaction_indices": [
+          24342,
+          24343
+        ],
+        "spine_smiles": [
+          "CCOC(=O)C1CCN(c2ccc(-c3ccc(OCc4ccccc4)nc3OCc3ccccc3)cc2C)CC1",
+          "Cc1cc(-c2ccc(OCc3ccccc3)nc2OCc2ccccc2)ccc1N1CCC(CO)CC1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          24346,
+          24347
+        ],
+        "spine_smiles": [
+          "CCOC(=O)C1CCN(c2ccc(-c3ccc(OCc4ccccc4)nc3OCc3ccccc3)cc2OC)CC1",
+          "COc1cc(-c2ccc(OCc3ccccc3)nc2OCc2ccccc2)ccc1N1CCC(CO)CC1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          42169,
+          42170
+        ],
+        "spine_smiles": [
+          "COC(=O)c1c(N)cc(-c2ccc(OC(F)(F)F)cc2)c2c1CCO2",
+          "Nc1cc(-c2ccc(OC(F)(F)F)cc2)c2c(c1CO)CCO2"
+        ]
+      },
+      {
+        "reaction_indices": [
+          65866,
+          65867
+        ],
+        "spine_smiles": [
+          "CC(C)COC(=O)c1cn(CC(C)C)c2cc(-c3ccncc3)ccc12",
+          "CC(C)Cn1cc(CO)c2ccc(-c3ccncc3)cc21"
+        ]
+      },
+      {
+        "reaction_indices": [
+          92938,
+          92939
+        ],
+        "spine_smiles": [
+          "CCOC(=O)c1cnc2cc(-c3cccc(Br)c3)ccn2c1=O",
+          "O=c1c(CO)cnc2cc(-c3cccc(Br)c3)ccn12"
+        ]
+      },
+      {
+        "reaction_indices": [
+          92946,
+          92947
+        ],
+        "spine_smiles": [
+          "CCOC(=O)c1cnc2cc(-c3cccc(Br)c3C)ccn2c1=O",
+          "Cc1c(Br)cccc1-c1ccn2c(=O)c(CO)cnc2c1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          97259,
+          97260
+        ],
+        "spine_smiles": [
+          "COCOc1cc(-n2cccn2)ccc1-c1ccc(Cl)nc1C(=O)OC",
+          "COCOc1cc(-n2cccn2)ccc1-c1ccc(Cl)nc1CO"
+        ]
+      },
+      {
+        "reaction_indices": [
+          118143,
+          118144
+        ],
+        "spine_smiles": [
+          "COC(=O)C(C)(C)n1cc(-c2cc3c(N4CCN(c5ncc([C@@](C)(N)c6ccc(F)cc6)cn5)CC4)ncnn3c2)cn1",
+          "CC(C)(CO)n1cc(-c2cc3c(N4CCN(c5ncc([C@@](C)(N)c6ccc(F)cc6)cn5)CC4)ncnn3c2)cn1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          118259,
+          118260
+        ],
+        "spine_smiles": [
+          "CCOC(=O)c1[nH]c2c(Cl)c(Cl)ccc2c1-c1cnn(C2CCCCO2)c1",
+          "OCc1[nH]c2c(Cl)c(Cl)ccc2c1-c1cnn(C2CCCCO2)c1"
+        ]
+      }
+    ],
+    "step1_reaction_count": 2345,
+    "step2_reaction_count": 1141,
+    "smirks": {
+      "step1_template_name": "{Suzuki}",
+      "step1_template_occurrence": 0,
+      "step1_smirks": "[#6;H0;D3;$([#6](~[#6])~[#6]):1]B(O)O.[#6;H0;D3;$([#6](~[#6])~[#6]):2][Cl,Br,I]>>[#6:2][#6:1]",
+      "step2_template_name": "Reduction of ester to primary alcohol",
+      "step2_template_occurrence": 0,
+      "step2_smirks": "[*:0]-[C;H0;D3;+0:1](=[O;H0;D1;+0:2])-[O;H0;D2;+0]>>[*:0]-[C;H2;D2;+0:1]-[O;H1;D1;+0:2]"
+    },
+    "step1_template_key": "{Suzuki}::442",
+    "step2_template_key": "Reduction of ester to primary alcohol::176"
+  },
+  "wittig_hydrogenation": {
+    "question_id": "wittig_hydrogenation",
+    "label": "Wittig olefination \u2192 alkene hydrogenation",
+    "path_length": 2,
+    "chain_count": 3,
+    "chain_count_no_persistence": 3,
+    "support_index_count": 6,
+    "example_chain": [
+      18439,
+      18440
+    ],
+    "chains": [
+      [
+        18439,
+        18440
+      ],
+      [
+        25750,
+        25751
+      ],
+      [
+        88149,
+        88150
+      ]
+    ],
+    "chain_details": [
+      {
+        "reaction_indices": [
+          18439,
+          18440
+        ],
+        "spine_smiles": [
+          "N#CC=CCCCC(F)(F)CC(F)(F)F",
+          "N#CCCCCCC(F)(F)CC(F)(F)F"
+        ]
+      },
+      {
+        "reaction_indices": [
+          25750,
+          25751
+        ],
+        "spine_smiles": [
+          "COC(=O)c1ccc(C=C2CCN(C(=O)OC(C)(C)C)CC2)cc1",
+          "COC(=O)c1ccc(CC2CCN(C(=O)OC(C)(C)C)CC2)cc1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          88149,
+          88150
+        ],
+        "spine_smiles": [
+          "N#CC=C1CCOCC1",
+          "N#CCC1CCOCC1"
+        ]
+      }
+    ],
+    "step1_reaction_count": 22,
+    "step2_reaction_count": 887,
+    "smirks": {
+      "step1_template_name": "Wittig with Phosphonium",
+      "step1_template_occurrence": 0,
+      "step1_smirks": "[#6:1]-[#6;+0:2](=O).O-P(=O)(-O)-[C;H2;D2;+0:3]-[*:4]>>[#6:1]-[#6;+0:2]=[C;H1;D2;+0:3]-[*:4]",
+      "step2_template_name": "Hydrogenation (double to single)",
+      "step2_template_occurrence": 0,
+      "step2_smirks": "[C;+0:0]=[C;+0:1]>>[C;+0:0]-[C;+0:1]"
+    },
+    "step1_template_key": "Wittig with Phosphonium::55",
+    "step2_template_key": "Hydrogenation (double to single)::190"
+  },
+  "alcohol_oxidation_reductive_amination": {
+    "question_id": "alcohol_oxidation_reductive_amination",
+    "label": "Alcohol oxidation \u2192 reductive amination",
+    "path_length": 2,
+    "chain_count": 133,
+    "chain_count_no_persistence": 349,
+    "support_index_count": 189,
+    "example_chain": [
+      3804,
+      3805
+    ],
+    "chains": [
+      [
+        3804,
+        3805
+      ],
+      [
+        7048,
+        7049
+      ],
+      [
+        7114,
+        115651
+      ],
+      [
+        14240,
+        14175
+      ],
+      [
+        14482,
+        14539
+      ],
+      [
+        14487,
+        14192
+      ],
+      [
+        14490,
+        14491
+      ],
+      [
+        15518,
+        15523
+      ],
+      [
+        15518,
+        15560
+      ],
+      [
+        15518,
+        15594
+      ],
+      [
+        15518,
+        15606
+      ],
+      [
+        15518,
+        15609
+      ],
+      [
+        15518,
+        15621
+      ],
+      [
+        15518,
+        15630
+      ],
+      [
+        15518,
+        15639
+      ],
+      [
+        15518,
+        15646
+      ],
+      [
+        15518,
+        15651
+      ],
+      [
+        15518,
+        15654
+      ],
+      [
+        15518,
+        15659
+      ],
+      [
+        15518,
+        15664
+      ],
+      [
+        15518,
+        15667
+      ],
+      [
+        15518,
+        15673
+      ],
+      [
+        15518,
+        15674
+      ],
+      [
+        15518,
+        15679
+      ],
+      [
+        15518,
+        53503
+      ],
+      [
+        15518,
+        53508
+      ],
+      [
+        15518,
+        53517
+      ],
+      [
+        15518,
+        53520
+      ],
+      [
+        15518,
+        53525
+      ],
+      [
+        15518,
+        53550
+      ],
+      [
+        15518,
+        53555
+      ],
+      [
+        15555,
+        15556
+      ],
+      [
+        15568,
+        15569
+      ],
+      [
+        15583,
+        15584
+      ],
+      [
+        15616,
+        15617
+      ],
+      [
+        15631,
+        19702
+      ],
+      [
+        16824,
+        16825
+      ],
+      [
+        16824,
+        17054
+      ],
+      [
+        16917,
+        16918
+      ],
+      [
+        18225,
+        17544
+      ],
+      [
+        18943,
+        26746
+      ],
+      [
+        18943,
+        115131
+      ],
+      [
+        19249,
+        79793
+      ],
+      [
+        19249,
+        98760
+      ],
+      [
+        19699,
+        19741
+      ],
+      [
+        19699,
+        19748
+      ],
+      [
+        19699,
+        24361
+      ],
+      [
+        19699,
+        24364
+      ],
+      [
+        19734,
+        19737
+      ],
+      [
+        19751,
+        19752
+      ],
+      [
+        19759,
+        19760
+      ],
+      [
+        24286,
+        19702
+      ],
+      [
+        26787,
+        26790
+      ],
+      [
+        26833,
+        26834
+      ],
+      [
+        29071,
+        29170
+      ],
+      [
+        29128,
+        15632
+      ],
+      [
+        29128,
+        15640
+      ],
+      [
+        29128,
+        53526
+      ],
+      [
+        29179,
+        29180
+      ],
+      [
+        30202,
+        30203
+      ],
+      [
+        30202,
+        30219
+      ],
+      [
+        30202,
+        30223
+      ],
+      [
+        30202,
+        30245
+      ],
+      [
+        30202,
+        30248
+      ],
+      [
+        30202,
+        30252
+      ],
+      [
+        30202,
+        30287
+      ],
+      [
+        30202,
+        30300
+      ],
+      [
+        30218,
+        30203
+      ],
+      [
+        30218,
+        30219
+      ],
+      [
+        30218,
+        30223
+      ],
+      [
+        30218,
+        30245
+      ],
+      [
+        30218,
+        30248
+      ],
+      [
+        30218,
+        30252
+      ],
+      [
+        30218,
+        30287
+      ],
+      [
+        30218,
+        30300
+      ],
+      [
+        31090,
+        31091
+      ],
+      [
+        31090,
+        31097
+      ],
+      [
+        38917,
+        39012
+      ],
+      [
+        38917,
+        39034
+      ],
+      [
+        39663,
+        40312
+      ],
+      [
+        47330,
+        47331
+      ],
+      [
+        51179,
+        51205
+      ],
+      [
+        51181,
+        51205
+      ],
+      [
+        52231,
+        52232
+      ],
+      [
+        55636,
+        104252
+      ],
+      [
+        55649,
+        55653
+      ],
+      [
+        55661,
+        55662
+      ],
+      [
+        55670,
+        55653
+      ],
+      [
+        55674,
+        55650
+      ],
+      [
+        55674,
+        104275
+      ],
+      [
+        55711,
+        104282
+      ],
+      [
+        59761,
+        59762
+      ],
+      [
+        61598,
+        61647
+      ],
+      [
+        61605,
+        61676
+      ],
+      [
+        61605,
+        61697
+      ],
+      [
+        61605,
+        61706
+      ],
+      [
+        61609,
+        88330
+      ],
+      [
+        62016,
+        62017
+      ],
+      [
+        62021,
+        62022
+      ],
+      [
+        70472,
+        70473
+      ],
+      [
+        71635,
+        71636
+      ],
+      [
+        74531,
+        61676
+      ],
+      [
+        74531,
+        61697
+      ],
+      [
+        74531,
+        61706
+      ],
+      [
+        76799,
+        76800
+      ],
+      [
+        79139,
+        32439
+      ],
+      [
+        79926,
+        79953
+      ],
+      [
+        83637,
+        83638
+      ],
+      [
+        88549,
+        88550
+      ],
+      [
+        88560,
+        88561
+      ],
+      [
+        88560,
+        101048
+      ],
+      [
+        89094,
+        76800
+      ],
+      [
+        92671,
+        92708
+      ],
+      [
+        92948,
+        93092
+      ],
+      [
+        93573,
+        93311
+      ],
+      [
+        93636,
+        93638
+      ],
+      [
+        93726,
+        93783
+      ],
+      [
+        93726,
+        93786
+      ],
+      [
+        94849,
+        94850
+      ],
+      [
+        96916,
+        96944
+      ],
+      [
+        98936,
+        98937
+      ],
+      [
+        101701,
+        101721
+      ],
+      [
+        101788,
+        101789
+      ],
+      [
+        104174,
+        55650
+      ],
+      [
+        104174,
+        104275
+      ],
+      [
+        111127,
+        111128
+      ],
+      [
+        112898,
+        112909
+      ],
+      [
+        115592,
+        115623
+      ],
+      [
+        118843,
+        27049
+      ],
+      [
+        118992,
+        118993
+      ],
+      [
+        121718,
+        61676
+      ],
+      [
+        121718,
+        61697
+      ],
+      [
+        121718,
+        61706
+      ]
+    ],
+    "chain_details": [
+      {
+        "reaction_indices": [
+          3804,
+          3805
+        ],
+        "spine_smiles": [
+          "COC(=O)c1cc(OCc2ccccc2)c(CCC=O)c(C(=O)OC)c1",
+          "COC(=O)c1cc(OCc2ccccc2)c(CCCNCc2cc(OC)cc(OC)c2)c(C(=O)OC)c1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          7048,
+          7049
+        ],
+        "spine_smiles": [
+          "C=CCC(C=O)NC(=O)OCc1ccccc1",
+          "C=CCNCC(CC=C)NC(=O)OCc1ccccc1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          7114,
+          115651
+        ],
+        "spine_smiles": [
+          "C=CC[C@@H](C=O)NC(=O)OC(C)(C)C",
+          "C=CC[C@@H](CNC1(C=C)CC1)NC(=O)OC(C)(C)C"
+        ]
+      },
+      {
+        "reaction_indices": [
+          14240,
+          14175
+        ],
+        "spine_smiles": [
+          "O=CC1Cc2ccnc(Cl)c2C1",
+          "O=C1COc2ccc(N3CC(CCNCC4Cc5ccnc(Cl)c5C4)OC3=O)nc2N1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          14482,
+          14539
+        ],
+        "spine_smiles": [
+          "C[Si](C)(C)CCOCN1C(=O)COc2ncc(-n3cc(CCC=O)oc3=O)nc21",
+          "Cc1ncc(F)c2c1CC(NCCCc1cn(-c3cnc4c(n3)N(COCC[Si](C)(C)C)C(=O)CO4)c(=O)o1)C2"
+        ]
+      },
+      {
+        "reaction_indices": [
+          14487,
+          14192
+        ],
+        "spine_smiles": [
+          "NC(=O)COc1cc(F)c2c(c1)CC(C=O)C2",
+          "NC(=O)COc1cc(F)c2c(c1)CC(CNCC[C@H]1CN(c3cnc4c(n3)NC(=O)CO4)C(=O)O1)C2"
+        ]
+      },
+      {
+        "reaction_indices": [
+          14490,
+          14491
+        ],
+        "spine_smiles": [
+          "O=CC1Cc2cc(OCC(=O)OCc3ccccc3)cc(F)c2C1",
+          "O=C1COc2ncc(N3CC(CCNCC4Cc5cc(OCC(=O)OCc6ccccc6)cc(F)c5C4)OC3=O)nc2N1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          15518,
+          15523
+        ],
+        "spine_smiles": [
+          "O=CC1CCN(c2ccc(N3CCC(=O)NC3=O)cc2)CC1",
+          "Cc1cc(-c2ncnc3[nH]c(-c4ccc(C5CCN(CC6CCN(c7ccc(N8CCC(=O)NC8=O)cc7)CC6)CC5)cc4)cc23)ccc1CNC(=O)c1nc(C(C)(C)C)no1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          15518,
+          15560
+        ],
+        "spine_smiles": [
+          "O=CC1CCN(c2ccc(N3CCC(=O)NC3=O)cc2)CC1",
+          "CC(C)(C)c1noc(C(=O)NCc2ccc(-c3ncnc4[nH]c(-c5cnn(C6CCN(CC7CCN(c8ccc(N9CCC(=O)NC9=O)cc8)CC7)CC6)c5)cc34)cc2F)n1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          15518,
+          15594
+        ],
+        "spine_smiles": [
+          "O=CC1CCN(c2ccc(N3CCC(=O)NC3=O)cc2)CC1",
+          "Cc1cc(-c2ncnc3[nH]c(-c4ccc(N5CCN(CC6CCN(c7ccc(N8CCC(=O)NC8=O)cc7)CC6)CC5)cc4)nc23)ccc1[C@@H](C)NC(=O)c1nc(C(C)(C)C)no1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          15518,
+          15606
+        ],
+        "spine_smiles": [
+          "O=CC1CCN(c2ccc(N3CCC(=O)NC3=O)cc2)CC1",
+          "Cc1cc(CNC(=O)c2ccc(C(C)(C)O)cc2F)c(F)cc1-c1ncnc2[nH]c(-c3ccc(C4CCN(CC5CCN(c6ccc(N7CCC(=O)NC7=O)cc6)CC5)CC4)cc3)cc12"
+        ]
+      },
+      {
+        "reaction_indices": [
+          15518,
+          15609
+        ],
+        "spine_smiles": [
+          "O=CC1CCN(c2ccc(N3CCC(=O)NC3=O)cc2)CC1",
+          "Cc1cc(-c2ncnc3[nH]c(-c4ccc(C5CCN(CC6CCN(c7ccc(N8CCC(=O)NC8=O)cc7)CC6)CC5)cc4)cc23)ccc1CNC(=O)c1cn(C(C)(C)C)nn1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          15518,
+          15621
+        ],
+        "spine_smiles": [
+          "O=CC1CCN(c2ccc(N3CCC(=O)NC3=O)cc2)CC1",
+          "Cc1cc(-c2ncnc3[nH]c(-c4ccc(OC5CCN(CC6CCN(c7ccc(N8CCC(=O)NC8=O)cc7)CC6)CC5)cc4)cc23)ccc1CNC(=O)c1nc(C(C)(C)C)no1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          15518,
+          15630
+        ],
+        "spine_smiles": [
+          "O=CC1CCN(c2ccc(N3CCC(=O)NC3=O)cc2)CC1",
+          "Cc1cc(-c2ncnc3[nH]c(-c4ccc(N5CCN(CC6CCN(c7ccc(N8CCC(=O)NC8=O)cc7)CC6)CC5)cc4)cc23)ccc1CNC(=O)c1noc(C(C)(C)C(F)(F)F)n1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          15518,
+          15639
+        ],
+        "spine_smiles": [
+          "O=CC1CCN(c2ccc(N3CCC(=O)NC3=O)cc2)CC1",
+          "Cc1cc(-c2ncnc3[nH]c(-c4c(C)nn(C5CCN(CC6CCN(c7ccc(N8CCC(=O)NC8=O)cc7)CC6)CC5)c4C)cc23)ccc1[C@@H](C)NC(=O)c1nc(C(C)(C)C)no1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          15518,
+          15646
+        ],
+        "spine_smiles": [
+          "O=CC1CCN(c2ccc(N3CCC(=O)NC3=O)cc2)CC1",
+          "C[C@@H](NC(=O)c1nc(C(C)(C)C)no1)c1ccc(-c2ncnc3[nH]c(-c4ccc(N5CCN(CC6CCN(c7ccc(N8CCC(=O)NC8=O)cc7)CC6)C[C@@H]5C)nc4)cc23)cc1F"
+        ]
+      },
+      {
+        "reaction_indices": [
+          15518,
+          15651
+        ],
+        "spine_smiles": [
+          "O=CC1CCN(c2ccc(N3CCC(=O)NC3=O)cc2)CC1",
+          "CC(C)(C)c1noc(C(=O)NCc2ccc(-c3ncnc4[nH]c(-c5ccc(N6CCN(CC7CCN(c8ccc(N9CCC(=O)NC9=O)cc8)CC7)CC6)cc5)cc34)cc2CO)n1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          15518,
+          15654
+        ],
+        "spine_smiles": [
+          "O=CC1CCN(c2ccc(N3CCC(=O)NC3=O)cc2)CC1",
+          "Cc1c([C@@H](C)NC(=O)c2noc(C(C)(C)C)n2)ccc(-c2ncnc3[nH]c(-c4ccc(N5CCN(CC6CCN(c7ccc(N8CCC(=O)NC8=O)cc7)CC6)CC5)nc4)cc23)c1F"
+        ]
+      },
+      {
+        "reaction_indices": [
+          15518,
+          15659
+        ],
+        "spine_smiles": [
+          "O=CC1CCN(c2ccc(N3CCC(=O)NC3=O)cc2)CC1",
+          "Cc1cc(-c2ncnc3[nH]c(-c4ccc(N5CCN(CC6CCN(c7ccc(N8CCC(=O)NC8=O)cc7)CC6)CC5)nc4)cc23)ccc1[C@@H](C)NC(=O)c1nc(C2(C)CC2)no1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          15518,
+          15664
+        ],
+        "spine_smiles": [
+          "O=CC1CCN(c2ccc(N3CCC(=O)NC3=O)cc2)CC1",
+          "Cc1cc(-c2ncnc3[nH]c(-c4cnc(N5CCN(CC6CCN(c7ccc(N8CCC(=O)NC8=O)cc7)CC6)CC5)s4)cc23)ccc1[C@@H](C)NC(=O)c1nc(C(C)(C)C)no1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          15518,
+          15667
+        ],
+        "spine_smiles": [
+          "O=CC1CCN(c2ccc(N3CCC(=O)NC3=O)cc2)CC1",
+          "C[C@@H](NC(=O)c1nc(C(C)(C)C)no1)c1ccc(-c2ncnc3[nH]c(-c4ccc(N5CCN(CC6CCN(c7ccc(N8CCC(=O)NC8=O)cc7)CC6)CC5)cn4)cc23)cc1CO"
+        ]
+      },
+      {
+        "reaction_indices": [
+          15518,
+          15673
+        ],
+        "spine_smiles": [
+          "O=CC1CCN(c2ccc(N3CCC(=O)NC3=O)cc2)CC1",
+          "C[C@@H](NC(=O)c1nc(C(C)(C)C)no1)c1cc(F)c(-c2ncnc3[nH]c(-c4ccc(N5CCN(CC6CCN(c7ccc(N8CCC(=O)NC8=O)cc7)CC6)CC5)cn4)cc23)cc1CO"
+        ]
+      },
+      {
+        "reaction_indices": [
+          15518,
+          15674
+        ],
+        "spine_smiles": [
+          "O=CC1CCN(c2ccc(N3CCC(=O)NC3=O)cc2)CC1",
+          "Cc1cc(-c2ncnc3[nH]c(-c4ccc(N5CCN(CC6CCN(c7ccc(N8CCC(=O)NC8=O)cc7)CC6)CC5)cn4)cc23)ccc1[C@@H](C)NC(=O)c1nnc(C(C)(C)C)o1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          15518,
+          15679
+        ],
+        "spine_smiles": [
+          "O=CC1CCN(c2ccc(N3CCC(=O)NC3=O)cc2)CC1",
+          "Cc1cc(-c2ncnc3[nH]c(-c4ncc(N5CCN(CC6CCN(c7ccc(N8CCC(=O)NC8=O)cc7)CC6)CC5)s4)cc23)ccc1[C@@H](C)NC(=O)c1nc(C(C)(C)C)no1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          15518,
+          53503
+        ],
+        "spine_smiles": [
+          "O=CC1CCN(c2ccc(N3CCC(=O)NC3=O)cc2)CC1",
+          "Cc1cc(-c2n[nH]c3ncc(-c4ccc(C5CCN(CC6CCN(c7ccc(N8CCC(=O)NC8=O)cc7)CC6)CC5)cc4)cc23)ccc1CNC(=O)c1noc(C(C)(C)C)n1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          15518,
+          53508
+        ],
+        "spine_smiles": [
+          "O=CC1CCN(c2ccc(N3CCC(=O)NC3=O)cc2)CC1",
+          "Cc1cc(-c2n[nH]c3ncc(-c4ccc(C5CCN(CC6CCN(c7ccc(N8CCC(=O)NC8=O)cc7)CC6)CC5)cc4)cc23)ccc1CNC(=O)c1nc(C(C)(C)C)no1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          15518,
+          53517
+        ],
+        "spine_smiles": [
+          "O=CC1CCN(c2ccc(N3CCC(=O)NC3=O)cc2)CC1",
+          "CC(C)(C)c1noc(C(=O)NCc2ccc(-c3n[nH]c4ncc(-c5ccc(C6CCN(CC7CCN(c8ccc(N9CCC(=O)NC9=O)cc8)CC7)CC6)cc5)cc34)cc2F)n1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          15518,
+          53520
+        ],
+        "spine_smiles": [
+          "O=CC1CCN(c2ccc(N3CCC(=O)NC3=O)cc2)CC1",
+          "CC(C)(C)c1nc(C(=O)NCc2ccc(-c3n[nH]c4ncc(-c5ccc(C6CCN(CC7CCN(c8ccc(N9CCC(=O)NC9=O)cc8)CC7)CC6)cc5)cc34)cc2F)no1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          15518,
+          53525
+        ],
+        "spine_smiles": [
+          "O=CC1CCN(c2ccc(N3CCC(=O)NC3=O)cc2)CC1",
+          "Cc1cc(-c2n[nH]c3ncc(-c4ccc(N5CCN(CC6CCN(c7ccc(N8CCC(=O)NC8=O)cc7)CC6)CC5)cc4)cc23)ccc1CNC(=O)c1cn(C(C)(C)C)nn1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          15518,
+          53550
+        ],
+        "spine_smiles": [
+          "O=CC1CCN(c2ccc(N3CCC(=O)NC3=O)cc2)CC1",
+          "Cc1cc(-c2n[nH]c3ncc(-c4ccc(C5(O)CCN(CC6CCN(c7ccc(N8CCC(=O)NC8=O)cc7)CC6)CC5)cc4)cc23)ccc1[C@@H](C)NC(=O)c1nc(C(C)(C)C)no1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          15518,
+          53555
+        ],
+        "spine_smiles": [
+          "O=CC1CCN(c2ccc(N3CCC(=O)NC3=O)cc2)CC1",
+          "Cc1cc(-c2n[nH]c3ncc(-c4ccc(C5(F)CCN(CC6CCN(c7ccc(N8CCC(=O)NC8=O)cc7)CC6)CC5)cn4)cc23)ccc1[C@@H](C)NC(=O)c1nc(C(C)(C)C)no1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          15555,
+          15556
+        ],
+        "spine_smiles": [
+          "O=CCC1CCN(c2ccc(N3CCC(=O)NC3=O)c(F)c2)CC1",
+          "Cc1cc(-c2ncnc3[nH]c(-c4ccc(C5CCN(CCC6CCN(c7ccc(N8CCC(=O)NC8=O)c(F)c7)CC6)CC5)cc4)cc23)ccc1CNC(=O)c1nc(C(C)(C)C)no1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          15568,
+          15569
+        ],
+        "spine_smiles": [
+          "O=CC1CCN(c2ccc3c(c2)CN(C2CCC(=O)NC2=O)C3=O)CC1",
+          "Cc1cc(-c2ncnc3[nH]c(-c4ccc(C5CCN(CC6CCN(c7ccc8c(c7)CN(C7CCC(=O)NC7=O)C8=O)CC6)CC5)cc4)cc23)ccc1CNC(=O)c1nc(C(C)(C)C)no1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          15583,
+          15584
+        ],
+        "spine_smiles": [
+          "Cc1cc(N2CCC(CC=O)CC2)ccc1N1CCC(=O)NC1=O",
+          "Cc1cc(-c2ncnc3[nH]c(-c4ccc(C5CCN(CCC6CCN(c7ccc(N8CCC(=O)NC8=O)c(C)c7)CC6)CC5)cc4)cc23)ccc1CNC(=O)c1nc(C(C)(C)C)no1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          15616,
+          15617
+        ],
+        "spine_smiles": [
+          "O=CC1CCN(c2cc(F)ccc2N2CCC(=O)NC2=O)CC1",
+          "Cc1cc(-c2ncnc3[nH]c(-c4ccc(N5CCN(CC6CCN(c7cc(F)ccc7N7CCC(=O)NC7=O)CC6)CC5)cc4)cc23)ccc1[C@@H](C)NC(=O)c1nc(C(C)(C)C)no1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          15631,
+          19702
+        ],
+        "spine_smiles": [
+          "O=CC1CCN(c2ccc(C3CCC(=O)NC3=O)cc2)CC1",
+          "COc1cc(C(=O)NC2CC3(CCN(CC4CCN(c5ccc(C6CCC(=O)NC6=O)cc5)CC4)CC3)C2)ccc1Nc1ncc2c(n1)N(C1CCCC1)CC(F)(F)C(=O)N2C"
+        ]
+      },
+      {
+        "reaction_indices": [
+          16824,
+          16825
+        ],
+        "spine_smiles": [
+          "CC(C)(C)C[C@@H](C=O)NC(=O)OC(C)(C)C",
+          "COC(=O)[C@H](C[C@@H]1CCNC1=O)NC[C@H](CC(C)(C)C)NC(=O)OC(C)(C)C"
+        ]
+      },
+      {
+        "reaction_indices": [
+          16824,
+          17054
+        ],
+        "spine_smiles": [
+          "CC(C)(C)C[C@@H](C=O)NC(=O)OC(C)(C)C",
+          "COC(=O)[C@H](C[C@@H]1CCNC1=O)NC[C@H](CC(C)(C)C)NC(=O)OC(C)(C)C"
+        ]
+      },
+      {
+        "reaction_indices": [
+          16917,
+          16918
+        ],
+        "spine_smiles": [
+          "CC(C)(C)OC(=O)c1[nH]ccc1CC=O",
+          "COC(=O)[C@H](CC1CC1)NCCc1cc[nH]c1C(=O)OC(C)(C)C"
+        ]
+      },
+      {
+        "reaction_indices": [
+          18225,
+          17544
+        ],
+        "spine_smiles": [
+          "COC(=O)c1cc(C=O)cc(C(F)(F)F)c1CBr",
+          "COC(=O)c1cc(CNC2(C)CCC2)cc(C(F)(F)F)c1CBr"
+        ]
+      },
+      {
+        "reaction_indices": [
+          18943,
+          26746
+        ],
+        "spine_smiles": [
+          "CC(C)(C)OC(=O)N1CC(C=O)C1",
+          "CC(C)(C)OC(=O)N1CC(CN2CCN(c3ccc(C(=O)Nc4n[nH]c5ccc(Cc6cc(F)cc(F)c6)cc45)c(NC4CCOCC4)c3)CC2)C1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          18943,
+          115131
+        ],
+        "spine_smiles": [
+          "CC(C)(C)OC(=O)N1CC(C=O)C1",
+          "CCc1cc(Nc2nccn3c(I)cnc23)ccc1C(=O)NCC1CCN(CC2CN(C(=O)OC(C)(C)C)C2)CC1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          19249,
+          79793
+        ],
+        "spine_smiles": [
+          "CC(C)(C)[Si](C)(C)OCC=O",
+          "CC(C)(C)[Si](C)(C)OCCN[C@H]1C[C@@H](OC(=O)N2CCc3ccccc3[C@@H]2c2ccc(F)cc2)C1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          19249,
+          98760
+        ],
+        "spine_smiles": [
+          "CC(C)(C)[Si](C)(C)OCC=O",
+          "COCOc1ccc(Cl)c(Cl)c1[C@@H](CNCCO[Si](C)(C)C(C)(C)C)N[S@@](=O)C(C)(C)C"
+        ]
+      },
+      {
+        "reaction_indices": [
+          19699,
+          19741
+        ],
+        "spine_smiles": [
+          "O=CC1CCN(c2ccc(C3CCC(=O)NC3=O)cc2F)CC1",
+          "O=C1CCC(c2ccc(N3CCC(CN4CCC5(CC4)CC5NC(=O)OCc4ccccc4)CC3)c(F)c2)C(=O)N1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          19699,
+          19748
+        ],
+        "spine_smiles": [
+          "O=CC1CCN(c2ccc(C3CCC(=O)NC3=O)cc2F)CC1",
+          "COc1cc(C(=O)NCC2CC23CCN(CC2CCN(c4ccc(C5CCC(=O)NC5=O)cc4F)CC2)CC3)ccc1Nc1ncc2c(n1)N(C1CCCC1)CC(F)(F)C(=O)N2C"
+        ]
+      },
+      {
+        "reaction_indices": [
+          19699,
+          24361
+        ],
+        "spine_smiles": [
+          "O=CC1CCN(c2ccc(C3CCC(=O)NC3=O)cc2F)CC1",
+          "CC(C)(C)OC(=O)NC1CC(NCC2CCN(c3ccc(C4CCC(=O)NC4=O)cc3F)CC2)C1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          19699,
+          24364
+        ],
+        "spine_smiles": [
+          "O=CC1CCN(c2ccc(C3CCC(=O)NC3=O)cc2F)CC1",
+          "O=C1CCC(c2ccc(N3CCC(CN4CCC5(CC4)CC5NC(=O)OCc4ccccc4)CC3)c(F)c2)C(=O)N1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          19734,
+          19737
+        ],
+        "spine_smiles": [
+          "O=CC1CC2(CCN(c3ccc(C4CCC(=O)NC4=O)cc3F)CC2)C1",
+          "COc1cc(C(=O)NC2CCN(CC3CC4(CCN(c5ccc(C6CCC(=O)NC6=O)cc5F)CC4)C3)CC2)ccc1Nc1ncc2c(n1)N(C1CCCC1)CC(F)(F)C(=O)N2C"
+        ]
+      },
+      {
+        "reaction_indices": [
+          19751,
+          19752
+        ],
+        "spine_smiles": [
+          "CC1(C=O)CCN(C(=O)OC(C)(C)C)CC1",
+          "CC1(CN2CCC3(CC2)CC(NC(=O)OCc2ccccc2)C3)CCN(C(=O)OC(C)(C)C)CC1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          19759,
+          19760
+        ],
+        "spine_smiles": [
+          "CC1CN(c2ccc(C3CCC(=O)NC3=O)cc2F)CCC1C=O",
+          "COc1cc(C(=O)NC2CC3(CCN(CC4CCN(c5ccc(C6CCC(=O)NC6=O)cc5F)CC4C)CC3)C2)ccc1Nc1ncc2c(n1)N(C1CCCC1)CC(F)(F)C(=O)N2C"
+        ]
+      },
+      {
+        "reaction_indices": [
+          24286,
+          19702
+        ],
+        "spine_smiles": [
+          "O=CC1CCN(c2ccc(C3CCC(=O)NC3=O)cc2)CC1",
+          "COc1cc(C(=O)NC2CC3(CCN(CC4CCN(c5ccc(C6CCC(=O)NC6=O)cc5)CC4)CC3)C2)ccc1Nc1ncc2c(n1)N(C1CCCC1)CC(F)(F)C(=O)N2C"
+        ]
+      },
+      {
+        "reaction_indices": [
+          26787,
+          26790
+        ],
+        "spine_smiles": [
+          "O=C1CCN(c2cccc(-c3cnc4ccc(N5CCC[C@@H]5c5cccc(F)c5)nn34)n2)CC1",
+          "O=C1CCC(N2C(=O)c3ccc(N4CC(NC5CCN(c6cccc(-c7cnc8ccc(N9CCC[C@@H]9c9cccc(F)c9)nn78)n6)CC5)C4)cc3C2=O)C(=O)N1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          26833,
+          26834
+        ],
+        "spine_smiles": [
+          "O=C1CCN(c2ccc(C(=O)Nc3n[nH]c4ccc(Cc5cc(F)cc(F)c5)cc34)c(NC3CCOCC3)c2)CC1",
+          "O=C1CCC(N2C(=O)c3ccc(N4CC(NC5CCN(c6ccc(C(=O)Nc7n[nH]c8ccc(Cc9cc(F)cc(F)c9)cc78)c(NC7CCOCC7)c6)CC5)C4)cc3C2=O)C(=O)N1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          29071,
+          29170
+        ],
+        "spine_smiles": [
+          "O=CCCCCc1ccc(C2CCC(=O)NC2=O)cc1",
+          "COc1cc(N2CCC(NCCCCCc3ccc(C4CCC(=O)NC4=O)cc3)CC2)ccc1Nc1ncc(Cl)c(Nc2ccccc2N(C)S(C)(=O)=O)n1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          29128,
+          15632
+        ],
+        "spine_smiles": [
+          "Cc1cc(N2CCC(C=O)CC2)ccc1N1CCC(=O)NC1=O",
+          "Cc1cc(-c2ncnc3[nH]c(-c4ccc(N5CCN(CC6CCN(c7ccc(N8CCC(=O)NC8=O)c(C)c7)CC6)CC5)nc4)cc23)ccc1[C@@H](C)NC(=O)c1nc(C(C)(C)C)no1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          29128,
+          15640
+        ],
+        "spine_smiles": [
+          "Cc1cc(N2CCC(C=O)CC2)ccc1N1CCC(=O)NC1=O",
+          "Cc1cc(-c2ncnc3[nH]c(-c4c(C)nn(C5CCN(CC6CCN(c7ccc(N8CCC(=O)NC8=O)c(C)c7)CC6)CC5)c4C)cc23)ccc1[C@@H](C)NC(=O)c1nc(C(C)(C)C)no1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          29128,
+          53526
+        ],
+        "spine_smiles": [
+          "Cc1cc(N2CCC(C=O)CC2)ccc1N1CCC(=O)NC1=O",
+          "Cc1cc(-c2n[nH]c3ncc(-c4ccc(N5CCN(CC6CCN(c7ccc(N8CCC(=O)NC8=O)c(C)c7)CC6)CC5)cc4)cc23)ccc1[C@@H](C)NC(=O)c1nc(C(C)(C)C)no1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          29179,
+          29180
+        ],
+        "spine_smiles": [
+          "O=CCCCCCCc1ccc(C2CCC(=O)NC2=O)cc1",
+          "COc1cc(N2CCC(NCCCCCCCc3ccc(C4CCC(=O)NC4=O)cc3)CC2)ccc1Nc1ncc(Cl)c(Nc2ccccc2N(C)S(C)(=O)=O)n1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          30202,
+          30203
+        ],
+        "spine_smiles": [
+          "CC(C)(C)OC(=O)N1CCCc2ccc(CCCC=O)nc21",
+          "CC(C)(C)OC(=O)N1CCCc2ccc(CCCCNC3CC3)nc21"
+        ]
+      },
+      {
+        "reaction_indices": [
+          30202,
+          30219
+        ],
+        "spine_smiles": [
+          "CC(C)(C)OC(=O)N1CCCc2ccc(CCCC=O)nc21",
+          "COC[C@@H](F)CNCCCCc1ccc2c(n1)N(C(=O)OC(C)(C)C)CCC2"
+        ]
+      },
+      {
+        "reaction_indices": [
+          30202,
+          30223
+        ],
+        "spine_smiles": [
+          "CC(C)(C)OC(=O)N1CCCc2ccc(CCCC=O)nc21",
+          "CC(C)(C)OC(=O)N1CCCc2ccc(CCCCNCC(F)F)nc21"
+        ]
+      },
+      {
+        "reaction_indices": [
+          30202,
+          30245
+        ],
+        "spine_smiles": [
+          "CC(C)(C)OC(=O)N1CCCc2ccc(CCCC=O)nc21",
+          "CC(C)(C)OC(=O)N1CCCc2ccc(CCCCNCCC(F)F)nc21"
+        ]
+      },
+      {
+        "reaction_indices": [
+          30202,
+          30248
+        ],
+        "spine_smiles": [
+          "CC(C)(C)OC(=O)N1CCCc2ccc(CCCC=O)nc21",
+          "CC(C)(C)OC(=O)N1CCCc2ccc(CCCCNCCCF)nc21"
+        ]
+      },
+      {
+        "reaction_indices": [
+          30202,
+          30252
+        ],
+        "spine_smiles": [
+          "CC(C)(C)OC(=O)N1CCCc2ccc(CCCC=O)nc21",
+          "CN(C)C(=O)CNCCCCc1ccc2c(n1)N(C(=O)OC(C)(C)C)CCC2"
+        ]
+      },
+      {
+        "reaction_indices": [
+          30202,
+          30287
+        ],
+        "spine_smiles": [
+          "CC(C)(C)OC(=O)N1CCCc2ccc(CCCC=O)nc21",
+          "CC(=O)NCCNCCCCc1ccc2c(n1)N(C(=O)OC(C)(C)C)CCC2"
+        ]
+      },
+      {
+        "reaction_indices": [
+          30202,
+          30300
+        ],
+        "spine_smiles": [
+          "CC(C)(C)OC(=O)N1CCCc2ccc(CCCC=O)nc21",
+          "CC(C)(C)OC(=O)N1CCCc2ccc(CCCCNCCOCC(F)F)nc21"
+        ]
+      },
+      {
+        "reaction_indices": [
+          30218,
+          30203
+        ],
+        "spine_smiles": [
+          "CC(C)(C)OC(=O)N1CCCc2ccc(CCCC=O)nc21",
+          "CC(C)(C)OC(=O)N1CCCc2ccc(CCCCNC3CC3)nc21"
+        ]
+      },
+      {
+        "reaction_indices": [
+          30218,
+          30219
+        ],
+        "spine_smiles": [
+          "CC(C)(C)OC(=O)N1CCCc2ccc(CCCC=O)nc21",
+          "COC[C@@H](F)CNCCCCc1ccc2c(n1)N(C(=O)OC(C)(C)C)CCC2"
+        ]
+      },
+      {
+        "reaction_indices": [
+          30218,
+          30223
+        ],
+        "spine_smiles": [
+          "CC(C)(C)OC(=O)N1CCCc2ccc(CCCC=O)nc21",
+          "CC(C)(C)OC(=O)N1CCCc2ccc(CCCCNCC(F)F)nc21"
+        ]
+      },
+      {
+        "reaction_indices": [
+          30218,
+          30245
+        ],
+        "spine_smiles": [
+          "CC(C)(C)OC(=O)N1CCCc2ccc(CCCC=O)nc21",
+          "CC(C)(C)OC(=O)N1CCCc2ccc(CCCCNCCC(F)F)nc21"
+        ]
+      },
+      {
+        "reaction_indices": [
+          30218,
+          30248
+        ],
+        "spine_smiles": [
+          "CC(C)(C)OC(=O)N1CCCc2ccc(CCCC=O)nc21",
+          "CC(C)(C)OC(=O)N1CCCc2ccc(CCCCNCCCF)nc21"
+        ]
+      },
+      {
+        "reaction_indices": [
+          30218,
+          30252
+        ],
+        "spine_smiles": [
+          "CC(C)(C)OC(=O)N1CCCc2ccc(CCCC=O)nc21",
+          "CN(C)C(=O)CNCCCCc1ccc2c(n1)N(C(=O)OC(C)(C)C)CCC2"
+        ]
+      },
+      {
+        "reaction_indices": [
+          30218,
+          30287
+        ],
+        "spine_smiles": [
+          "CC(C)(C)OC(=O)N1CCCc2ccc(CCCC=O)nc21",
+          "CC(=O)NCCNCCCCc1ccc2c(n1)N(C(=O)OC(C)(C)C)CCC2"
+        ]
+      },
+      {
+        "reaction_indices": [
+          30218,
+          30300
+        ],
+        "spine_smiles": [
+          "CC(C)(C)OC(=O)N1CCCc2ccc(CCCC=O)nc21",
+          "CC(C)(C)OC(=O)N1CCCc2ccc(CCCCNCCOCC(F)F)nc21"
+        ]
+      },
+      {
+        "reaction_indices": [
+          31090,
+          31091
+        ],
+        "spine_smiles": [
+          "CC(C)(C)OC(=O)NC(C)(C)C(=O)N1CCN(C(=O)Nc2ccn(-c3ccc4c(c3)CCC(=O)C4)c(=O)n2)CC1",
+          "CC(C)(C)OC(=O)N[C@H]1CC[C@H](NC2CCc3cc(-n4ccc(NC(=O)N5CCN(C(=O)C(C)(C)NC(=O)OC(C)(C)C)CC5)nc4=O)ccc3C2)C1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          31090,
+          31097
+        ],
+        "spine_smiles": [
+          "CC(C)(C)OC(=O)NC(C)(C)C(=O)N1CCN(C(=O)Nc2ccn(-c3ccc4c(c3)CCC(=O)C4)c(=O)n2)CC1",
+          "CC(C)(C)OC(=O)NCCC1CCN(C2CCc3cc(-n4ccc(NC(=O)N5CCN(C(=O)C(C)(C)NC(=O)OC(C)(C)C)CC5)nc4=O)ccc3C2)CC1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          38917,
+          39012
+        ],
+        "spine_smiles": [
+          "COC(=O)c1ccc2c(c1)N(C[C@@H]1CC[C@H]1C=O)C[C@@]1(CCCc3cc(Cl)ccc31)CO2",
+          "CNC[C@@H]1CC[C@H]1CN1C[C@@]2(CCCc3cc(Cl)ccc32)COc2ccc(C(=O)OC)cc21"
+        ]
+      },
+      {
+        "reaction_indices": [
+          38917,
+          39034
+        ],
+        "spine_smiles": [
+          "COC(=O)c1ccc2c(c1)N(C[C@@H]1CC[C@H]1C=O)C[C@@]1(CCCc3cc(Cl)ccc31)CO2",
+          "C=CCNC[C@@H]1CC[C@H]1CN1C[C@@]2(CCCc3cc(Cl)ccc32)COc2ccc(C(=O)OC)cc21"
+        ]
+      },
+      {
+        "reaction_indices": [
+          39663,
+          40312
+        ],
+        "spine_smiles": [
+          "CC(C)(O)c1cc2nn(C3CCC(C=O)CC3)cc2cc1NC(=O)c1cccc(C(F)(F)F)n1",
+          "Cn1c(=O)n(C2CCC(=O)NC2=O)c2cccc(C3CCC(NCC4CCC(n5cc6cc(NC(=O)c7cccc(C(F)(F)F)n7)c(C(C)(C)O)cc6n5)CC4)CC3)c21"
+        ]
+      },
+      {
+        "reaction_indices": [
+          47330,
+          47331
+        ],
+        "spine_smiles": [
+          "O=CC1CN(C(=O)Cc2ccc(OCCCC3CCN(c4ncc(Cl)cn4)CC3)cc2F)C1",
+          "O=C(Cc1ccc(OCCCC2CCN(c3ncc(Cl)cn3)CC2)cc1F)N1CC(CNC[C@H](O)[C@@H](O)[C@H](O)[C@H](O)CO)C1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          51179,
+          51205
+        ],
+        "spine_smiles": [
+          "COc1ccnc(OC)c1-c1cc2cc(NC(=O)[C@@H]3C[C@H]3C=O)ncc2n1C",
+          "COc1ccnc(OC)c1-c1cc2cc(NC(=O)[C@@H]3C[C@H]3CN3CCNCC3)ncc2n1C"
+        ]
+      },
+      {
+        "reaction_indices": [
+          51181,
+          51205
+        ],
+        "spine_smiles": [
+          "COc1ccnc(OC)c1-c1cc2cc(NC(=O)[C@@H]3C[C@H]3C=O)ncc2n1C",
+          "COc1ccnc(OC)c1-c1cc2cc(NC(=O)[C@@H]3C[C@H]3CN3CCNCC3)ncc2n1C"
+        ]
+      },
+      {
+        "reaction_indices": [
+          52231,
+          52232
+        ],
+        "spine_smiles": [
+          "O=CC12CC(F)(C1)C2",
+          "O=C1CCC(N2Cc3cc(O[C@H]4CCCCC[C@@H]4NCC45CC(F)(C4)C5)ccc3C2=O)C(=O)N1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          55636,
+          104252
+        ],
+        "spine_smiles": [
+          "CC(C)(C)OC(=O)NC(C)(C)C(=O)N1CCN(C(=O)Nc2ccn(-c3ccc(CC=O)cc3)c(=O)n2)CC1",
+          "CC(C)(C)OC(=O)NC1CCCN(CCc2ccc(-n3ccc(NC(=O)N4CCN(C(=O)C(C)(C)NC(=O)OC(C)(C)C)CC4)nc3=O)cc2)CC1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          55649,
+          55653
+        ],
+        "spine_smiles": [
+          "CCC(=O)Cc1ccc(-n2ccc(NC(=O)N3CCN(C(=O)C(C)(C)NC(=O)OC(C)(C)C)CC3)nc2=O)cc1",
+          "CCC(Cc1ccc(-n2ccc(NC(=O)N3CCN(C(=O)C(C)(C)NC(=O)OC(C)(C)C)CC3)nc2=O)cc1)N1CC2CCCC(NC(=O)OC(C)(C)C)C2C1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          55661,
+          55662
+        ],
+        "spine_smiles": [
+          "CC(=O)Cc1ccc(-n2ccc(NC(=O)N3CCN(C(=O)C(C)(C)NC(=O)OC(C)(C)C)CC3)nc2=O)cc1C(F)(F)F",
+          "CC(Cc1ccc(-n2ccc(NC(=O)N3CCN(C(=O)C(C)(C)NC(=O)OC(C)(C)C)CC3)nc2=O)cc1C(F)(F)F)N1CC2C(CNC(=O)OC(C)(C)C)C2C1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          55670,
+          55653
+        ],
+        "spine_smiles": [
+          "CCC(=O)Cc1ccc(-n2ccc(NC(=O)N3CCN(C(=O)C(C)(C)NC(=O)OC(C)(C)C)CC3)nc2=O)cc1",
+          "CCC(Cc1ccc(-n2ccc(NC(=O)N3CCN(C(=O)C(C)(C)NC(=O)OC(C)(C)C)CC3)nc2=O)cc1)N1CC2CCCC(NC(=O)OC(C)(C)C)C2C1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          55674,
+          55650
+        ],
+        "spine_smiles": [
+          "CC(=O)Cc1ccc(-n2ccc(NC(=O)N3CCN(C(=O)C(C)(C)NC(=O)OC(C)(C)C)CC3)nc2=O)cc1",
+          "CC(Cc1ccc(-n2ccc(NC(=O)N3CCN(C(=O)C(C)(C)NC(=O)OC(C)(C)C)CC3)nc2=O)cc1)N1CC2(CCC2NC(=O)OC(C)(C)C)C1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          55674,
+          104275
+        ],
+        "spine_smiles": [
+          "CC(=O)Cc1ccc(-n2ccc(NC(=O)N3CCN(C(=O)C(C)(C)NC(=O)OC(C)(C)C)CC3)nc2=O)cc1",
+          "CC(Cc1ccc(-n2ccc(NC(=O)N3CCN(C(=O)C(C)(C)NC(=O)OC(C)(C)C)CC3)nc2=O)cc1)N[C@H]1CC[C@@H](NC(=O)OC(C)(C)C)C1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          55711,
+          104282
+        ],
+        "spine_smiles": [
+          "CC(C=O)Oc1ccc(-n2ccc(NC(=O)N3CCN(C(=O)C(C)(C)NC(=O)OC(C)(C)C)CC3)nc2=O)cc1",
+          "CC(CN1CC(NC(=O)OC(C)(C)C)C1)Oc1ccc(-n2ccc(NC(=O)N3CCN(C(=O)C(C)(C)NC(=O)OC(C)(C)C)CC3)nc2=O)cc1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          59761,
+          59762
+        ],
+        "spine_smiles": [
+          "Cn1cnnc1CC1(c2cccc(N3Cc4c(cc(C=O)cc4C(F)F)C3=O)c2)CC(F)(F)C1",
+          "Cn1cnnc1CC1(c2cccc(N3Cc4c(cc(CNC5(C)CCC5)cc4C(F)F)C3=O)c2)CC(F)(F)C1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          61598,
+          61647
+        ],
+        "spine_smiles": [
+          "O=CCCc1ccc2c(c1)c1cccnc1n2C1CCC(=O)NC1=O",
+          "O=C1CCC(n2c3ccc(CCCN4CCC(c5cnc(N6CCN7c8cc(-c9ccccc9O)nnc8NC[C@@H]7C6)nc5)CC4)cc3c3cccnc32)C(=O)N1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          61605,
+          61676
+        ],
+        "spine_smiles": [
+          "O=CC1CCN(c2ccc3c(c2)C(=O)N(C2CCC(=O)NC2=O)C3=O)CC1",
+          "CC1CN(CC2CCN(c3ccc4c(c3)C(=O)N(C3CCC(=O)NC3=O)C4=O)CC2)CCC1CN1CCN2c3cc(-c4ccccc4O)nnc3NC[C@H]2C1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          61605,
+          61697
+        ],
+        "spine_smiles": [
+          "O=CC1CCN(c2ccc3c(c2)C(=O)N(C2CCC(=O)NC2=O)C3=O)CC1",
+          "O=C1CCC(N2C(=O)c3ccc(N4CCC(CN5CCC(CN6CCN7c8cc(-c9ccccc9O)nnc8NC[C@H]7C6)CC5CO)CC4)cc3C2=O)C(=O)N1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          61605,
+          61706
+        ],
+        "spine_smiles": [
+          "O=CC1CCN(c2ccc3c(c2)C(=O)N(C2CCC(=O)NC2=O)C3=O)CC1",
+          "CC(C)(C)OC(=O)NC1CCN(CC2CCN(c3ccc4c(c3)C(=O)N(C3CCC(=O)NC3=O)C4=O)CC2)CC1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          61609,
+          88330
+        ],
+        "spine_smiles": [
+          "O=CC1CCN(c2ccc3c(c2)C(=O)N(C2CCC(=O)NC2=O)C3)CC1",
+          "C[C@@H]1CN(CC2CCN(c3ccc4c(c3)C(=O)N(C3CCC(=O)NC3=O)C4)CC2)[C@@H](C)CN1C(=O)N1CCN2c3cc(-c4cccc(F)c4O)nnc3NCC2(C)C1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          62016,
+          62017
+        ],
+        "spine_smiles": [
+          "Nc1cncnc1C=O",
+          "CC[C@H](C)[C@H](NCc1ncncc1N)C(=O)OC"
+        ]
+      },
+      {
+        "reaction_indices": [
+          62021,
+          62022
+        ],
+        "spine_smiles": [
+          "Nc1cc(F)cnc1C=O",
+          "CC[C@H](C)[C@H](NCc1ncc(F)cc1N)C(=O)OC"
+        ]
+      },
+      {
+        "reaction_indices": [
+          70472,
+          70473
+        ],
+        "spine_smiles": [
+          "COc1cc(N(C)CCN(C)C)c([N+](=O)[O-])cc1Nc1nccc(-c2c(C=O)n(C)c3ccccc23)n1",
+          "COC(=O)CCNCc1c(-c2ccnc(Nc3cc([N+](=O)[O-])c(N(C)CCN(C)C)cc3OC)n2)c2ccccc2n1C"
+        ]
+      },
+      {
+        "reaction_indices": [
+          71635,
+          71636
+        ],
+        "spine_smiles": [
+          "COc1nc(NCc2cccc(Br)c2C)c(Cl)cc1C=O",
+          "COc1nc(NCc2cccc(Br)c2C)c(Cl)cc1CNC1COC1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          74531,
+          61676
+        ],
+        "spine_smiles": [
+          "O=CC1CCN(c2ccc3c(c2)C(=O)N(C2CCC(=O)NC2=O)C3=O)CC1",
+          "CC1CN(CC2CCN(c3ccc4c(c3)C(=O)N(C3CCC(=O)NC3=O)C4=O)CC2)CCC1CN1CCN2c3cc(-c4ccccc4O)nnc3NC[C@H]2C1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          74531,
+          61697
+        ],
+        "spine_smiles": [
+          "O=CC1CCN(c2ccc3c(c2)C(=O)N(C2CCC(=O)NC2=O)C3=O)CC1",
+          "O=C1CCC(N2C(=O)c3ccc(N4CCC(CN5CCC(CN6CCN7c8cc(-c9ccccc9O)nnc8NC[C@H]7C6)CC5CO)CC4)cc3C2=O)C(=O)N1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          74531,
+          61706
+        ],
+        "spine_smiles": [
+          "O=CC1CCN(c2ccc3c(c2)C(=O)N(C2CCC(=O)NC2=O)C3=O)CC1",
+          "CC(C)(C)OC(=O)NC1CCN(CC2CCN(c3ccc4c(c3)C(=O)N(C3CCC(=O)NC3=O)C4=O)CC2)CC1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          76799,
+          76800
+        ],
+        "spine_smiles": [
+          "O=CCNC(=O)OCC1c2ccccc2-c2ccccc21",
+          "COC(=O)[C@@H](CNCCNC(=O)OCC1c2ccccc2-c2ccccc21)NC(=O)OC(C)(C)C"
+        ]
+      },
+      {
+        "reaction_indices": [
+          79139,
+          32439
+        ],
+        "spine_smiles": [
+          "CC(C)(C)[Si](C)(C)OCCC=O",
+          "CC(C)(C)[Si](C)(C)OCCCNCCN(C(=O)c1cc(Cl)ccc1C#N)c1ccccc1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          79926,
+          79953
+        ],
+        "spine_smiles": [
+          "Cc1ncncc1C=O",
+          "Cc1ncncc1CNCc1ccc2[nH]c(-c3ccccc3F)c(C)c2c1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          83637,
+          83638
+        ],
+        "spine_smiles": [
+          "O=CCCc1ccccn1",
+          "Cc1csc2c(N3CCC(NCCCc4ccccn4)CC3)ncnc12"
+        ]
+      },
+      {
+        "reaction_indices": [
+          88549,
+          88550
+        ],
+        "spine_smiles": [
+          "CC(C)N(C)c1ccnc(C=O)n1",
+          "Cc1cccc(C)c1-c1cc(CC[C@@H](CC(C)C)NCc2nccc(N(C)C(C)C)n2)nc(NS(=O)(=O)c2cccc(C(=O)O)c2)n1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          88560,
+          88561
+        ],
+        "spine_smiles": [
+          "CN(c1cncc(C=O)n1)C1CCC1",
+          "COc1c(CC[C@@H](CC(C)(C)C)NCc2cncc(N(C)C3CCC3)n2)nc(NS(=O)(=O)c2cccc(C(=O)O)c2)nc1-c1c(C)cccc1C"
+        ]
+      },
+      {
+        "reaction_indices": [
+          88560,
+          101048
+        ],
+        "spine_smiles": [
+          "CN(c1cncc(C=O)n1)C1CCC1",
+          "Cc1cccc(C)c1-c1nc(NS(=O)(=O)c2cccc(C(=O)O)c2)cc(OC[C@@H](CC(C)(C)C)NCc2cncc(N(C)C3CCC3)n2)c1C(F)(F)F"
+        ]
+      },
+      {
+        "reaction_indices": [
+          89094,
+          76800
+        ],
+        "spine_smiles": [
+          "O=CCNC(=O)OCC1c2ccccc2-c2ccccc21",
+          "COC(=O)[C@@H](CNCCNC(=O)OCC1c2ccccc2-c2ccccc21)NC(=O)OC(C)(C)C"
+        ]
+      },
+      {
+        "reaction_indices": [
+          92671,
+          92708
+        ],
+        "spine_smiles": [
+          "O=CCC(N1C(=O)c2ccccc2C1=O)C(F)(F)F",
+          "CC(C)(C)OC(=O)N[C@H](c1cn2ncc([C@H](NCCC(N3C(=O)c4ccccc4C3=O)C(F)(F)F)C3CC3)cc2n1)C1CCC(F)(F)CC1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          92948,
+          93092
+        ],
+        "spine_smiles": [
+          "Cc1c(Br)cccc1-c1ccn2c(=O)c(C=O)cnc2c1",
+          "Cc1c(Br)cccc1-c1ccn2c(=O)c(CNC[C@@H]3CCC(=O)N3)cnc2c1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          93573,
+          93311
+        ],
+        "spine_smiles": [
+          "Cc1nc2cc(Br)ccn2c(=O)c1C=O",
+          "Cc1nc2cc(Br)ccn2c(=O)c1CNC[C@@H]1CCC(=O)N1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          93636,
+          93638
+        ],
+        "spine_smiles": [
+          "COc1nc(-c2cccc(-c3cccc(-c4ccn5c(=O)cc(C=O)nc5c4)c3Cl)c2Cl)ccc1CN(C[C@@H]1CCC(=O)N1)C(=O)OC(C)(C)C",
+          "CNC(=O)C(C)(C)NCc1cc(=O)n2ccc(-c3cccc(-c4cccc(-c5ccc(CN(C[C@@H]6CCC(=O)N6)C(=O)OC(C)(C)C)c(OC)n5)c4Cl)c3Cl)cc2n1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          93726,
+          93783
+        ],
+        "spine_smiles": [
+          "COc1nc(-c2cccc(-c3cccc(-c4cc5c(=O)n(C)c(C=O)nn5c4)c3Cl)c2Cl)ccc1CN(C[C@@H]1CCC(=O)N1)C(=O)OC(C)(C)C",
+          "COc1nc(-c2cccc(-c3cccc(-c4cc5c(=O)n(C)c(CNCCN6CCCC6=O)nn5c4)c3Cl)c2Cl)ccc1CN(C[C@@H]1CCC(=O)N1)C(=O)OC(C)(C)C"
+        ]
+      },
+      {
+        "reaction_indices": [
+          93726,
+          93786
+        ],
+        "spine_smiles": [
+          "COc1nc(-c2cccc(-c3cccc(-c4cc5c(=O)n(C)c(C=O)nn5c4)c3Cl)c2Cl)ccc1CN(C[C@@H]1CCC(=O)N1)C(=O)OC(C)(C)C",
+          "COc1nc(-c2cccc(-c3cccc(-c4cc5c(=O)n(C)c(CNC[C@@H]6CCCO6)nn5c4)c3Cl)c2Cl)ccc1CN(C[C@@H]1CCC(=O)N1)C(=O)OC(C)(C)C"
+        ]
+      },
+      {
+        "reaction_indices": [
+          94849,
+          94850
+        ],
+        "spine_smiles": [
+          "O=CCC1CC=C(c2c(Cl)cccc2Cl)CC1",
+          "Clc1cccc(Cl)c1C1=CCC(CCNC2CCOCC2)CC1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          96916,
+          96944
+        ],
+        "spine_smiles": [
+          "O=CC1(NC(=O)OCc2ccccc2)CC1",
+          "CC(C)(C)OC(=O)N[C@H](c1cn2ncc([C@H](NCC3(NC(=O)OCc4ccccc4)CC3)C3CC3)cc2n1)C1CCC(F)(F)CC1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          98936,
+          98937
+        ],
+        "spine_smiles": [
+          "CCN(CC)c1cc(Cl)cc(C=O)n1",
+          "CCN(CC)c1cc(Cl)cc(CNC)n1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          101701,
+          101721
+        ],
+        "spine_smiles": [
+          "O=CCCC1CN(c2cccc3c2C(=O)N(C2CCC(=O)NC2=O)C3=O)C1",
+          "COc1ccc(CNCCCC2CN(c3cccc4c3C(=O)N(C3CCC(=O)NC3=O)C4=O)C2)c(OC)c1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          101788,
+          101789
+        ],
+        "spine_smiles": [
+          "Nc1nnc(-c2ccccc2O)cc1OCCc1ccc(C=O)cc1",
+          "Cc1ncsc1-c1ccc(CNC(=O)[C@@H]2C[C@@H](O)CN2C(=O)[C@@H](NC(=O)CCCCCCCCCNCc2ccc(CCOc3cc(-c4ccccc4O)nnc3N)cc2)C(C)(C)C)cc1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          104174,
+          55650
+        ],
+        "spine_smiles": [
+          "CC(=O)Cc1ccc(-n2ccc(NC(=O)N3CCN(C(=O)C(C)(C)NC(=O)OC(C)(C)C)CC3)nc2=O)cc1",
+          "CC(Cc1ccc(-n2ccc(NC(=O)N3CCN(C(=O)C(C)(C)NC(=O)OC(C)(C)C)CC3)nc2=O)cc1)N1CC2(CCC2NC(=O)OC(C)(C)C)C1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          104174,
+          104275
+        ],
+        "spine_smiles": [
+          "CC(=O)Cc1ccc(-n2ccc(NC(=O)N3CCN(C(=O)C(C)(C)NC(=O)OC(C)(C)C)CC3)nc2=O)cc1",
+          "CC(Cc1ccc(-n2ccc(NC(=O)N3CCN(C(=O)C(C)(C)NC(=O)OC(C)(C)C)CC3)nc2=O)cc1)N[C@H]1CC[C@@H](NC(=O)OC(C)(C)C)C1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          111127,
+          111128
+        ],
+        "spine_smiles": [
+          "O=CCc1cccc(C(F)(F)F)c1",
+          "CC(C)(NCCc1cccc(C(F)(F)F)c1)c1cccc(N)c1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          112898,
+          112909
+        ],
+        "spine_smiles": [
+          "COC(=O)c1c(CCCOC(C)=O)c2ccc(Cl)c(-c3c(C=O)nn4c3CCC4)c2n1C",
+          "COC(=O)c1c(CCCOC(C)=O)c2ccc(Cl)c(-c3c(CNCc4cc(CCc5cc(OCc6ccc(OC)cc6)c6ncccc6c5)n(C)n4)nn4c3CCC4)c2n1C"
+        ]
+      },
+      {
+        "reaction_indices": [
+          115592,
+          115623
+        ],
+        "spine_smiles": [
+          "CC(C)(C)OC(=O)N1CCN2C(=O)c3c(N4CC(=O)CC4(C)C)nc(-c4ccccc4F)c(Cl)c3OC[C@H]2C1",
+          "CC(C)(C)OC(=O)N1CCN2C(=O)c3c(N4CC(NCC(F)(F)F)CC4(C)C)nc(-c4ccccc4F)c(Cl)c3OC[C@H]2C1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          118843,
+          27049
+        ],
+        "spine_smiles": [
+          "O=CCCC(F)(F)F",
+          "C=CC(=O)Nc1ccc2c(c1)CC(NCCCC(F)(F)F)C2"
+        ]
+      },
+      {
+        "reaction_indices": [
+          118992,
+          118993
+        ],
+        "spine_smiles": [
+          "CC(=O)c1cc(Cl)c2occc2n1",
+          "CCNC(C)c1cc(Cl)c2occc2n1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          121718,
+          61676
+        ],
+        "spine_smiles": [
+          "O=CC1CCN(c2ccc3c(c2)C(=O)N(C2CCC(=O)NC2=O)C3=O)CC1",
+          "CC1CN(CC2CCN(c3ccc4c(c3)C(=O)N(C3CCC(=O)NC3=O)C4=O)CC2)CCC1CN1CCN2c3cc(-c4ccccc4O)nnc3NC[C@H]2C1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          121718,
+          61697
+        ],
+        "spine_smiles": [
+          "O=CC1CCN(c2ccc3c(c2)C(=O)N(C2CCC(=O)NC2=O)C3=O)CC1",
+          "O=C1CCC(N2C(=O)c3ccc(N4CCC(CN5CCC(CN6CCN7c8cc(-c9ccccc9O)nnc8NC[C@H]7C6)CC5CO)CC4)cc3C2=O)C(=O)N1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          121718,
+          61706
+        ],
+        "spine_smiles": [
+          "O=CC1CCN(c2ccc3c(c2)C(=O)N(C2CCC(=O)NC2=O)C3=O)CC1",
+          "CC(C)(C)OC(=O)NC1CCN(CC2CCN(c3ccc4c(c3)C(=O)N(C3CCC(=O)NC3=O)C4=O)CC2)CC1"
+        ]
+      }
+    ],
+    "step1_reaction_count": 1193,
+    "step2_reaction_count": 1589,
+    "smirks": {
+      "step1_template_name": "Oxidation or Dehydrogenation of Alcohols to Aldehydes and Ketones",
+      "step1_template_occurrence": 1,
+      "step1_smirks": "[C;+0:1]-[O;H1;D1;+0:2]>>[C;+0:1](=[O;H0;D1;+0:2])",
+      "step2_template_name": "{reductive amination}",
+      "step2_template_occurrence": 0,
+      "step2_smirks": "[#6:4]-[C;H1,$([CH0](-[#6])[#6]):1]=[OD1].[N;H2,$([NH1;D2](C)C);!$(N-[#6]=[*]):3]-[C:5]>>[#6:4][C:1]-[N:3]-[C:5]"
+    },
+    "step1_template_key": "Oxidation or Dehydrogenation of Alcohols to Aldehydes and Ketones::25",
+    "step2_template_key": "{reductive amination}::441"
+  }
+}

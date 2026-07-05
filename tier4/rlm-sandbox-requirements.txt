@@ -1,0 +1,7 @@
+# Auto-generated from /home/bhagavan/rlms/.rlm via export_rlm_sandbox_requirements.sh
+# Re-run ./build_rlm_sandbox.sh to refresh before building the image.
+# REPL surface: stdlib + numpy + rdkit (+ dill/requests for DockerREPL runtime).
+dill==0.4.1
+requests==2.32.5
+numpy==1.26.4
+rdkit==2025.9.6

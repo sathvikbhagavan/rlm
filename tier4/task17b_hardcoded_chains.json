@@ -1,0 +1,999 @@
+{
+  "azide_staudinger": {
+    "question_id": "azide_staudinger",
+    "label": "Azide formation \u2192 Staudinger reduction",
+    "path_length": 2,
+    "chain_count": 37,
+    "chain_count_no_persistence": 37,
+    "support_index_count": 73,
+    "example_chain": [
+      3799,
+      3800
+    ],
+    "chains": [
+      [
+        3799,
+        3800
+      ],
+      [
+        4660,
+        4661
+      ],
+      [
+        4663,
+        4664
+      ],
+      [
+        4666,
+        4667
+      ],
+      [
+        10999,
+        13137
+      ],
+      [
+        11106,
+        11818
+      ],
+      [
+        11147,
+        11681
+      ],
+      [
+        11782,
+        12656
+      ],
+      [
+        12497,
+        11992
+      ],
+      [
+        13354,
+        11761
+      ],
+      [
+        13394,
+        11244
+      ],
+      [
+        24998,
+        24999
+      ],
+      [
+        28620,
+        28621
+      ],
+      [
+        47195,
+        47196
+      ],
+      [
+        54891,
+        54892
+      ],
+      [
+        58028,
+        94676
+      ],
+      [
+        58252,
+        94767
+      ],
+      [
+        59624,
+        59625
+      ],
+      [
+        69816,
+        69817
+      ],
+      [
+        70147,
+        70148
+      ],
+      [
+        70162,
+        98980
+      ],
+      [
+        82405,
+        82406
+      ],
+      [
+        84689,
+        84690
+      ],
+      [
+        85361,
+        85362
+      ],
+      [
+        87226,
+        87227
+      ],
+      [
+        94624,
+        94625
+      ],
+      [
+        94632,
+        94633
+      ],
+      [
+        94667,
+        94668
+      ],
+      [
+        94675,
+        94676
+      ],
+      [
+        94686,
+        94687
+      ],
+      [
+        94696,
+        94697
+      ],
+      [
+        94703,
+        94704
+      ],
+      [
+        94724,
+        94725
+      ],
+      [
+        96780,
+        96781
+      ],
+      [
+        105072,
+        105073
+      ],
+      [
+        105851,
+        105852
+      ],
+      [
+        109931,
+        109932
+      ]
+    ],
+    "chain_details": [
+      {
+        "reaction_indices": [
+          3799,
+          3800
+        ],
+        "spine_smiles": [
+          "COc1ccnc(CN2CCc3c(cc(CN=[N+]=[N-])cc3-c3cn(C)nc3C)C2=O)c1",
+          "COc1ccnc(CN2CCc3c(cc(CN)cc3-c3cn(C)nc3C)C2=O)c1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          4660,
+          4661
+        ],
+        "spine_smiles": [
+          "CC(C)c1ncc(CN=[N+]=[N-])s1",
+          "CC(C)c1ncc(CN)s1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          4663,
+          4664
+        ],
+        "spine_smiles": [
+          "CCc1ncsc1CN=[N+]=[N-]",
+          "CCc1ncsc1CN"
+        ]
+      },
+      {
+        "reaction_indices": [
+          4666,
+          4667
+        ],
+        "spine_smiles": [
+          "CC(C)c1ncsc1CN=[N+]=[N-]",
+          "CC(C)c1ncsc1CN"
+        ]
+      },
+      {
+        "reaction_indices": [
+          10999,
+          13137
+        ],
+        "spine_smiles": [
+          "Cn1c(=O)n(CCCOC2CCCCO2)c(=O)c2c1nc(N=[N+]=[N-])n2Cc1ccc(Cl)cc1",
+          "Cn1c(=O)n(CCCOC2CCCCO2)c(=O)c2c1nc(N)n2Cc1ccc(Cl)cc1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          11106,
+          11818
+        ],
+        "spine_smiles": [
+          "Cn1cc2c(n1)CCC(N=[N+]=[N-])C(=O)N2",
+          "Cn1cc2c(n1)CCC(N)C(=O)N2"
+        ]
+      },
+      {
+        "reaction_indices": [
+          11147,
+          11681
+        ],
+        "spine_smiles": [
+          "CN1C(=O)C(N=[N+]=[N-])C2(CC2)Oc2cccnc21",
+          "CN1C(=O)C(N)C2(CC2)Oc2cccnc21"
+        ]
+      },
+      {
+        "reaction_indices": [
+          11782,
+          12656
+        ],
+        "spine_smiles": [
+          "Cc1cc2n(n1)CCC(N=[N+]=[N-])C(=O)N2C",
+          "Cc1cc2n(n1)CCC(N)C(=O)N2C"
+        ]
+      },
+      {
+        "reaction_indices": [
+          12497,
+          11992
+        ],
+        "spine_smiles": [
+          "CN1C(=O)C(N=[N+]=[N-])CCc2nccnc21",
+          "CN1C(=O)C(N)CCc2nccnc21"
+        ]
+      },
+      {
+        "reaction_indices": [
+          13354,
+          11761
+        ],
+        "spine_smiles": [
+          "[N-]=[N+]=NC1CC2(CC2)c2cc(F)cc(F)c2NC1=O",
+          "NC1CC2(CC2)c2cc(F)cc(F)c2NC1=O"
+        ]
+      },
+      {
+        "reaction_indices": [
+          13394,
+          11244
+        ],
+        "spine_smiles": [
+          "Cc1cnn2c1N(C)C(=O)C(N=[N+]=[N-])CC2",
+          "Cc1cnn2c1N(C)C(=O)C(N)CC2"
+        ]
+      },
+      {
+        "reaction_indices": [
+          24998,
+          24999
+        ],
+        "spine_smiles": [
+          "COc1ccc(-n2cnnn2)c(CN=[N+]=[N-])c1F",
+          "COc1ccc(-n2cnnn2)c(CN)c1F"
+        ]
+      },
+      {
+        "reaction_indices": [
+          28620,
+          28621
+        ],
+        "spine_smiles": [
+          "N#Cc1c(F)cc(O)cc1N=[N+]=[N-]",
+          "N#Cc1c(N)cc(O)cc1F"
+        ]
+      },
+      {
+        "reaction_indices": [
+          47195,
+          47196
+        ],
+        "spine_smiles": [
+          "CCOC(=O)c1nc(C(C)N=[N+]=[N-])ns1",
+          "CCOC(=O)c1nc(C(C)N)ns1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          54891,
+          54892
+        ],
+        "spine_smiles": [
+          "CCOc1cc([C@@H](CS(C)(=O)=O)N2C(=O)c3cccc(NC(=O)CCCCN=[N+]=[N-])c3C2=O)ccc1OC",
+          "CCOc1cc([C@@H](CS(C)(=O)=O)N2C(=O)c3cccc(NC(=O)CCCCN)c3C2=O)ccc1OC"
+        ]
+      },
+      {
+        "reaction_indices": [
+          58028,
+          94676
+        ],
+        "spine_smiles": [
+          "[N-]=[N+]=NCc1cn2nc(C3CC3)ccc2n1",
+          "NCc1cn2nc(C3CC3)ccc2n1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          58252,
+          94767
+        ],
+        "spine_smiles": [
+          "[N-]=[N+]=NCc1nc2cc(C3CC3)ccn2n1",
+          "NCc1nc2cc(C3CC3)ccn2n1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          59624,
+          59625
+        ],
+        "spine_smiles": [
+          "COc1cc(Br)ccc1C1(N=[N+]=[N-])COC1",
+          "COc1cc(Br)ccc1C1(N)COC1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          69816,
+          69817
+        ],
+        "spine_smiles": [
+          "[N-]=[N+]=NCc1cnc2[nH]c3ccccc3c2c1",
+          "NCc1cnc2[nH]c3ccccc3c2c1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          70147,
+          70148
+        ],
+        "spine_smiles": [
+          "CC(C)(O)c1cccc(CN=[N+]=[N-])n1",
+          "CC(C)(O)c1cccc(CN)n1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          70162,
+          98980
+        ],
+        "spine_smiles": [
+          "[N-]=[N+]=NCc1cccc(N2CCCC2=O)n1",
+          "NCc1cccc(N2CCCC2=O)n1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          82405,
+          82406
+        ],
+        "spine_smiles": [
+          "CC(c1ccc2c(c1)OCO2)N1CCN(c2nc(CN=[N+]=[N-])cs2)CC1",
+          "CC(c1ccc2c(c1)OCO2)N1CCN(c2nc(CN)cs2)CC1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          84689,
+          84690
+        ],
+        "spine_smiles": [
+          "COc1ccc(COc2cc(N=[N+]=[N-])c(C)cn2)cc1",
+          "COc1ccc(COc2cc(N)c(C)cn2)cc1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          85361,
+          85362
+        ],
+        "spine_smiles": [
+          "CC(C)(C)OC(=O)NCCc1ccc(CN=[N+]=[N-])cc1",
+          "CC(C)(C)OC(=O)NCCc1ccc(CN)cc1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          87226,
+          87227
+        ],
+        "spine_smiles": [
+          "COC(=O)C(C)(N=[N+]=[N-])c1cc(Cl)nc(-c2ccc(F)cc2)c1",
+          "COC(=O)C(C)(N)c1cc(Cl)nc(-c2ccc(F)cc2)c1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          94624,
+          94625
+        ],
+        "spine_smiles": [
+          "[2H]C([2H])(N=[N+]=[N-])c1cn2ccccc2n1",
+          "[2H]C([2H])(N)c1cn2ccccc2n1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          94632,
+          94633
+        ],
+        "spine_smiles": [
+          "CC(N=[N+]=[N-])c1cn2ccccc2n1",
+          "CC(N)c1cn2ccccc2n1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          94667,
+          94668
+        ],
+        "spine_smiles": [
+          "COc1cccc2nc(CN=[N+]=[N-])cn12",
+          "COc1cccc2nc(CN)cn12"
+        ]
+      },
+      {
+        "reaction_indices": [
+          94675,
+          94676
+        ],
+        "spine_smiles": [
+          "[N-]=[N+]=NCc1cn2nc(C3CC3)ccc2n1",
+          "NCc1cn2nc(C3CC3)ccc2n1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          94686,
+          94687
+        ],
+        "spine_smiles": [
+          "[N-]=[N+]=NCc1cn2c(C3CC3)cccc2n1",
+          "NCc1cn2c(C3CC3)cccc2n1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          94696,
+          94697
+        ],
+        "spine_smiles": [
+          "Cc1cc(C)n2cc(CN=[N+]=[N-])nc2c1",
+          "Cc1cc(C)n2cc(CN)nc2c1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          94703,
+          94704
+        ],
+        "spine_smiles": [
+          "[N-]=[N+]=NCc1cn2cc(C(F)(F)F)cc(Cl)c2n1",
+          "NCc1cn2cc(C(F)(F)F)cc(Cl)c2n1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          94724,
+          94725
+        ],
+        "spine_smiles": [
+          "[N-]=[N+]=NCc1cn2c(C(F)(F)F)cccc2n1",
+          "NCc1cn2c(C(F)(F)F)cccc2n1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          96780,
+          96781
+        ],
+        "spine_smiles": [
+          "CN(C(=O)OC(C)(C)C)c1nccnc1N=[N+]=[N-]",
+          "CN(C(=O)OC(C)(C)C)c1nccnc1N"
+        ]
+      },
+      {
+        "reaction_indices": [
+          105072,
+          105073
+        ],
+        "spine_smiles": [
+          "[N-]=[N+]=NC1CCc2cccnc2NC1=O",
+          "NC1CCc2cccnc2NC1=O"
+        ]
+      },
+      {
+        "reaction_indices": [
+          105851,
+          105852
+        ],
+        "spine_smiles": [
+          "CC(C)(C)OC(=O)Cn1ccc2c(N=[N+]=[N-])nc(N)nc21",
+          "CC(C)(C)OC(=O)Cn1ccc2c(N)nc(N)nc21"
+        ]
+      },
+      {
+        "reaction_indices": [
+          109931,
+          109932
+        ],
+        "spine_smiles": [
+          "CC(C)(C)OC(=O)N1CCCC(F)(CN=[N+]=[N-])CC1",
+          "CC(C)(C)OC(=O)N1CCCC(F)(CN)CC1"
+        ]
+      }
+    ],
+    "step_reaction_counts": [
+      153,
+      218
+    ],
+    "smirks": {
+      "chain_length": 2,
+      "steps": [
+        {
+          "step": 1,
+          "template_name": "Formation of Azides from halogens",
+          "template_occurrence": 0,
+          "smirks": "[*:1]-[Cl,F,Br,I:2]>>[*:1]-[N;H0;D2;+0]=[N;H0;D2;+1]=[N;H0;D1;-1]"
+        },
+        {
+          "step": 2,
+          "template_name": "Azide to amine reduction (Staudinger)",
+          "template_occurrence": 0,
+          "smirks": "[#6;+0:1]-[N;H0;D2;+0]=[N;H0;D2;+1]=[N;H0;D1;-1]>>[N;H2;D1;+0]-[#6;+0:1]"
+        }
+      ]
+    }
+  },
+  "aryl_brom_negishi": {
+    "question_id": "aryl_brom_negishi",
+    "label": "Aromatic bromination \u2192 Negishi coupling",
+    "path_length": 2,
+    "chain_count": 4,
+    "chain_count_no_persistence": 7,
+    "support_index_count": 8,
+    "example_chain": [
+      5956,
+      70623
+    ],
+    "chains": [
+      [
+        5956,
+        70623
+      ],
+      [
+        16593,
+        16594
+      ],
+      [
+        67212,
+        67337
+      ],
+      [
+        67240,
+        67346
+      ]
+    ],
+    "chain_details": [
+      {
+        "reaction_indices": [
+          5956,
+          70623
+        ],
+        "spine_smiles": [
+          "Cc1cc(Br)cc(F)c1N",
+          "Cc1cc(-c2cccc(OCc3ccc(C#N)cc3F)n2)cc(F)c1N"
+        ]
+      },
+      {
+        "reaction_indices": [
+          16593,
+          16594
+        ],
+        "spine_smiles": [
+          "CCc1nc(Br)ccc1NS(C)(=O)=O",
+          "CCc1nc(-c2nnn(C)c2C(=O)O)ccc1NS(C)(=O)=O"
+        ]
+      },
+      {
+        "reaction_indices": [
+          67212,
+          67337
+        ],
+        "spine_smiles": [
+          "[2H]C([2H])([2H])C1(C([2H])([2H])F)CCc2c(Br)c(-c3ccc(F)cn3)nn2C1",
+          "[2H]C([2H])([2H])C1(C([2H])([2H])F)CCc2c(-c3c(F)cnc4c3cnn4C3CCCCO3)c(-c3ccc(F)cn3)nn2C1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          67240,
+          67346
+        ],
+        "spine_smiles": [
+          "[2H]C([2H])([2H])C1(C(F)(F)F)Cn2nc(-c3ccc(F)cn3)c(Br)c2CO1",
+          "[2H]C([2H])([2H])C1(C(F)(F)F)Cn2nc(-c3ccc(F)cn3)c(-c3c(F)c(C)nc4c3c(C)nn4COCC[Si](C)(C)C)c2CO1"
+        ]
+      }
+    ],
+    "step_reaction_counts": [
+      1185,
+      184
+    ],
+    "smirks": {
+      "chain_length": 2,
+      "steps": [
+        {
+          "step": 1,
+          "template_name": "Aromatic bromination",
+          "template_occurrence": 0,
+          "smirks": "[c;H1;D2;+0:1]>>[c;H0;D3;+0:1]-[Br;H0;D1;+0:2]"
+        },
+        {
+          "step": 2,
+          "template_name": "{Negishi}",
+          "template_occurrence": 0,
+          "smirks": "[#6;$([#6]~[#6]);!$([#6]~[S,N,O,P]):1][Cl,Br,I].[Cl,Br,I][#6;$([#6]~[#6]);!$([#6]~[S,N,O,P]):2]>>[#6:2][#6:1]"
+        }
+      ]
+    }
+  },
+  "boronic_suzuki": {
+    "question_id": "boronic_suzuki",
+    "label": "Boronic acid preparation \u2192 Suzuki coupling",
+    "path_length": 2,
+    "chain_count": 8,
+    "chain_count_no_persistence": 8,
+    "support_index_count": 11,
+    "example_chain": [
+      14078,
+      36748
+    ],
+    "chains": [
+      [
+        14078,
+        36748
+      ],
+      [
+        14078,
+        36759
+      ],
+      [
+        67334,
+        67335
+      ],
+      [
+        71587,
+        92946
+      ],
+      [
+        71587,
+        92966
+      ],
+      [
+        71587,
+        92975
+      ],
+      [
+        71587,
+        92996
+      ],
+      [
+        71587,
+        93021
+      ]
+    ],
+    "chain_details": [
+      {
+        "reaction_indices": [
+          14078,
+          36748
+        ],
+        "spine_smiles": [
+          "CN(C)c1ccc(B(O)O)cn1",
+          "CN(C)c1ccc(-c2ccc(-c3cc4ccncc4n3C(=O)OC(C)(C)C)cc2)cn1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          14078,
+          36759
+        ],
+        "spine_smiles": [
+          "CN(C)c1ccc(B(O)O)cn1",
+          "CN(C)c1ccc(-c2ccc(-c3nc4cnccc4[nH]3)cc2)cn1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          67334,
+          67335
+        ],
+        "spine_smiles": [
+          "CC1(C)Cc2c(B(O)O)c(-c3ccc(F)cn3)nn2C1",
+          "CC1(C)Cc2c(-c3c(F)cnc4c3cnn4COCC[Si](C)(C)C)c(-c3ccc(F)cn3)nn2C1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          71587,
+          92946
+        ],
+        "spine_smiles": [
+          "Cc1c(Br)cccc1B(O)O",
+          "CCOC(=O)c1cnc2cc(-c3cccc(Br)c3C)ccn2c1=O"
+        ]
+      },
+      {
+        "reaction_indices": [
+          71587,
+          92966
+        ],
+        "spine_smiles": [
+          "Cc1c(Br)cccc1B(O)O",
+          "Cc1c(Br)cccc1-c1ccc2c(c1)C(=O)N(C)CC(=O)N2"
+        ]
+      },
+      {
+        "reaction_indices": [
+          71587,
+          92975
+        ],
+        "spine_smiles": [
+          "Cc1c(Br)cccc1B(O)O",
+          "Cc1c(Br)cccc1-c1ccn2c(=O)c(C=O)ccc2c1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          71587,
+          92996
+        ],
+        "spine_smiles": [
+          "Cc1c(Br)cccc1B(O)O",
+          "Cc1c(Br)cccc1-c1cnc2cc(CN(CCO)C(=O)OC(C)(C)C)ccn2c1=O"
+        ]
+      },
+      {
+        "reaction_indices": [
+          71587,
+          93021
+        ],
+        "spine_smiles": [
+          "Cc1c(Br)cccc1B(O)O",
+          "Cc1c(Br)cccc1-c1ccc2c(c1)N(C)C(=O)CCC2N(CCOC(=O)OC(C)(C)C)C(=O)OC(C)(C)C"
+        ]
+      }
+    ],
+    "step_reaction_counts": [
+      22,
+      2345
+    ],
+    "smirks": {
+      "chain_length": 2,
+      "steps": [
+        {
+          "step": 1,
+          "template_name": "Preparation of boronic acids",
+          "template_occurrence": 0,
+          "smirks": "[*]-[O;H0;D2;+0:1]-[B;H0;D3;+0:2](-[O;H0;D2;+0:3]-[*])-[O;H0;D2;+0:4]-[*].[#6;+0:5]-[Br]>>[O;H1;+0:1]-[B;H0;D3;+0:2](-[#6;+0:5])-[O;H1;+0:3]"
+        },
+        {
+          "step": 2,
+          "template_name": "{Suzuki}",
+          "template_occurrence": 0,
+          "smirks": "[#6;H0;D3;$([#6](~[#6])~[#6]):1]B(O)O.[#6;H0;D3;$([#6](~[#6])~[#6]):2][Cl,Br,I]>>[#6:2][#6:1]"
+        }
+      ]
+    }
+  },
+  "boc_deprot_buchwald": {
+    "question_id": "boc_deprot_buchwald",
+    "label": "Boc deprotection \u2192 Buchwald-Hartwig",
+    "path_length": 2,
+    "chain_count": 6,
+    "chain_count_no_persistence": 6,
+    "support_index_count": 7,
+    "example_chain": [
+      97139,
+      97143
+    ],
+    "chains": [
+      [
+        97139,
+        97143
+      ],
+      [
+        97139,
+        97148
+      ],
+      [
+        97139,
+        97153
+      ],
+      [
+        97139,
+        97157
+      ],
+      [
+        97139,
+        97161
+      ],
+      [
+        97139,
+        97176
+      ]
+    ],
+    "chain_details": [
+      {
+        "reaction_indices": [
+          97139,
+          97143
+        ],
+        "spine_smiles": [
+          "Cn1c(=O)c(-c2nccc(N)n2)cn1COCC[Si](C)(C)C",
+          "CC(CCO[Si](C)(C)C(C)(C)C)n1nc(N2CCC2)c2cnc(Nc3ccnc(-c4cn(COCC[Si](C)(C)C)n(C)c4=O)n3)cc21"
+        ]
+      },
+      {
+        "reaction_indices": [
+          97139,
+          97148
+        ],
+        "spine_smiles": [
+          "Cn1c(=O)c(-c2nccc(N)n2)cn1COCC[Si](C)(C)C",
+          "Cn1c(=O)c(-c2nccc(Nc3cc4c(cn3)c(N3CCC3)nn4C(C)(C)CCO[Si](C)(C)C(C)(C)C)n2)cn1COCC[Si](C)(C)C"
+        ]
+      },
+      {
+        "reaction_indices": [
+          97139,
+          97153
+        ],
+        "spine_smiles": [
+          "Cn1c(=O)c(-c2nccc(N)n2)cn1COCC[Si](C)(C)C",
+          "CC(CCO[Si](c1ccccc1)(c1ccccc1)C(C)(C)C)n1nc(-c2cccn2CCN(C)C)c2cnc(Nc3ccnc(-c4cn(COCC[Si](C)(C)C)n(C)c4=O)n3)cc21"
+        ]
+      },
+      {
+        "reaction_indices": [
+          97139,
+          97157
+        ],
+        "spine_smiles": [
+          "Cn1c(=O)c(-c2nccc(N)n2)cn1COCC[Si](C)(C)C",
+          "C[C@@H](CCO[Si](C)(C)C(C)(C)C)n1nc(-c2cccc(OCCN3CCOCC3)c2)c2cnc(Nc3ccnc(-c4cn(COCC[Si](C)(C)C)n(C)c4=O)n3)cc21"
+        ]
+      },
+      {
+        "reaction_indices": [
+          97139,
+          97161
+        ],
+        "spine_smiles": [
+          "Cn1c(=O)c(-c2nccc(N)n2)cn1COCC[Si](C)(C)C",
+          "CC(CCO[Si](C)(C)C(C)(C)C)n1nc(-c2ccc(CN3CCN(C)CC3)o2)c2cnc(Nc3ccnc(-c4cn(COCC[Si](C)(C)C)n(C)c4=O)n3)cc21"
+        ]
+      },
+      {
+        "reaction_indices": [
+          97139,
+          97176
+        ],
+        "spine_smiles": [
+          "Cn1c(=O)c(-c2nccc(N)n2)cn1COCC[Si](C)(C)C",
+          "C[C@@H](CCO[Si](C)(C)C(C)(C)C)n1nc(-c2ncc(CN3CCN(C)CC3)s2)c2cnc(Nc3ccnc(-c4cn(COCC[Si](C)(C)C)n(C)c4=O)n3)cc21"
+        ]
+      }
+    ],
+    "step_reaction_counts": [
+      53,
+      4119
+    ],
+    "smirks": {
+      "chain_length": 2,
+      "steps": [
+        {
+          "step": 1,
+          "template_name": "Boc amine deprotection",
+          "template_occurrence": 0,
+          "smirks": "[C;H3;D1;+0]-[C;H0;D4;+0](-[C;H3;D1;+0])(-[C;H3;D1;+0])-[O;H0;D2;+0]-[C;H0;D3;+0](=[O;H0;D1;+0])-[#7;H0;D3;+0:1]-[C;H0;D3;+0](=[O;H0;D1;+0])-[O;H0;D2;+0]-[C;H0;D4;+0](-[C;H3;D1;+0])(-[C;H3;D1;+0])-[C;H3;D1;+0]>>[#7;H2;D1;+0:1]"
+        },
+        {
+          "step": 2,
+          "template_name": "{Buchwald-Hartwig}",
+          "template_occurrence": 0,
+          "smirks": "[Cl,Br,I][c;$(c1:[c,n]:[c,n]:[c,n]:[c,n]:[c,n]:1):1].[N;$(NC)&!$(N=*)&!$([N-])&!$(N#*)&!$([ND3])&!$([ND4])&!$(N[c,O])&!$(N[C,S]=[S,O,N]),H2&$(Nc1:[c,n]:[c,n]:[c,n]:[c,n]:[c,n]:1):2]>>[c:1][N:2]"
+        }
+      ]
+    }
+  },
+  "aryl_brom_suzuki_ester_red": {
+    "question_id": "aryl_brom_suzuki_ester_red",
+    "label": "Bromination \u2192 Suzuki \u2192 ester reduction",
+    "path_length": 3,
+    "chain_count": 2,
+    "chain_count_no_persistence": 2,
+    "support_index_count": 4,
+    "example_chain": [
+      24340,
+      19676,
+      24317
+    ],
+    "chains": [
+      [
+        24340,
+        19676,
+        24317
+      ],
+      [
+        82768,
+        19676,
+        24317
+      ]
+    ],
+    "chain_details": [
+      {
+        "reaction_indices": [
+          24340,
+          19676,
+          24317
+        ],
+        "spine_smiles": [
+          "Brc1ccc(OCc2ccccc2)nc1OCc1ccccc1",
+          "CCOC(=O)CC1CCN(c2ccc(-c3ccc(OCc4ccccc4)nc3OCc3ccccc3)cc2F)CC1",
+          "OCCC1CCN(c2ccc(-c3ccc(OCc4ccccc4)nc3OCc3ccccc3)cc2F)CC1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          82768,
+          19676,
+          24317
+        ],
+        "spine_smiles": [
+          "Brc1ccc(OCc2ccccc2)nc1OCc1ccccc1",
+          "CCOC(=O)CC1CCN(c2ccc(-c3ccc(OCc4ccccc4)nc3OCc3ccccc3)cc2F)CC1",
+          "OCCC1CCN(c2ccc(-c3ccc(OCc4ccccc4)nc3OCc3ccccc3)cc2F)CC1"
+        ]
+      }
+    ],
+    "step_reaction_counts": [
+      1185,
+      2345,
+      1141
+    ],
+    "smirks": {
+      "chain_length": 3,
+      "steps": [
+        {
+          "step": 1,
+          "template_name": "Aromatic bromination",
+          "template_occurrence": 0,
+          "smirks": "[c;H1;D2;+0:1]>>[c;H0;D3;+0:1]-[Br;H0;D1;+0:2]"
+        },
+        {
+          "step": 2,
+          "template_name": "{Suzuki}",
+          "template_occurrence": 0,
+          "smirks": "[#6;H0;D3;$([#6](~[#6])~[#6]):1]B(O)O.[#6;H0;D3;$([#6](~[#6])~[#6]):2][Cl,Br,I]>>[#6:2][#6:1]"
+        },
+        {
+          "step": 3,
+          "template_name": "Reduction of ester to primary alcohol",
+          "template_occurrence": 0,
+          "smirks": "[*:0]-[C;H0;D3;+0:1](=[O;H0;D1;+0:2])-[O;H0;D2;+0]>>[*:0]-[C;H2;D2;+0:1]-[O;H1;D1;+0:2]"
+        }
+      ]
+    }
+  }
+}
