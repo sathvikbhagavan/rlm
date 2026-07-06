@@ -16,6 +16,12 @@ except ImportError:  # pragma: no cover
 
 
 TASK_NUMBERS = [2, 3, 4, 5]
+TASK_TITLES = {
+    2: "Molecular Weight Change",
+    3: "Ring Count Change",
+    4: "Aromatic Ring Formation",
+    5: "Combined MW and Ring Change",
+}
 PROJECT_BY_FAMILY = {
     "LLM": "LLM-Task{task}",
     "CodeAct": "CodeAct-Task{task}",
@@ -346,7 +352,7 @@ def plot_task_f1_line(
     model_name: str,
     task_agg: dict[tuple[str, int, int], dict[str, float]],
 ) -> None:
-    fig, axes = plt.subplots(2, 2, figsize=(11, 8), constrained_layout=True)
+    fig, axes = plt.subplots(2, 2, figsize=(10.5, 8.5))
     for idx, task in enumerate(TASK_NUMBERS):
         ax = axes[idx // 2][idx % 2]
         for family in ("LLM", "CodeAct", "RLM"):
@@ -378,12 +384,21 @@ def plot_task_f1_line(
         ax.grid(which="major", axis="both", alpha=0.35)
         ax.minorticks_on()
         ax.grid(which="minor", axis="y", alpha=0.18, linestyle=":")
-        ax.set_title(f"Task {task}")
+        ax.set_title(TASK_TITLES.get(task, f"Task {task}"), fontsize=11, pad=8)
         ax.set_xlabel("Context length")
         ax.set_ylabel("Avg F1")
     handles, labels = axes[0][0].get_legend_handles_labels()
     if handles:
-        fig.legend(handles, labels, loc="upper center", ncol=3)
+        fig.legend(
+            handles,
+            labels,
+            loc="lower center",
+            bbox_to_anchor=(0.5, 0.02),
+            ncol=3,
+            frameon=True,
+            framealpha=0.95,
+        )
+    fig.subplots_adjust(left=0.08, right=0.98, top=0.93, bottom=0.12, hspace=0.42, wspace=0.30)
     save_plot(fig, out_dir, f"{model_slug(model_name)}_2_task_f1_vs_context")
 
 
@@ -441,7 +456,7 @@ def plot_task_cost_bar(
             )
         ax.set_xticks(x)
         ax.set_xticklabels([context_label(c) for c in contexts])
-        ax.set_title(f"Task {task}")
+        ax.set_title(TASK_TITLES.get(task, f"Task {task}"))
         ax.set_xlabel("Context length")
         ax.set_ylabel("Avg cost/sample (USD)")
     handles, labels = axes[0][0].get_legend_handles_labels()
@@ -520,7 +535,7 @@ def plot_task_tokens_bar(
                 )
         ax.set_xticks(x)
         ax.set_xticklabels([context_label(c) for c in contexts])
-        ax.set_title(f"Task {task}")
+        ax.set_title(TASK_TITLES.get(task, f"Task {task}"))
         ax.set_xlabel("Context length")
         ax.set_ylabel("Avg tokens / sample")
     handles, labels = axes[0][0].get_legend_handles_labels()

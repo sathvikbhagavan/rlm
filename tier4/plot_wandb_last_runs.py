@@ -44,19 +44,16 @@ TASK_QUESTION_COUNTS: dict[str, int] = {
     "12b": 1,
     "13": 4,
     "14": 2,
-    "15": 5,
+    "15": 4,
     "16": 10,
     "17": 5,
     "17b": 5,
 }
 
-# Use fewer runs for specific family/context combos (e.g. RLM @ full context).
-FAMILY_CONTEXT_RUN_LIMITS: dict[tuple[str, int], int] = {
-    ("RLM", -1): 3,
+# Task-specific overrides take precedence (e.g. RLM task16 @ full context).
+MIN_RUNS_OVERRIDES: dict[tuple[str, str, int], int] = {
+    ("RLM", "16", -1): 3,
 }
-
-# Task-specific overrides take precedence over family/context limits.
-MIN_RUNS_OVERRIDES: dict[tuple[str, str, int], int] = {}
 
 
 @dataclass
@@ -164,9 +161,6 @@ def required_runs_for_group(
 ) -> int:
     if (family, task_id, context_size) in MIN_RUNS_OVERRIDES:
         return MIN_RUNS_OVERRIDES[(family, task_id, context_size)]
-    family_context_limit = FAMILY_CONTEXT_RUN_LIMITS.get((family, context_size))
-    if family_context_limit is not None:
-        return min(default, family_context_limit)
     return default
 
 

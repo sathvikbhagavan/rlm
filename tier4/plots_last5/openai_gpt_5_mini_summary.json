@@ -192,6 +192,16 @@
       "output_tokens_per_sample": 14755.2
     },
     {
+      "family": "RLM",
+      "task_id": "17b",
+      "context_size": -1,
+      "question_count": 5.0,
+      "f1": 0.1474135445979468,
+      "cost_per_sample_usd": 0.02407257,
+      "input_tokens_per_sample": 78746.6,
+      "output_tokens_per_sample": 8969.6
+    },
+    {
       "family": "CodeAct",
       "task_id": "16",
       "context_size": 500,
@@ -280,6 +290,16 @@
       "cost_per_sample_usd": 0.004456455,
       "input_tokens_per_sample": 51061.5,
       "output_tokens_per_sample": 992.1
+    },
+    {
+      "family": "RLM",
+      "task_id": "17b",
+      "context_size": -1,
+      "question_count": 5.0,
+      "f1": 0.04345347688024149,
+      "cost_per_sample_usd": 0.020021212000000004,
+      "input_tokens_per_sample": 49201.2,
+      "output_tokens_per_sample": 7450.6
     },
     {
       "family": "LLM",
@@ -694,6 +714,26 @@
     {
       "family": "RLM",
       "task_id": "17",
+      "context_size": -1,
+      "question_count": 5.0,
+      "f1": 0.013779694062251133,
+      "cost_per_sample_usd": 0.021313442,
+      "input_tokens_per_sample": 52313.8,
+      "output_tokens_per_sample": 8033.4
+    },
+    {
+      "family": "RLM",
+      "task_id": "17",
+      "context_size": -1,
+      "question_count": 5.0,
+      "f1": 0.03217101082831252,
+      "cost_per_sample_usd": 0.013600372,
+      "input_tokens_per_sample": 17267.6,
+      "output_tokens_per_sample": 5565.0
+    },
+    {
+      "family": "RLM",
+      "task_id": "17",
       "context_size": 500,
       "question_count": 5.0,
       "f1": 0.3333333333333333,
@@ -1042,6 +1082,16 @@
       "output_tokens_per_sample": 10741.0
     },
     {
+      "family": "RLM",
+      "task_id": "14",
+      "context_size": -1,
+      "question_count": 2.0,
+      "f1": 0.5,
+      "cost_per_sample_usd": 0.020298289999999997,
+      "input_tokens_per_sample": 23817.0,
+      "output_tokens_per_sample": 8548.5
+    },
+    {
       "family": "CodeAct",
       "task_id": "14",
       "context_size": 500,
@@ -1050,6 +1100,16 @@
       "cost_per_sample_usd": 0.02653105,
       "input_tokens_per_sample": 164493.0,
       "output_tokens_per_sample": 10329.5
+    },
+    {
+      "family": "RLM",
+      "task_id": "14",
+      "context_size": -1,
+      "question_count": 2.0,
+      "f1": 1.0,
+      "cost_per_sample_usd": 0.012930009999999999,
+      "input_tokens_per_sample": 11813.0,
+      "output_tokens_per_sample": 5457.5
     },
     {
       "family": "CodeAct",
@@ -1372,6 +1432,16 @@
       "output_tokens_per_sample": 11317.25
     },
     {
+      "family": "RLM",
+      "task_id": "13",
+      "context_size": -1,
+      "question_count": 4.0,
+      "f1": 0.6957986381245732,
+      "cost_per_sample_usd": 0.0144730725,
+      "input_tokens_per_sample": 20373.25,
+      "output_tokens_per_sample": 5719.0
+    },
+    {
       "family": "CodeAct",
       "task_id": "13",
       "context_size": 500,
@@ -1390,6 +1460,16 @@
       "cost_per_sample_usd": 0.026613699999999997,
       "input_tokens_per_sample": 107924.0,
       "output_tokens_per_sample": 7012.75
+    },
+    {
+      "family": "RLM",
+      "task_id": "13",
+      "context_size": -1,
+      "question_count": 4.0,
+      "f1": 0.6975292872127987,
+      "cost_per_sample_usd": 0.012300915,
+      "input_tokens_per_sample": 17341.5,
+      "output_tokens_per_sample": 4713.25
     },
     {
       "family": "CodeAct",
@@ -1872,6 +1952,26 @@
       "output_tokens_per_sample": 13711.5
     },
     {
+      "family": "RLM",
+      "task_id": "12b",
+      "context_size": -1,
+      "question_count": 1.0,
+      "f1": 0.9995147986414362,
+      "cost_per_sample_usd": 0.005439650000000001,
+      "input_tokens_per_sample": 8197.0,
+      "output_tokens_per_sample": 2228.0
+    },
+    {
+      "family": "RLM",
+      "task_id": "12b",
+      "context_size": -1,
+      "question_count": 1.0,
+      "f1": 1.0,
+      "cost_per_sample_usd": 0.00729265,
+      "input_tokens_per_sample": 8417.0,
+      "output_tokens_per_sample": 3127.0
+    },
+    {
       "family": "CodeAct",
       "task_id": "12",
       "context_size": 100,
@@ -2222,6 +2322,16 @@
       "output_tokens_per_sample": 2201.5
     },
     {
+      "family": "RLM",
+      "task_id": "11",
+      "context_size": -1,
+      "question_count": 2.0,
+      "f1": 1.0,
+      "cost_per_sample_usd": 0.0075747,
+      "input_tokens_per_sample": 11542.0,
+      "output_tokens_per_sample": 3079.0
+    },
+    {
       "family": "LLM",
       "task_id": "11",
       "context_size": 500,
@@ -2230,6 +2340,16 @@
       "cost_per_sample_usd": 0.016694,
       "input_tokens_per_sample": 50224.0,
       "output_tokens_per_sample": 2069.0
+    },
+    {
+      "family": "RLM",
+      "task_id": "11",
+      "context_size": -1,
+      "question_count": 2.0,
+      "f1": 1.0,
+      "cost_per_sample_usd": 0.008163725,
+      "input_tokens_per_sample": 13368.5,
+      "output_tokens_per_sample": 3246.0
     },
     {
       "family": "LLM",
@@ -2440,6 +2560,26 @@
       "cost_per_sample_usd": 0.008793800000000001,
       "input_tokens_per_sample": 10764.0,
       "output_tokens_per_sample": 3685.0
+    },
+    {
+      "family": "RLM",
+      "task_id": "12",
+      "context_size": -1,
+      "question_count": 2.0,
+      "f1": 1.0,
+      "cost_per_sample_usd": 0.009878175,
+      "input_tokens_per_sample": 13837.5,
+      "output_tokens_per_sample": 4059.0
+    },
+    {
+      "family": "RLM",
+      "task_id": "12",
+      "context_size": -1,
+      "question_count": 2.0,
+      "f1": 1.0,
+      "cost_per_sample_usd": 0.0110202,
+      "input_tokens_per_sample": 13044.0,
+      "output_tokens_per_sample": 4542.0
     },
     {
       "family": "RLM",
@@ -2933,12 +3073,12 @@
     },
     "RLM/task11/ctx=-1": {
       "question_count": 2.0,
-      "run_count": 3,
+      "run_count": 5,
       "f1": 1.0,
       "f1_std": 0.0,
-      "cost": 0.00773453,
-      "input_tokens": 13503.666666666666,
-      "output_tokens": 3018.6666666666665
+      "cost": 0.007788403,
+      "input_tokens": 13084.3,
+      "output_tokens": 3076.2
     },
     "RLM/task11/ctx=100": {
       "question_count": 2.0,
@@ -2960,12 +3100,12 @@
     },
     "RLM/task12/ctx=-1": {
       "question_count": 2.0,
-      "run_count": 3,
+      "run_count": 5,
       "f1": 1.0,
       "f1_std": 0.0,
-      "cost": 0.008297158333333334,
-      "input_tokens": 9867.833333333334,
-      "output_tokens": 3481.5
+      "cost": 0.00915797,
+      "input_tokens": 11297.0,
+      "output_tokens": 3809.1
     },
     "RLM/task12/ctx=100": {
       "question_count": 2.0,
@@ -2987,12 +3127,12 @@
     },
     "RLM/task12b/ctx=-1": {
       "question_count": 1.0,
-      "run_count": 3,
-      "f1": 1.0,
-      "f1_std": 0.0,
-      "cost": 0.007015400000000001,
-      "input_tokens": 10006.666666666666,
-      "output_tokens": 2789.6666666666665
+      "run_count": 5,
+      "f1": 0.9999029597282872,
+      "f1_std": 0.00019408054342551218,
+      "cost": 0.006755700000000001,
+      "input_tokens": 9326.8,
+      "output_tokens": 2744.8
     },
     "RLM/task12b/ctx=100": {
       "question_count": 1.0,
@@ -3014,12 +3154,12 @@
     },
     "RLM/task13/ctx=-1": {
       "question_count": 4.0,
-      "run_count": 3,
-      "f1": 0.8576632071974024,
-      "f1_std": 0.11254144553498573,
-      "cost": 0.020162030833333334,
-      "input_tokens": 48039.083333333336,
-      "output_tokens": 7527.916666666667
+      "run_count": 5,
+      "f1": 0.7932635093859158,
+      "f1_std": 0.11756116412236371,
+      "cost": 0.017452016,
+      "input_tokens": 36366.4,
+      "output_tokens": 6603.2
     },
     "RLM/task13/ctx=100": {
       "question_count": 4.0,
@@ -3041,12 +3181,12 @@
     },
     "RLM/task14/ctx=-1": {
       "question_count": 2.0,
-      "run_count": 3,
-      "f1": 0.621969696969697,
-      "f1_std": 0.1440363841222953,
-      "cost": 0.018840433333333333,
-      "input_tokens": 22239.333333333332,
-      "output_tokens": 7962.166666666667
+      "run_count": 5,
+      "f1": 0.6731818181818182,
+      "f1_std": 0.2034254409093974,
+      "cost": 0.01794992,
+      "input_tokens": 20469.6,
+      "output_tokens": 7578.5
     },
     "RLM/task14/ctx=100": {
       "question_count": 2.0,
@@ -3095,12 +3235,12 @@
     },
     "RLM/task17/ctx=-1": {
       "question_count": 5.0,
-      "run_count": 3,
-      "f1": 0.03443869497442409,
-      "f1_std": 0.011262098195483718,
-      "cost": 0.02124490266666667,
-      "input_tokens": 57827.333333333336,
-      "output_tokens": 8005.0
+      "run_count": 5,
+      "f1": 0.029853357962767182,
+      "f1_std": 0.011893819401836302,
+      "cost": 0.0197297044,
+      "input_tokens": 48612.68,
+      "output_tokens": 7522.68
     },
     "RLM/task17/ctx=100": {
       "question_count": 5.0,
@@ -3122,12 +3262,12 @@
     },
     "RLM/task17b/ctx=-1": {
       "question_count": 5.0,
-      "run_count": 3,
-      "f1": 0.06262103388745295,
-      "f1_std": 0.04288834038187783,
-      "cost": 0.023127650666666666,
-      "input_tokens": 70601.86666666667,
-      "output_tokens": 8320.266666666666
+      "run_count": 5,
+      "f1": 0.07574602462810943,
+      "f1_std": 0.04942482660897813,
+      "cost": 0.022695346800000002,
+      "input_tokens": 67950.68,
+      "output_tokens": 8276.2
     },
     "RLM/task17b/ctx=100": {
       "question_count": 5.0,
@@ -3204,11 +3344,11 @@
       "question_count": 31.0
     },
     "RLM/ctx=full": {
-      "f1": 0.3423510425816078,
-      "f1_std": 0.021336740001259853,
-      "cost": 0.02338839032258065,
-      "input_tokens": 52874.47311827958,
-      "output_tokens": 9046.79569892473,
+      "f1": 0.3387196451477879,
+      "f1_std": 0.02400951143835044,
+      "cost": 0.022717779763440863,
+      "input_tokens": 49383.51612903226,
+      "output_tokens": 8841.223655913976,
       "task_count": 8,
       "question_count": 31.0
     }
@@ -3270,11 +3410,11 @@
         "question_count": 5.0
       },
       "RLM/ctx=full": {
-        "f1": 1.0,
-        "f1_std": 0.0,
-        "cost": 0.007815755333333334,
-        "input_tokens": 11349.933333333334,
-        "output_tokens": 3158.0,
+        "f1": 0.9999805919456574,
+        "f1_std": 3.881610868510244e-05,
+        "cost": 0.008129689200000002,
+        "input_tokens": 11617.88,
+        "output_tokens": 3303.0800000000004,
         "task_count": 3,
         "question_count": 5.0
       }
@@ -3335,11 +3475,11 @@
         "question_count": 6.0
       },
       "RLM/ctx=full": {
-        "f1": 0.7790987037881673,
-        "f1_std": 0.08907474252524114,
-        "cost": 0.019721498333333334,
-        "input_tokens": 39439.166666666664,
-        "output_tokens": 7672.666666666667,
+        "f1": 0.7532362789845499,
+        "f1_std": 0.1036363402846726,
+        "cost": 0.017617984,
+        "input_tokens": 31067.466666666664,
+        "output_tokens": 6928.3,
         "task_count": 2,
         "question_count": 6.0
       }
@@ -3400,11 +3540,11 @@
         "question_count": 20.0
       },
       "RLM/ctx=full": {
-        "f1": 0.04691450486504191,
-        "f1_std": 0.019485014766880544,
-        "cost": 0.02838161666666667,
-        "input_tokens": 67286.20000000001,
-        "output_tokens": 10931.233333333332,
+        "f1": 0.0490494182972918,
+        "f1_std": 0.020452207454611356,
+        "cost": 0.027894741133333335,
+        "input_tokens": 64319.73999999999,
+        "output_tokens": 10799.636666666665,
         "task_count": 3,
         "question_count": 20.0
       }
