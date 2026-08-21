@@ -31,6 +31,43 @@ def _normalize_sampling_args(sampling_args: dict[str, Any]) -> dict[str, Any]:
     return {k: v for k, v in args.items() if v is not None}
 
 
+def _assistant_text(message: Any) -> str:
+    """Return assistant text from a chat message. Never returns None.
+
+    OpenRouter/Gemini sometimes leave ``message.content`` unset (thinking-only
+    turns, filters, empty choices). The RLM parser requires a string.
+    """
+    content = getattr(message, "content", None)
+    if isinstance(content, str):
+        return content
+    if isinstance(content, list):
+        parts: list[str] = []
+        for part in content:
+            if isinstance(part, str):
+                parts.append(part)
+                continue
+            text = (
+                part.get("text")
+                if isinstance(part, dict)
+                else getattr(part, "text", None)
+            )
+            if text:
+                parts.append(str(text))
+        if parts:
+            return "".join(parts)
+    refusal = getattr(message, "refusal", None)
+    if isinstance(refusal, str) and refusal:
+        return refusal
+    return ""
+
+
+def _completion_text(response: Any) -> str:
+    choices = getattr(response, "choices", None) or []
+    if not choices:
+        return ""
+    return _assistant_text(getattr(choices[0], "message", None))
+
+
 def _merge_extra_body(
     hardcoded: dict[str, Any], sampling_args: dict[str, Any] | None
 ) -> dict[str, Any]:
@@ -90,6 +127,9 @@ class OpenAIClient(BaseLM):
         self.model_output_tokens: dict[str, int] = defaultdict(int)
         self.model_total_tokens: dict[str, int] = defaultdict(int)
         self.model_costs: dict[str, float] = defaultdict(float)  # Cost in USD
+        self.last_prompt_tokens = 0
+        self.last_completion_tokens = 0
+        self.last_cost: float | None = None
 
     def completion(self, prompt: str | list[dict[str, Any]], model: str | None = None) -> str:
         if isinstance(prompt, str):
@@ -115,7 +155,7 @@ class OpenAIClient(BaseLM):
             **_normalize_sampling_args(self.sampling_args),
         )
         self._track_cost(response, model)
-        return response.choices[0].message.content
+        return _completion_text(response)
 
     async def acompletion(
         self, prompt: str | list[dict[str, Any]], model: str | None = None
@@ -143,26 +183,33 @@ class OpenAIClient(BaseLM):
             **_normalize_sampling_args(self.sampling_args),
         )
         self._track_cost(response, model)
-        return response.choices[0].message.content
+        return _completion_text(response)
 
     def _track_cost(self, response: openai.ChatCompletion, model: str):
         self.model_call_counts[model] += 1
+        self.last_cost = None
 
         usage = getattr(response, "usage", None)
         if usage is None:
-            raise ValueError("No usage data received. Tracking tokens not possible.")
+            # OpenRouter/Gemini sometimes omit usage on empty or filtered turns.
+            self.last_prompt_tokens = 0
+            self.last_completion_tokens = 0
+            return
 
-        self.model_input_tokens[model] += usage.prompt_tokens
-        self.model_output_tokens[model] += usage.completion_tokens
-        self.model_total_tokens[model] += usage.total_tokens
+        prompt_tokens = getattr(usage, "prompt_tokens", None) or 0
+        completion_tokens = getattr(usage, "completion_tokens", None) or 0
+        total_tokens = getattr(usage, "total_tokens", None) or (
+            prompt_tokens + completion_tokens
+        )
 
-        # Track last call for handler to read
-        self.last_prompt_tokens = usage.prompt_tokens
-        self.last_completion_tokens = usage.completion_tokens
+        self.model_input_tokens[model] += prompt_tokens
+        self.model_output_tokens[model] += completion_tokens
+        self.model_total_tokens[model] += total_tokens
+        self.last_prompt_tokens = prompt_tokens
+        self.last_completion_tokens = completion_tokens
 
         # Extract cost from OpenRouter responses (cost is in USD)
         # OpenRouter returns cost in usage.model_extra for pydantic models
-        self.last_cost: float | None = None
         cost = None
 
         # Try direct attribute first

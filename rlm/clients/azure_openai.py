@@ -88,7 +88,7 @@ class AzureOpenAIClient(BaseLM):
             messages=messages,
         )
         self._track_cost(response, model)
-        return response.choices[0].message.content
+        return response.choices[0].message.content or ""
 
     async def acompletion(
         self, prompt: str | list[dict[str, Any]], model: str | None = None
@@ -109,22 +109,27 @@ class AzureOpenAIClient(BaseLM):
             messages=messages,
         )
         self._track_cost(response, model)
-        return response.choices[0].message.content
+        return response.choices[0].message.content or ""
 
     def _track_cost(self, response: openai.ChatCompletion, model: str):
         self.model_call_counts[model] += 1
 
         usage = getattr(response, "usage", None)
         if usage is None:
-            raise ValueError("No usage data received. Tracking tokens not possible.")
+            self.last_prompt_tokens = 0
+            self.last_completion_tokens = 0
+            return
 
-        self.model_input_tokens[model] += usage.prompt_tokens
-        self.model_output_tokens[model] += usage.completion_tokens
-        self.model_total_tokens[model] += usage.total_tokens
-
-        # Track last call for handler to read
-        self.last_prompt_tokens = usage.prompt_tokens
-        self.last_completion_tokens = usage.completion_tokens
+        prompt_tokens = getattr(usage, "prompt_tokens", None) or 0
+        completion_tokens = getattr(usage, "completion_tokens", None) or 0
+        total_tokens = getattr(usage, "total_tokens", None) or (
+            prompt_tokens + completion_tokens
+        )
+        self.model_input_tokens[model] += prompt_tokens
+        self.model_output_tokens[model] += completion_tokens
+        self.model_total_tokens[model] += total_tokens
+        self.last_prompt_tokens = prompt_tokens
+        self.last_completion_tokens = completion_tokens
 
     def get_usage_summary(self) -> UsageSummary:
         model_summaries = {}

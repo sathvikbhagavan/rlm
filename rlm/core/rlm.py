@@ -654,7 +654,7 @@ class RLM:
         and code execution + tool execution.
         """
         iter_start = time.perf_counter()
-        response = lm_handler.completion(prompt)
+        response = lm_handler.completion(prompt) or ""
         code_block_strs = find_code_blocks(response)
         code_blocks = []
 

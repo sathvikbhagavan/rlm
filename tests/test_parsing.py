@@ -45,6 +45,10 @@ End."""
         blocks = find_code_blocks(text)
         assert blocks == []
 
+    def test_none_text_returns_empty_list(self):
+        assert find_code_blocks(None) == []
+        assert find_code_blocks("") == []
+
     def test_non_repl_code_blocks_ignored(self):
         text = """Python block:
 ```python
