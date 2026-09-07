@@ -1,0 +1,426 @@
+{
+  "records": [
+    {
+      "family": "LLM",
+      "model_name": "openai/gpt-5-mini",
+      "context_size": 100,
+      "question_count": 10.0,
+      "f1": 0.8666666666666668,
+      "cost_per_sample_usd": 0.00262456,
+      "input_tokens_per_sample": 10243.2,
+      "output_tokens_per_sample": 1123.4
+    },
+    {
+      "family": "LLM",
+      "model_name": "openai/gpt-5-mini",
+      "context_size": 100,
+      "question_count": 10.0,
+      "f1": 0.9666666666666668,
+      "cost_per_sample_usd": 0.0027603600000000003,
+      "input_tokens_per_sample": 10243.2,
+      "output_tokens_per_sample": 1191.3
+    },
+    {
+      "family": "LLM",
+      "model_name": "openai/gpt-5-mini",
+      "context_size": 100,
+      "question_count": 10.0,
+      "f1": 0.9666666666666668,
+      "cost_per_sample_usd": 0.0018461599999999997,
+      "input_tokens_per_sample": 10243.2,
+      "output_tokens_per_sample": 734.2
+    },
+    {
+      "family": "LLM",
+      "model_name": "openai/gpt-5-mini",
+      "context_size": 100,
+      "question_count": 10.0,
+      "f1": 0.9666666666666668,
+      "cost_per_sample_usd": 0.005674075,
+      "input_tokens_per_sample": 10263.5,
+      "output_tokens_per_sample": 1554.1
+    },
+    {
+      "family": "LLM",
+      "model_name": "openai/gpt-5-mini",
+      "context_size": 500,
+      "question_count": 10.0,
+      "f1": 0.6466666666666667,
+      "cost_per_sample_usd": 0.003926364999999999,
+      "input_tokens_per_sample": 50891.7,
+      "output_tokens_per_sample": 1278.2
+    },
+    {
+      "family": "LLM",
+      "model_name": "openai/gpt-5-mini",
+      "context_size": 500,
+      "question_count": 10.0,
+      "f1": 0.7466666666666667,
+      "cost_per_sample_usd": 0.003968965,
+      "input_tokens_per_sample": 50891.7,
+      "output_tokens_per_sample": 1299.5
+    },
+    {
+      "family": "LLM",
+      "model_name": "openai/gpt-5-mini",
+      "context_size": 500,
+      "question_count": 10.0,
+      "f1": 0.6466666666666667,
+      "cost_per_sample_usd": 0.004291965,
+      "input_tokens_per_sample": 50891.7,
+      "output_tokens_per_sample": 1461.0
+    },
+    {
+      "family": "LLM",
+      "model_name": "openai/gpt-5-mini",
+      "context_size": 500,
+      "question_count": 10.0,
+      "f1": 0.7833333333333333,
+      "cost_per_sample_usd": 0.003083365,
+      "input_tokens_per_sample": 50891.7,
+      "output_tokens_per_sample": 856.7
+    },
+    {
+      "family": "LLM",
+      "model_name": "openai/gpt-5-mini",
+      "context_size": 500,
+      "question_count": 10.0,
+      "f1": 0.6466666666666667,
+      "cost_per_sample_usd": 0.015773725,
+      "input_tokens_per_sample": 50891.7,
+      "output_tokens_per_sample": 1525.4
+    },
+    {
+      "family": "LLM",
+      "model_name": "openai/gpt-5-mini",
+      "context_size": 100,
+      "question_count": 10.0,
+      "f1": 0.9666666666666666,
+      "cost_per_sample_usd": 0.0037798,
+      "input_tokens_per_sample": 10243.2,
+      "output_tokens_per_sample": 609.5
+    },
+    {
+      "family": "CodeAct",
+      "model_name": "openai/gpt-5-mini",
+      "context_size": 500,
+      "question_count": 10.0,
+      "f1": 0.5133333333333334,
+      "cost_per_sample_usd": 0.03324393,
+      "input_tokens_per_sample": 126228.2,
+      "output_tokens_per_sample": 11973.2
+    },
+    {
+      "family": "CodeAct",
+      "model_name": "openai/gpt-5-mini",
+      "context_size": 500,
+      "question_count": 10.0,
+      "f1": 0.4833333333333333,
+      "cost_per_sample_usd": 0.02797969,
+      "input_tokens_per_sample": 127602.6,
+      "output_tokens_per_sample": 11261.6
+    },
+    {
+      "family": "CodeAct",
+      "model_name": "openai/gpt-5-mini",
+      "context_size": 500,
+      "question_count": 10.0,
+      "f1": 0.5166666666666666,
+      "cost_per_sample_usd": 0.036367495,
+      "input_tokens_per_sample": 142275.9,
+      "output_tokens_per_sample": 14800.7
+    },
+    {
+      "family": "CodeAct",
+      "model_name": "openai/gpt-5-mini",
+      "context_size": 500,
+      "question_count": 10.0,
+      "f1": 0.3833333333333333,
+      "cost_per_sample_usd": 0.04610082,
+      "input_tokens_per_sample": 153364.4,
+      "output_tokens_per_sample": 19166.9
+    },
+    {
+      "family": "CodeAct",
+      "model_name": "openai/gpt-5-mini",
+      "context_size": 500,
+      "question_count": 10.0,
+      "f1": 0.2833333333333333,
+      "cost_per_sample_usd": 0.036228529999999995,
+      "input_tokens_per_sample": 131028.2,
+      "output_tokens_per_sample": 10302.3
+    },
+    {
+      "family": "CodeAct",
+      "model_name": "openai/gpt-5-mini",
+      "context_size": 100,
+      "question_count": 10.0,
+      "f1": 1.0,
+      "cost_per_sample_usd": 0.02327619,
+      "input_tokens_per_sample": 23515.0,
+      "output_tokens_per_sample": 9500.8
+    },
+    {
+      "family": "CodeAct",
+      "model_name": "openai/gpt-5-mini",
+      "context_size": 100,
+      "question_count": 10.0,
+      "f1": 1.0,
+      "cost_per_sample_usd": 0.02498259,
+      "input_tokens_per_sample": 27887.0,
+      "output_tokens_per_sample": 11038.7
+    },
+    {
+      "family": "CodeAct",
+      "model_name": "openai/gpt-5-mini",
+      "context_size": 100,
+      "question_count": 10.0,
+      "f1": 0.8666666666666668,
+      "cost_per_sample_usd": 0.021944595000000004,
+      "input_tokens_per_sample": 25026.7,
+      "output_tokens_per_sample": 9775.0
+    },
+    {
+      "family": "CodeAct",
+      "model_name": "openai/gpt-5-mini",
+      "context_size": 100,
+      "question_count": 10.0,
+      "f1": 1.0,
+      "cost_per_sample_usd": 0.026408165,
+      "input_tokens_per_sample": 35884.5,
+      "output_tokens_per_sample": 11147.8
+    },
+    {
+      "family": "CodeAct",
+      "model_name": "openai/gpt-5-mini",
+      "context_size": 100,
+      "question_count": 10.0,
+      "f1": 0.98,
+      "cost_per_sample_usd": 0.034633335,
+      "input_tokens_per_sample": 36057.5,
+      "output_tokens_per_sample": 14448.2
+    },
+    {
+      "family": "RLM",
+      "model_name": "openai/gpt-5-mini",
+      "context_size": -1,
+      "question_count": 10.0,
+      "f1": 1.0,
+      "cost_per_sample_usd": 0.00416891,
+      "input_tokens_per_sample": 9575.0,
+      "output_tokens_per_sample": 1518.3
+    },
+    {
+      "family": "RLM",
+      "model_name": "openai/gpt-5-mini",
+      "context_size": -1,
+      "question_count": 10.0,
+      "f1": 1.0,
+      "cost_per_sample_usd": 0.003752105,
+      "input_tokens_per_sample": 7479.3,
+      "output_tokens_per_sample": 1436.5
+    },
+    {
+      "family": "RLM",
+      "model_name": "openai/gpt-5-mini",
+      "context_size": -1,
+      "question_count": 10.0,
+      "f1": 1.0,
+      "cost_per_sample_usd": 0.00394983,
+      "input_tokens_per_sample": 7456.6,
+      "output_tokens_per_sample": 1538.2
+    },
+    {
+      "family": "RLM",
+      "model_name": "openai/gpt-5-mini",
+      "context_size": -1,
+      "question_count": 10.0,
+      "f1": 1.0,
+      "cost_per_sample_usd": 0.0037416,
+      "input_tokens_per_sample": 7459.2,
+      "output_tokens_per_sample": 1413.6
+    },
+    {
+      "family": "RLM",
+      "model_name": "openai/gpt-5-mini",
+      "context_size": -1,
+      "question_count": 10.0,
+      "f1": 1.0,
+      "cost_per_sample_usd": 0.0050247,
+      "input_tokens_per_sample": 10346.0,
+      "output_tokens_per_sample": 1823.9
+    },
+    {
+      "family": "RLM",
+      "model_name": "openai/gpt-5-mini",
+      "context_size": 500,
+      "question_count": 10.0,
+      "f1": 1.0,
+      "cost_per_sample_usd": 0.003534794999999999,
+      "input_tokens_per_sample": 8624.3,
+      "output_tokens_per_sample": 1252.4
+    },
+    {
+      "family": "RLM",
+      "model_name": "openai/gpt-5-mini",
+      "context_size": 500,
+      "question_count": 10.0,
+      "f1": 1.0,
+      "cost_per_sample_usd": 0.003908385,
+      "input_tokens_per_sample": 10149.7,
+      "output_tokens_per_sample": 1402.6
+    },
+    {
+      "family": "RLM",
+      "model_name": "openai/gpt-5-mini",
+      "context_size": 500,
+      "question_count": 10.0,
+      "f1": 1.0,
+      "cost_per_sample_usd": 0.00429111,
+      "input_tokens_per_sample": 9838.2,
+      "output_tokens_per_sample": 1575.3
+    },
+    {
+      "family": "RLM",
+      "model_name": "openai/gpt-5-mini",
+      "context_size": 500,
+      "question_count": 10.0,
+      "f1": 1.0,
+      "cost_per_sample_usd": 0.0045147799999999995,
+      "input_tokens_per_sample": 9726.8,
+      "output_tokens_per_sample": 1695.3
+    },
+    {
+      "family": "RLM",
+      "model_name": "openai/gpt-5-mini",
+      "context_size": 500,
+      "question_count": 10.0,
+      "f1": 1.0,
+      "cost_per_sample_usd": 0.0035255549999999997,
+      "input_tokens_per_sample": 7869.9,
+      "output_tokens_per_sample": 1288.8
+    },
+    {
+      "family": "RLM",
+      "model_name": "openai/gpt-5-mini",
+      "context_size": 100,
+      "question_count": 10.0,
+      "f1": 1.0,
+      "cost_per_sample_usd": 0.0031737149999999997,
+      "input_tokens_per_sample": 9331.5,
+      "output_tokens_per_sample": 1035.3
+    },
+    {
+      "family": "RLM",
+      "model_name": "openai/gpt-5-mini",
+      "context_size": 100,
+      "question_count": 10.0,
+      "f1": 1.0,
+      "cost_per_sample_usd": 0.0033948400000000005,
+      "input_tokens_per_sample": 7351.2,
+      "output_tokens_per_sample": 1256.6
+    },
+    {
+      "family": "RLM",
+      "model_name": "openai/gpt-5-mini",
+      "context_size": 100,
+      "question_count": 10.0,
+      "f1": 1.0,
+      "cost_per_sample_usd": 0.004069675,
+      "input_tokens_per_sample": 12202.7,
+      "output_tokens_per_sample": 1344.7
+    },
+    {
+      "family": "RLM",
+      "model_name": "openai/gpt-5-mini",
+      "context_size": 100,
+      "question_count": 10.0,
+      "f1": 0.9,
+      "cost_per_sample_usd": 0.00305774,
+      "input_tokens_per_sample": 7738.0,
+      "output_tokens_per_sample": 1082.9
+    },
+    {
+      "family": "RLM",
+      "model_name": "openai/gpt-5-mini",
+      "context_size": 100,
+      "question_count": 10.0,
+      "f1": 1.0,
+      "cost_per_sample_usd": 0.00385993,
+      "input_tokens_per_sample": 13998.6,
+      "output_tokens_per_sample": 1186.7
+    }
+  ],
+  "overall_agg": [
+    {
+      "family": "CodeAct",
+      "context": "100",
+      "question_count": 10.0,
+      "f1": 0.9693333333333334,
+      "f1_std": 0.05191445955715137,
+      "cost": 0.026248975,
+      "input_tokens": 29674.14,
+      "output_tokens": 11182.1
+    },
+    {
+      "family": "CodeAct",
+      "context": "500",
+      "question_count": 10.0,
+      "f1": 0.436,
+      "f1_std": 0.09034255795458628,
+      "cost": 0.035984093,
+      "input_tokens": 136099.86,
+      "output_tokens": 13500.94
+    },
+    {
+      "family": "LLM",
+      "context": "100",
+      "question_count": 10.0,
+      "f1": 0.9466666666666668,
+      "f1_std": 0.039999999999999966,
+      "cost": 0.003336991,
+      "input_tokens": 10247.26,
+      "output_tokens": 1042.5
+    },
+    {
+      "family": "LLM",
+      "context": "500",
+      "question_count": 10.0,
+      "f1": 0.6940000000000001,
+      "f1_std": 0.05911946473972095,
+      "cost": 0.006208877,
+      "input_tokens": 50891.7,
+      "output_tokens": 1284.16
+    },
+    {
+      "family": "RLM",
+      "context": "full",
+      "question_count": 10.0,
+      "f1": 1.0,
+      "f1_std": 0.0,
+      "cost": 0.004127429,
+      "input_tokens": 8463.22,
+      "output_tokens": 1546.1
+    },
+    {
+      "family": "RLM",
+      "context": "100",
+      "question_count": 10.0,
+      "f1": 0.98,
+      "f1_std": 0.039999999999999994,
+      "cost": 0.00351118,
+      "input_tokens": 10124.4,
+      "output_tokens": 1181.24
+    },
+    {
+      "family": "RLM",
+      "context": "500",
+      "question_count": 10.0,
+      "f1": 1.0,
+      "f1_std": 0.0,
+      "cost": 0.003954925,
+      "input_tokens": 9241.78,
+      "output_tokens": 1442.8799999999999
+    }
+  ]
+}
