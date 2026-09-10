@@ -1,0 +1,19 @@
+{
+  "schema_version": "1.0.0",
+  "pack_id": "example-prospective-pack",
+  "version": "0.1.0",
+  "seed": 20270910,
+  "candidates": [
+    {
+      "candidate_id": "cand-example-001",
+      "question_id": "rxh-t4-task16-indole-oxindole",
+      "candidate_answer": [[9245, 26791, 81856, 81879]],
+      "reaction_indices": [9245, 26791, 81856, 81879],
+      "model_id": "ADMIN-ONLY-EXAMPLE",
+      "run_id": "ADMIN-ONLY-RUN",
+      "evaluator_outcome": "incorrect",
+      "control_type": "positive",
+      "duplicate_group": null
+    }
+  ]
+}

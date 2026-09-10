@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}Questions · RxnHaystack{% endblock %}
+{% block content %}
+<h1>{% if mode == 'baseline' %}Independent baseline{% else %}Ground-truth audit{% endif %}</h1>
+{% if mode == 'baseline' %}
+<p class="danger-note">Official answers and evaluation feedback stay hidden until you submit each answer. A disagreement can be flagged after submission.</p>
+{% else %}
+<p class="danger-note">Audit mode reveals ground truth. Do not use this screen while completing the independent baseline.</p>
+{% endif %}
+{% if study_id %}<p><span class="badge">Assigned study: {{ study_id }}</span> Only assigned questions are shown, in assigned order.</p>{% endif %}
+{% if filter_errors %}<div class="danger-note" role="alert"><strong>Some filter values were ignored.</strong><ul>{% for error in filter_errors %}<li>{{ error }}</li>{% endfor %}</ul></div>{% endif %}
+<form class="filters" method="get">
+  <input type="hidden" name="mode" value="{{ mode }}">
+  <input type="hidden" name="study_id" value="{{ study_id }}">
+  <label>Tier<select name="tier"><option value="">All</option>{% for n in [1,2,3,4] %}<option value="{{ n }}" {% if tier == n %}selected{% endif %}>Tier {{ n }}</option>{% endfor %}</select></label>
+  <label>Category<select name="category"><option value="">All</option>{% for x in categories %}<option {% if category == x %}selected{% endif %}>{{ x }}</option>{% endfor %}</select></label>
+  <label>Status<select name="status"><option value="">All</option>{% for x in ['not-started','started','completed'] %}<option {% if status == x %}selected{% endif %}>{{ x }}</option>{% endfor %}</select></label>
+  <label>Search <span class="help-tooltip"><button class="help-trigger" type="button" aria-label="What does question search cover?" aria-describedby="question-search-help">?</button><span class="help-text" id="question-search-help" role="tooltip">Case-insensitive substring search across the question ID and full canonical question text. Examples: “task11”, “quinoline”, “C-N bond”, or “heaviest product”. This does not search reaction SMILES; use the Dataset page for that.</span></span><input name="search" value="{{ search }}" placeholder="Question ID or words in the question" aria-describedby="question-search-help"></label><button>Filter</button>
+</form>
+<p>{{ rows|length }} questions shown.</p>
+<div class="panel">
+{% for q in rows %}
+<div class="question-row"><span>Tier {{ q.tier }}<br><span class="badge">{{ q.status }}</span></span><span><strong>{{ q.question_id }}</strong><br>{{ q.category }} / {{ q.subcategory }}<br>{{ q.canonical_prompt[:170] }}…</span><span><a class="button" href="/question/{{ q.question_id }}?mode={{ mode }}">Open</a></span></div>
+{% else %}<p>No questions match.</p>{% endfor %}
+</div>
+{% endblock %}

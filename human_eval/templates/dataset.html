@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}Dataset · RxnHaystack{% endblock %}
+{% block content %}
+<h1>Clean USPTO reaction dataset</h1>
+<p>122,456 reactions · SHA-256 {{ manifest.dataset_sha256 }} · <a href="https://doi.org/10.6084/m9.figshare.24921555.v1">Reaction SMILES USPTO year 2023</a>, Rik van der Lingen, CC BY 4.0. The local cleaned derivative removes invalid reactions, atom maps, and canonical duplicates; see the repository dataset documentation.</p>
+<p><a class="button" href="/download/dataset">Download clean dataset</a></p>
+<form class="filters">
+  <label>SMILES search<input name="q" value="{{ q }}"></label>
+  <label><input type="checkbox" name="exact" value="true" {% if exact %}checked{% endif %}> Exact component/field match</label>
+  <label>Reaction index<input type="number" min="0" name="index" value="{{ index if index is not none else '' }}"></label>
+  <button>Search</button>
+</form>
+<p>{{ result.total }} matching records; page {{ result.page }}.</p>
+<p><button type="button" data-export-records="csv">Export selected CSV</button> <button type="button" data-export-records="jsonl">Export selected JSONL</button></p>
+{% for row in result.rows %}
+<article class="panel dataset-row" id="reaction-{{ row.idx }}"><h2><label><input type="checkbox" data-record-select value="{{ row.idx }}"> Reaction {{ row.idx }}</label></h2><button data-copy="{{ row.raw }}">Copy full record</button><p><strong>Reactants</strong><br><span class="smiles">{{ row.reactants }}</span></p><p><strong>Reagents</strong><br><span class="smiles">{{ row.reagents or '—' }}</span></p><p><strong>Products</strong><br><span class="smiles">{{ row.products }}</span></p></article>
+{% endfor %}
+<nav>{% if result.page > 1 %}<a class="button" href="?page={{ result.page-1 }}&q={{ q }}&exact={{ exact|string|lower }}">Previous</a>{% endif %} {% if result.page*result.page_size < result.total %}<a class="button" href="?page={{ result.page+1 }}&q={{ q }}&exact={{ exact|string|lower }}">Next</a>{% endif %}</nav>
+{% endblock %}

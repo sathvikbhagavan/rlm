@@ -1,0 +1,7 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Blinded prospective-answer plausibility review</h1>
+<p>Candidate order is deterministic. Model, run, prompting method, and original evaluator outcome are deliberately absent. Review candidates independently; duplicates and controls are not identified.</p>
+{% if study_id %}<p><span class="badge">Assigned study: {{ study_id }}</span> Only assigned candidates are shown.</p>{% endif %}
+<div class="panel">{% for item in rows %}<div class="question-row"><span><span class="badge">{% if item.completed %}completed{% else %}open{% endif %}</span></span><span><strong>Candidate {{ loop.index }}</strong><br>Question {{ item.question_id }}</span><a class="button" href="/prospective/{{ item.candidate_id }}">Review</a></div>{% else %}<p>No candidate pack imported or assigned. An administrator can import a versioned pack with the CLI.</p>{% endfor %}</div>
+{% endblock %}

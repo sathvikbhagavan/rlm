@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Validation workspace</h1>
+<p>Your work is stored locally in SQLite and can be resumed at any time.</p>
+
+<div class="mode-grid">
+  <section class="card mode-baseline">
+    <h2>Benchmark validation</h2>
+    <p>Answer each question without seeing the stored result. After submitting, you can compare your answer with the stored reference and flag a possible benchmark error immediately.</p>
+    <p>{{ progress.baseline.completed }} completed · {{ progress.baseline.started }} started</p>
+    <a class="button" href="/questions?mode=baseline">Begin or resume</a>
+  </section>
+
+  {% if progress.audit.started %}
+  <section class="card mode-audit">
+    <h2>Assigned detailed audit</h2>
+    <p>Resume the separate benchmark audit that Amin assigned to you.</p>
+    <p>{{ progress.audit.completed }} completed · {{ progress.audit.started }} started</p>
+    <a class="button" href="/questions?mode=audit">Resume audit</a>
+  </section>
+  {% endif %}
+
+  {% if candidate_count %}
+  <section class="card mode-prospective">
+    <h2>Assigned route review</h2>
+    <p>Review the blinded candidate routes supplied for this study.</p>
+    <p>{{ candidate_count }} candidates · {{ progress.prospective.completed }} completed</p>
+    <a class="button" href="/prospective">Review candidates</a>
+  </section>
+  {% endif %}
+</div>
+
+<section class="panel">
+  <h2>Resources</h2>
+  <p>{{ question_count }} canonical questions. Inspect or download the clean dataset without loading it all into the browser.</p>
+  <a class="button" href="/dataset">Open dataset browser</a>
+</section>
+{% endblock %}

@@ -1,0 +1,22 @@
+{
+  "schema_version": "1.0.0",
+  "study_id": "pilot-baseline-v1",
+  "mode": "baseline",
+  "seed": 20270910,
+  "quotas": {
+    "structural-lookup": 2,
+    "molecular-weight-change": 2,
+    "ring-count-change": 1,
+    "aromatic-ring-formation": 1,
+    "combined-mw-ring": 1,
+    "functional-groups": 2,
+    "mechanism-templates": 2,
+    "bond-level": 1,
+    "scaffold": 1,
+    "reagent": 1,
+    "stereochemistry": 1,
+    "mechanical-graph": 1,
+    "chemically-constrained-graph": 1,
+    "prospective-multiconstraint": 1
+  }
+}

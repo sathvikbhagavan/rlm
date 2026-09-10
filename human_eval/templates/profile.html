@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Optional expertise profile</h1>
+<p>Do not enter your name, institution, email, or other identifying information.</p>
+<form class="panel" data-profile-form>
+  <label>Role / career stage<select name="role"><option value="">Prefer not to say</option>{% for x in ['student','doctoral_researcher','postdoctoral_researcher','faculty_or_staff_scientist','industry_scientist','other'] %}<option value="{{ x }}" {% if expertise.role == x %}selected{% endif %}>{{ x|replace('_',' ') }}</option>{% endfor %}</select></label>
+  <label>Years of organic/synthetic chemistry experience<input type="number" min="0" max="80" step="0.5" name="years_chemistry" value="{{ expertise.years_chemistry or '' }}"></label>
+  {% for key,label in [('reaction_informatics','Familiarity with reaction informatics'),('uspto_familiarity','Familiarity with USPTO reaction datasets')] %}<label>{{ label }}<select name="{{ key }}"><option value="">Prefer not to say</option>{% for x in ['none','limited','moderate','high','expert'] %}<option {% if expertise[key] == x %}selected{% endif %}>{{ x }}</option>{% endfor %}</select></label>{% endfor %}
+  <p id="profile-status" role="status"></p><button>Save profile</button>
+</form>
+{% endblock %}

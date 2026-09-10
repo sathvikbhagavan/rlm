@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block content %}
+<h1>Resume from an export</h1>
+<p>Upload a previously downloaded <code>rxnhaystack_human_annotation_*.zip</code> to restore drafts, submissions, revision history, timing, assignments, expertise, and attachments.</p>
+<p>The ZIP is verified against its manifest and merged idempotently. For safety, an existing workspace containing another anonymous annotator's work cannot be replaced.</p>
+<form class="panel" data-restore-form>
+  <label>Annotation export ZIP<input type="file" name="archive" accept=".zip,application/zip" required></label>
+  <p id="restore-status" role="status" tabindex="-1"></p>
+  <button>Verify and restore</button>
+</form>
+{% endblock %}
