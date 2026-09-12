@@ -1,22 +1,10 @@
 import argparse
-import os
-import shutil
-import subprocess
 import uuid
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from io import TextIOWrapper
 from pathlib import Path
 
-import wandb
-
-from rxnhaystack.campaign_metrics import install_campaign_metrics
-
 from rich.console import Console
-from rlm import RLM
-from rxnhaystack.worker import instrument_rlm_from_environment
-from rlm.codeact_helpers import load_lines
-from rlm.tracing import init_tracing, using_tracing_attributes
-
 from task16_truncated_synthesis_graph import (
     FULL_CHAIN_LENGTH,
     MAX_HEAVY_ATOMS,
@@ -44,6 +32,13 @@ from task16_truncated_synthesis_ground_truth import (
     target_spec_for_question,
     update_task16_run_summary,
 )
+
+import wandb
+from rlm import RLM
+from rlm.codeact_helpers import load_lines
+from rlm.tracing import init_tracing, using_tracing_attributes
+from rxnhaystack.campaign_metrics import install_campaign_metrics
+from rxnhaystack.worker import instrument_rlm_from_environment, resolve_rlm_environment
 
 install_campaign_metrics(wandb)
 
@@ -90,35 +85,6 @@ class VerboseLogFile:
         if self._handle is not None:
             self._handle.close()
             self._handle = None
-
-
-def docker_is_available() -> bool:
-    if not shutil.which("docker"):
-        return False
-    try:
-        result = subprocess.run(
-            ["docker", "info"],
-            capture_output=True,
-            text=True,
-            timeout=10,
-            check=False,
-        )
-    except (OSError, subprocess.TimeoutExpired):
-        return False
-    return result.returncode == 0
-
-
-def resolve_environment(requested: str) -> str:
-    if requested != "docker":
-        return requested
-    if docker_is_available():
-        return "docker"
-    print(
-        "WARNING: Docker is unavailable in this session "
-        "(permission denied or daemon not running). "
-        "Falling back to environment=local."
-    )
-    return "local"
 
 
 def build_rlm_init_kwargs(*, model_name: str, environment: str, verbose: bool) -> dict:
@@ -210,7 +176,7 @@ def main(
     verbose: bool,
     verbose_log_path: Path | None,
 ) -> None:
-    environment = resolve_environment(environment)
+    environment = resolve_rlm_environment(environment)
     maybe_init_tracing()
     lines = load_lines(DATASET_PATH)
     print("Parsing full dataset records (one-time)...")
@@ -228,7 +194,7 @@ def main(
 
     verbose_log: VerboseLogFile | None = None
     if verbose:
-        timestamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+        timestamp = datetime.now(UTC).strftime("%Y%m%dT%H%M%SZ")
         log_path = verbose_log_path or (
             VERBOSE_LOG_DIR / f"verbose_{timestamp}_{run_session_id[-8:]}.log"
         )
@@ -323,7 +289,6 @@ def _run_task16_samples(
         )
         sampling = built.sampling
         support_indices = set(sampling.support_indices)
-        excluded_terminals = sampling.excluded_terminal_indices
         context_lines = built.context_lines
         gt = built.gt
         filters = built.filters

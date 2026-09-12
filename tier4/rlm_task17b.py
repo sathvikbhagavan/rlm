@@ -1,23 +1,7 @@
 import argparse
 import random
-import shutil
-import subprocess
 import uuid
 
-import wandb
-
-from rxnhaystack.campaign_metrics import install_campaign_metrics
-
-from rlm import RLM
-from rxnhaystack.worker import instrument_rlm_from_environment
-from rlm.codeact_helpers import build_context_pipeline, load_lines
-from rlm.tracing import init_tracing, using_tracing_attributes
-
-from task17b_smirks_sequential_graph import (
-    build_rlm_question,
-    parse_chain_response,
-    precision_recall_f1,
-)
 from task17b_ground_truth import (
     FIXED_QUESTIONS,
     TASK17B_FORCED_CHAIN_COUNT,
@@ -29,13 +13,25 @@ from task17b_ground_truth import (
     full_support_indices_for_question,
     ground_truth_chains_in_context,
     min_selected_ground_truth_for_spec,
-    random_pool_excluded_indices,
     print_task17b_run_summary,
     print_task17b_sample_context,
     print_task17b_sample_metrics,
     print_task17b_startup_banner,
+    random_pool_excluded_indices,
     update_task17b_run_summary,
 )
+from task17b_smirks_sequential_graph import (
+    build_rlm_question,
+    parse_chain_response,
+    precision_recall_f1,
+)
+
+import wandb
+from rlm import RLM
+from rlm.codeact_helpers import build_context_pipeline, load_lines
+from rlm.tracing import init_tracing, using_tracing_attributes
+from rxnhaystack.campaign_metrics import install_campaign_metrics
+from rxnhaystack.worker import instrument_rlm_from_environment, resolve_rlm_environment
 
 install_campaign_metrics(wandb)
 
@@ -50,35 +46,6 @@ MAX_CHAINS_PER_QUESTION = 0
 ENVIRONMENT = "docker"
 DOCKER_IMAGE = "rlm-sandbox"
 DOCKER_MEMORY_LIMIT = "20g"
-
-
-def docker_is_available() -> bool:
-    if not shutil.which("docker"):
-        return False
-    try:
-        result = subprocess.run(
-            ["docker", "info"],
-            capture_output=True,
-            text=True,
-            timeout=10,
-            check=False,
-        )
-    except (OSError, subprocess.TimeoutExpired):
-        return False
-    return result.returncode == 0
-
-
-def resolve_environment(requested: str) -> str:
-    if requested != "docker":
-        return requested
-    if docker_is_available():
-        return "docker"
-    print(
-        "WARNING: Docker is unavailable in this session "
-        "(permission denied or daemon not running). "
-        "Falling back to environment=local."
-    )
-    return "local"
 
 
 def maybe_init_tracing() -> None:
@@ -165,7 +132,7 @@ def main(
     if max_chains_per_question < 0:
         raise ValueError("--max-chains-per-question must be non-negative.")
 
-    environment = resolve_environment(environment)
+    environment = resolve_rlm_environment(environment)
     maybe_init_tracing()
     lines = load_lines(DATASET_PATH)
     evaluated_specs = [

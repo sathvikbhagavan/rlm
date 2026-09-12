@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import os
 import resource
+import shutil
+import subprocess
 import time
 from dataclasses import dataclass
 from pathlib import Path
@@ -16,6 +18,44 @@ RLM_LOCAL_MEMORY_LIMIT_ENV = "RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB"
 RLM_LOCAL_MEMORY_LIMIT_MIB = 8192
 RLM_LOCAL_TOOL_MEMORY_LIMIT_ENV = "RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB"
 RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = 4096
+
+
+def docker_is_available() -> bool:
+    """Return whether this user can reach a running Docker daemon."""
+
+    if not shutil.which("docker"):
+        return False
+    try:
+        result = subprocess.run(
+            ["docker", "info"],
+            capture_output=True,
+            text=True,
+            timeout=10,
+            check=False,
+        )
+    except (OSError, subprocess.TimeoutExpired):
+        return False
+    return result.returncode == 0
+
+
+def resolve_rlm_environment(requested: str) -> str:
+    """Require Docker isolation for launcher-managed jobs that request it."""
+
+    if requested != "docker":
+        return requested
+    if docker_is_available():
+        return "docker"
+    message = (
+        "Docker is unavailable to this user (permission denied, daemon stopped, "
+        "or command missing)."
+    )
+    if os.environ.get("RXNHAYSTACK_RUN_ID"):
+        raise RuntimeError(
+            f"{message} This archival RLM job requires Docker isolation; see "
+            "experiments/iclr2027/running_benchmark.md."
+        )
+    print(f"WARNING: {message} Falling back to environment=local for this standalone run.")
+    return "local"
 
 
 @dataclass(frozen=True)

@@ -11,6 +11,7 @@ from rxnhaystack.worker import (
     RLM_LOCAL_TOOL_MEMORY_LIMIT_ENV,
     BenchmarkRuntime,
     instrument_rlm_from_environment,
+    resolve_rlm_environment,
 )
 
 
@@ -129,3 +130,25 @@ def test_local_rlm_rejects_tool_limit_above_worker_limit(
         instrument_rlm_from_environment(
             {"backend": "openrouter", "environment": "local"}
         )
+
+
+def test_archival_docker_job_does_not_fall_back_to_local(monkeypatch) -> None:
+    monkeypatch.setenv("RXNHAYSTACK_RUN_ID", "archival-job")
+    with (
+        patch("rxnhaystack.worker.docker_is_available", return_value=False),
+        pytest.raises(RuntimeError, match="requires Docker isolation"),
+    ):
+        resolve_rlm_environment("docker")
+
+
+def test_standalone_docker_job_can_warn_and_fall_back(monkeypatch, capsys) -> None:
+    monkeypatch.delenv("RXNHAYSTACK_RUN_ID", raising=False)
+    with patch("rxnhaystack.worker.docker_is_available", return_value=False):
+        assert resolve_rlm_environment("docker") == "local"
+    assert "standalone run" in capsys.readouterr().out
+
+
+def test_available_docker_environment_is_preserved(monkeypatch) -> None:
+    monkeypatch.setenv("RXNHAYSTACK_RUN_ID", "archival-job")
+    with patch("rxnhaystack.worker.docker_is_available", return_value=True):
+        assert resolve_rlm_environment("docker") == "docker"

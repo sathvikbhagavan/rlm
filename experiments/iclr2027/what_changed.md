@@ -187,15 +187,15 @@ bound; a live full-corpus Qwen turn exceeded two minutes while ordinary turns
 used 129--860 output tokens. The 30-iteration and two-level recursion limits are
 unchanged.
 
-For launcher-managed RLM work, Docker remains the preferred isolated execution
-environment. When Docker is unavailable and RLM uses the local Python fallback,
-the worker has an 8,192-MiB address-space limit and model-generated Python has a
-temporary 4,096-MiB limit. Restoring the larger limit before error reporting
-reserves controller and logging headroom, so a runaway tool allocation becomes
-a `MemoryError` visible to the RLM instead of crashing the worker. Both values
-are recorded in the experiment files. The outer 30-GiB process-tree monitor
-remains active and stops the job if the RLM does not recover; a trace event
-records the effective local limits for later audit.
+Recorded Tier-4 Tasks 16, 17, and 17b now require Docker isolation and fail
+before model calls rather than silently falling back when Docker is inaccessible.
+This boundary is necessary because model-generated native RDKit code can crash
+an in-process Python worker. Standalone development may still use the local
+fallback, and the remaining RLM tasks use local execution directly. Those local
+workers have an 8,192-MiB address-space limit, with a temporary 4,096-MiB limit
+around model-generated Python so the controller retains error-reporting
+headroom. Both values are recorded in the experiment files and resource trace.
+The outer 30-GiB process-tree monitor remains the final safeguard.
 
 We kept five repetitions as five independent jobs. A single `n=5` model request
 would not be equivalent for CodeAct or RLM because later calls depend on earlier

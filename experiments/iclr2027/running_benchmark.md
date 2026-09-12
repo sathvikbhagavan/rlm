@@ -153,6 +153,33 @@ uv run --frozen pytest -q
 changing `uv.lock`. The tests should finish with the same pass/skip counts on
 each machine. Report any failure before making API calls.
 
+### Prepare the isolated Tier-4 RLM environment
+
+Tier-4 Tasks 16, 17, and 17b execute model-written Python and native RDKit code.
+Their recorded benchmark jobs require Docker isolation; they deliberately stop
+before making model calls if this user cannot reach Docker. First check access:
+
+```bash
+docker info
+```
+
+If this reports permission denied, ask the machine administrator to grant this
+user Docker access. On a conventional Linux installation the administrator may
+use `sudo usermod -aG docker "$USER"`; the user must then sign out and back in.
+Membership in the Docker group is a privileged machine-level permission, so it
+should follow the host's normal policy.
+
+Build and test the pinned chemistry sandbox from the repository root:
+
+```bash
+docker build -t rlm-sandbox -f tier4/Dockerfile.sandbox tier4
+docker run --rm rlm-sandbox python -c \
+  'import dill, numpy, rdkit, requests; print(numpy.__version__, rdkit.__version__)'
+```
+
+The build must complete successfully, and the test must print NumPy `1.26.4`
+and RDKit `2025.09.6`. Report the `docker info` result and those two versions.
+
 ### Prepare or verify the dataset
 
 ```bash
@@ -317,17 +344,19 @@ turns normally used 129--860 output tokens; without a request bound, one turn
 continued for more than two minutes. The RLM-level limits of 30 iterations and
 two recursion levels remain unchanged.
 
-RLM should use the Docker environment when it is available. If Docker is not
-available to the user running the benchmark, the code falls back to its local
-Python environment. Every launcher-managed local RLM worker has an explicit
-8,192-MiB address-space limit. While model-generated Python executes, that limit
-is temporarily lowered to 4,096 MiB; it is restored before errors are formatted
-or logged. This reserves approximately 4 GiB for the RLM controller to turn an
-oversized allocation into `MemoryError` and ask the model to try a smaller
-approach. The separate 30,720-MiB process-tree limit remains in force and stops
-the whole job if recovery fails. Both local limits are written in the experiment
-files, and `resource-trace.jsonl` records them in an
-`rlm_local_memory_limit_set` event.
+Tier-4 Tasks 16, 17, and 17b require the Docker environment for recorded
+benchmark jobs. There is no automatic local fallback during these archival
+runs: a missing daemon, image, or user permission is reported before model calls
+begin. This matters because native-library failures in model-generated code can
+terminate an in-process Python worker. The container instead turns a failed tool
+process into an error the RLM controller can record and respond to.
+
+Standalone development runs may still fall back to the local Python environment,
+and the other RLM tasks use that environment directly. Launcher-managed local
+RLM workers have an 8,192-MiB address-space limit; model-generated Python is
+temporarily limited to 4,096 MiB so the controller retains error-reporting
+headroom. The separate 30,720-MiB process-tree limit remains the final safeguard.
+Both local limits are recorded in `resource-trace.jsonl` when they apply.
 
 Start with one open model, one job at a time:
 
