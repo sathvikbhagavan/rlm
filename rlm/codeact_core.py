@@ -3,12 +3,20 @@ from __future__ import annotations
 import ast
 import asyncio
 import contextlib
+import importlib
 import io
 import json
+import multiprocessing
+import os
 import re
+import resource
+import signal
+import threading
 import time
 import traceback
-from typing import Any, Callable, Dict, Optional
+from collections.abc import Callable
+from types import ModuleType
+from typing import Any
 
 from llama_index.core.llms import LLM, ChatMessage
 from llama_index.core.memory import ChatMemoryBuffer
@@ -102,6 +110,11 @@ The exact retrieved context rows are already available in Python as the list
 generated code.
 </tool-data-reminder>"""
 
+CODEACT_TOOL_TIMEOUT_ENV = "RXNHAYSTACK_CODEACT_TOOL_TIMEOUT_SECONDS"
+CODEACT_TOOL_TIMEOUT_SECONDS = 60.0
+CODEACT_TOOL_MEMORY_LIMIT_ENV = "RXNHAYSTACK_CODEACT_TOOL_MEMORY_LIMIT_MIB"
+CODEACT_TOOL_MEMORY_LIMIT_MIB = 4096
+
 
 def append_preloaded_lines_reminder(user_input: str) -> str:
     """Keep the tool-data instruction near the question in long CodeAct prompts."""
@@ -115,8 +128,8 @@ class SimpleCodeExecutor:
     NOTE: not safe for production use.
     """
 
-    def __init__(self, locals: Dict[str, Any], globals: Dict[str, Any]):
-        self.namespace: Dict[str, Any] = {}
+    def __init__(self, locals: dict[str, Any], globals: dict[str, Any]):
+        self.namespace: dict[str, Any] = {}
         self.namespace.update(globals)
         self.namespace.update(locals)
 
@@ -169,6 +182,162 @@ class SimpleCodeExecutor:
         return output
 
 
+def _isolated_executor_main(
+    connection,
+    extra_locals: dict[str, Any],
+    extra_globals: dict[str, Any],
+    module_globals: dict[str, str],
+    memory_limit_mib: int,
+) -> None:
+    """Serve persistent code execution inside a killable process group."""
+
+    os.setsid()
+    limit_bytes = memory_limit_mib * 1024 * 1024
+    _, hard_limit = resource.getrlimit(resource.RLIMIT_AS)
+    if hard_limit != resource.RLIM_INFINITY:
+        limit_bytes = min(limit_bytes, hard_limit)
+    resource.setrlimit(resource.RLIMIT_AS, (limit_bytes, hard_limit))
+    for alias, module_name in module_globals.items():
+        extra_globals[alias] = importlib.import_module(module_name)
+    executor = SimpleCodeExecutor(locals=extra_locals, globals=extra_globals)
+    try:
+        connection.send(("ready", None))
+        while True:
+            command, payload = connection.recv()
+            if command == "stop":
+                return
+            if command != "execute":
+                connection.send(("error", f"Unknown executor command: {command}"))
+                continue
+            connection.send(("result", executor.execute(payload)))
+    except (EOFError, BrokenPipeError):
+        return
+    finally:
+        connection.close()
+
+
+class IsolatedCodeExecutor:
+    """Persistent CodeAct namespace in a process that can be truly terminated."""
+
+    def __init__(
+        self,
+        *,
+        extra_locals: dict[str, Any],
+        extra_globals: dict[str, Any],
+        timeout_s: float,
+        memory_limit_mib: int,
+    ) -> None:
+        self.extra_locals = extra_locals
+        self.extra_globals: dict[str, Any] = {}
+        self.module_globals: dict[str, str] = {}
+        for alias, value in extra_globals.items():
+            if isinstance(value, ModuleType):
+                self.module_globals[alias] = value.__name__
+            else:
+                self.extra_globals[alias] = value
+        self.timeout_s = timeout_s
+        self.memory_limit_mib = memory_limit_mib
+        self._context = multiprocessing.get_context("spawn")
+        self._process: multiprocessing.Process | None = None
+        self._connection = None
+        self._lock = threading.Lock()
+        self._start()
+
+    def _start(self) -> None:
+        parent_connection, child_connection = self._context.Pipe()
+        process = self._context.Process(
+            target=_isolated_executor_main,
+            args=(
+                child_connection,
+                self.extra_locals,
+                self.extra_globals,
+                self.module_globals,
+                self.memory_limit_mib,
+            ),
+            daemon=True,
+        )
+        process.start()
+        child_connection.close()
+        self._connection = parent_connection
+        self._process = process
+        try:
+            if not parent_connection.poll(30):
+                raise RuntimeError("Isolated CodeAct process did not start within 30 seconds")
+            status, payload = parent_connection.recv()
+            if status != "ready":
+                raise RuntimeError(f"Isolated CodeAct process failed to start: {payload}")
+        except (BrokenPipeError, EOFError, OSError, RuntimeError):
+            exit_code = process.exitcode
+            self._stop()
+            raise RuntimeError(
+                f"Isolated CodeAct process failed during startup (exit code {exit_code})"
+            ) from None
+
+    def _stop(self) -> None:
+        process = self._process
+        connection = self._connection
+        self._process = None
+        self._connection = None
+        if connection is not None:
+            try:
+                connection.close()
+            except OSError:
+                pass
+        if process is None:
+            return
+        if process.is_alive():
+            try:
+                os.killpg(process.pid, signal.SIGKILL)
+            except (ProcessLookupError, PermissionError):
+                process.kill()
+        process.join(timeout=5)
+        if process.is_alive():
+            process.kill()
+            process.join(timeout=5)
+        process.close()
+
+    def _reset(self) -> None:
+        self._stop()
+        self._start()
+
+    def execute(self, code: str) -> str:
+        with self._lock:
+            if self._process is None or not self._process.is_alive():
+                self._reset()
+            assert self._process is not None
+            assert self._connection is not None
+            try:
+                self._connection.send(("execute", code))
+                if not self._connection.poll(self.timeout_s):
+                    self._reset()
+                    return (
+                        format_code_execution_timeout_error(self.timeout_s)
+                        + "\nThe isolated Python state was reset after the timeout."
+                    )
+                status, payload = self._connection.recv()
+            except (BrokenPipeError, EOFError, OSError):
+                exit_code = self._process.exitcode
+                self._reset()
+                return (
+                    "Error: RuntimeError: The isolated code process exited "
+                    f"unexpectedly (exit code {exit_code}).\n"
+                    "The isolated Python state was reset; use a safer approach."
+                )
+            if status != "result":
+                return f"Error: RuntimeError: {payload}"
+            return str(payload)
+
+    def cleanup(self) -> None:
+        with self._lock:
+            self._stop()
+
+    def __del__(self) -> None:
+        try:
+            self.cleanup()
+        except Exception:
+            pass
+
+
 def format_code_execution_timeout_error(timeout_s: float) -> str:
     return (
         f"Error: TimeoutError: Code execution exceeded {timeout_s:.1f}s timeout.\n"
@@ -188,21 +357,52 @@ async def execute_code_with_timeout(
         return code_execute_fn(code)
     try:
         return await asyncio.wait_for(asyncio.to_thread(code_execute_fn, code), timeout=timeout_s)
-    except asyncio.TimeoutError:
+    except TimeoutError:
         return format_code_execution_timeout_error(timeout_s)
 
 
 def make_simple_code_executor(
-    extra_locals: Optional[dict[str, Any]] = None,
-    extra_globals: Optional[dict[str, Any]] = None,
-) -> SimpleCodeExecutor:
+    extra_locals: dict[str, Any] | None = None,
+    extra_globals: dict[str, Any] | None = None,
+) -> SimpleCodeExecutor | IsolatedCodeExecutor:
     globals_dict: dict[str, Any] = {"__builtins__": __builtins__}
     if extra_globals:
         globals_dict.update(extra_globals)
     locals_dict: dict[str, Any] = {}
     if extra_locals:
         locals_dict.update(extra_locals)
+    if os.environ.get("RXNHAYSTACK_RUN_ID"):
+        return IsolatedCodeExecutor(
+            extra_locals=locals_dict,
+            extra_globals=globals_dict,
+            timeout_s=_positive_float_from_environment(
+                CODEACT_TOOL_TIMEOUT_ENV, CODEACT_TOOL_TIMEOUT_SECONDS
+            ),
+            memory_limit_mib=_positive_int_from_environment(
+                CODEACT_TOOL_MEMORY_LIMIT_ENV, CODEACT_TOOL_MEMORY_LIMIT_MIB
+            ),
+        )
     return SimpleCodeExecutor(locals=locals_dict, globals=globals_dict)
+
+
+def _positive_float_from_environment(name: str, default: float) -> float:
+    try:
+        value = float(os.environ.get(name, str(default)))
+    except ValueError as error:
+        raise ValueError(f"{name} must be a positive number") from error
+    if value <= 0:
+        raise ValueError(f"{name} must be a positive number")
+    return value
+
+
+def _positive_int_from_environment(name: str, default: int) -> int:
+    try:
+        value = int(os.environ.get(name, str(default)))
+    except ValueError as error:
+        raise ValueError(f"{name} must be a positive integer") from error
+    if value <= 0:
+        raise ValueError(f"{name} must be a positive integer")
+    return value
 
 
 class InputEvent(Event):
@@ -213,7 +413,7 @@ class CodeExecutionEvent(Event):
     code: str
 
 
-def _extract_finish_reason(response: Any) -> Optional[str]:
+def _extract_finish_reason(response: Any) -> str | None:
     raw = getattr(response, "raw", None)
     if raw is None:
         return None
@@ -582,7 +782,13 @@ class CodeActAgent(Workflow):
 
 
 async def run_agent_verbose(agent: CodeActAgent, ctx: Context, query: str):
-    handler = agent.run(user_input=query, ctx=ctx)
-    async for _event in handler.stream_events():
-        pass
-    return await handler
+    try:
+        handler = agent.run(user_input=query, ctx=ctx)
+        async for _event in handler.stream_events():
+            pass
+        return await handler
+    finally:
+        executor = getattr(agent.code_execute_fn, "__self__", None)
+        cleanup = getattr(executor, "cleanup", None)
+        if callable(cleanup):
+            cleanup()

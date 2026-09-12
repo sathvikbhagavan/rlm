@@ -331,6 +331,16 @@ lines; the controller recognizes
 the `ANSWER:` marker and leaves validation of the following task-specific format
 to the task's own parser.
 
+For recorded benchmark jobs, each question's CodeAct Python namespace lives in
+its own child process. Variables persist across ordinary turns, but the whole
+child process group is terminated if one generated block runs longer than 60
+seconds or exits inside native code. The next turn receives a clear error and a
+fresh namespace with that question's `lines` restored. Each child also has a
+4,096-MiB address-space limit. This is a real termination boundary; an earlier
+thread-based timeout could report a timeout while an infinite loop continued in
+the background and prevented the worker from exiting. Both values are written
+into every CodeAct job in the experiment file.
+
 Each CodeAct model turn is capped at 2,048 output tokens. The older scripts
 requested as many as 30,000, which allowed a malformed action to occupy a
 provider for five minutes and could create an outsized paid bill. A 4,096-token
@@ -401,7 +411,8 @@ For every trial job, inspect:
   RLM iteration or subcall, and whether the expected local RLM memory limit was
   applied;
 - `stdout.log` and `stderr.log`: parse failures, authentication errors, 400/429/
-  5xx responses, retries, or chemistry-tool errors;
+  5xx responses, retries, chemistry-tool errors, or isolated CodeAct timeouts/
+  restarts;
 - W&B: the run exists once, has the expected model/provider labels, and contains
   per-question outputs and final metrics.
 

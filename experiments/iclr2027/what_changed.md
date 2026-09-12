@@ -181,6 +181,16 @@ short actions while bounding a pathological turn's latency and paid cost. A
 4,096-token follow-up trial still exceeded three minutes; the known-good action
 on the same long prompt required only 390 tokens.
 
+Launcher-managed CodeAct tools now run in a persistent child process for each
+question rather than a Python thread in the benchmark worker. Normal variables
+persist across turns. A generated block exceeding 60 seconds, a native crash,
+or a 4,096-MiB address-space limit terminates the complete child process group;
+the controller reports the failure and restores a clean process with the same
+preloaded `lines`. This replaces a thread timeout that could return an error but
+could not stop the underlying computation, leaving a worker unable to finish.
+The shared factory applies this to all 34 CodeAct scripts, and agent cleanup
+stops every child even when the workflow itself fails or is interrupted.
+
 RLM now sends the same 2,048-token limit on every root and recursive request.
 Its prior OpenAI-compatible client had a 300-second deadline but no output-token
 bound; a live full-corpus Qwen turn exceeded two minutes while ordinary turns
