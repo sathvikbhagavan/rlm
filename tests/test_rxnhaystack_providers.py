@@ -4,6 +4,7 @@ import pytest
 
 from rxnhaystack.manifest import ManifestError
 from rxnhaystack.providers import (
+    ANTHROPIC_CACHE_CONTROL,
     CODEACT_MAX_OUTPUT_TOKENS,
     CODEACT_MAX_OUTPUT_TOKENS_ENV,
     RLM_MAX_OUTPUT_TOKENS,
@@ -150,6 +151,86 @@ def test_codeact_caps_each_provider_completion(monkeypatch) -> None:
     )
 
     assert swiss_client.max_tokens == CODEACT_MAX_OUTPUT_TOKENS
+
+
+def test_anthropic_codeact_enables_openrouter_prompt_cache(monkeypatch) -> None:
+    monkeypatch.setenv("RXNHAYSTACK_PROVIDER", "openrouter")
+    monkeypatch.setenv("RXNHAYSTACK_METHOD", "codeact")
+    monkeypatch.setenv("RXNHAYSTACK_RUN_ID", "full-claude-codeact-r01")
+
+    client = build_benchmark_llm(
+        model="anthropic/claude-sonnet-5",
+        api_key="private",
+        additional_kwargs={"max_completion_tokens": 100},
+    )
+
+    assert client.additional_kwargs == {
+        "max_completion_tokens": 100,
+        "extra_body": {
+            "cache_control": ANTHROPIC_CACHE_CONTROL,
+            "session_id": "full-claude-codeact-r01",
+        },
+    }
+
+
+@pytest.mark.parametrize(
+    ("method", "model"),
+    (("llm", "anthropic/claude-sonnet-5"), ("codeact", "openai/gpt-5-mini")),
+)
+def test_prompt_cache_is_not_added_to_unrelated_openrouter_calls(
+    monkeypatch, method: str, model: str
+) -> None:
+    monkeypatch.setenv("RXNHAYSTACK_PROVIDER", "openrouter")
+    monkeypatch.setenv("RXNHAYSTACK_METHOD", method)
+
+    client = build_benchmark_llm(model=model, api_key="private")
+
+    assert "extra_body" not in client.additional_kwargs
+
+
+def test_prompt_cache_is_not_sent_to_swissai(monkeypatch) -> None:
+    monkeypatch.setenv("RXNHAYSTACK_PROVIDER", "swissai")
+    monkeypatch.setenv("RXNHAYSTACK_METHOD", "codeact")
+    monkeypatch.setenv("SWISSAI_RESEARCH_API_KEY", "private")
+
+    client = build_benchmark_llm(
+        model="anthropic/claude-sonnet-5",
+        api_key="replaced",
+    )
+
+    assert client.additional_kwargs == {
+        "extra_body": {"chat_template_kwargs": {"enable_thinking": False}}
+    }
+
+
+def test_anthropic_rlm_enables_openrouter_prompt_cache(monkeypatch) -> None:
+    monkeypatch.setenv("RXNHAYSTACK_PROVIDER", "openrouter")
+    monkeypatch.setenv("RXNHAYSTACK_MODEL", "anthropic/claude-sonnet-5")
+    monkeypatch.setenv("RXNHAYSTACK_RUN_ID", "full-claude-rlm-r01")
+
+    configured = configure_rlm_for_provider(
+        {
+            "backend": "openrouter",
+            "backend_kwargs": {
+                "chat_completion_extra_body": {"existing": True},
+            },
+        }
+    )
+
+    assert configured["backend_kwargs"]["chat_completion_extra_body"] == {
+        "existing": True,
+        "cache_control": ANTHROPIC_CACHE_CONTROL,
+        "session_id": "full-claude-rlm-r01",
+    }
+
+
+def test_anthropic_cache_routing_rejects_overlong_run_id(monkeypatch) -> None:
+    monkeypatch.setenv("RXNHAYSTACK_PROVIDER", "openrouter")
+    monkeypatch.setenv("RXNHAYSTACK_METHOD", "codeact")
+    monkeypatch.setenv("RXNHAYSTACK_RUN_ID", "x" * 257)
+
+    with pytest.raises(ManifestError, match="at most 256"):
+        build_benchmark_llm(model="anthropic/claude-sonnet-5", api_key="private")
 
 
 def test_codeact_rejects_invalid_output_guardrail(monkeypatch) -> None:

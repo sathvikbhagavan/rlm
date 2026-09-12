@@ -12,7 +12,7 @@ There are three experiment-description files, but only two contain new work:
 
 | Experiment file | Purpose | Separately tracked jobs | Estimated cost with safety margin |
 | --- | --- | ---: | ---: |
-| `full-campaign.toml` | Complete 100-question benchmark with six models | 6,300 | CHF 939.25 |
+| `full-campaign.toml` | Complete 100-question benchmark with six models | 6,300 | CHF 1,161.22 |
 | `matched-cardinality-campaign.toml` | Corpus-size/cardinality control on the 65 questions with ordinary reaction-row positives | 1,450 | CHF 70.98 |
 | `baseline-campaign.toml` | Optional independent GPT-5-mini reproduction | 1,050 | CHF 67.32 |
 
@@ -75,11 +75,12 @@ The full experiment already includes every GPT-5-mini setting from the optional
 baseline reproduction. We should not run `baseline-campaign.toml` as well unless
 we explicitly want a second, independent GPT-5-mini reproduction.
 
-The estimated total for the full and matched-cardinality experiments is CHF
-1,010.23. This includes a 25% safety margin for the six-model benchmark and a
-50% safety margin for the matched-cardinality experiment. The margins protect
-against models producing longer trajectories than GPT-5-mini did historically;
-they are not expected charges.
+The provisional estimated total for the full and matched-cardinality experiments
+is CHF 1,232.20. The estimates include a 25% general safety margin, a further
+Claude CodeAct allowance based on a live Tier-4 trial, and a 50% margin for the
+matched-cardinality experiment. They are spending ceilings, not expected
+charges. Freeze the final figure only after the Docker-based RLM trial described
+below.
 
 ### Models and methods
 
@@ -96,7 +97,7 @@ As calculated above, each full-benchmark model accounts for:
 ```
 
 The planned costs, including the safety margin, are CHF 0 for the three SwissAI
-models, CHF 229.89 for Gemini, CHF 613.04 for Claude, and CHF 96.33 for
+models, CHF 229.89 for Gemini, CHF 835.00 for Claude, and CHF 96.33 for
 GPT-5-mini. Each matched-cardinality model accounts for 725 jobs and 2,175
 question-level trajectories, as calculated above; only its GPT-5-mini half is
 expected to incur API charges.
@@ -107,6 +108,15 @@ For each model we run:
 - CodeAct at 100 and 500 reaction rows;
 - RLM at 100 rows, 500 rows, and the full corpus;
 - five independent repetitions of every setting.
+
+Anthropic CodeAct and RLM calls use OpenRouter's provider-side prompt cache.
+The benchmark messages and answers are unchanged; repeated prefixes are billed
+at the provider's cache-read price. Each job name is also used as its routing
+session so concurrent questions return to the same provider endpoint. Cache
+writes, reads, and actual cost are recorded per model turn in
+`resource-trace.jsonl`. A live 10-question Claude CodeAct x500 trial reused
+79.46% of nominal input tokens and cost CHF 4.79, compared with CHF 12.13
+without caching. The recorded allowance for that cell is CHF 6.51.
 
 The matched-cardinality experiment uses Qwen3.5-397B-A17B and GPT-5-mini. It
 holds K=1 while increasing the corpus through 100, 500, 5,000, 50,000, and full.
@@ -409,7 +419,8 @@ For every trial job, inspect:
 - `metadata.json`: exact setting, completion state, and peak process-tree RAM;
 - `resource-trace.jsonl`: whether RAM grew steadily or spiked during a particular
   RLM iteration or subcall, and whether the expected local RLM memory limit was
-  applied;
+  applied; for Claude CodeAct, also compare cached tokens, cache-write tokens,
+  and actual cost turn by turn;
 - `stdout.log` and `stderr.log`: parse failures, authentication errors, 400/429/
   5xx responses, retries, chemistry-tool errors, or isolated CodeAct timeouts/
   restarts;
@@ -594,6 +605,13 @@ hidden client retries multiplying that deadline. For diagnosis only, the value
 can be overridden for a launch by setting
 `RXNHAYSTACK_SWISSAI_REQUEST_TIMEOUT_SECONDS`; do not change it between
 benchmark jobs without recording and justifying the deviation.
+
+The runner also checks the CHF ceiling again before every queued job starts.
+Once completed jobs' actual costs plus estimates for unfinished work exceed the
+ceiling, no new process starts: affected jobs report `budget-stopped` and remain
+pending. Jobs already making API calls are allowed to finish and record their
+results. Recalculate the estimates and create a new experiment version before
+resuming; do not simply raise the ceiling without reviewing the measured costs.
 
 SwissAI chat calls use the endpoint's native `enable_thinking=false` option.
 Live trials showed that its separately returned hidden thinking channel could

@@ -268,6 +268,11 @@ def codeact_callbacks_from_environment(*, sample_id: str | int) -> dict[str, Any
             duration_seconds=duration,
             failed=failed,
         ),
+        "on_llm_usage": lambda iteration, usage: trace(
+            "codeact_llm_usage",
+            iteration=iteration,
+            **usage,
+        ),
         "on_tool_start": lambda iteration: trace("codeact_tool_started", iteration=iteration),
         "on_tool_complete": lambda iteration, duration, failed: trace(
             "codeact_tool_finished",

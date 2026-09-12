@@ -14,6 +14,8 @@ CODEACT_MAX_OUTPUT_TOKENS_ENV = "RXNHAYSTACK_CODEACT_OUTPUT_LIMIT"
 CODEACT_MAX_OUTPUT_TOKENS = 2048
 RLM_MAX_OUTPUT_TOKENS_ENV = "RXNHAYSTACK_RLM_OUTPUT_LIMIT"
 RLM_MAX_OUTPUT_TOKENS = 2048
+ANTHROPIC_CACHE_CONTROL = {"type": "ephemeral"}
+RUN_ID_ENV = "RXNHAYSTACK_RUN_ID"
 SWISSAI_API_KEY_ENV = "SWISSAI_RESEARCH_API_KEY"
 SWISSAI_BASE_URL = "https://api.swissai.svc.cscs.ch/v1"
 SWISSAI_REQUEST_TIMEOUT_ENV = "RXNHAYSTACK_SWISSAI_REQUEST_TIMEOUT_SECONDS"
@@ -65,10 +67,40 @@ def _bounded_chat_kwargs(kwargs: dict[str, Any]) -> dict[str, Any]:
     return configured
 
 
+def _enable_anthropic_prompt_cache(kwargs: dict[str, Any]) -> dict[str, Any]:
+    """Enable provider-side prefix caching for Anthropic agent conversations.
+
+    OpenRouter requires an explicit top-level ``cache_control`` field for Claude.
+    The OpenAI Python client accepts provider extensions through ``extra_body``.
+    Restrict this to multi-turn methods: a one-shot request cannot reuse a cache
+    and an Anthropic cache write costs more than an uncached prompt.
+    """
+
+    configured = dict(kwargs)
+    if benchmark_provider() != "openrouter":
+        return configured
+    if os.environ.get(METHOD_ENV) not in {"codeact", "rlm"}:
+        return configured
+    model = str(configured.get("model") or os.environ.get("RXNHAYSTACK_MODEL", ""))
+    if not model.startswith("anthropic/"):
+        return configured
+    additional = dict(configured.get("additional_kwargs", {}) or {})
+    extra_body = dict(additional.get("extra_body", {}) or {})
+    extra_body["cache_control"] = dict(ANTHROPIC_CACHE_CONTROL)
+    run_id = os.environ.get(RUN_ID_ENV)
+    if run_id:
+        if len(run_id) > 256:
+            raise ManifestError(f"{RUN_ID_ENV} must be at most 256 characters for cache routing")
+        extra_body["session_id"] = run_id
+    additional["extra_body"] = extra_body
+    configured["additional_kwargs"] = additional
+    return configured
+
+
 def build_benchmark_llm(**kwargs: Any) -> OpenRouter | OpenAILike:
     """Build a LlamaIndex chat client without changing benchmark prompt semantics."""
 
-    kwargs = _bounded_chat_kwargs(kwargs)
+    kwargs = _enable_anthropic_prompt_cache(_bounded_chat_kwargs(kwargs))
     provider = benchmark_provider()
     if provider == "openrouter":
         return OpenRouter(**kwargs)
@@ -141,6 +173,21 @@ def configure_rlm_for_provider(kwargs: dict[str, Any]) -> dict[str, Any]:
     model = os.environ.get("RXNHAYSTACK_MODEL")
     if model:
         backend_kwargs["model_name"] = model
+    if (
+        benchmark_provider() == "openrouter"
+        and model is not None
+        and model.startswith("anthropic/")
+    ):
+        extra_body = dict(backend_kwargs.get("chat_completion_extra_body", {}) or {})
+        extra_body["cache_control"] = dict(ANTHROPIC_CACHE_CONTROL)
+        run_id = os.environ.get(RUN_ID_ENV)
+        if run_id:
+            if len(run_id) > 256:
+                raise ManifestError(
+                    f"{RUN_ID_ENV} must be at most 256 characters for cache routing"
+                )
+            extra_body["session_id"] = run_id
+        backend_kwargs["chat_completion_extra_body"] = extra_body
     if benchmark_provider() == "swissai":
         api_key = os.environ.get(SWISSAI_API_KEY_ENV)
         if not api_key:

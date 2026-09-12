@@ -567,6 +567,7 @@ class CodeActAgent(Workflow):
         memory_token_limit: int = 120_000,
         on_llm_start: Callable[[int], None] | None = None,
         on_llm_complete: Callable[[int, float, bool], None] | None = None,
+        on_llm_usage: Callable[[int, dict[str, float | int]], None] | None = None,
         on_tool_start: Callable[[int], None] | None = None,
         on_tool_complete: Callable[[int, float, bool], None] | None = None,
         **workflow_kwargs: Any,
@@ -589,6 +590,7 @@ class CodeActAgent(Workflow):
         self.memory_token_limit = max(1024, memory_token_limit)
         self.on_llm_start = on_llm_start
         self.on_llm_complete = on_llm_complete
+        self.on_llm_usage = on_llm_usage
         self.on_tool_start = on_tool_start
         self.on_tool_complete = on_tool_complete
         self.system_message = ChatMessage(role="system", content=system_prompt)
@@ -700,6 +702,8 @@ class CodeActAgent(Workflow):
 
         llm_turn_metrics = await ctx.store.get("llm_turn_metrics", default=[])
         usage_metrics = extract_usage_metrics(response)
+        if self.on_llm_usage is not None:
+            self.on_llm_usage(iteration, usage_metrics)
         llm_turn_metrics.append(
             {
                 "iteration": iteration,

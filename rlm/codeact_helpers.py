@@ -316,35 +316,51 @@ def extract_response_text(response_obj: Any) -> str:
 
 
 def extract_usage_metrics(response: Any) -> dict[str, float | int]:
-    def _from_usage_obj(usage: Any) -> tuple[int, int, int, float | None]:
+    missing = object()
+
+    def _value(source: Any, name: str, default: Any = None) -> Any:
+        if isinstance(source, dict):
+            return source.get(name, default)
+        value = getattr(source, name, default)
+        if value is default:
+            extra = getattr(source, "model_extra", None)
+            if isinstance(extra, dict):
+                return extra.get(name, default)
+        return value
+
+    def _from_usage_obj(usage: Any) -> dict[str, float | int]:
         if usage is None:
-            return 0, 0, 0, None
-        if isinstance(usage, dict):
-            prompt = int(usage.get("prompt_tokens", 0) or usage.get("input_tokens", 0) or 0)
-            completion = int(
-                usage.get("completion_tokens", 0) or usage.get("output_tokens", 0) or 0
-            )
-            total = int(usage.get("total_tokens", 0) or (prompt + completion))
-            cost = usage.get("cost")
-            if cost is None:
-                cost = (
-                    usage.get("cost_details", {}).get("upstream_inference_cost")
-                    if isinstance(usage.get("cost_details"), dict)
-                    else None
-                )
-            return prompt, completion, total, (float(cost) if cost is not None else None)
-        prompt = int(getattr(usage, "prompt_tokens", 0) or getattr(usage, "input_tokens", 0) or 0)
+            return {}
+        prompt = int(_value(usage, "prompt_tokens", 0) or _value(usage, "input_tokens", 0) or 0)
         completion = int(
-            getattr(usage, "completion_tokens", 0) or getattr(usage, "output_tokens", 0) or 0
+            _value(usage, "completion_tokens", 0)
+            or _value(usage, "output_tokens", 0)
+            or 0
         )
-        total = int(getattr(usage, "total_tokens", 0) or (prompt + completion))
-        cost = getattr(usage, "cost", None)
-        extra = getattr(usage, "model_extra", None)
-        if cost is None and isinstance(extra, dict):
-            cost = extra.get("cost")
-            if cost is None and isinstance(extra.get("cost_details"), dict):
-                cost = extra["cost_details"].get("upstream_inference_cost")
-        return prompt, completion, total, (float(cost) if cost is not None else None)
+        total = int(_value(usage, "total_tokens", 0) or (prompt + completion))
+        cost = _value(usage, "cost")
+        cost_details = _value(usage, "cost_details", {})
+        if cost is None and isinstance(cost_details, dict):
+            cost = cost_details.get("upstream_inference_cost")
+        prompt_details = _value(usage, "prompt_tokens_details", missing)
+        result: dict[str, float | int] = {
+            "prompt_tokens": prompt,
+            "completion_tokens": completion,
+            "total_tokens": total,
+        }
+        if cost is not None:
+            result["cost_usd"] = float(cost)
+        if prompt_details is not missing and prompt_details is not None:
+            cached = _value(prompt_details, "cached_tokens", 0)
+            cache_write = _value(prompt_details, "cache_write_tokens", 0)
+            if cached is not None:
+                result["cached_tokens"] = int(cached or 0)
+            if cache_write is not None:
+                result["cache_write_tokens"] = int(cache_write or 0)
+        cache_discount = _value(usage, "cache_discount")
+        if cache_discount is not None:
+            result["cache_discount_usd"] = float(cache_discount)
+        return result
 
     candidates: list[Any] = []
     raw = getattr(response, "raw", None)
@@ -363,15 +379,8 @@ def extract_usage_metrics(response: Any) -> dict[str, float | int]:
         candidates.append(add_kwargs.get("usage"))
 
     for usage in candidates:
-        p, c, t, cost = _from_usage_obj(usage)
-        if p or c or t or cost is not None:
-            result: dict[str, float | int] = {
-                "prompt_tokens": p,
-                "completion_tokens": c,
-                "total_tokens": t,
-            }
-            if cost is not None:
-                result["cost_usd"] = cost
+        result = _from_usage_obj(usage)
+        if any(result.get(key, 0) for key in ("prompt_tokens", "completion_tokens", "total_tokens")) or "cost_usd" in result:
             return result
     return {"prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0}
 

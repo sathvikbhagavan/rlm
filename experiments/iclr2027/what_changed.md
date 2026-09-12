@@ -129,6 +129,14 @@ OpenAI-compatible client. Provider selection changes the connection and
 credential, not the chemistry question. OpenRouter-only request options are not
 sent to SwissAI when the endpoint does not advertise them.
 
+Anthropic's multi-turn CodeAct and RLM requests explicitly enable OpenRouter
+prompt caching. The job name supplies a stable provider-routing session, while
+the chemistry prompts and scoring remain unchanged. Each CodeAct turn records
+cache reads, cache writes, nominal tokens, and actual provider cost in the
+timestamped resource trace. A live Claude Tier-4 CodeAct x500 check reused
+79.46% of nominal input tokens and reduced cost from CHF 12.13 without caching
+to CHF 4.79 with caching; the experiment reserves CHF 6.51 for that cell.
+
 All three SwissAI model names were confirmed against the live service and
 successfully answered test requests. A live Qwen RLM check completed both root
 and recursive model calls.
@@ -269,6 +277,13 @@ cost rather than an absent cost field. W&B settings now also identify the exact
 job, repetition, provider, question parallelism, context size, and positive
 cardinality.
 
+The runner recalculates the spending ceiling before each queued job starts,
+using actual costs for completed attempts and estimates for unfinished work. If
+the revised total exceeds the ceiling, no further job is launched; the untouched
+jobs remain pending and already-running work finishes cleanly. This prevents a
+systematic model-specific underestimate from silently propagating through the
+whole queue.
+
 The adapter reads both ordinary dictionary summaries and the current W&B
 `Summary` object. A full 10-question live run exposed that the latter does not
 provide the dictionary `.items()` method; a compatibility test now reproduces
@@ -301,9 +316,9 @@ current closed-model prices:
 | --- | ---: |
 | Three SwissAI models | CHF 0 |
 | Gemini-3.7-Flash | CHF 229.89 |
-| Claude-Sonnet-5 | CHF 613.04 |
+| Claude-Sonnet-5 | CHF 835.00 |
 | GPT-5-mini | CHF 96.33 |
-| **Full benchmark** | **CHF 939.25** |
+| **Full benchmark** | **CHF 1,161.22** |
 
 Actual cost can differ because models may take different numbers of recursive
 turns. This is why the running guide requires small real-model trials before the

@@ -120,11 +120,16 @@ def command_run(args: argparse.Namespace) -> int:
         recover_running=args.recover_running,
     )
     for result in results:
-        detail = f"attempt={result.attempt}" if result.attempt is not None else "already recorded"
+        if result.attempt is not None:
+            detail = f"attempt={result.attempt}"
+        elif result.status == "skipped":
+            detail = "already recorded"
+        else:
+            detail = "no attempt started"
         print(f"{result.run_id}: {result.status} ({detail})")
         if result.error is not None:
             print(f"  {result.error}")
-    return 1 if any(result.status == "failed" for result in results) else 0
+    return 1 if any(result.status not in {"succeeded", "skipped"} for result in results) else 0
 
 
 def command_status(args: argparse.Namespace) -> int:

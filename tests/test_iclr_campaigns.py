@@ -28,7 +28,7 @@ def test_full_campaign_is_generated_and_covers_six_models() -> None:
 
     assert len(manifest.runs) == 6_300
     assert len({run.model for run in manifest.runs}) == 6
-    assert manifest.estimated_cost_chf == pytest.approx(939.25, abs=0.02)
+    assert manifest.estimated_cost_chf == pytest.approx(1_161.22, abs=0.02)
     assert manifest.campaign.required_secrets == REQUIRED_SECRETS
     assert Counter(run.env["RXNHAYSTACK_PROVIDER"] for run in manifest.runs) == {
         "swissai": 3_150,

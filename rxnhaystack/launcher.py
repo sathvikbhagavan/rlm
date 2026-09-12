@@ -342,9 +342,49 @@ def run_selected(
     results: list[ExecutionResult] = []
     memory_budget = MemoryBudget(manifest.campaign.max_parallel_memory_mib)
     cancellation_event = threading.Event()
+    budget_stop_event = threading.Event()
+    budget_lock = threading.Lock()
+
+    def budget_stopped(run: PlannedRun, error: str) -> ExecutionResult:
+        return ExecutionResult(
+            run_id=run.run_id,
+            status="budget-stopped",
+            attempt=None,
+            return_code=None,
+            artifact_dir=None,
+            error=error,
+        )
+
+    def check_rolling_budget(run: PlannedRun) -> ExecutionResult | None:
+        if budget_stop_event.is_set():
+            return budget_stopped(
+                run,
+                "Not started because an earlier job exhausted the experiment budget",
+            )
+        with budget_lock:
+            if budget_stop_event.is_set():
+                return budget_stopped(
+                    run,
+                    "Not started because an earlier job exhausted the experiment budget",
+                )
+            try:
+                enforce_remaining_budget(manifest, ledger)
+            except ManifestError as error:
+                budget_stop_event.set()
+                return budget_stopped(run, str(error))
+        return None
 
     def execute_with_reservation(run: PlannedRun) -> ExecutionResult:
+        stopped = check_rolling_budget(run)
+        if stopped is not None:
+            return stopped
         with memory_budget.reserve(run.memory_reservation_mib):
+            # A worker can wait here while other jobs finish and replace their
+            # estimates with higher actual costs. Check again immediately before
+            # claiming a ledger attempt and launching a paid subprocess.
+            stopped = check_rolling_budget(run)
+            if stopped is not None:
+                return stopped
             return execute_run_safely(
                 run,
                 manifest=manifest,

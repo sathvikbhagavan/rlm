@@ -24,9 +24,15 @@ def initialize_git_repository(path: Path) -> None:
     subprocess.run(["git", "-C", str(path), "commit", "-qm", "initial"], check=True)
 
 
-def write_worker(path: Path, *, write_metrics: bool = True, exit_code: int = 0) -> None:
+def write_worker(
+    path: Path,
+    *,
+    write_metrics: bool = True,
+    exit_code: int = 0,
+    cost_chf: float = 0.08,
+) -> None:
     metrics_statement = (
-        """
+        f"""
 from rxnhaystack.metrics import RunMetrics, write_run_metrics
 write_run_metrics(RunMetrics(
     calls=2,
@@ -36,8 +42,8 @@ write_run_metrics(RunMetrics(
     latency_seconds=0.1,
     tool_time_seconds=0.02,
     cost_usd=0.1,
-    cost_chf=0.08,
-    results={"macro_f1": 0.75},
+    cost_chf={cost_chf},
+    results={{"macro_f1": 0.75}},
 ))
 """
         if write_metrics
@@ -207,6 +213,50 @@ def test_budget_includes_failed_attempt_before_retry(tmp_path: Path) -> None:
     ledger = RunLedger(manifest.campaign.artifact_dir / "ledger.sqlite3")
     with pytest.raises(ManifestError, match="exceeds campaign budget"):
         enforce_remaining_budget(manifest, ledger)
+
+
+def test_launcher_stops_queued_jobs_when_actual_cost_exhausts_budget(
+    tmp_path: Path,
+) -> None:
+    project_root = tmp_path / "project"
+    project_root.mkdir()
+    initialize_git_repository(project_root)
+    worker = project_root / "worker.py"
+    write_worker(worker, cost_chf=0.20)
+    manifest = load_manifest(
+        write_campaign(
+            tmp_path,
+            project_root,
+            worker,
+            repetitions=3,
+            budget_chf=0.35,
+            estimated_cost_chf=0.10,
+        )
+    )
+
+    results = run_selected(
+        manifest,
+        preflight=perform_preflight(manifest),
+        selected=list(manifest.runs),
+        secrets={},
+        max_parallel=1,
+        retry_failed=False,
+        recover_running=False,
+    )
+
+    assert [result.status for result in results] == [
+        "succeeded",
+        "budget-stopped",
+        "budget-stopped",
+    ]
+    assert results[1].attempt is None
+    assert "exceeds campaign budget" in (results[1].error or "")
+    ledger = RunLedger(manifest.campaign.artifact_dir / "ledger.sqlite3")
+    assert [record.status for record in ledger.list_runs()] == [
+        "succeeded",
+        "pending",
+        "pending",
+    ]
 
 
 def test_launcher_failure_after_claim_never_leaves_running_record(tmp_path: Path) -> None:
