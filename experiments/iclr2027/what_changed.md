@@ -164,6 +164,14 @@ instruction is repeated after the question at the end of the initial user
 message. A live 53k-token Qwen probe changed from an unclosed 4,096-token copy of
 the context to a complete 390-token action using `lines`.
 
+The shared controller also accepts each task's own answer shape instead of
+assuming every answer is one comma-separated line. This matters for Tier 4,
+where a correct answer may contain several routes or reaction pairs. After the
+eighth permitted reasoning/tool turn, the controller allows one answer-only
+turn and explicitly forbids further code. A live Tier-4 Qwen check reached this
+boundary, returned a multi-line `ANSWER:` response, and stopped cleanly; tests
+cover the boundary and multi-line marker.
+
 We kept five repetitions as five independent jobs. A single `n=5` model request
 would not be equivalent for CodeAct or RLM because later calls depend on earlier
 responses and tool outputs.

@@ -1,4 +1,11 @@
-from rlm.codeact_core import PRELOADED_LINES_REMINDER, append_preloaded_lines_reminder
+from rlm.codeact_core import (
+    FINAL_ANSWER_REQUIRED,
+    INDEX_CODEACT_SYSTEM_PROMPT,
+    PRELOADED_LINES_REMINDER,
+    _continuation_instruction,
+    _has_final_answer,
+    append_preloaded_lines_reminder,
+)
 
 
 def test_preloaded_lines_reminder_is_last_in_long_codeact_prompt() -> None:
@@ -10,3 +17,36 @@ def test_preloaded_lines_reminder_is_last_in_long_codeact_prompt() -> None:
     assert completed.count("<tool-data-reminder>") == 1
     assert "`lines`" in completed
     assert completed.index("<question>") < completed.index("<tool-data-reminder>")
+
+
+def test_codeact_final_marker_accepts_task_specific_multiline_answers() -> None:
+    response = "ANSWER: 12,34,56,78\n90,91,92,93"
+
+    assert _has_final_answer(response)
+
+
+def test_codeact_does_not_treat_unfinished_reasoning_as_an_answer() -> None:
+    assert not _has_final_answer("THINK: I should inspect one more candidate.")
+
+
+def test_index_prompt_and_last_turn_instruction_do_not_assume_one_answer_shape() -> None:
+    normalized_prompt = " ".join(INDEX_CODEACT_SYSTEM_PROMPT.split())
+    assert "exact output format requested in the question" in normalized_prompt
+    assert "Do not write or request more code" in FINAL_ANSWER_REQUIRED
+
+
+def test_last_allowed_action_forces_a_bounded_final_answer_turn() -> None:
+    normal = "continue with code"
+
+    assert (
+        _continuation_instruction(
+            iteration=7, max_iterations=8, normal_instruction=normal
+        )
+        == normal
+    )
+    assert (
+        _continuation_instruction(
+            iteration=8, max_iterations=8, normal_instruction=normal
+        )
+        == FINAL_ANSWER_REQUIRED
+    )

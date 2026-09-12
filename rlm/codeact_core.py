@@ -54,9 +54,8 @@ AVAILABLE ACTIONS:
 ```python
 CODE...
 ```
-- Provide final answer exactly as:
-  ANSWER: <comma-separated indices in ascending order>
-  or ANSWER: -1
+- Provide the final answer as `ANSWER:` followed by the exact output format
+  requested in the question. The requested output may contain one or more lines.
 
 RULES:
 - Variables are persistent across turns. You don't have to declare them again.
@@ -76,7 +75,7 @@ DEFAULT_FORCE_LOOP_MESSAGE = (
 INDEX_FORCE_LOOP_MESSAGE = (
     "You must follow THINK -> ACT.\n"
     "Write Python code to proceed.\n"
-    "Or finish with: ANSWER: <comma-separated indices in ascending order> (or ANSWER: -1)."
+    "Or finish with ANSWER: followed by the exact output requested in the question."
 )
 
 DEFAULT_OBSERVATION_FOLLOWUP = (
@@ -85,9 +84,15 @@ DEFAULT_OBSERVATION_FOLLOWUP = (
 )
 
 INDEX_OBSERVATION_FOLLOWUP = (
-    "If this is sufficient, respond now with exactly: "
-    "ANSWER: <comma-separated indices in ascending order> or ANSWER: -1. "
+    "If this is sufficient, respond now with ANSWER: followed by the exact output "
+    "requested in the question. "
     "If not sufficient, continue with THINK and one Python code block."
+)
+
+FINAL_ANSWER_REQUIRED = (
+    "This was the last allowed tool action. Do not write or request more code. "
+    "Respond now with ANSWER: followed by the exact output requested in the "
+    "question. Include no reasoning or explanation."
 )
 
 PRELOADED_LINES_REMINDER = """<tool-data-reminder>
@@ -230,13 +235,25 @@ def _extract_answer_payload(content: str) -> str | None:
     return match.group(1).strip()
 
 
-def _has_valid_index_answer(content: str) -> bool:
-    payload = _extract_answer_payload(content)
-    if payload is None:
-        return False
-    if payload == "-1":
-        return True
-    return bool(re.fullmatch(r"\d+(?:\s*,\s*\d+)*", payload))
+def _has_final_answer(content: str) -> bool:
+    """Recognize the CodeAct protocol marker without assuming a task's shape.
+
+    Some benchmark tasks return one index, while others return several lines of
+    pairs or paths. Their task-specific parsers remain responsible for validating
+    the payload.
+    """
+
+    return _extract_answer_payload(content) is not None
+
+
+def _continuation_instruction(
+    *, iteration: int, max_iterations: int, normal_instruction: str
+) -> str:
+    """Require an answer after the final permitted tool/reasoning turn."""
+
+    if iteration >= max_iterations:
+        return FINAL_ANSWER_REQUIRED
+    return normal_instruction
 
 
 def _iter_exception_chain(exc: BaseException):
@@ -479,12 +496,17 @@ class CodeActAgent(Workflow):
         )
         await ctx.store.set("llm_turn_metrics", llm_turn_metrics)
 
-        if _has_valid_index_answer(content) or iteration > self.max_iterations:
+        if _has_final_answer(content) or iteration > self.max_iterations:
             return StopEvent(result=response)
 
         code = self._parse_code(content)
         if not code:
-            memory.put(ChatMessage(role="user", content=self.force_loop_message))
+            correction = _continuation_instruction(
+                iteration=iteration,
+                max_iterations=self.max_iterations,
+                normal_instruction=self.force_loop_message,
+            )
+            memory.put(ChatMessage(role="user", content=correction))
             await ctx.store.set("memory", memory)
             return InputEvent(input=await self._build_input_messages(ctx))
         return CodeExecutionEvent(code=code)
@@ -526,10 +548,15 @@ class CodeActAgent(Workflow):
         print("[END OUTPUT]\n")
 
         memory = await ctx.store.get("memory")
+        followup = _continuation_instruction(
+            iteration=iteration,
+            max_iterations=self.max_iterations,
+            normal_instruction=self.observation_followup,
+        )
         memory.put(
             ChatMessage(
                 role=self.observation_role,
-                content=(f"Code execution observation:\n{output}\n\n{self.observation_followup}"),
+                content=(f"Code execution observation:\n{output}\n\n{followup}"),
             )
         )
         await ctx.store.set("memory", memory)
