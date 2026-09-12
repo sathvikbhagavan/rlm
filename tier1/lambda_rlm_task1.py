@@ -16,7 +16,7 @@ from rlm import LambdaRLM
 from rlm.codeact_helpers import build_context_pipeline, precision_recall_f1
 
 
-DATASET_PATH = "/home/bhagavan/rlms/datasets/reactionSmilesFigShareUSPTO2023.txt"
+DATASET_PATH = __import__("os").environ.get("RXNHAYSTACK_RAW_DATASET", __import__("os").path.expanduser("~/datasets/rxnhaystack/reactionSmilesFigShareUSPTO2023.txt"))
 BACKEND = "openrouter"
 MODEL_NAME = "x-ai/grok-4-fast"
 SEED = 42

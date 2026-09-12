@@ -1,18 +1,23 @@
 import argparse
 import asyncio
-import random
 import os
+import random
+import time
 import uuid
 
 import wandb
 from llama_index.core.workflow import Context
-from llama_index.llms.openrouter import OpenRouter
+from rxnhaystack.providers import build_benchmark_llm
+from task1_hardcoded_cases import (
+    TASK1_HARDCODED_GROUND_TRUTH_INDICES,
+    TASK1_HARDCODED_PRODUCTS,
+)
 
 from rlm.codeact_core import (
-    CodeActAgent,
     INDEX_CODEACT_SYSTEM_PROMPT,
     INDEX_FORCE_LOOP_MESSAGE,
     INDEX_OBSERVATION_FOLLOWUP,
+    CodeActAgent,
     make_simple_code_executor,
     run_agent_verbose,
 )
@@ -23,22 +28,20 @@ from rlm.codeact_helpers import (
     parse_indices,
     precision_recall_f1,
 )
-from task1_hardcoded_cases import (
-    TASK1_HARDCODED_GROUND_TRUTH_INDICES,
-    TASK1_HARDCODED_PRODUCTS,
-)
 from rlm.tracing import get_tracer, init_tracing, using_tracing_attributes
 from rlm.utils.token_utils import count_tokens
+from rxnhaystack.concurrency import map_async_bounded
+from rxnhaystack.metrics import RunMetrics, cost_chf_from_usd, write_run_metrics
+from rxnhaystack.worker import BenchmarkRuntime
 
-
-DATASET_PATH = "/home/bhagavan/rlms/datasets/reactionSmilesFigShareUSPTO2023_cleaned.txt"
-MODEL_NAME = "openai/gpt-5-mini"
+DATASET_PATH = "~/datasets/rxnhaystack/reactionSmilesFigShareUSPTO2023_cleaned.txt"
+MODEL_NAME = __import__("os").environ.get("RXNHAYSTACK_MODEL", "openai/gpt-5-mini")
 OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
 ENABLE_TRACING = True
 WORKFLOW_TIMEOUT_S = 900.0
 NUM_QUESTIONS = 10
-SEED = 42
-CONTEXT_SIZE = 500
+SEED = int(__import__("os").environ.get("RXNHAYSTACK_SEED", "42"))
+CONTEXT_SIZE = int(__import__("os").environ.get("RXNHAYSTACK_CONTEXT_SIZE", "500"))
 CONTEXT_PIPELINE_NAME = "random"
 MIN_SELECTED_GROUND_TRUTH = 5
 MAX_OUTPUT_TOKENS = 20_000
@@ -47,6 +50,7 @@ REASONING_EFFORT = "low"
 LLM_TIMEOUT_RETRIES = 2
 LLM_TIMEOUT_RETRY_BACKOFF_S = 2.0
 # os.environ["WANDB_MODE"] = "disabled"
+
 
 def maybe_init_tracing() -> None:
     if not ENABLE_TRACING:
@@ -91,6 +95,7 @@ def build_code_executor(lines: list[str]):
         },
     )
 
+
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Run CodeAct task 1 evaluation.")
     parser.add_argument("--model-name", type=str, default=MODEL_NAME)
@@ -111,10 +116,18 @@ async def main(
     context_size: int,
     dataset_path: str,
 ) -> None:
+    started = time.monotonic()
+    runtime = BenchmarkRuntime.from_defaults(
+        model=model_name,
+        dataset_path=dataset_path,
+        seed=SEED,
+    )
+    model_name = runtime.model
+    dataset_path = str(runtime.dataset_path)
     maybe_init_tracing()
     tracer = get_tracer("codeact-task1")
     lines = load_lines(dataset_path=dataset_path)
-    rng = random.Random(SEED)
+    rng = random.Random(runtime.seed)
     context_pipeline = build_context_pipeline(
         name=CONTEXT_PIPELINE_NAME,
         lines=lines,
@@ -139,7 +152,8 @@ async def main(
             "NUM_QUESTIONS": num_questions,
             "dataset_path": dataset_path,
             "workflow_timeout_s": WORKFLOW_TIMEOUT_S,
-            "seed": SEED,
+            "seed": runtime.seed,
+            "question_parallelism": runtime.question_parallelism,
             "context_size": context_size,
             "context_pipeline_name": CONTEXT_PIPELINE_NAME,
             "min_selected_ground_truth": MIN_SELECTED_GROUND_TRUTH,
@@ -157,8 +171,17 @@ async def main(
     retrieval_hits = 0
     total_cost_usd = 0.0
     samples_with_cost = 0
+    total_input_tokens = 0
+    total_output_tokens = 0
+    total_calls = 0
+    total_tool_time = 0.0
+    question_latencies = [0.0] * len(questions)
 
-    for i, question in enumerate(questions):
+    async def evaluate_one(item: tuple[int, str]) -> None:
+        nonlocal precision_sum, recall_sum, f1_sum, retrieval_hits
+        nonlocal total_cost_usd, samples_with_cost
+        nonlocal total_calls, total_input_tokens, total_output_tokens, total_tool_time
+        i, question = item
         print(f"Question {i + 1}/{len(questions)}")
         target_product = selected_products[i]
         ground_truth_index_set = set(selected_ground_truth[i])
@@ -184,7 +207,9 @@ async def main(
         context_has_ground_truth = bool(ground_truth_in_context_set)
         retrieval_hits += int(context_has_ground_truth)
         if not context_has_ground_truth:
-            print(f"[WARNING] Ground truth missing from retrieved context for target_index={target_index}")
+            print(
+                f"[WARNING] Ground truth missing from retrieved context for target_index={target_index}"
+            )
         context_coverage = len(retrieved_lines) / len(lines) if lines else 0.0
         completion_prompt = f"""
         You are given a subset of chemical reactions in SMILES format and a question.
@@ -198,7 +223,7 @@ async def main(
         executor = build_code_executor(lines=retrieved_lines)
         agent = CodeActAgent(
             code_execute_fn=executor.execute,
-            llm=OpenRouter(
+            llm=build_benchmark_llm(
                 model=model_name,
                 api_key=OPENROUTER_API_KEY,
                 max_tokens=MAX_OUTPUT_TOKENS,
@@ -212,35 +237,39 @@ async def main(
             timeout=WORKFLOW_TIMEOUT_S,
             llm_timeout_retries=LLM_TIMEOUT_RETRIES,
             llm_timeout_retry_backoff_s=LLM_TIMEOUT_RETRY_BACKOFF_S,
+            **runtime.codeact_callbacks(sample_id=i),
         )
         ctx = Context(agent)
 
-        with tracer.start_as_current_span(f"codeact_task1_sample_{i}") as sample_span:
-            sample_span.set_attributes(
-                {
-                    "sample.index": i,
-                    "sample.count": len(questions),
-                    "target.index": target_index,
-                    "agent.name": "codeact",
-                }
-            )
-            with using_tracing_attributes(
-                session_id=run_session_id,
-                metadata={
-                    "sample_index": i,
-                    "sample_count": len(questions),
-                    "target_index": target_index,
-                    "agent": "codeact",
-                },
-                tags=["codeact", "sample"],
-            ):
-                # print(f"Prompt: {completion_prompt!r}")
-                response = await run_agent_verbose(agent, ctx, completion_prompt)
+        with runtime.timed_sample("codeact", i) as timer:
+            with tracer.start_as_current_span(f"codeact_task1_sample_{i}") as sample_span:
+                sample_span.set_attributes(
+                    {
+                        "sample.index": i,
+                        "sample.count": len(questions),
+                        "target.index": target_index,
+                        "agent.name": "codeact",
+                    }
+                )
+                with using_tracing_attributes(
+                    session_id=run_session_id,
+                    metadata={
+                        "sample_index": i,
+                        "sample_count": len(questions),
+                        "target_index": target_index,
+                        "agent": "codeact",
+                    },
+                    tags=["codeact", "sample"],
+                ):
+                    response = await run_agent_verbose(agent, ctx, completion_prompt)
+        assert timer.duration_seconds is not None
+        question_latencies[i] = timer.duration_seconds
 
         response_text = extract_response_text(response)
         # print(f"Raw response: {response_text!r}")
         # print("-" * 60)
         llm_turn_metrics = await ctx.store.get("llm_turn_metrics", default=[])
+        tool_turn_metrics = await ctx.store.get("tool_turn_metrics", default=[])
         if not llm_turn_metrics:
             estimated_prompt_tokens = count_tokens(
                 [{"role": "user", "content": completion_prompt}],
@@ -261,7 +290,9 @@ async def main(
 
         parsed_indices = parse_indices(response_text)
         predicted_index_set = set(parsed_indices)
-        precision, recall, f1 = precision_recall_f1(predicted_index_set, ground_truth_in_context_set)
+        precision, recall, f1 = precision_recall_f1(
+            predicted_index_set, ground_truth_in_context_set
+        )
         precision_sum += precision
         recall_sum += recall
         f1_sum += f1
@@ -302,11 +333,18 @@ async def main(
         final_total_tokens = sum(
             int(metric.get("iteration_total_tokens", 0)) for metric in llm_turn_metrics
         )
-        final_cost = sum(float(metric.get("iteration_cost_usd", 0.0)) for metric in llm_turn_metrics)
+        final_cost = sum(
+            float(metric.get("iteration_cost_usd", 0.0)) for metric in llm_turn_metrics
+        )
         has_cost = any("iteration_cost_usd" in metric for metric in llm_turn_metrics)
         if has_cost:
             total_cost_usd += final_cost
             samples_with_cost += 1
+        total_input_tokens += final_input_tokens
+        total_output_tokens += final_output_tokens
+        total_calls += len(llm_turn_metrics)
+        sample_tool_time = sum(float(metric["tool_time_seconds"]) for metric in tool_turn_metrics)
+        total_tool_time += sample_tool_time
 
         wandb.log(
             {
@@ -325,17 +363,17 @@ async def main(
                 f"sample/{i}/retrieved_line_count": len(retrieved_lines),
                 f"sample/{i}/context_coverage": context_coverage,
                 f"sample/{i}/context_has_ground_truth": int(context_has_ground_truth),
+                f"sample/{i}/latency_seconds": timer.duration_seconds,
+                f"sample/{i}/tool_time_seconds": sample_tool_time,
                 **({f"sample/{i}/final_total_cost_usd": final_cost} if has_cost else {}),
             }
         )
-        wandb.log(
-            {
-                "running_precision": precision_sum / (i + 1),
-                "running_recall": recall_sum / (i + 1),
-                "running_f1": f1_sum / (i + 1),
-                "running_retrieval_hit_rate": retrieval_hits / (i + 1),
-            }
-        )
+
+    await map_async_bounded(
+        evaluate_one,
+        list(enumerate(questions)),
+        max_concurrency=runtime.question_parallelism,
+    )
 
     total = len(questions)
     avg_precision = (precision_sum / total) if total else 0.0
@@ -357,6 +395,29 @@ async def main(
     if samples_with_cost > 0:
         run.summary["total_cost_usd"] = total_cost_usd
         run.summary["avg_cost_per_sample_usd"] = total_cost_usd / samples_with_cost
+    if runtime.launched:
+        if samples_with_cost != total:
+            raise RuntimeError("OpenRouter did not report cost for every launched sample")
+        write_run_metrics(
+            RunMetrics(
+                calls=total_calls,
+                input_tokens=total_input_tokens,
+                output_tokens=total_output_tokens,
+                total_tokens=total_input_tokens + total_output_tokens,
+                latency_seconds=time.monotonic() - started,
+                tool_time_seconds=total_tool_time,
+                cost_usd=total_cost_usd,
+                cost_chf=cost_chf_from_usd(total_cost_usd),
+                wandb_url=getattr(run, "url", None),
+                results={
+                    "macro_precision": avg_precision,
+                    "macro_recall": avg_recall,
+                    "macro_f1": avg_f1,
+                    "retrieval_hit_rate": retrieval_hit_rate,
+                    "question_latencies_seconds": question_latencies,
+                },
+            )
+        )
     wandb.finish()
 
 

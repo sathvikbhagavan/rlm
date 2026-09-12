@@ -1,11 +1,17 @@
 import asyncio
 import os
 import random
+import time
 import uuid
+from dataclasses import dataclass
 
 import wandb
 from llama_index.core.llms import ChatMessage
-from llama_index.llms.openrouter import OpenRouter
+from rxnhaystack.providers import build_benchmark_llm
+from task1_hardcoded_cases import (
+    TASK1_HARDCODED_GROUND_TRUTH_INDICES,
+    TASK1_HARDCODED_PRODUCTS,
+)
 
 from rlm.codeact_helpers import (
     build_context_pipeline,
@@ -15,26 +21,55 @@ from rlm.codeact_helpers import (
     parse_indices,
     precision_recall_f1,
 )
-from task1_hardcoded_cases import (
-    TASK1_HARDCODED_GROUND_TRUTH_INDICES,
-    TASK1_HARDCODED_PRODUCTS,
-)
 from rlm.tracing import init_tracing, using_tracing_attributes
 from rlm.utils.token_utils import count_tokens
+from rxnhaystack.concurrency import map_async_bounded
+from rxnhaystack.metrics import RunMetrics, cost_chf_from_usd, write_run_metrics
+from rxnhaystack.worker import BenchmarkRuntime
 
-
-DATASET_PATH = "/home/bhagavan/rlms/datasets/reactionSmilesFigShareUSPTO2023_cleaned.txt"
-MODEL_NAME = "openai/gpt-5-mini"
+DATASET_PATH = "~/datasets/rxnhaystack/reactionSmilesFigShareUSPTO2023_cleaned.txt"
+MODEL_NAME = __import__("os").environ.get("RXNHAYSTACK_MODEL", "openai/gpt-5-mini")
 OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
 ENABLE_TRACING = True
 NUM_QUESTIONS = 10
-SEED = 42
-CONTEXT_SIZE = 100
+SEED = int(__import__("os").environ.get("RXNHAYSTACK_SEED", "42"))
+CONTEXT_SIZE = int(__import__("os").environ.get("RXNHAYSTACK_CONTEXT_SIZE", "100"))
 CONTEXT_PIPELINE_NAME = "random"
 MIN_SELECTED_GROUND_TRUTH = 5
 REASONING_EFFORT = "low"
 MAX_OUTPUT_TOKENS = 40_000
 # os.environ["WANDB_MODE"] = "disabled"
+
+
+@dataclass(frozen=True)
+class Sample:
+    index: int
+    question: str
+    target_product: str
+    target_index: int
+    target_line: str
+    retrieved_context: str
+    retrieved_lines: tuple[str, ...]
+    ground_truth_in_context: frozenset[int]
+    context_has_ground_truth: bool
+    context_coverage: float
+    completion_prompt: str
+
+
+@dataclass(frozen=True)
+class SampleResult:
+    sample: Sample
+    response_text: str
+    predicted_indices: frozenset[int]
+    precision: float
+    recall: float
+    f1: float
+    prompt_tokens: int
+    completion_tokens: int
+    total_tokens: int
+    cost_usd: float | None
+    latency_seconds: float
+
 
 def maybe_init_tracing() -> None:
     if not ENABLE_TRACING:
@@ -68,10 +103,17 @@ def build_question(product: str) -> str:
     - If the product is not found, report: -1
 """
 
+
 async def main() -> None:
+    started = time.monotonic()
+    runtime = BenchmarkRuntime.from_defaults(
+        model=MODEL_NAME,
+        dataset_path=DATASET_PATH,
+        seed=SEED,
+    )
     maybe_init_tracing()
-    lines = load_lines(DATASET_PATH)
-    rng = random.Random(SEED)
+    lines = load_lines(runtime.dataset_path)
+    rng = random.Random(runtime.seed)
     context_pipeline = build_context_pipeline(
         name=CONTEXT_PIPELINE_NAME,
         lines=lines,
@@ -89,21 +131,14 @@ async def main() -> None:
     print(f"[QUESTION-SAMPLING] using_hardcoded_products={len(selected_products)}")
     run_session_id = f"llm-task1-{uuid.uuid4()}"
 
-    llm = OpenRouter(
-        model=MODEL_NAME,
-        api_key=OPENROUTER_API_KEY,
-        max_tokens=MAX_OUTPUT_TOKENS,
-        reasoning_effort=REASONING_EFFORT,
-        additional_kwargs={"max_completion_tokens": MAX_OUTPUT_TOKENS},
-    )
-
     run = wandb.init(
         project="LLM-Task1",
         config={
-            "MODEL_NAME": MODEL_NAME,
+            "MODEL_NAME": runtime.model,
             "NUM_QUESTIONS": NUM_QUESTIONS,
-            "dataset_path": DATASET_PATH,
-            "seed": SEED,
+            "dataset_path": str(runtime.dataset_path),
+            "seed": runtime.seed,
+            "question_parallelism": runtime.question_parallelism,
             "context_size": CONTEXT_SIZE,
             "context_pipeline_name": CONTEXT_PIPELINE_NAME,
             "min_selected_ground_truth": MIN_SELECTED_GROUND_TRUTH,
@@ -114,15 +149,8 @@ async def main() -> None:
     wandb.define_metric("sample_iteration")
     wandb.define_metric("sample/*", step_metric="sample_iteration")
 
-    precision_sum = 0.0
-    recall_sum = 0.0
-    f1_sum = 0.0
-    retrieval_hits = 0
-    total_cost_usd = 0.0
-    samples_with_cost = 0
-
+    samples: list[Sample] = []
     for i, question in enumerate(questions):
-        print(f"Question {i + 1}/{len(questions)}")
         target_product = selected_products[i]
         ground_truth_index_set = set(selected_ground_truth[i])
         target_index = sorted(ground_truth_index_set)[0]
@@ -132,7 +160,7 @@ async def main() -> None:
             correct_indices=ground_truth_index_set,
             query=target_product,
         )
-        retrieved_lines = [line for line in retrieved_context.splitlines() if line.strip()]
+        retrieved_lines = tuple(line for line in retrieved_context.splitlines() if line.strip())
         retrieved_indices = {
             int(line.split(" ", 1)[0])
             for line in retrieved_lines
@@ -145,8 +173,6 @@ async def main() -> None:
             f"ground_truth_in_context={gt_in_context_count}/{len(ground_truth_index_set)}"
         )
         context_has_ground_truth = bool(ground_truth_in_context_set)
-        retrieval_hits += int(context_has_ground_truth)
-
         context_coverage = len(retrieved_lines) / len(lines) if lines else 0.0
         completion_prompt = f"""
         You are given a subset of chemical reactions in SMILES format and a question.
@@ -158,91 +184,150 @@ async def main() -> None:
         </question>
         """
 
-        with using_tracing_attributes(
-            session_id=run_session_id,
-            metadata={
-                "sample_index": i,
-                "sample_count": len(questions),
-                "target_index": target_index,
-                "agent": "llm_baseline",
-            },
-            tags=["llm-baseline", "sample"],
-        ):
-            response = await llm.achat([ChatMessage(role="user", content=completion_prompt)])
+        samples.append(
+            Sample(
+                index=i,
+                question=question,
+                target_product=target_product,
+                target_index=target_index,
+                target_line=target_line,
+                retrieved_context=retrieved_context,
+                retrieved_lines=retrieved_lines,
+                ground_truth_in_context=frozenset(ground_truth_in_context_set),
+                context_has_ground_truth=context_has_ground_truth,
+                context_coverage=context_coverage,
+                completion_prompt=completion_prompt,
+            )
+        )
 
+    async def evaluate(sample: Sample) -> SampleResult:
+        print(f"Question {sample.index + 1}/{len(samples)}")
+        llm = build_benchmark_llm(
+            model=runtime.model,
+            api_key=OPENROUTER_API_KEY,
+            max_tokens=MAX_OUTPUT_TOKENS,
+            reasoning_effort=REASONING_EFFORT,
+            additional_kwargs={"max_completion_tokens": MAX_OUTPUT_TOKENS},
+        )
+        with runtime.timed_sample("llm", sample.index) as timer:
+            with using_tracing_attributes(
+                session_id=run_session_id,
+                metadata={
+                    "sample_index": sample.index,
+                    "sample_count": len(samples),
+                    "target_index": sample.target_index,
+                    "agent": "llm_baseline",
+                },
+                tags=["llm-baseline", "sample"],
+            ):
+                response = await llm.achat(
+                    [ChatMessage(role="user", content=sample.completion_prompt)]
+                )
         response_text = extract_response_text(response)
         parsed_indices = parse_indices(response_text)
         predicted_index_set = set(parsed_indices)
-        precision, recall, f1 = precision_recall_f1(predicted_index_set, ground_truth_in_context_set)
-        precision_sum += precision
-        recall_sum += recall
-        f1_sum += f1
+        precision, recall, f1 = precision_recall_f1(
+            predicted_index_set, set(sample.ground_truth_in_context)
+        )
         if f1 < 1.0:
             print(
-                f"Mismatch for target_index={target_index}: "
+                f"Mismatch for target_index={sample.target_index}: "
                 f"precision={precision:.4f}, recall={recall:.4f}, f1={f1:.4f}"
             )
-            print(f"Line in context: {target_line}")
-            print(f"Product: {target_product}")
+            print(f"Line in context: {sample.target_line}")
+            print(f"Product: {sample.target_product}")
             print(f"Predicted indices: {sorted(predicted_index_set)}")
-            print(f"Ground truth indices (in context): {sorted(ground_truth_in_context_set)}")
+            print(f"Ground truth indices (in context): {sorted(sample.ground_truth_in_context)}")
             print("--------------------------------")
         else:
-            print(f"F1 is 1.0 for target_index={target_index}")
+            print(f"F1 is 1.0 for target_index={sample.target_index}")
 
         usage_metrics = extract_usage_metrics(response)
         prompt_tokens = int(usage_metrics.get("prompt_tokens", 0))
         completion_tokens = int(usage_metrics.get("completion_tokens", 0))
         total_tokens = int(usage_metrics.get("total_tokens", 0))
-        sample_cost = (
-            float(usage_metrics["cost_usd"]) if "cost_usd" in usage_metrics else None
-        )
+        sample_cost = float(usage_metrics["cost_usd"]) if "cost_usd" in usage_metrics else None
         if total_tokens == 0:
-            prompt_tokens = count_tokens([{"role": "user", "content": completion_prompt}], MODEL_NAME)
+            prompt_tokens = count_tokens(
+                [{"role": "user", "content": sample.completion_prompt}], runtime.model
+            )
             completion_tokens = count_tokens(
                 [{"role": "assistant", "content": response_text}],
-                MODEL_NAME,
+                runtime.model,
             )
             total_tokens = prompt_tokens + completion_tokens
-        if sample_cost is not None:
-            total_cost_usd += sample_cost
-            samples_with_cost += 1
+        assert timer.duration_seconds is not None
+        return SampleResult(
+            sample=sample,
+            response_text=response_text,
+            predicted_indices=frozenset(predicted_index_set),
+            precision=precision,
+            recall=recall,
+            f1=f1,
+            prompt_tokens=prompt_tokens,
+            completion_tokens=completion_tokens,
+            total_tokens=total_tokens,
+            cost_usd=sample_cost,
+            latency_seconds=timer.duration_seconds,
+        )
+
+    results = await map_async_bounded(
+        evaluate,
+        samples,
+        max_concurrency=runtime.question_parallelism,
+    )
+    precision_sum = sum(result.precision for result in results)
+    recall_sum = sum(result.recall for result in results)
+    f1_sum = sum(result.f1 for result in results)
+    retrieval_hits = sum(int(result.sample.context_has_ground_truth) for result in results)
+    costs = [result.cost_usd for result in results if result.cost_usd is not None]
+    total_cost_usd = sum(costs)
+    samples_with_cost = len(costs)
+
+    for completed_count, result in enumerate(results, start=1):
+        i = result.sample.index
 
         wandb.log(
             {
                 "sample_iteration": 1,
-                f"sample/{i}/iteration_input_tokens": prompt_tokens,
-                f"sample/{i}/iteration_output_tokens": completion_tokens,
-                f"sample/{i}/iteration_total_tokens": total_tokens,
-                **({f"sample/{i}/iteration_cost_usd": sample_cost} if sample_cost is not None else {}),
+                f"sample/{i}/iteration_input_tokens": result.prompt_tokens,
+                f"sample/{i}/iteration_output_tokens": result.completion_tokens,
+                f"sample/{i}/iteration_total_tokens": result.total_tokens,
+                **(
+                    {f"sample/{i}/iteration_cost_usd": result.cost_usd}
+                    if result.cost_usd is not None
+                    else {}
+                ),
             }
         )
         wandb.log(
             {
                 "sample_idx": i,
-                f"sample/{i}/final_total_input_tokens": prompt_tokens,
-                f"sample/{i}/final_total_output_tokens": completion_tokens,
-                f"sample/{i}/final_total_tokens": total_tokens,
+                f"sample/{i}/final_total_input_tokens": result.prompt_tokens,
+                f"sample/{i}/final_total_output_tokens": result.completion_tokens,
+                f"sample/{i}/final_total_tokens": result.total_tokens,
                 f"sample/{i}/iterations": 1,
-                f"sample/{i}/precision": precision,
-                f"sample/{i}/recall": recall,
-                f"sample/{i}/f1": f1,
-                f"sample/{i}/target_index": target_index,
-                f"sample/{i}/completion_prompt_char_count": len(completion_prompt),
-                f"sample/{i}/context_char_count": len(retrieved_context),
+                f"sample/{i}/precision": result.precision,
+                f"sample/{i}/recall": result.recall,
+                f"sample/{i}/f1": result.f1,
+                f"sample/{i}/target_index": result.sample.target_index,
+                f"sample/{i}/completion_prompt_char_count": len(result.sample.completion_prompt),
+                f"sample/{i}/context_char_count": len(result.sample.retrieved_context),
                 f"sample/{i}/context_size": CONTEXT_SIZE,
-                f"sample/{i}/retrieved_line_count": len(retrieved_lines),
-                f"sample/{i}/context_coverage": context_coverage,
-                f"sample/{i}/context_has_ground_truth": int(context_has_ground_truth),
-                **({f"sample/{i}/final_total_cost_usd": sample_cost} if sample_cost is not None else {}),
+                f"sample/{i}/retrieved_line_count": len(result.sample.retrieved_lines),
+                f"sample/{i}/context_coverage": result.sample.context_coverage,
+                f"sample/{i}/context_has_ground_truth": int(result.sample.context_has_ground_truth),
+                f"sample/{i}/latency_seconds": result.latency_seconds,
+                **(
+                    {f"sample/{i}/final_total_cost_usd": result.cost_usd}
+                    if result.cost_usd is not None
+                    else {}
+                ),
             }
         )
         wandb.log(
             {
-                "running_precision": precision_sum / (i + 1),
-                "running_recall": recall_sum / (i + 1),
-                "running_f1": f1_sum / (i + 1),
-                "running_retrieval_hit_rate": retrieval_hits / (i + 1),
+                "completed_samples": completed_count,
             }
         )
 
@@ -266,6 +351,29 @@ async def main() -> None:
     if samples_with_cost > 0:
         run.summary["total_cost_usd"] = total_cost_usd
         run.summary["avg_cost_per_sample_usd"] = total_cost_usd / samples_with_cost
+    if runtime.launched:
+        if samples_with_cost != total:
+            raise RuntimeError("OpenRouter did not report cost for every launched sample")
+        write_run_metrics(
+            RunMetrics(
+                calls=total,
+                input_tokens=sum(result.prompt_tokens for result in results),
+                output_tokens=sum(result.completion_tokens for result in results),
+                total_tokens=sum(result.total_tokens for result in results),
+                latency_seconds=time.monotonic() - started,
+                tool_time_seconds=0,
+                cost_usd=total_cost_usd,
+                cost_chf=cost_chf_from_usd(total_cost_usd),
+                wandb_url=getattr(run, "url", None),
+                results={
+                    "macro_precision": avg_precision,
+                    "macro_recall": avg_recall,
+                    "macro_f1": avg_f1,
+                    "retrieval_hit_rate": retrieval_hit_rate,
+                    "question_latencies_seconds": [result.latency_seconds for result in results],
+                },
+            )
+        )
     wandb.finish()
 
 

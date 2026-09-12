@@ -53,7 +53,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--tier3-dir",
         type=str,
-        default="/home/bhagavan/rlms/rlm/tier3",
+        default=str(Path(__file__).resolve().parent),
         help="Directory containing rlm_task*.py and codeact_task*.py files.",
     )
     parser.add_argument(
@@ -80,7 +80,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--output-dir",
         type=str,
-        default="/home/bhagavan/rlms/rlm/tier3/wandb_last_runs_report_tables",
+        default=str(Path(__file__).resolve().parent / "wandb_last_runs_report_tables"),
         help="Directory where CSV table outputs will be written.",
     )
     parser.add_argument(

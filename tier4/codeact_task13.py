@@ -5,7 +5,7 @@ import random
 import uuid
 
 from llama_index.core.workflow import Context
-from llama_index.llms.openrouter import OpenRouter
+from rxnhaystack.providers import build_benchmark_llm
 from task13_fg_chain_graph import (
     MAX_HEAVY_ATOMS,
     MAX_MOLECULE_FREQ_REFERENCE,
@@ -34,6 +34,11 @@ from task13_fg_chain_ground_truth import (
 )
 
 import wandb
+
+from rxnhaystack.campaign_metrics import install_campaign_metrics
+from rxnhaystack.worker import codeact_callbacks_from_environment
+from rxnhaystack.concurrency import map_async_bounded, question_parallelism_from_environment
+
 from rlm.codeact_core import (
     INDEX_CODEACT_SYSTEM_PROMPT,
     INDEX_FORCE_LOOP_MESSAGE,
@@ -46,15 +51,17 @@ from rlm.codeact_helpers import build_context_pipeline, extract_response_text, l
 from rlm.tracing import get_tracer, init_tracing, using_tracing_attributes
 from rlm.utils.token_utils import count_tokens
 
+install_campaign_metrics(wandb)
+
 # os.environ["WANDB_MODE"] = "disabled"
 
-DATASET_PATH = "/home/bhagavan/rlms/datasets/reactionSmilesFigShareUSPTO2023_cleaned.txt"
-MODEL_NAME = "openai/gpt-5-mini"
+DATASET_PATH = __import__("os").environ.get("RXNHAYSTACK_CLEANED_DATASET", __import__("os").path.expanduser("~/datasets/rxnhaystack/reactionSmilesFigShareUSPTO2023_cleaned.txt"))
+MODEL_NAME = __import__("os").environ.get("RXNHAYSTACK_MODEL", "openai/gpt-5-mini")
 OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
 ENABLE_TRACING = True
 WORKFLOW_TIMEOUT_S = 900.0
-SEED = 42
-CONTEXT_SIZE = 100
+SEED = int(__import__("os").environ.get("RXNHAYSTACK_SEED", "42"))
+CONTEXT_SIZE = int(__import__("os").environ.get("RXNHAYSTACK_CONTEXT_SIZE", "100"))
 CONTEXT_PIPELINE_NAME = "random"
 MAX_OUTPUT_TOKENS = 30_000
 REASONING_EFFORT = "high"
@@ -153,7 +160,9 @@ async def main(model_name: str, context_size: int) -> None:
     total_output_tokens = 0
     samples_run = 0
 
-    for i, question in enumerate(FIXED_QUESTIONS):
+    async def _evaluate_question(_item):
+        nonlocal exact_match_count, macro_f1, macro_precision, macro_recall, samples_run, samples_with_cost, total_cost_usd, total_input_tokens, total_output_tokens
+        (i, question) = _item
         full_support_indices = full_support_indices_for_question(question)
         sampling = chains_for_context_sampling(question, context_size)
         support_indices = set(sampling.support_indices)
@@ -226,7 +235,7 @@ async def main(model_name: str, context_size: int) -> None:
         executor = build_code_executor()
         agent = CodeActAgent(
             code_execute_fn=executor.execute,
-            llm=OpenRouter(
+            llm=build_benchmark_llm(
                 model=model_name,
                 api_key=OPENROUTER_API_KEY,
                 max_tokens=MAX_OUTPUT_TOKENS,
@@ -242,6 +251,7 @@ async def main(model_name: str, context_size: int) -> None:
             llm_timeout_retry_backoff_s=LLM_TIMEOUT_RETRY_BACKOFF_S,
             llm_request_timeout_s=LLM_REQUEST_TIMEOUT_S,
             code_execution_timeout_s=CODE_EXECUTION_TIMEOUT_S,
+            **codeact_callbacks_from_environment(sample_id=i),
         )
         ctx = Context(agent)
 
@@ -373,6 +383,12 @@ async def main(model_name: str, context_size: int) -> None:
                 "running_macro_f1": macro_f1 / samples_run,
             }
         )
+
+    await map_async_bounded(
+        _evaluate_question,
+        list(enumerate(FIXED_QUESTIONS)),
+        max_concurrency=question_parallelism_from_environment(),
+    )
 
     total = samples_run
     macro_precision = macro_precision / total if total else 0.0

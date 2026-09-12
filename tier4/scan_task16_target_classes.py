@@ -12,7 +12,7 @@ from task11_synthetic_chain_graph import canonicalize_components
 RDLogger.DisableLog("rdApp.*")
 
 CHAIN_LENGTH = 5
-DATASET_PATH = "/home/bhagavan/rlms/datasets/reactionSmilesFigShareUSPTO2023_cleaned.txt"
+DATASET_PATH = __import__("os").environ.get("RXNHAYSTACK_CLEANED_DATASET", __import__("os").path.expanduser("~/datasets/rxnhaystack/reactionSmilesFigShareUSPTO2023_cleaned.txt"))
 MAX_CHAINS_PER_TARGET = 500
 MAX_CANDIDATES_PER_CLASS = 2000
 

@@ -5,7 +5,7 @@ import random
 import uuid
 
 from llama_index.core.workflow import Context
-from llama_index.llms.openrouter import OpenRouter
+from rxnhaystack.providers import build_benchmark_llm
 from task12b_hub_molecule_graph import (
     build_protected_hub_context,
     canonicalize_smiles,
@@ -23,6 +23,10 @@ from task12b_hub_molecule_ground_truth import (
 )
 
 import wandb
+
+from rxnhaystack.campaign_metrics import install_campaign_metrics
+from rxnhaystack.worker import codeact_callbacks_from_environment
+
 from rlm.codeact_core import (
     INDEX_CODEACT_SYSTEM_PROMPT,
     INDEX_FORCE_LOOP_MESSAGE,
@@ -35,15 +39,17 @@ from rlm.codeact_helpers import extract_response_text, load_lines, precision_rec
 from rlm.tracing import get_tracer, init_tracing, using_tracing_attributes
 from rlm.utils.token_utils import count_tokens
 
+install_campaign_metrics(wandb)
+
 # os.environ["WANDB_MODE"] = "disabled"
 
-DATASET_PATH = "/home/bhagavan/rlms/datasets/reactionSmilesFigShareUSPTO2023_cleaned.txt"
-MODEL_NAME = "openai/gpt-5-mini"
+DATASET_PATH = __import__("os").environ.get("RXNHAYSTACK_CLEANED_DATASET", __import__("os").path.expanduser("~/datasets/rxnhaystack/reactionSmilesFigShareUSPTO2023_cleaned.txt"))
+MODEL_NAME = __import__("os").environ.get("RXNHAYSTACK_MODEL", "openai/gpt-5-mini")
 OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
 ENABLE_TRACING = True
 WORKFLOW_TIMEOUT_S = 900.0
-SEED = 42
-CONTEXT_SIZE = 100
+SEED = int(__import__("os").environ.get("RXNHAYSTACK_SEED", "42"))
+CONTEXT_SIZE = int(__import__("os").environ.get("RXNHAYSTACK_CONTEXT_SIZE", "100"))
 MAX_OUTPUT_TOKENS = 30_000
 REASONING_EFFORT = "high"
 MAX_ITERATIONS = 8
@@ -245,7 +251,7 @@ async def main(model_name: str, context_size: int) -> None:
     executor = build_code_executor()
     agent = CodeActAgent(
         code_execute_fn=executor.execute,
-        llm=OpenRouter(
+        llm=build_benchmark_llm(
             model=model_name,
             api_key=OPENROUTER_API_KEY,
             max_tokens=MAX_OUTPUT_TOKENS,
@@ -261,6 +267,7 @@ async def main(model_name: str, context_size: int) -> None:
         llm_timeout_retry_backoff_s=LLM_TIMEOUT_RETRY_BACKOFF_S,
         llm_request_timeout_s=LLM_REQUEST_TIMEOUT_S,
         code_execution_timeout_s=CODE_EXECUTION_TIMEOUT_S,
+        **codeact_callbacks_from_environment(sample_id=0),
     )
     ctx = Context(agent)
 

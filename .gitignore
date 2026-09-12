@@ -216,3 +216,9 @@ __marimo__/
 out/
 wandb/
 .rlm_workspace/
+/artifacts/
+
+# Local paper/data inputs maintained outside this source repository
+/overleaf/
+/plot_data.zip
+/RxnHaystack_ICLR_2027_Review_and_20_Day_Plan.tex

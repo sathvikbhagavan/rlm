@@ -1,25 +1,29 @@
-import os
 import random
+import time
 import uuid
 
 import wandb
-from rlm import RLM
-from rlm.codeact_helpers import build_context_pipeline, precision_recall_f1
-from rlm.tracing import init_tracing, using_tracing_attributes
 from task1_hardcoded_cases import (
     TASK1_HARDCODED_GROUND_TRUTH_INDICES,
     TASK1_HARDCODED_PRODUCTS,
 )
 
+from rlm import RLM
+from rxnhaystack.worker import instrument_rlm_from_environment
+from rlm.codeact_helpers import build_context_pipeline, precision_recall_f1
+from rlm.tracing import init_tracing, using_tracing_attributes
+from rxnhaystack.metrics import RunMetrics, cost_chf_from_usd, write_run_metrics
+from rxnhaystack.worker import BenchmarkRuntime
+
 # os.environ["WANDB_MODE"] = "disabled"
 
-DATASET_PATH = "/home/bhagavan/rlms/datasets/reactionSmilesFigShareUSPTO2023_cleaned.txt"
+DATASET_PATH = "~/datasets/rxnhaystack/reactionSmilesFigShareUSPTO2023_cleaned.txt"
 BACKEND = "openrouter"
-MODEL_NAME = "openai/gpt-5-mini"
-SEED = 42
+MODEL_NAME = __import__("os").environ.get("RXNHAYSTACK_MODEL", "openai/gpt-5-mini")
+SEED = int(__import__("os").environ.get("RXNHAYSTACK_SEED", "42"))
 NUM_QUESTIONS = 10
 ENABLE_TRACING = True
-CONTEXT_SIZE = 100
+CONTEXT_SIZE = int(__import__("os").environ.get("RXNHAYSTACK_CONTEXT_SIZE", "100"))
 CONTEXT_PIPELINE_NAME = "random"
 MIN_SELECTED_GROUND_TRUTH = 5
 
@@ -89,16 +93,21 @@ def build_question(product: str) -> str:
 
 
 def main() -> None:
+    started = time.monotonic()
+    runtime = BenchmarkRuntime.from_defaults(
+        model=MODEL_NAME,
+        dataset_path=DATASET_PATH,
+        seed=SEED,
+    )
     maybe_init_tracing()
-    rlm = RLM(**RLM_INIT_KWARGS)
     run_session_id = f"run-rlms-{uuid.uuid4()}"
-    with open(DATASET_PATH, "r") as f:
+    with runtime.dataset_path.open() as f:
         raw_lines = [line.strip() for line in f.readlines() if line.strip()]
         lines = [f"{i} {line}" for i, line in enumerate(raw_lines)]
     context_pipeline = build_context_pipeline(
         name=CONTEXT_PIPELINE_NAME,
         lines=lines,
-        rng=random.Random(SEED),
+        rng=random.Random(runtime.seed),
         min_selected_ground_truth=MIN_SELECTED_GROUND_TRUTH,
     )
     selected_products = TASK1_HARDCODED_PRODUCTS
@@ -109,13 +118,14 @@ def main() -> None:
     run = wandb.init(
         project="RLMs-Task1",
         config={
-            "MODEL_NAME": MODEL_NAME,
-            "SEED": SEED,
+            "MODEL_NAME": runtime.model,
+            "SEED": runtime.seed,
             "NUM_QUESTIONS": NUM_QUESTIONS,
             "backend": BACKEND,
-            "model_name": MODEL_NAME,
-            "dataset_path": DATASET_PATH,
-            "seed": SEED,
+            "model_name": runtime.model,
+            "dataset_path": str(runtime.dataset_path),
+            "seed": runtime.seed,
+            "question_parallelism": 1,
             "context_size": CONTEXT_SIZE,
             "context_pipeline_name": CONTEXT_PIPELINE_NAME,
             "min_selected_ground_truth": MIN_SELECTED_GROUND_TRUTH,
@@ -132,8 +142,14 @@ def main() -> None:
     f1_sum = 0.0
     total_cost_usd = 0.0
     samples_with_cost = 0
+    total_calls = 0
+    total_input_tokens = 0
+    total_output_tokens = 0
+    question_latencies: list[float] = []
+    total_tool_time = 0.0
 
     for i, question in enumerate(questions):
+        rlm = RLM(**runtime.instrument_rlm_kwargs(RLM_INIT_KWARGS, sample_id=i))
         print(f"Question {i + 1}/{len(questions)}")
         target_product = selected_products[i]
         ground_truth_index_set = set(selected_ground_truth[i])
@@ -158,26 +174,38 @@ def main() -> None:
         )
         completion_kwargs = {"prompt": sample_context, "root_prompt": question}
         # Group all sample traces under one run session while keeping each sample as a distinct trace.
-        with using_tracing_attributes(
-            session_id=run_session_id,
-            metadata={
-                "sample_index": i,
-                "sample_count": len(questions),
-                "target_index": target_index,
-            },
-            tags=["run_rlms", "sample"],
-        ):
-            completion = rlm.completion(**completion_kwargs)
-            response = completion.response
+        with runtime.timed_sample("rlm", i) as timer:
+            with using_tracing_attributes(
+                session_id=run_session_id,
+                metadata={
+                    "sample_index": i,
+                    "sample_count": len(questions),
+                    "target_index": target_index,
+                },
+                tags=["run_rlms", "sample"],
+            ):
+                completion = rlm.completion(**completion_kwargs)
+                response = completion.response
+        assert timer.duration_seconds is not None
+        question_latencies.append(timer.duration_seconds)
         iteration_metrics = rlm.get_last_iteration_metrics()
+        total_tool_time += sum(float(metric["tool_time_s"]) for metric in iteration_metrics)
         parsed = parse_indices(response)
         sample_cost_usd = completion.usage_summary.total_cost
         if sample_cost_usd is not None:
             total_cost_usd += sample_cost_usd
             samples_with_cost += 1
+        total_calls += sum(
+            summary.total_calls
+            for summary in completion.usage_summary.model_usage_summaries.values()
+        )
+        total_input_tokens += completion.usage_summary.total_input_tokens
+        total_output_tokens += completion.usage_summary.total_output_tokens
 
         predicted_index_set = set(parsed)
-        precision, recall, f1 = precision_recall_f1(predicted_index_set, ground_truth_in_context_set)
+        precision, recall, f1 = precision_recall_f1(
+            predicted_index_set, ground_truth_in_context_set
+        )
         precision_sum += precision
         recall_sum += recall
         f1_sum += f1
@@ -193,7 +221,7 @@ def main() -> None:
             print(f"Ground truth indices (in context): {sorted(ground_truth_in_context_set)}")
             print("--------------------------------")
         else:
-            print(f'F1 is 1.0 for target_index={target_index}')
+            print(f"F1 is 1.0 for target_index={target_index}")
 
         for metric in iteration_metrics:
             wandb.log(
@@ -222,6 +250,7 @@ def main() -> None:
                     f"sample/{i}/target_index": target_index,
                     f"sample/{i}/completion_prompt_char_count": len(sample_context),
                     f"sample/{i}/context_size": CONTEXT_SIZE,
+                    f"sample/{i}/latency_seconds": timer.duration_seconds,
                     **(
                         {f"sample/{i}/final_total_cost_usd": sample_cost_usd}
                         if sample_cost_usd is not None
@@ -254,6 +283,28 @@ def main() -> None:
     if samples_with_cost > 0:
         run.summary["total_cost_usd"] = total_cost_usd
         run.summary["avg_cost_per_sample_usd"] = total_cost_usd / samples_with_cost
+    if runtime.launched:
+        if samples_with_cost != total:
+            raise RuntimeError("OpenRouter did not report cost for every launched sample")
+        write_run_metrics(
+            RunMetrics(
+                calls=total_calls,
+                input_tokens=total_input_tokens,
+                output_tokens=total_output_tokens,
+                total_tokens=total_input_tokens + total_output_tokens,
+                latency_seconds=time.monotonic() - started,
+                tool_time_seconds=total_tool_time,
+                cost_usd=total_cost_usd,
+                cost_chf=cost_chf_from_usd(total_cost_usd),
+                wandb_url=getattr(run, "url", None),
+                results={
+                    "macro_precision": avg_precision,
+                    "macro_recall": avg_recall,
+                    "macro_f1": avg_f1,
+                    "question_latencies_seconds": question_latencies,
+                },
+            )
+        )
     wandb.finish()
 
 

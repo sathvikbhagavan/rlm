@@ -17,14 +17,14 @@ METRICS = ("accuracy",)
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Tabulate tier2 W&B runs.")
     parser.add_argument("--entity", type=str, required=True, help="W&B entity/username.")
-    parser.add_argument("--tier2-dir", type=str, default="/home/bhagavan/rlms/rlm/tier2")
+    parser.add_argument("--tier2-dir", type=str, default=str(Path(__file__).resolve().parent))
     parser.add_argument("--last-n-per-model", type=int, default=3)
     parser.add_argument("--max-models", type=int, default=2)
     parser.add_argument("--models", type=str, default="")
     parser.add_argument(
         "--output-dir",
         type=str,
-        default="/home/bhagavan/rlms/rlm/tier2/wandb_last_runs_report_tables",
+        default=str(Path(__file__).resolve().parent / "wandb_last_runs_report_tables"),
     )
     parser.add_argument(
         "--context-sizes",

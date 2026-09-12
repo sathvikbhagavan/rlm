@@ -1,0 +1,55 @@
+from __future__ import annotations
+
+import pytest
+
+from rxnhaystack.manifest import ManifestError
+from rxnhaystack.providers import (
+    SWISSAI_BASE_URL,
+    benchmark_provider,
+    build_benchmark_llm,
+    configure_rlm_for_provider,
+)
+
+
+def test_provider_defaults_to_openrouter(monkeypatch) -> None:
+    monkeypatch.delenv("RXNHAYSTACK_PROVIDER", raising=False)
+    assert benchmark_provider() == "openrouter"
+
+
+def test_swissai_rlm_uses_openai_compatible_transport(monkeypatch) -> None:
+    monkeypatch.setenv("RXNHAYSTACK_PROVIDER", "swissai")
+    monkeypatch.setenv("SWISSAI_RESEARCH_API_KEY", "private")
+    monkeypatch.setenv("RXNHAYSTACK_MODEL", "RCP-AIaaS/Qwen/Qwen3.5-397B-A17B")
+
+    configured = configure_rlm_for_provider(
+        {"backend": "openrouter", "backend_kwargs": {"model_name": "old"}}
+    )
+
+    assert configured["backend"] == "openai"
+    assert configured["backend_kwargs"] == {
+        "model_name": "RCP-AIaaS/Qwen/Qwen3.5-397B-A17B",
+        "api_key": "private",
+        "base_url": SWISSAI_BASE_URL,
+    }
+
+
+def test_swissai_llamaindex_client_preserves_chat_interface(monkeypatch) -> None:
+    monkeypatch.setenv("RXNHAYSTACK_PROVIDER", "swissai")
+    monkeypatch.setenv("SWISSAI_RESEARCH_API_KEY", "private")
+    client = build_benchmark_llm(
+        model="RCP-AIaaS/deepseek-ai/DeepSeek-V4-Flash-0731",
+        api_key="must-be-replaced",
+        max_tokens=100,
+        reasoning_effort="high",
+        additional_kwargs={"max_completion_tokens": 100},
+    )
+    assert client.api_base == SWISSAI_BASE_URL
+    assert client.api_key == "private"
+    assert client.metadata.is_chat_model
+
+
+def test_swissai_requires_its_own_key(monkeypatch) -> None:
+    monkeypatch.setenv("RXNHAYSTACK_PROVIDER", "swissai")
+    monkeypatch.delenv("SWISSAI_RESEARCH_API_KEY", raising=False)
+    with pytest.raises(ManifestError, match="SWISSAI_RESEARCH_API_KEY"):
+        configure_rlm_for_provider({"backend_kwargs": {}})

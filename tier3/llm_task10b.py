@@ -5,8 +5,16 @@ import random
 import uuid
 
 import wandb
+
+from rxnhaystack.campaign_metrics import install_campaign_metrics
+from rxnhaystack.concurrency import (
+    OrderedAsyncGate,
+    map_async_bounded,
+    question_parallelism_from_environment,
+)
+
 from llama_index.core.llms import ChatMessage
-from llama_index.llms.openrouter import OpenRouter
+from rxnhaystack.providers import build_benchmark_llm
 from task10b_hardcoded_ground_truth import (
     TASK10B_GROUND_TRUTH_DEFINITION,
     TASK10B_HARDCODED_GROUND_TRUTH_INDICES_BY_REACTION,
@@ -33,13 +41,15 @@ from rlm.codeact_helpers import (
 from rlm.tracing import init_tracing, using_tracing_attributes
 from rlm.utils.token_utils import count_tokens
 
+install_campaign_metrics(wandb)
 
-DATASET_PATH = "/home/bhagavan/rlms/datasets/reactionSmilesFigShareUSPTO2023_cleaned.txt"
-MODEL_NAME = "openai/gpt-5-mini"
+
+DATASET_PATH = __import__("os").environ.get("RXNHAYSTACK_CLEANED_DATASET", __import__("os").path.expanduser("~/datasets/rxnhaystack/reactionSmilesFigShareUSPTO2023_cleaned.txt"))
+MODEL_NAME = __import__("os").environ.get("RXNHAYSTACK_MODEL", "openai/gpt-5-mini")
 OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
 ENABLE_TRACING = False
-SEED = 42
-CONTEXT_SIZE = 100
+SEED = int(__import__("os").environ.get("RXNHAYSTACK_SEED", "42"))
+CONTEXT_SIZE = int(__import__("os").environ.get("RXNHAYSTACK_CONTEXT_SIZE", "100"))
 CONTEXT_PIPELINE_NAME = "random"
 MIN_SELECTED_GROUND_TRUTH = 5
 REASONING_EFFORT = "high"
@@ -109,7 +119,7 @@ async def main(model_name: str, context_size: int) -> None:
             f"definition={TASK10B_GROUND_TRUTH_DEFINITION}"
         )
 
-    llm = OpenRouter(
+    llm = build_benchmark_llm(
         model=model_name,
         api_key=OPENROUTER_API_KEY,
         max_tokens=MAX_OUTPUT_TOKENS,
@@ -152,14 +162,19 @@ async def main(model_name: str, context_size: int) -> None:
     total_output_tokens = 0
     samples_run = 0
 
-    for i, reaction_key in enumerate(reaction_keys):
-        question = build_question(reaction_key)
-        full_gt_set = set(TASK10B_HARDCODED_GROUND_TRUTH_INDICES_BY_REACTION[reaction_key])
-        retrieved_context = context_pipeline.build_context(
-            context_size=context_size,
-            correct_indices=full_gt_set,
-            query=reaction_key,
-        )
+    _preparation_gate = OrderedAsyncGate()
+
+    async def _evaluate_question(_item):
+        nonlocal exact_match_count, macro_f1, macro_precision, macro_recall, samples_run, samples_with_cost, total_cost_usd, total_input_tokens, total_output_tokens
+        (i, reaction_key) = _item
+        async with _preparation_gate.turn(i):
+            question = build_question(reaction_key)
+            full_gt_set = set(TASK10B_HARDCODED_GROUND_TRUTH_INDICES_BY_REACTION[reaction_key])
+            retrieved_context = context_pipeline.build_context(
+                context_size=context_size,
+                correct_indices=full_gt_set,
+                query=reaction_key,
+            )
         retrieved_lines = [line for line in retrieved_context.splitlines() if line.strip()]
         retrieved_indices = {
             int(line.split(" ", 1)[0])
@@ -296,6 +311,12 @@ async def main(model_name: str, context_size: int) -> None:
                 "running_macro_f1": macro_f1 / samples_run,
             }
         )
+
+    await map_async_bounded(
+        _evaluate_question,
+        list(enumerate(reaction_keys)),
+        max_concurrency=question_parallelism_from_environment(),
+    )
 
     total = samples_run
     exact_match_accuracy = exact_match_count / total if total else 0.0

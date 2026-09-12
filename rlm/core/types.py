@@ -72,6 +72,11 @@ class UsageSummary:
     model_usage_summaries: dict[str, ModelUsageSummary]
 
     @property
+    def total_calls(self) -> int:
+        """Aggregate successful model calls across all models."""
+        return sum(summary.total_calls for summary in self.model_usage_summaries.values())
+
+    @property
     def total_cost(self) -> float | None:
         """Aggregate cost across all models. Returns None if no cost data available."""
         costs = [
@@ -207,6 +212,8 @@ class RLMIteration:
     code_blocks: list[CodeBlock]
     final_answer: str | None = None
     iteration_time: float | None = None
+    model_time: float | None = None
+    tool_time: float | None = None
 
     def to_dict(self):
         return {
@@ -215,6 +222,8 @@ class RLMIteration:
             "code_blocks": [code_block.to_dict() for code_block in self.code_blocks],
             "final_answer": self.final_answer,
             "iteration_time": self.iteration_time,
+            "model_time": self.model_time,
+            "tool_time": self.tool_time,
         }
 
 

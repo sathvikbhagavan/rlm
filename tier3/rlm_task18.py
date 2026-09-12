@@ -4,7 +4,11 @@ import random
 import uuid
 
 import wandb
+
+from rxnhaystack.campaign_metrics import install_campaign_metrics
+
 from rlm import RLM
+from rxnhaystack.worker import instrument_rlm_from_environment
 from rlm.codeact_helpers import build_context_pipeline, parse_indices, precision_recall_f1
 from rlm.tracing import init_tracing, using_tracing_attributes
 from task18_hardcoded_ground_truth import (
@@ -16,14 +20,16 @@ from task18_hardcoded_ground_truth import (
     TASK18_VALID_REACTIONS,
 )
 
+install_campaign_metrics(wandb)
+
 # os.environ["WANDB_MODE"] = "disabled"
 
-DATASET_PATH = "/home/bhagavan/rlms/datasets/reactionSmilesFigShareUSPTO2023_cleaned.txt"
+DATASET_PATH = __import__("os").environ.get("RXNHAYSTACK_CLEANED_DATASET", __import__("os").path.expanduser("~/datasets/rxnhaystack/reactionSmilesFigShareUSPTO2023_cleaned.txt"))
 BACKEND = "openrouter"
-MODEL_NAME = "openai/gpt-5-mini"
+MODEL_NAME = __import__("os").environ.get("RXNHAYSTACK_MODEL", "openai/gpt-5-mini")
 ENABLE_TRACING = True
-SEED = 42
-CONTEXT_SIZE = 100
+SEED = int(__import__("os").environ.get("RXNHAYSTACK_SEED", "42"))
+CONTEXT_SIZE = int(__import__("os").environ.get("RXNHAYSTACK_CONTEXT_SIZE", "100"))
 CONTEXT_PIPELINE_NAME = "random"
 
 RLM_INIT_KWARGS = {
@@ -171,7 +177,7 @@ def main(model_name: str, context_size: int) -> None:
     maybe_init_tracing()
     rlm_init_kwargs = dict(RLM_INIT_KWARGS)
     rlm_init_kwargs["backend_kwargs"] = {"model_name": model_name}
-    rlm = RLM(**rlm_init_kwargs)
+    rlm = RLM(**instrument_rlm_from_environment(rlm_init_kwargs))
     run_session_id = f"run-rlms-{uuid.uuid4()}"
 
     run = wandb.init(

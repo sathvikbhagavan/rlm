@@ -5,8 +5,11 @@ import random
 import uuid
 
 import wandb
+
+from rxnhaystack.campaign_metrics import install_campaign_metrics
+
 from llama_index.core.llms import ChatMessage
-from llama_index.llms.openrouter import OpenRouter
+from rxnhaystack.providers import build_benchmark_llm
 from task16_hardcoded_ground_truth import (
     TASK16_HARDCODED_GROUND_TRUTH_INDICES,
     TASK16_POSITIVE_REACTIONS,
@@ -27,13 +30,15 @@ from rlm.codeact_helpers import (
 from rlm.tracing import init_tracing, using_tracing_attributes
 from rlm.utils.token_utils import count_tokens
 
+install_campaign_metrics(wandb)
 
-DATASET_PATH = "/home/bhagavan/rlms/datasets/reactionSmilesFigShareUSPTO2023_cleaned.txt"
-MODEL_NAME = "openai/gpt-5-mini"
+
+DATASET_PATH = __import__("os").environ.get("RXNHAYSTACK_CLEANED_DATASET", __import__("os").path.expanduser("~/datasets/rxnhaystack/reactionSmilesFigShareUSPTO2023_cleaned.txt"))
+MODEL_NAME = __import__("os").environ.get("RXNHAYSTACK_MODEL", "openai/gpt-5-mini")
 OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
 ENABLE_TRACING = True
-SEED = 42
-CONTEXT_SIZE = 100
+SEED = int(__import__("os").environ.get("RXNHAYSTACK_SEED", "42"))
+CONTEXT_SIZE = int(__import__("os").environ.get("RXNHAYSTACK_CONTEXT_SIZE", "100"))
 CONTEXT_PIPELINE_NAME = "random"
 REASONING_EFFORT = "high"
 MAX_OUTPUT_TOKENS = 30_000
@@ -129,7 +134,7 @@ async def main(model_name: str, context_size: int) -> None:
         f"smarts={TASK16_PYRIDINE_SMARTS}"
     )
 
-    llm = OpenRouter(
+    llm = build_benchmark_llm(
         model=model_name,
         api_key=OPENROUTER_API_KEY,
         max_tokens=MAX_OUTPUT_TOKENS,

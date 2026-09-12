@@ -78,7 +78,7 @@ def stripped_keys(smiles: str, patterns: tuple[Chem.Mol, ...]) -> tuple[str, ...
 
 def main() -> None:
     compiled = compile_candidates()
-    lines = load_lines("/home/bhagavan/rlms/datasets/reactionSmilesFigShareUSPTO2023_cleaned.txt")
+    lines = load_lines(__import__("os").environ.get("RXNHAYSTACK_CLEANED_DATASET", __import__("os").path.expanduser("~/datasets/rxnhaystack/reactionSmilesFigShareUSPTO2023_cleaned.txt")))
     records = parse_records_from_lines(lines)
 
     events: dict[str, list[tuple[int, str, str]]] = defaultdict(list)

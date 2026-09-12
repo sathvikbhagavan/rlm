@@ -121,6 +121,14 @@ We currently support most major clients (OpenAI, Anthropic), as well as the rout
 * **[Dec '25]** [Recursive Language Models arXiv](https://arxiv.org/abs/2512.24601)
 * **[Oct '25]** [Recursive Language Models Blogpost](https://alexzhang13.github.io/blog/2025/rlm/)
 
+## RxnHaystack benchmark experiments
+
+This checkout also contains the RxnHaystack chemistry benchmark. See
+[`dataset/README.md`](dataset/README.md) to reconstruct its exact USPTO-2023
+corpus and [`experiments/iclr2027/README.md`](experiments/iclr2027/README.md)
+for the reproducible campaign launcher, run manifests, budget controls, and
+artifact contract.
+
 If you use this code or repository in your research, please cite:
 
 ```bibtex

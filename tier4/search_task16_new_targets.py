@@ -22,7 +22,7 @@ from task16_truncated_synthesis_graph import (
 
 RDLogger.DisableLog("rdApp.*")
 
-DATASET_PATH = "/home/bhagavan/rlms/datasets/reactionSmilesFigShareUSPTO2023_cleaned.txt"
+DATASET_PATH = __import__("os").environ.get("RXNHAYSTACK_CLEANED_DATASET", __import__("os").path.expanduser("~/datasets/rxnhaystack/reactionSmilesFigShareUSPTO2023_cleaned.txt"))
 CHAINS_JSON = Path(__file__).with_name("task16_truncated_hardcoded_chains.json")
 
 EXISTING_TARGETS = {

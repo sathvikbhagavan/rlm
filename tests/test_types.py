@@ -149,12 +149,16 @@ class TestRLMIteration:
             response="r",
             code_blocks=[block],
             iteration_time=1.5,
+            model_time=1.0,
+            tool_time=0.5,
         )
         d = iteration.to_dict()
         assert d["prompt"] == "p"
         assert d["response"] == "r"
         assert len(d["code_blocks"]) == 1
         assert d["iteration_time"] == 1.5
+        assert d["model_time"] == 1.0
+        assert d["tool_time"] == 0.5
 
 
 class TestRLMChatCompletion:

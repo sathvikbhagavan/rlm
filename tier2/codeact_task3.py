@@ -5,8 +5,17 @@ import random
 import uuid
 
 import wandb
+
+from rxnhaystack.campaign_metrics import install_campaign_metrics
+from rxnhaystack.worker import codeact_callbacks_from_environment
+from rxnhaystack.concurrency import (
+    OrderedAsyncGate,
+    map_async_bounded,
+    question_parallelism_from_environment,
+)
+
 from llama_index.core.workflow import Context
-from llama_index.llms.openrouter import OpenRouter
+from rxnhaystack.providers import build_benchmark_llm
 from task3_hardcoded_ground_truth import (
     TASK3_HARDCODED_GROUND_TRUTH_INDICES,
     TASK3_THRESHOLDS,
@@ -30,15 +39,17 @@ from rlm.codeact_helpers import (
 from rlm.tracing import get_tracer, init_tracing, using_tracing_attributes
 from rlm.utils.token_utils import count_tokens
 
+install_campaign_metrics(wandb)
 
-DATASET_PATH = "/home/bhagavan/rlms/datasets/reactionSmilesFigShareUSPTO2023_cleaned.txt"
-MODEL_NAME = "openai/gpt-5-mini"
+
+DATASET_PATH = __import__("os").environ.get("RXNHAYSTACK_CLEANED_DATASET", __import__("os").path.expanduser("~/datasets/rxnhaystack/reactionSmilesFigShareUSPTO2023_cleaned.txt"))
+MODEL_NAME = __import__("os").environ.get("RXNHAYSTACK_MODEL", "openai/gpt-5-mini")
 OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
 ENABLE_TRACING = True
 WORKFLOW_TIMEOUT_S = 900.0
 THRESHOLDS = TASK3_THRESHOLDS
-SEED = 42
-CONTEXT_SIZE = 500
+SEED = int(__import__("os").environ.get("RXNHAYSTACK_SEED", "42"))
+CONTEXT_SIZE = int(__import__("os").environ.get("RXNHAYSTACK_CONTEXT_SIZE", "500"))
 CONTEXT_PIPELINE_NAME = "random"
 MAX_OUTPUT_TOKENS = 30_000
 MAX_ITERATIONS = 8
@@ -166,15 +177,20 @@ async def main(model_name: str, context_size: int) -> None:
     total_cost_usd = 0.0
     samples_with_cost = 0
 
-    for i, threshold in enumerate(THRESHOLDS):
-        print(f"Question {i + 1}/{len(THRESHOLDS)} for X={threshold}")
-        question = build_question(threshold)
-        ground_truth_index_set = ground_truth_indices_by_threshold[threshold]
-        retrieved_context = context_pipeline.build_context(
-            context_size=context_size,
-            correct_indices=ground_truth_index_set,
-            query=str(threshold),
-        )
+    _preparation_gate = OrderedAsyncGate()
+
+    async def _evaluate_question(_item):
+        nonlocal f1_sum, precision_sum, recall_sum, samples_with_cost, total_cost_usd, total_input_tokens_sum, total_output_tokens_sum
+        (i, threshold) = _item
+        async with _preparation_gate.turn(i):
+            print(f"Question {i + 1}/{len(THRESHOLDS)} for X={threshold}")
+            question = build_question(threshold)
+            ground_truth_index_set = ground_truth_indices_by_threshold[threshold]
+            retrieved_context = context_pipeline.build_context(
+                context_size=context_size,
+                correct_indices=ground_truth_index_set,
+                query=str(threshold),
+            )
         retrieved_lines = [line for line in retrieved_context.splitlines() if line.strip()]
         retrieved_indices = {
             int(line.split(" ", 1)[0])
@@ -200,7 +216,7 @@ async def main(model_name: str, context_size: int) -> None:
         executor = build_code_executor(lines=retrieved_lines)
         agent = CodeActAgent(
             code_execute_fn=executor.execute,
-            llm=OpenRouter(
+            llm=build_benchmark_llm(
                 model=model_name,
                 api_key=OPENROUTER_API_KEY,
                 max_tokens=MAX_OUTPUT_TOKENS,
@@ -215,6 +231,7 @@ async def main(model_name: str, context_size: int) -> None:
             llm_timeout_retries=LLM_TIMEOUT_RETRIES,
             llm_timeout_retry_backoff_s=LLM_TIMEOUT_RETRY_BACKOFF_S,
             llm_request_timeout_s=LLM_REQUEST_TIMEOUT_S,
+            **codeact_callbacks_from_environment(sample_id=i),
         )
         ctx = Context(agent)
 
@@ -339,6 +356,12 @@ async def main(model_name: str, context_size: int) -> None:
                 "running_context_coverage": context_coverage,
             }
         )
+
+    await map_async_bounded(
+        _evaluate_question,
+        list(enumerate(THRESHOLDS)),
+        max_concurrency=question_parallelism_from_environment(),
+    )
 
     total = len(THRESHOLDS)
     avg_precision = (precision_sum / total) if total else 0.0

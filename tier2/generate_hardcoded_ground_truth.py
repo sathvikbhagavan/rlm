@@ -1,7 +1,7 @@
 """Generate hardcoded ground-truth mappings for tier2 tasks.
 
 Usage:
-  /home/bhagavan/rlms/.rlm/bin/python generate_hardcoded_ground_truth.py
+  uv run python generate_hardcoded_ground_truth.py
 """
 
 from __future__ import annotations
@@ -14,7 +14,7 @@ from rdkit import Chem
 from rdkit.Chem import Descriptors, rdMolDescriptors
 
 
-DATASET_PATH = "/home/bhagavan/rlms/datasets/reactionSmilesFigShareUSPTO2023_cleaned.txt"
+DATASET_PATH = __import__("os").environ.get("RXNHAYSTACK_CLEANED_DATASET", __import__("os").path.expanduser("~/datasets/rxnhaystack/reactionSmilesFigShareUSPTO2023_cleaned.txt"))
 TASK2_THRESHOLDS = [150, 184, 218, 252, 286, 320]
 TASK3_THRESHOLDS = [1, 2, 3, 4, 5]
 TASK4_THRESHOLDS = [1, 2, 3, 4, 5]

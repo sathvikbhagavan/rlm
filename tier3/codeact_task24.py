@@ -5,8 +5,12 @@ import random
 import uuid
 
 import wandb
+
+from rxnhaystack.campaign_metrics import install_campaign_metrics
+from rxnhaystack.worker import codeact_callbacks_from_environment
+
 from llama_index.core.workflow import Context
-from llama_index.llms.openrouter import OpenRouter
+from rxnhaystack.providers import build_benchmark_llm
 
 from rlm.codeact_core import (
     CodeActAgent,
@@ -34,13 +38,15 @@ from task24_hardcoded_ground_truth import (
     TASK24_VALID_REACTIONS,
 )
 
-DATASET_PATH = "/home/bhagavan/rlms/datasets/reactionSmilesFigShareUSPTO2023_cleaned.txt"
-MODEL_NAME = "openai/gpt-5-mini"
+install_campaign_metrics(wandb)
+
+DATASET_PATH = __import__("os").environ.get("RXNHAYSTACK_CLEANED_DATASET", __import__("os").path.expanduser("~/datasets/rxnhaystack/reactionSmilesFigShareUSPTO2023_cleaned.txt"))
+MODEL_NAME = __import__("os").environ.get("RXNHAYSTACK_MODEL", "openai/gpt-5-mini")
 OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
 ENABLE_TRACING = True
 WORKFLOW_TIMEOUT_S = 900.0
-SEED = 42
-CONTEXT_SIZE = 100
+SEED = int(__import__("os").environ.get("RXNHAYSTACK_SEED", "42"))
+CONTEXT_SIZE = int(__import__("os").environ.get("RXNHAYSTACK_CONTEXT_SIZE", "100"))
 CONTEXT_PIPELINE_NAME = "random"
 MIN_SELECTED_GROUND_TRUTH = 5
 MAX_OUTPUT_TOKENS = 30_000
@@ -224,7 +230,7 @@ async def main(model_name: str, context_size: int) -> None:
     executor = build_code_executor()
     agent = CodeActAgent(
         code_execute_fn=executor.execute,
-        llm=OpenRouter(
+        llm=build_benchmark_llm(
             model=model_name,
             api_key=OPENROUTER_API_KEY,
             max_tokens=MAX_OUTPUT_TOKENS,
@@ -240,6 +246,7 @@ async def main(model_name: str, context_size: int) -> None:
         llm_timeout_retry_backoff_s=LLM_TIMEOUT_RETRY_BACKOFF_S,
         llm_request_timeout_s=LLM_REQUEST_TIMEOUT_S,
         code_execution_timeout_s=CODE_EXECUTION_TIMEOUT_S,
+        **codeact_callbacks_from_environment(sample_id=0),
     )
     ctx = Context(agent)
 

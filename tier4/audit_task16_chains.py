@@ -16,7 +16,7 @@ from task16_truncated_synthesis_ground_truth import (
     hardcoded_full_chains_for_question,
 )
 
-DATASET_PATH = "/home/bhagavan/rlms/datasets/reactionSmilesFigShareUSPTO2023_cleaned.txt"
+DATASET_PATH = __import__("os").environ.get("RXNHAYSTACK_CLEANED_DATASET", __import__("os").path.expanduser("~/datasets/rxnhaystack/reactionSmilesFigShareUSPTO2023_cleaned.txt"))
 MIN_ORGANIC_HEAVY = 3
 
 

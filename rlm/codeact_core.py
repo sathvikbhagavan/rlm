@@ -6,15 +6,15 @@ import contextlib
 import io
 import json
 import re
+import time
 import traceback
 from typing import Any, Callable, Dict, Optional
 
-from llama_index.core.llms import ChatMessage, LLM
+from llama_index.core.llms import LLM, ChatMessage
 from llama_index.core.memory import ChatMemoryBuffer
 from llama_index.core.workflow import Context, Event, StartEvent, StopEvent, Workflow, step
 
 from rlm.codeact_helpers import extract_usage_metrics
-
 
 DEFAULT_CODEACT_SYSTEM_PROMPT = """
 You are a helpful assistant in a CodeAct (Code + Acting) loop that can execute Python code to help you answer questions.
@@ -198,7 +198,11 @@ def _extract_finish_reason(response: Any) -> Optional[str]:
     if not choices:
         return None
     first = choices[0]
-    reason = first.get("finish_reason") if isinstance(first, dict) else getattr(first, "finish_reason", None)
+    reason = (
+        first.get("finish_reason")
+        if isinstance(first, dict)
+        else getattr(first, "finish_reason", None)
+    )
     return str(reason) if reason is not None else None
 
 
@@ -307,6 +311,10 @@ class CodeActAgent(Workflow):
         llm_request_timeout_s: float = 300.0,
         code_execution_timeout_s: float = 300.0,
         memory_token_limit: int = 120_000,
+        on_llm_start: Callable[[int], None] | None = None,
+        on_llm_complete: Callable[[int, float, bool], None] | None = None,
+        on_tool_start: Callable[[int], None] | None = None,
+        on_tool_complete: Callable[[int, float, bool], None] | None = None,
         **workflow_kwargs: Any,
     ) -> None:
         super().__init__(**workflow_kwargs)
@@ -325,6 +333,10 @@ class CodeActAgent(Workflow):
             float(code_execution_timeout_s) if code_execution_timeout_s > 0 else None
         )
         self.memory_token_limit = max(1024, memory_token_limit)
+        self.on_llm_start = on_llm_start
+        self.on_llm_complete = on_llm_complete
+        self.on_tool_start = on_tool_start
+        self.on_tool_complete = on_tool_complete
         self.system_message = ChatMessage(role="system", content=system_prompt)
 
     async def _build_input_messages(self, ctx: Context) -> list[ChatMessage]:
@@ -376,32 +388,45 @@ class CodeActAgent(Workflow):
         return InputEvent(input=await self._build_input_messages(ctx))
 
     @step
-    async def handle_llm_input(self, ctx: Context, ev: InputEvent) -> CodeExecutionEvent | StopEvent:
+    async def handle_llm_input(
+        self, ctx: Context, ev: InputEvent
+    ) -> CodeExecutionEvent | StopEvent:
         iteration = await ctx.store.get("iteration", default=0)
         iteration += 1
         await ctx.store.set("iteration", iteration)
 
         max_attempts = self.llm_timeout_retries + 1
         response = None
-        for attempt in range(1, max_attempts + 1):
-            try:
-                if self.llm_request_timeout_s is not None:
-                    response = await asyncio.wait_for(
-                        self.llm.achat(ev.input), timeout=self.llm_request_timeout_s
+        llm_started = time.perf_counter()
+        if self.on_llm_start is not None:
+            self.on_llm_start(iteration)
+        try:
+            for attempt in range(1, max_attempts + 1):
+                try:
+                    if self.llm_request_timeout_s is not None:
+                        response = await asyncio.wait_for(
+                            self.llm.achat(ev.input), timeout=self.llm_request_timeout_s
+                        )
+                    else:
+                        response = await self.llm.achat(ev.input)
+                    break
+                except Exception as exc:
+                    if not _is_retryable_llm_exception(exc) or attempt >= max_attempts:
+                        raise
+                    sleep_s = self.llm_timeout_retry_backoff_s * (2 ** (attempt - 1))
+                    print(
+                        f"[LLM RETRY] Retryable {type(exc).__name__} on attempt "
+                        f"{attempt}/{max_attempts}; retrying in {sleep_s:.1f}s"
                     )
-                else:
-                    response = await self.llm.achat(ev.input)
-                break
-            except Exception as exc:
-                if not _is_retryable_llm_exception(exc) or attempt >= max_attempts:
-                    raise
-                sleep_s = self.llm_timeout_retry_backoff_s * (2 ** (attempt - 1))
-                print(
-                    f"[LLM RETRY] Retryable {type(exc).__name__} on attempt {attempt}/{max_attempts}; "
-                    f"retrying in {sleep_s:.1f}s"
-                )
-                if sleep_s > 0:
-                    await asyncio.sleep(sleep_s)
+                    if sleep_s > 0:
+                        await asyncio.sleep(sleep_s)
+        except Exception:
+            if self.on_llm_complete is not None:
+                self.on_llm_complete(iteration, time.perf_counter() - llm_started, True)
+            raise
+        llm_duration = time.perf_counter() - llm_started
+        if self.on_llm_complete is not None:
+            self.on_llm_complete(iteration, llm_duration, False)
         if response is None:
             raise ValueError("LLM returned no response")
         if response.message is None:
@@ -426,6 +451,7 @@ class CodeActAgent(Workflow):
                 "iteration_input_tokens": int(usage_metrics.get("prompt_tokens", 0)),
                 "iteration_output_tokens": int(usage_metrics.get("completion_tokens", 0)),
                 "iteration_total_tokens": int(usage_metrics.get("total_tokens", 0)),
+                "iteration_latency_seconds": llm_duration,
                 **(
                     {"iteration_cost_usd": float(usage_metrics["cost_usd"])}
                     if "cost_usd" in usage_metrics
@@ -450,11 +476,31 @@ class CodeActAgent(Workflow):
         print("\n[CODE]")
         print(ev.code)
         print("[END CODE]\n")
-        output = await execute_code_with_timeout(
-            self.code_execute_fn,
-            ev.code,
-            self.code_execution_timeout_s,
+        iteration = await ctx.store.get("iteration", default=0)
+        tool_started = time.perf_counter()
+        if self.on_tool_start is not None:
+            self.on_tool_start(iteration)
+        try:
+            output = await execute_code_with_timeout(
+                self.code_execute_fn,
+                ev.code,
+                self.code_execution_timeout_s,
+            )
+        except Exception:
+            if self.on_tool_complete is not None:
+                self.on_tool_complete(iteration, time.perf_counter() - tool_started, True)
+            raise
+        tool_duration = time.perf_counter() - tool_started
+        if self.on_tool_complete is not None:
+            self.on_tool_complete(iteration, tool_duration, False)
+        tool_turn_metrics = await ctx.store.get("tool_turn_metrics", default=[])
+        tool_turn_metrics.append(
+            {
+                "iteration": iteration,
+                "tool_time_seconds": tool_duration,
+            }
         )
+        await ctx.store.set("tool_turn_metrics", tool_turn_metrics)
         if output.startswith("Error: TimeoutError: Code execution exceeded"):
             print(f"[CODE EXEC TIMEOUT] exceeded {self.code_execution_timeout_s:.1f}s")
         print("[OUTPUT]")
@@ -465,11 +511,7 @@ class CodeActAgent(Workflow):
         memory.put(
             ChatMessage(
                 role=self.observation_role,
-                content=(
-                    "Code execution observation:\n"
-                    f"{output}\n\n"
-                    f"{self.observation_followup}"
-                ),
+                content=(f"Code execution observation:\n{output}\n\n{self.observation_followup}"),
             )
         )
         await ctx.store.set("memory", memory)

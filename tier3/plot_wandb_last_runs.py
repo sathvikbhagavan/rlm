@@ -80,7 +80,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--tier3-dir",
         type=str,
-        default="/home/bhagavan/rlms/rlm/tier3",
+        default=str(Path(__file__).resolve().parent),
         help="Directory containing tier3 task scripts (used to discover W&B project names).",
     )
     parser.add_argument(
@@ -105,13 +105,13 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--local-wandb-dir",
         type=str,
-        default="/home/bhagavan/rlms/rlm/tier3/wandb",
+        default=str(Path(__file__).resolve().parent / "wandb"),
         help="Directory of local offline W&B run folders when --source local.",
     )
     parser.add_argument(
         "--output-dir",
         type=str,
-        default="/home/bhagavan/rlms/rlm/tier3/plots_last5",
+        default=str(Path(__file__).resolve().parent / "plots_last5"),
     )
     parser.add_argument(
         "--allow-partial",

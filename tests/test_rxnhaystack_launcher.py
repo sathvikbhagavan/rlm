@@ -1,0 +1,304 @@
+from __future__ import annotations
+
+import json
+import subprocess
+import sys
+from pathlib import Path
+
+import pytest
+
+from rxnhaystack.launcher import enforce_remaining_budget, run_selected
+from rxnhaystack.ledger import RunLedger
+from rxnhaystack.manifest import ManifestError, load_manifest
+from rxnhaystack.runtime import perform_preflight
+
+
+def initialize_git_repository(path: Path) -> None:
+    subprocess.run(["git", "init", "-q", str(path)], check=True)
+    subprocess.run(["git", "-C", str(path), "config", "user.email", "test@example.com"], check=True)
+    subprocess.run(["git", "-C", str(path), "config", "user.name", "Test"], check=True)
+    (path / "tracked.txt").write_text("test\n")
+    subprocess.run(["git", "-C", str(path), "add", "tracked.txt"], check=True)
+    subprocess.run(["git", "-C", str(path), "commit", "-qm", "initial"], check=True)
+
+
+def write_worker(path: Path, *, write_metrics: bool = True, exit_code: int = 0) -> None:
+    metrics_statement = (
+        """
+from rxnhaystack.metrics import RunMetrics, write_run_metrics
+write_run_metrics(RunMetrics(
+    calls=2,
+    input_tokens=10,
+    output_tokens=5,
+    total_tokens=15,
+    latency_seconds=0.1,
+    tool_time_seconds=0.02,
+    cost_usd=0.1,
+    cost_chf=0.08,
+    results={"macro_f1": 0.75},
+))
+"""
+        if write_metrics
+        else ""
+    )
+    path.write_text(
+        "import os\n"
+        "from pathlib import Path\n"
+        f"{metrics_statement}\n"
+        "print('run=' + os.environ['RXNHAYSTACK_RUN_ID'])\n"
+        "print('secret-present=' + str(bool(os.environ.get('TEST_API_KEY'))))\n"
+        f"raise SystemExit({exit_code})\n"
+    )
+
+
+def write_campaign(
+    path: Path,
+    project_root: Path,
+    worker: Path,
+    *,
+    repetitions: int = 2,
+    budget_chf: float = 10,
+    estimated_cost_chf: float = 1,
+) -> Path:
+    manifest = path / "campaign.toml"
+    manifest.write_text(
+        f"""
+schema_version = 1
+
+[campaign]
+name = "integration"
+project_root = {json.dumps(str(project_root))}
+artifact_dir = {json.dumps(str(path / "artifacts"))}
+budget_chf = {budget_chf}
+usd_to_chf = 0.8
+require_dataset = false
+require_clean_git = true
+require_metrics = true
+
+[[runs]]
+id = "integration-cell"
+task = "tier1/task1"
+condition = "smoke"
+method = "deterministic"
+model = "none"
+corpus_size = 100
+positive_cardinality = 1
+seed = 42
+repetitions = {repetitions}
+estimated_cost_chf = {estimated_cost_chf}
+command = [{json.dumps(sys.executable)}, {json.dumps(str(worker))}]
+""".strip()
+        + "\n"
+    )
+    return manifest
+
+
+def test_launcher_executes_parallel_runs_records_artifacts_and_resumes(tmp_path: Path) -> None:
+    project_root = tmp_path / "project"
+    project_root.mkdir()
+    initialize_git_repository(project_root)
+    worker = project_root / "worker.py"
+    write_worker(worker)
+    manifest = load_manifest(write_campaign(tmp_path, project_root, worker))
+    preflight = perform_preflight(manifest)
+
+    results = run_selected(
+        manifest,
+        preflight=preflight,
+        selected=list(manifest.runs),
+        secrets={"TEST_API_KEY": "never-record-this"},
+        max_parallel=2,
+        retry_failed=False,
+        recover_running=False,
+    )
+
+    assert [result.status for result in results] == ["succeeded", "succeeded"]
+    for result in results:
+        assert result.artifact_dir is not None
+        metadata = json.loads((result.artifact_dir / "metadata.json").read_text())
+        metrics = json.loads((result.artifact_dir / "metrics.json").read_text())
+        resource_events = [
+            json.loads(line)
+            for line in (result.artifact_dir / "resource-trace.jsonl").read_text().splitlines()
+        ]
+        stdout = (result.artifact_dir / "stdout.log").read_text()
+        assert metadata["result"]["metrics"]["results"]["macro_f1"] == 0.75
+        assert metadata["result"]["metrics"]["resources"]["peak_process_tree_rss_mib"] > 0
+        assert metadata["execution"]["resources"]["process_wall_time_seconds"] > 0
+        assert metadata["execution"]["resources"]["memory_limit_exceeded"] is False
+        assert metrics["resources"] == metadata["execution"]["resources"]
+        assert resource_events[0]["event"] == "process_started"
+        assert resource_events[-1]["event"] == "process_finished"
+        assert any(event["event"] == "resource_sample" for event in resource_events)
+        assert metadata["execution"]["secret_names"] == ["TEST_API_KEY"]
+        assert "never-record-this" not in json.dumps(metadata)
+        assert "secret-present=True" in stdout
+
+    resumed = run_selected(
+        manifest,
+        preflight=preflight,
+        selected=list(manifest.runs),
+        secrets={},
+        max_parallel=2,
+        retry_failed=False,
+        recover_running=False,
+    )
+    assert [result.status for result in resumed] == ["skipped", "skipped"]
+    ledger = RunLedger(manifest.campaign.artifact_dir / "ledger.sqlite3")
+    assert len(ledger.list_attempts()) == 2
+
+
+def test_launcher_fails_successful_process_that_omits_required_metrics(tmp_path: Path) -> None:
+    project_root = tmp_path / "project"
+    project_root.mkdir()
+    initialize_git_repository(project_root)
+    worker = project_root / "worker.py"
+    write_worker(worker, write_metrics=False)
+    manifest = load_manifest(write_campaign(tmp_path, project_root, worker, repetitions=1))
+
+    [result] = run_selected(
+        manifest,
+        preflight=perform_preflight(manifest),
+        selected=list(manifest.runs),
+        secrets={},
+        max_parallel=1,
+        retry_failed=False,
+        recover_running=False,
+    )
+
+    assert result.status == "failed"
+    assert "required metrics" in (result.error or "")
+    assert (
+        RunLedger(manifest.campaign.artifact_dir / "ledger.sqlite3").get(result.run_id).status
+        == "failed"
+    )
+
+
+def test_budget_includes_failed_attempt_before_retry(tmp_path: Path) -> None:
+    project_root = tmp_path / "project"
+    project_root.mkdir()
+    initialize_git_repository(project_root)
+    worker = project_root / "worker.py"
+    write_worker(worker, exit_code=1)
+    manifest = load_manifest(
+        write_campaign(
+            tmp_path,
+            project_root,
+            worker,
+            repetitions=1,
+            budget_chf=1.05,
+            estimated_cost_chf=1,
+        )
+    )
+    preflight = perform_preflight(manifest)
+    [result] = run_selected(
+        manifest,
+        preflight=preflight,
+        selected=list(manifest.runs),
+        secrets={},
+        max_parallel=1,
+        retry_failed=False,
+        recover_running=False,
+    )
+    assert result.status == "failed"
+
+    ledger = RunLedger(manifest.campaign.artifact_dir / "ledger.sqlite3")
+    with pytest.raises(ManifestError, match="exceeds campaign budget"):
+        enforce_remaining_budget(manifest, ledger)
+
+
+def test_launcher_failure_after_claim_never_leaves_running_record(tmp_path: Path) -> None:
+    project_root = tmp_path / "project"
+    project_root.mkdir()
+    initialize_git_repository(project_root)
+    worker = project_root / "worker.py"
+    write_worker(worker)
+    manifest = load_manifest(write_campaign(tmp_path, project_root, worker, repetitions=1))
+    conflicting_attempt_dir = (
+        manifest.campaign.artifact_dir / "runs" / "integration-cell" / "attempt-001"
+    )
+    conflicting_attempt_dir.mkdir(parents=True)
+
+    [result] = run_selected(
+        manifest,
+        preflight=perform_preflight(manifest),
+        selected=list(manifest.runs),
+        secrets={},
+        max_parallel=1,
+        retry_failed=False,
+        recover_running=False,
+    )
+
+    assert result.status == "failed"
+    assert result.return_code == 125
+    assert "FileExistsError" in (result.error or "")
+    ledger = RunLedger(manifest.campaign.artifact_dir / "ledger.sqlite3")
+    assert ledger.get(result.run_id).status == "failed"
+    assert (conflicting_attempt_dir / "launcher-error.json").is_file()
+
+
+def test_launcher_enforces_process_tree_memory_limit(tmp_path: Path) -> None:
+    project_root = tmp_path / "project"
+    project_root.mkdir()
+    initialize_git_repository(project_root)
+    worker = project_root / "memory_worker.py"
+    worker.write_text(
+        "import time\n"
+        "allocation = bytearray(96 * 1024 * 1024)\n"
+        "print(len(allocation), flush=True)\n"
+        "time.sleep(30)\n"
+    )
+    manifest_path = tmp_path / "memory.toml"
+    manifest_path.write_text(
+        f"""
+schema_version = 1
+
+[campaign]
+name = "memory-integration"
+project_root = {json.dumps(str(project_root))}
+artifact_dir = {json.dumps(str(tmp_path / "memory-artifacts"))}
+budget_chf = 0
+usd_to_chf = 0.8
+require_dataset = false
+require_clean_git = true
+require_metrics = false
+max_parallel_memory_mib = 128
+
+[[runs]]
+id = "memory-cell"
+task = "test/memory"
+condition = "watchdog"
+method = "deterministic"
+model = "none"
+corpus_size = 1
+seed = 42
+repetitions = 1
+estimated_cost_chf = 0
+memory_reservation_mib = 64
+memory_limit_mib = 64
+command = [{json.dumps(sys.executable)}, {json.dumps(str(worker))}]
+""".strip()
+        + "\n"
+    )
+    manifest = load_manifest(manifest_path)
+
+    [result] = run_selected(
+        manifest,
+        preflight=perform_preflight(manifest),
+        selected=list(manifest.runs),
+        secrets={},
+        max_parallel=1,
+        retry_failed=False,
+        recover_running=False,
+    )
+
+    assert result.status == "failed"
+    assert "memory limit" in (result.error or "")
+    assert result.artifact_dir is not None
+    metadata = json.loads((result.artifact_dir / "metadata.json").read_text())
+    resources = metadata["execution"]["resources"]
+    assert resources["memory_limit_exceeded"] is True
+    assert resources["peak_process_tree_rss_mib"] > 64
+    record = RunLedger(manifest.campaign.artifact_dir / "ledger.sqlite3").get(result.run_id)
+    assert record.status == "failed"
+    assert "memory limit" in (record.error or "")

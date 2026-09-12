@@ -76,6 +76,8 @@ class RLM:
         on_subcall_complete: Callable[[int, str, float, str | None], None] | None = None,
         on_iteration_start: Callable[[int, int], None] | None = None,
         on_iteration_complete: Callable[[int, int, float], None] | None = None,
+        on_iteration_metrics: Callable[[int, int, dict[str, Any]], None] | None = None,
+        on_completion_metrics: Callable[[dict[str, Any]], None] | None = None,
     ):
         """
         Args:
@@ -108,6 +110,9 @@ class RLM:
             on_subcall_complete: Callback fired when a child RLM completes. Args: (depth, model, duration, error_or_none).
             on_iteration_start: Callback fired when an iteration starts. Args: (depth, iteration_num).
             on_iteration_complete: Callback fired when an iteration completes. Args: (depth, iteration_num, duration).
+            on_iteration_metrics: Callback fired after usage metrics are computed. Args:
+                (depth, iteration_num, prompt-free metrics dictionary).
+            on_completion_metrics: Callback fired once with final prompt-free usage totals.
         """
         # Store config for spawning per-completion
         self.backend = backend
@@ -151,6 +156,8 @@ class RLM:
         self.on_subcall_complete = on_subcall_complete
         self.on_iteration_start = on_iteration_start
         self.on_iteration_complete = on_iteration_complete
+        self.on_iteration_metrics = on_iteration_metrics
+        self.on_completion_metrics = on_completion_metrics
 
         # Tracking (cumulative across all calls including children)
         self._cumulative_cost: float = 0.0
@@ -337,6 +344,8 @@ class RLM:
                     message_history = self._setup_prompt(prompt)
                     prev_total_input_tokens = 0
                     prev_total_output_tokens = 0
+                    prev_total_calls = 0
+                    prev_total_cost = 0.0
 
                     compaction_count = 0
                     try:
@@ -362,7 +371,9 @@ class RLM:
                                     self._check_timeout(i, time_start)
 
                                     # Compaction: check if context needs summarization
-                                    if self.compaction and hasattr(environment, "append_compaction_entry"):
+                                    if self.compaction and hasattr(
+                                        environment, "append_compaction_entry"
+                                    ):
                                         (
                                             current_tokens,
                                             threshold_tokens,
@@ -395,7 +406,9 @@ class RLM:
                                         else 0
                                     )
                                     current_prompt = message_history + [
-                                        build_user_prompt(root_prompt, i, context_count, history_count)
+                                        build_user_prompt(
+                                            root_prompt, i, context_count, history_count
+                                        )
                                     ]
                                     prompt_tokens = count_tokens(current_prompt, root_model_name)
                                     context_limit_tokens = get_context_limit(root_model_name)
@@ -431,6 +444,8 @@ class RLM:
                                     total_input_tokens = current_usage.total_input_tokens
                                     total_output_tokens = current_usage.total_output_tokens
                                     total_tokens = total_input_tokens + total_output_tokens
+                                    total_calls = current_usage.total_calls
+                                    total_cost = current_usage.total_cost or 0.0
                                     iteration_input_tokens = max(
                                         0,
                                         total_input_tokens - prev_total_input_tokens,
@@ -444,12 +459,15 @@ class RLM:
                                     )
                                     prev_total_input_tokens = total_input_tokens
                                     prev_total_output_tokens = total_output_tokens
+                                    iteration_calls = max(0, total_calls - prev_total_calls)
+                                    iteration_cost = max(0.0, total_cost - prev_total_cost)
+                                    prev_total_calls = total_calls
+                                    prev_total_cost = total_cost
                                     iteration_had_error = any(
                                         bool(block.result and block.result.stderr)
                                         for block in iteration.code_blocks
                                     )
-                                    self._last_iteration_metrics.append(
-                                        {
+                                    iteration_metrics = {
                                             "iteration": iteration_num,
                                             "prompt_tokens": prompt_tokens,
                                             "context_limit_tokens": context_limit_tokens,
@@ -457,14 +475,27 @@ class RLM:
                                             "iteration_input_tokens": iteration_input_tokens,
                                             "iteration_output_tokens": iteration_output_tokens,
                                             "iteration_total_tokens": iteration_total_tokens,
+                                            "iteration_calls": iteration_calls,
+                                            "iteration_cost_usd": iteration_cost,
                                             "total_input_tokens": total_input_tokens,
                                             "total_output_tokens": total_output_tokens,
                                             "total_tokens": total_tokens,
                                             "iteration_time_s": iteration.iteration_time,
+                                            "model_time_s": iteration.model_time,
+                                            "tool_time_s": iteration.tool_time,
                                             "code_block_count": len(iteration.code_blocks),
                                             "had_error": int(iteration_had_error),
                                         }
-                                    )
+                                    self._last_iteration_metrics.append(iteration_metrics)
+                                    if self.on_iteration_metrics:
+                                        try:
+                                            self.on_iteration_metrics(
+                                                self.depth,
+                                                iteration_num,
+                                                dict(iteration_metrics),
+                                            )
+                                        except Exception:
+                                            pass
 
                                     # Store as best partial answer (most recent response with content)
                                     if iteration.response and iteration.response.strip():
@@ -488,23 +519,35 @@ class RLM:
                                         )
 
                                         # Store message history in persistent environment
-                                        if self.persistent and isinstance(environment, SupportsPersistence):
+                                        if self.persistent and isinstance(
+                                            environment, SupportsPersistence
+                                        ):
                                             environment.add_history(message_history)
                                         completion_span.set_attribute("rlm.completed", True)
-                                        completion_span.set_attribute("rlm.iterations", iteration_num)
-                                        completion_span.set_attribute("rlm.final_model", root_model_name)
+                                        completion_span.set_attribute(
+                                            "rlm.iterations", iteration_num
+                                        )
+                                        completion_span.set_attribute(
+                                            "rlm.final_model", root_model_name
+                                        )
                                         completion_span.set_attribute(
                                             "rlm.execution_time_s",
                                             time_end - time_start,
                                         )
                                         iteration_span.set_attribute("rlm.has_final_answer", True)
+                                        self._emit_completion_metrics(
+                                            usage,
+                                            execution_time=time_end - time_start,
+                                        )
                                         return RLMChatCompletion(
                                             root_model=root_model_name,
                                             prompt=prompt,
                                             response=final_answer,
                                             usage_summary=usage,
                                             execution_time=time_end - time_start,
-                                            metadata=self.logger.get_trajectory() if self.logger else None,
+                                            metadata=self.logger.get_trajectory()
+                                            if self.logger
+                                            else None,
                                         )
 
                                     # Format the iteration for the next prompt.
@@ -512,7 +555,9 @@ class RLM:
 
                                     # Update message history with the new messages.
                                     message_history.extend(new_messages)
-                                    if self.compaction and hasattr(environment, "append_compaction_entry"):
+                                    if self.compaction and hasattr(
+                                        environment, "append_compaction_entry"
+                                    ):
                                         environment.append_compaction_entry(new_messages)
                                     iteration_span.set_attribute("rlm.has_final_answer", False)
                                 finally:
@@ -540,8 +585,8 @@ class RLM:
                         ) from None
 
                     # Default behavior: we run out of iterations, provide one final answer
-                    time_end = time.perf_counter()
                     final_answer = self._default_answer(message_history, lm_handler)
+                    time_end = time.perf_counter()
                     usage = lm_handler.get_usage_summary()
                     self.verbose.print_final_answer(final_answer)
                     self.verbose.print_summary(
@@ -558,6 +603,10 @@ class RLM:
                     completion_span.set_attribute("rlm.iterations", self.max_iterations)
                     completion_span.set_attribute("rlm.final_model", root_model_name)
                     completion_span.set_attribute("rlm.execution_time_s", time_end - time_start)
+                    self._emit_completion_metrics(
+                        usage,
+                        execution_time=time_end - time_start,
+                    )
                     return RLMChatCompletion(
                         root_model=root_model_name,
                         prompt=prompt,
@@ -566,6 +615,34 @@ class RLM:
                         execution_time=time_end - time_start,
                         metadata=self.logger.get_trajectory() if self.logger else None,
                     )
+
+    def _emit_completion_metrics(
+        self,
+        usage: UsageSummary,
+        *,
+        execution_time: float,
+    ) -> None:
+        if self.on_completion_metrics is None:
+            return
+        metrics = {
+            "calls": usage.total_calls,
+            "input_tokens": usage.total_input_tokens,
+            "output_tokens": usage.total_output_tokens,
+            "cost_usd": usage.total_cost or 0.0,
+            "execution_time_seconds": execution_time,
+            "model_time_seconds": sum(
+                float(metric.get("model_time_s") or 0.0)
+                for metric in self._last_iteration_metrics
+            ),
+            "tool_time_seconds": sum(
+                float(metric.get("tool_time_s") or 0.0)
+                for metric in self._last_iteration_metrics
+            ),
+        }
+        try:
+            self.on_completion_metrics(metrics)
+        except Exception:
+            pass
 
     def _check_timeout(self, iteration: int, time_start: float) -> None:
         """Raise TimeoutExceededError if the timeout has been exceeded."""
@@ -739,6 +816,7 @@ class RLM:
                 "rlm.depth": self.depth,
             },
         ) as turn_span:
+            model_start = time.perf_counter()
             with self._tracer.start_as_current_span(
                 "rlm.model_call",
                 attributes={
@@ -747,10 +825,13 @@ class RLM:
                 },
             ):
                 response = self._coerce_response_text(lm_handler.completion(prompt))
+            model_time = time.perf_counter() - model_start
             code_block_strs = find_code_blocks(response)
             code_blocks = []
+            tool_time = 0.0
 
             for block_idx, code_block_str in enumerate(code_block_strs):
+                tool_start = time.perf_counter()
                 with self._tracer.start_as_current_span(
                     "rlm.repl.execute",
                     attributes={
@@ -766,6 +847,7 @@ class RLM:
                     if code_result.stderr:
                         repl_span.set_attribute("rlm.stderr_chars", len(code_result.stderr))
                     code_blocks.append(CodeBlock(code=code_block_str, result=code_result))
+                tool_time += time.perf_counter() - tool_start
             turn_span.set_attribute("rlm.code_block_count", len(code_blocks))
 
         iteration_time = time.perf_counter() - iter_start
@@ -774,6 +856,8 @@ class RLM:
             response=response,
             code_blocks=code_blocks,
             iteration_time=iteration_time,
+            model_time=model_time,
+            tool_time=tool_time,
         )
 
     def _default_answer(self, message_history: list[dict[str, Any]], lm_handler: LMHandler) -> str:
@@ -866,7 +950,9 @@ class RLM:
                         response = self._coerce_response_text(client.completion(prompt))
                         end_time = time.perf_counter()
                         model_usage = client.get_last_usage()
-                        usage_summary = UsageSummary(model_usage_summaries={root_model: model_usage})
+                        usage_summary = UsageSummary(
+                            model_usage_summaries={root_model: model_usage}
+                        )
                         return RLMChatCompletion(
                             root_model=root_model,
                             prompt=prompt,
@@ -987,7 +1073,9 @@ class RLM:
                     try:
                         duration = time.perf_counter() - subcall_start
                         subcall_span.set_attribute("rlm.subcall_duration_s", duration)
-                        self.on_subcall_complete(next_depth, str(resolved_model), duration, error_msg)
+                        self.on_subcall_complete(
+                            next_depth, str(resolved_model), duration, error_msg
+                        )
                     except Exception:
                         pass  # Don't let callback errors break execution
 

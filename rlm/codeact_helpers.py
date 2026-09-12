@@ -1,19 +1,20 @@
 from __future__ import annotations
 
+import os
 import random
 import re
+from collections.abc import Iterable
 from itertools import permutations
-from typing import Any, Iterable, Optional
+from typing import Any
 
 from rdkit import Chem
 from rdkit.Chem import rdChemReactions
-
 
 DEFAULT_DATASET_PATH = "/home/bhagavan/rlms/datasets/reactionSmilesFigShareUSPTO2023.txt"
 
 
 def load_lines(dataset_path: str = DEFAULT_DATASET_PATH) -> list[str]:
-    with open(dataset_path, "r") as f:
+    with open(dataset_path) as f:
         raw_lines = [line.strip() for line in f.readlines() if line.strip()]
     return [f"{i} {line}" for i, line in enumerate(raw_lines)]
 
@@ -41,13 +42,19 @@ class RandomContextPipeline(BaseContextPipeline):
         ground_truth_indices_by_reaction: dict[str, list[int]] | None = None,
         ground_truth_fraction_per_context: float = 0.0,
         min_selected_ground_truth: int = 1,
+        positive_cardinality: int | None = None,
     ):
         super().__init__(name="random")
         self.lines = lines
         self.rng = rng
         self.ground_truth_indices_by_reaction = ground_truth_indices_by_reaction or {}
-        self.ground_truth_fraction_per_context = min(1.0, max(0.0, ground_truth_fraction_per_context))
+        self.ground_truth_fraction_per_context = min(
+            1.0, max(0.0, ground_truth_fraction_per_context)
+        )
         self.min_selected_ground_truth = max(1, int(min_selected_ground_truth))
+        if positive_cardinality is not None and positive_cardinality < 0:
+            raise ValueError("positive_cardinality must be non-negative")
+        self.positive_cardinality = positive_cardinality
         self.line_by_idx: dict[int, str] = {}
         for line in lines:
             idx_str, _ = line.split(" ", 1)
@@ -55,9 +62,7 @@ class RandomContextPipeline(BaseContextPipeline):
 
     def _valid_line_indices(self, indices: Iterable[int] | None) -> set[int]:
         return {
-            idx
-            for idx in (indices or [])
-            if isinstance(idx, int) and 0 <= idx < len(self.lines)
+            idx for idx in (indices or []) if isinstance(idx, int) and 0 <= idx < len(self.lines)
         }
 
     def _sample_with_seed(
@@ -88,26 +93,24 @@ class RandomContextPipeline(BaseContextPipeline):
         excluded_indices: Iterable[int] | None = None,
     ) -> str:
         pipeline_excluded = self._valid_line_indices(excluded_indices)
+        valid_correct = sorted(self._valid_line_indices(correct_indices) - pipeline_excluded)
+        if self.positive_cardinality is not None:
+            return self._build_cardinality_matched_context(
+                context_size=context_size,
+                valid_correct=valid_correct,
+                pipeline_excluded=pipeline_excluded,
+            )
         if context_size < 0:
             if not pipeline_excluded:
                 return "\n".join(self.lines)
             return "\n".join(
-                line
-                for idx, line in enumerate(self.lines)
-                if idx not in pipeline_excluded
+                line for idx, line in enumerate(self.lines) if idx not in pipeline_excluded
             )
         top_k = min(context_size, len(self.lines))
         if top_k == 0:
             return ""
 
         if correct_indices is not None:
-            valid_correct = sorted(
-                {
-                    idx
-                    for idx in correct_indices
-                    if isinstance(idx, int) and 0 <= idx < len(self.lines)
-                }
-            )
             answer_count = len(valid_correct)
             if answer_count > 0:
                 ratio = answer_count / len(self.lines)
@@ -172,6 +175,53 @@ class RandomContextPipeline(BaseContextPipeline):
             excluded_indices=pipeline_excluded,
         )
 
+    def _build_cardinality_matched_context(
+        self,
+        *,
+        context_size: int,
+        valid_correct: list[int],
+        pipeline_excluded: set[int],
+    ) -> str:
+        requested = self.positive_cardinality
+        assert requested is not None
+        available = len(valid_correct)
+        if requested > available:
+            raise ValueError(
+                "Cannot construct cardinality-matched context: "
+                f"requested {requested} positives but only {available} are available"
+            )
+        if context_size >= 0 and requested > min(context_size, len(self.lines)):
+            raise ValueError(
+                "Cannot construct cardinality-matched context: "
+                f"requested {requested} positives in a context of size {context_size}"
+            )
+
+        forced = self.rng.sample(valid_correct, k=requested)
+        non_forced_correct = set(valid_correct) - set(forced)
+        excluded = non_forced_correct | pipeline_excluded
+        if context_size < 0:
+            selected = [line for idx, line in enumerate(self.lines) if idx not in excluded]
+            effective_size = len(selected)
+            result = "\n".join(selected)
+        else:
+            effective_size = min(context_size, len(self.lines) - len(excluded))
+            if effective_size < context_size:
+                raise ValueError(
+                    "Cannot construct cardinality-matched context of the requested size: "
+                    f"only {effective_size} eligible reactions remain for {context_size} slots"
+                )
+            result = self._sample_with_seed(
+                top_k=context_size,
+                forced_indices=forced,
+                excluded_indices=excluded,
+            )
+        print(
+            f"[PIPELINE] context_size_requested={context_size} "
+            f"context_size_effective={effective_size} answers_total={available} "
+            f"cardinality_matched=true selected_ground_truth={requested}"
+        )
+        return result
+
 
 def build_context_pipeline(
     name: str,
@@ -180,7 +230,19 @@ def build_context_pipeline(
     ground_truth_indices_by_reaction: dict[str, list[int]] | None = None,
     ground_truth_fraction_per_context: float = 0.0,
     min_selected_ground_truth: int = 1,
+    positive_cardinality: int | None = None,
 ) -> BaseContextPipeline:
+    if positive_cardinality is None:
+        configured_cardinality = os.environ.get("RXNHAYSTACK_POSITIVE_CARDINALITY")
+        if configured_cardinality is not None:
+            try:
+                positive_cardinality = int(configured_cardinality)
+            except ValueError as error:
+                raise ValueError(
+                    "RXNHAYSTACK_POSITIVE_CARDINALITY must be a non-negative integer"
+                ) from error
+            if positive_cardinality < 0:
+                raise ValueError("RXNHAYSTACK_POSITIVE_CARDINALITY must be a non-negative integer")
     if name == "random":
         return RandomContextPipeline(
             lines=lines,
@@ -188,11 +250,12 @@ def build_context_pipeline(
             ground_truth_indices_by_reaction=ground_truth_indices_by_reaction,
             ground_truth_fraction_per_context=ground_truth_fraction_per_context,
             min_selected_ground_truth=min_selected_ground_truth,
+            positive_cardinality=positive_cardinality,
         )
     raise ValueError(f"Unsupported context pipeline: {name}")
 
 
-def parse_count(response: str) -> Optional[int]:
+def parse_count(response: str) -> int | None:
     cleaned = response.strip().replace('"', "").replace("'", "")
     if cleaned.isdigit():
         return int(cleaned)
@@ -286,7 +349,9 @@ def extract_usage_metrics(response: Any) -> dict[str, float | int]:
     candidates: list[Any] = []
     raw = getattr(response, "raw", None)
     if raw is not None:
-        candidates.append(raw.get("usage") if isinstance(raw, dict) else getattr(raw, "usage", None))
+        candidates.append(
+            raw.get("usage") if isinstance(raw, dict) else getattr(raw, "usage", None)
+        )
     candidates.append(getattr(response, "usage", None))
     msg = getattr(response, "message", None)
     if msg is not None:
@@ -369,11 +434,7 @@ def precision_recall_f1(
     fn = len(ground_truth_index_set - predicted_indices)
     precision = tp / (tp + fp) if (tp + fp) else 0.0
     recall = tp / (tp + fn) if (tp + fn) else 0.0
-    f1 = (
-        2 * precision * recall / (precision + recall)
-        if (precision + recall)
-        else 0.0
-    )
+    f1 = 2 * precision * recall / (precision + recall) if (precision + recall) else 0.0
     return precision, recall, f1
 
 

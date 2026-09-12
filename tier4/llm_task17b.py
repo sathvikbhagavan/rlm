@@ -5,7 +5,7 @@ import random
 import uuid
 
 from llama_index.core.llms import ChatMessage
-from llama_index.llms.openrouter import OpenRouter
+from rxnhaystack.providers import build_benchmark_llm
 from task17b_smirks_sequential_graph import (
     build_rlm_question,
     parse_chain_response,
@@ -30,6 +30,10 @@ from task17b_ground_truth import (
 )
 
 import wandb
+
+from rxnhaystack.campaign_metrics import install_campaign_metrics
+from rxnhaystack.concurrency import map_async_bounded, question_parallelism_from_environment
+
 from rlm.codeact_helpers import (
     build_context_pipeline,
     extract_response_text,
@@ -39,12 +43,14 @@ from rlm.codeact_helpers import (
 from rlm.tracing import init_tracing, using_tracing_attributes
 from rlm.utils.token_utils import count_tokens
 
-DATASET_PATH = "/home/bhagavan/rlms/datasets/reactionSmilesFigShareUSPTO2023_cleaned.txt"
-MODEL_NAME = "openai/gpt-5-mini"
+install_campaign_metrics(wandb)
+
+DATASET_PATH = __import__("os").environ.get("RXNHAYSTACK_CLEANED_DATASET", __import__("os").path.expanduser("~/datasets/rxnhaystack/reactionSmilesFigShareUSPTO2023_cleaned.txt"))
+MODEL_NAME = __import__("os").environ.get("RXNHAYSTACK_MODEL", "openai/gpt-5-mini")
 OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
 ENABLE_TRACING = True
-SEED = 42
-CONTEXT_SIZE = 100
+SEED = int(__import__("os").environ.get("RXNHAYSTACK_SEED", "42"))
+CONTEXT_SIZE = int(__import__("os").environ.get("RXNHAYSTACK_CONTEXT_SIZE", "100"))
 CONTEXT_PIPELINE_NAME = "random"
 MAX_CHAINS_PER_QUESTION = 0
 REASONING_EFFORT = "high"
@@ -99,7 +105,7 @@ async def main(model_name: str, context_size: int, max_chains_per_question: int)
     print_task17b_startup_banner(max_chains_per_question=max_chains_per_question)
     run_session_id = f"llm-task17b-{uuid.uuid4()}"
 
-    llm = OpenRouter(
+    llm = build_benchmark_llm(
         model=model_name,
         api_key=OPENROUTER_API_KEY,
         max_tokens=MAX_OUTPUT_TOKENS,
@@ -139,7 +145,9 @@ async def main(model_name: str, context_size: int, max_chains_per_question: int)
     total_output_tokens = 0
     samples_run = 0
 
-    for i, spec in enumerate(evaluated_specs):
+    async def _evaluate_question(_item):
+        nonlocal exact_match_count, macro_f1, macro_precision, macro_recall, samples_run, samples_with_cost, total_cost_usd, total_input_tokens, total_output_tokens
+        (i, spec) = _item
         full_support_indices = full_support_indices_for_question(spec)
         sampling = chains_for_context_sampling(spec, context_size)
         support_indices = set(sampling.support_indices)
@@ -307,6 +315,12 @@ async def main(model_name: str, context_size: int, max_chains_per_question: int)
                 "running_macro_f1": macro_f1 / samples_run,
             }
         )
+
+    await map_async_bounded(
+        _evaluate_question,
+        list(enumerate(evaluated_specs)),
+        max_concurrency=question_parallelism_from_environment(),
+    )
 
     total = samples_run
     macro_precision = macro_precision / total if total else 0.0

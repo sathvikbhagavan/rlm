@@ -4,8 +4,16 @@ import random
 import uuid
 
 import wandb
+
+from rxnhaystack.campaign_metrics import install_campaign_metrics
+from rxnhaystack.concurrency import (
+    OrderedAsyncGate,
+    map_async_bounded,
+    question_parallelism_from_environment,
+)
+
 from llama_index.core.llms import ChatMessage
-from llama_index.llms.openrouter import OpenRouter
+from rxnhaystack.providers import build_benchmark_llm
 from task3_hardcoded_ground_truth import (
     TASK3_HARDCODED_GROUND_TRUTH_INDICES,
     TASK3_THRESHOLDS,
@@ -22,14 +30,16 @@ from rlm.codeact_helpers import (
 from rlm.tracing import init_tracing, using_tracing_attributes
 from rlm.utils.token_utils import count_tokens
 
+install_campaign_metrics(wandb)
 
-DATASET_PATH = "/home/bhagavan/rlms/datasets/reactionSmilesFigShareUSPTO2023_cleaned.txt"
-MODEL_NAME = "openai/gpt-5-mini"
+
+DATASET_PATH = __import__("os").environ.get("RXNHAYSTACK_CLEANED_DATASET", __import__("os").path.expanduser("~/datasets/rxnhaystack/reactionSmilesFigShareUSPTO2023_cleaned.txt"))
+MODEL_NAME = __import__("os").environ.get("RXNHAYSTACK_MODEL", "openai/gpt-5-mini")
 OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
 ENABLE_TRACING = True
 THRESHOLDS = TASK3_THRESHOLDS
-SEED = 42
-CONTEXT_SIZE = 500
+SEED = int(__import__("os").environ.get("RXNHAYSTACK_SEED", "42"))
+CONTEXT_SIZE = int(__import__("os").environ.get("RXNHAYSTACK_CONTEXT_SIZE", "500"))
 CONTEXT_PIPELINE_NAME = "random"
 REASONING_EFFORT = "high"
 MAX_OUTPUT_TOKENS = 30_000
@@ -90,7 +100,7 @@ async def main() -> None:
     )
     run_session_id = f"llm-task3-{uuid.uuid4()}"
 
-    llm = OpenRouter(
+    llm = build_benchmark_llm(
         model=MODEL_NAME,
         api_key=OPENROUTER_API_KEY,
         max_tokens=MAX_OUTPUT_TOKENS,
@@ -128,15 +138,20 @@ async def main() -> None:
     total_cost_usd = 0.0
     samples_with_cost = 0
 
-    for i, threshold in enumerate(THRESHOLDS):
-        print(f"Question {i + 1}/{len(THRESHOLDS)} for X={threshold}")
-        question = build_question(threshold)
-        ground_truth_index_set = ground_truth_indices_by_threshold[threshold]
-        retrieved_context = context_pipeline.build_context(
-            context_size=CONTEXT_SIZE,
-            correct_indices=ground_truth_index_set,
-            query=str(threshold),
-        )
+    _preparation_gate = OrderedAsyncGate()
+
+    async def _evaluate_question(_item):
+        nonlocal f1_sum, precision_sum, recall_sum, retrieval_hits, samples_with_cost, total_cost_usd, total_input_tokens_sum, total_output_tokens_sum
+        (i, threshold) = _item
+        async with _preparation_gate.turn(i):
+            print(f"Question {i + 1}/{len(THRESHOLDS)} for X={threshold}")
+            question = build_question(threshold)
+            ground_truth_index_set = ground_truth_indices_by_threshold[threshold]
+            retrieved_context = context_pipeline.build_context(
+                context_size=CONTEXT_SIZE,
+                correct_indices=ground_truth_index_set,
+                query=str(threshold),
+            )
         retrieved_lines = [line for line in retrieved_context.splitlines() if line.strip()]
         retrieved_indices = {
             int(line.split(" ", 1)[0])
@@ -252,6 +267,12 @@ async def main() -> None:
                 "running_retrieval_hit_rate": retrieval_hits / (i + 1),
             }
         )
+
+    await map_async_bounded(
+        _evaluate_question,
+        list(enumerate(THRESHOLDS)),
+        max_concurrency=question_parallelism_from_environment(),
+    )
 
     total = len(THRESHOLDS)
     avg_precision = (precision_sum / total) if total else 0.0

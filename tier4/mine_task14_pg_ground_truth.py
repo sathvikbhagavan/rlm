@@ -17,7 +17,7 @@ from task14_protecting_group_graph import (
     summarize_gt_pair,
 )
 
-DATASET_PATH = "/home/bhagavan/rlms/datasets/reactionSmilesFigShareUSPTO2023_cleaned.txt"
+DATASET_PATH = __import__("os").environ.get("RXNHAYSTACK_CLEANED_DATASET", __import__("os").path.expanduser("~/datasets/rxnhaystack/reactionSmilesFigShareUSPTO2023_cleaned.txt"))
 TIER4_DIR = Path(__file__).resolve().parent
 PAIRS_JSON_PATH = TIER4_DIR / "task14_pg_hardcoded_pairs.json"
 GROUND_TRUTH_PY_PATH = TIER4_DIR / "task14_protecting_group_ground_truth.py"

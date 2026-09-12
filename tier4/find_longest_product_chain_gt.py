@@ -19,7 +19,7 @@ from collections import defaultdict, deque
 
 from rdkit import Chem
 
-DATASET_PATH = "/home/bhagavan/rlms/datasets/reactionSmilesFigShareUSPTO2023.txt"
+DATASET_PATH = __import__("os").environ.get("RXNHAYSTACK_RAW_DATASET", __import__("os").path.expanduser("~/datasets/rxnhaystack/reactionSmilesFigShareUSPTO2023.txt"))
 
 
 def parse_reaction_sides(indexed_line: str) -> tuple[str, str]:

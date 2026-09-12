@@ -1,7 +1,7 @@
 """Generate hardcoded ground truth for tier3 task21.
 
 Usage:
-  /home/bhagavan/rlms/.rlm/bin/python generate_task21_hardcoded_ground_truth.py
+  uv run python generate_task21_hardcoded_ground_truth.py
 """
 
 from __future__ import annotations
@@ -16,7 +16,7 @@ from task21_transition_metal_evaluator import (
     compute_metal_frequency,
 )
 
-DATASET_PATH = "/home/bhagavan/rlms/datasets/reactionSmilesFigShareUSPTO2023_cleaned.txt"
+DATASET_PATH = __import__("os").environ.get("RXNHAYSTACK_CLEANED_DATASET", __import__("os").path.expanduser("~/datasets/rxnhaystack/reactionSmilesFigShareUSPTO2023_cleaned.txt"))
 OUTPUT_PATH = "task21_hardcoded_ground_truth.py"
 
 

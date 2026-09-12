@@ -63,7 +63,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--output-dir",
         type=str,
-        default="/home/bhagavan/rlms/rlm/tier2/wandb_last_runs_report_tables/figures",
+        default=str(Path(__file__).resolve().parent / "wandb_last_runs_report_tables" / "figures"),
     )
     return parser.parse_args()
 

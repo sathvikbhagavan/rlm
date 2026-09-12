@@ -1,0 +1,27 @@
+schema_version = 1
+
+[campaign]
+name = "iclr2027-metrics-adapter-smoke-v1"
+project_root = "../.."
+artifact_dir = "artifacts/iclr2027-metrics-adapter-smoke-v1"
+budget_chf = 0
+usd_to_chf = 0.80
+require_dataset = false
+require_clean_git = false
+require_metrics = true
+max_parallel_memory_mib = 512
+
+[[runs]]
+id = "metrics-adapter-smoke-v1"
+task = "infrastructure/legacy-metrics-adapter"
+condition = "wandb-disabled"
+method = "llm"
+model = "none"
+corpus_size = 1
+seed = 0
+repetitions = 1
+estimated_cost_chf = 0
+memory_reservation_mib = 256
+memory_limit_mib = 512
+question_parallelism = 1
+command = ["uv", "run", "--frozen", "python", "-m", "rxnhaystack.campaign_metrics_smoke"]

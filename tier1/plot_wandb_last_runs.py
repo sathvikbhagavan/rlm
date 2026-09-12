@@ -55,7 +55,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--output-dir",
         type=str,
-        default="/home/bhagavan/rlms/rlm/tier1/plots_last5",
+        default=str(Path(__file__).resolve().parent / "plots_last5"),
     )
     return parser.parse_args()
 

@@ -7,7 +7,7 @@ import random
 from collections import defaultdict
 from rdkit import Chem
 
-DATASET_PATH = "/home/bhagavan/rlms/datasets/reactionSmilesFigShareUSPTO2023.txt"
+DATASET_PATH = __import__("os").environ.get("RXNHAYSTACK_RAW_DATASET", __import__("os").path.expanduser("~/datasets/rxnhaystack/reactionSmilesFigShareUSPTO2023.txt"))
 MAX_MOLECULE_FREQ = 200
 MAX_SUCCESSORS_UNCAPPED = 10_000  # effectively no cap
 MIN_L2_CHAINS = 10                # minimum length-2 chains

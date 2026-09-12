@@ -17,7 +17,7 @@ from task17_smirks_sequential_graph import (
     verify_chain,
 )
 
-DATASET_PATH = "/home/bhagavan/rlms/datasets/reactionSmilesFigShareUSPTO2023_cleaned.txt"
+DATASET_PATH = __import__("os").environ.get("RXNHAYSTACK_CLEANED_DATASET", __import__("os").path.expanduser("~/datasets/rxnhaystack/reactionSmilesFigShareUSPTO2023_cleaned.txt"))
 TIER4_DIR = Path(__file__).resolve().parent
 CHAINS_JSON_PATH = TIER4_DIR / "task17_hardcoded_chains.json"
 

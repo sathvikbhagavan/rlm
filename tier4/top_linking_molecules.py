@@ -9,7 +9,7 @@ Usage:
 from collections import defaultdict
 from rdkit import Chem
 
-DATASET_PATH = "/home/bhagavan/rlms/datasets/reactionSmilesFigShareUSPTO2023.txt"
+DATASET_PATH = __import__("os").environ.get("RXNHAYSTACK_RAW_DATASET", __import__("os").path.expanduser("~/datasets/rxnhaystack/reactionSmilesFigShareUSPTO2023.txt"))
 MAX_MOLECULE_FREQ = 200
 MAX_SUCCESSORS_PER_REACTION = 50
 TOP_N = 20
