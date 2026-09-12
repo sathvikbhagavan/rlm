@@ -514,6 +514,11 @@ can be overridden for a launch by setting
 `RXNHAYSTACK_SWISSAI_REQUEST_TIMEOUT_SECONDS`; do not change it between
 benchmark jobs without recording and justifying the deviation.
 
+For SwissAI, the LLM baseline's low-reasoning setting is sent as the endpoint's
+native `enable_thinking=false` option. CodeAct's high-reasoning setting keeps
+thinking enabled. This is a transport setting, not a change to the chemistry
+prompt.
+
 Stop and report before retrying when:
 
 - authentication fails;

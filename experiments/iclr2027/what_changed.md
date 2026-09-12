@@ -185,6 +185,11 @@ inheriting the chat client's 60-second default. Hidden client-level retries are
 disabled so a single slow request cannot silently multiply that deadline;
 CodeAct and whole-job retries remain visible in the result history.
 
+Low-reasoning LLM calls are translated to SwissAI's native
+`enable_thinking=false` chat-template setting. This keeps Qwen from spending its
+entire answer allowance in separately returned chain-of-thought text before it
+emits the requested final answer. High-reasoning CodeAct calls retain thinking.
+
 ## 8. Time, tokens, calls, and cost are recorded consistently
 
 The previous task scripts already logged useful information to W&B, but fields

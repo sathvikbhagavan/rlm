@@ -61,9 +61,19 @@ def build_benchmark_llm(**kwargs: Any) -> OpenRouter | OpenAILike:
     configured["max_retries"] = 0
     # This OpenAI-compatible endpoint does not advertise OpenRouter's normalized
     # reasoning_effort or max_completion_tokens extensions.
-    configured.pop("reasoning_effort", None)
+    reasoning_effort = configured.pop("reasoning_effort", None)
     additional = dict(configured.pop("additional_kwargs", {}) or {})
     additional.pop("max_completion_tokens", None)
+    if reasoning_effort in {"none", "minimal", "low"}:
+        # SwissAI's vLLM endpoint returns Qwen's chain of thought separately as
+        # reasoning_content. Without this native template option, even a trivial
+        # low-reasoning request can exhaust its output allowance before emitting
+        # final content. Translate the intent without changing the user prompt.
+        extra_body = dict(additional.get("extra_body", {}) or {})
+        chat_template_kwargs = dict(extra_body.get("chat_template_kwargs", {}) or {})
+        chat_template_kwargs["enable_thinking"] = False
+        extra_body["chat_template_kwargs"] = chat_template_kwargs
+        additional["extra_body"] = extra_body
     if additional:
         configured["additional_kwargs"] = additional
     return OpenAILike(**configured)

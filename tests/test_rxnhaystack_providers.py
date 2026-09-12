@@ -50,6 +50,23 @@ def test_swissai_llamaindex_client_preserves_chat_interface(monkeypatch) -> None
     assert client.metadata.is_chat_model
     assert client.timeout == SWISSAI_REQUEST_TIMEOUT_SECONDS
     assert client.max_retries == 0
+    assert client.additional_kwargs == {}
+
+
+def test_swissai_translates_low_reasoning_to_native_no_thinking(monkeypatch) -> None:
+    monkeypatch.setenv("RXNHAYSTACK_PROVIDER", "swissai")
+    monkeypatch.setenv("SWISSAI_RESEARCH_API_KEY", "private")
+
+    client = build_benchmark_llm(
+        model="model",
+        api_key="replaced",
+        reasoning_effort="low",
+        additional_kwargs={"max_completion_tokens": 100},
+    )
+
+    assert client.additional_kwargs == {
+        "extra_body": {"chat_template_kwargs": {"enable_thinking": False}}
+    }
 
 
 def test_swissai_llamaindex_timeout_is_configurable_and_validated(monkeypatch) -> None:
