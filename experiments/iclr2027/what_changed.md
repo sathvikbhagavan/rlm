@@ -243,6 +243,12 @@ cost rather than an absent cost field. W&B settings now also identify the exact
 job, repetition, provider, question parallelism, context size, and positive
 cardinality.
 
+The adapter reads both ordinary dictionary summaries and the current W&B
+`Summary` object. A full 10-question live run exposed that the latter does not
+provide the dictionary `.items()` method; a compatibility test now reproduces
+that interface so successful scientific work cannot fail during final metric
+serialization.
+
 See [`rxnhaystack/campaign_metrics.py`](../../rxnhaystack/campaign_metrics.py),
 [`rxnhaystack/metrics.py`](../../rxnhaystack/metrics.py), and
 [`rxnhaystack/worker.py`](../../rxnhaystack/worker.py).

@@ -24,6 +24,19 @@ class FakeWandb:
         self.finished = True
 
 
+class WandbSummaryLike:
+    """Mimic W&B Summary: `_as_dict()` exists but `.items()` does not."""
+
+    def __init__(self) -> None:
+        self.values = {"macro_f1": 0.625, "_runtime": 10}
+
+    def __getattr__(self, key: str):
+        raise KeyError(key)
+
+    def _as_dict(self) -> dict[str, float]:
+        return dict(self.values)
+
+
 def configure_campaign(monkeypatch, tmp_path: Path, *, method: str) -> Path:
     metrics = tmp_path / "metrics.json"
     monkeypatch.setenv("RXNHAYSTACK_RUN_ID", "test-run")
@@ -61,6 +74,28 @@ def test_capture_writes_complete_llm_metrics(monkeypatch, tmp_path: Path) -> Non
     assert metrics["cost_chf"] == pytest.approx(0.24)
     assert metrics["results"]["macro_f1"] == 0.75
     assert wandb.finished
+
+
+def test_capture_reads_current_wandb_summary_object(monkeypatch, tmp_path: Path) -> None:
+    metrics_path = configure_campaign(monkeypatch, tmp_path, method="llm")
+    wandb = FakeWandb()
+    wandb.run.summary = WandbSummaryLike()
+    install_campaign_metrics(wandb)
+    wandb.init(project="test")
+    wandb.log(
+        {
+            "sample/0/iteration_total_tokens": 3,
+            "sample/0/final_total_input_tokens": 2,
+            "sample/0/final_total_output_tokens": 1,
+            "sample/0/final_total_tokens": 3,
+            "sample/0/final_total_cost_usd": 0.01,
+        }
+    )
+
+    wandb.finish()
+
+    metrics = json.loads(metrics_path.read_text())
+    assert metrics["results"] == {"macro_f1": 0.625}
 
 
 def test_capture_uses_exact_recursive_trace_metrics(monkeypatch, tmp_path: Path) -> None:

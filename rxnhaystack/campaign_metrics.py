@@ -120,13 +120,18 @@ class CampaignMetricsCapture:
         summary = getattr(self.run, "summary", None)
         if summary is None:
             return {}
-        try:
-            items = summary.items()
-        except AttributeError:
+        if isinstance(summary, Mapping):
+            summary_values = summary
+        else:
+            as_dict = getattr(summary, "_as_dict", None)
+            if not callable(as_dict):
+                return {}
+            summary_values = as_dict()
+        if not isinstance(summary_values, Mapping):
             return {}
         return {
             str(key): _json_value(value)
-            for key, value in items
+            for key, value in summary_values.items()
             if not str(key).startswith(("_", "sample/", "running_"))
             and str(key) not in {"sample_idx", "sample_iteration"}
         }
