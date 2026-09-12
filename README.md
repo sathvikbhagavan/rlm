@@ -127,7 +127,8 @@ This checkout also contains the RxnHaystack chemistry benchmark. See
 [`dataset/README.md`](dataset/README.md) to reconstruct its exact USPTO-2023
 corpus and [`experiments/iclr2027/README.md`](experiments/iclr2027/README.md)
 for the reproducible campaign launcher, run manifests, budget controls, and
-artifact contract.
+artifact contract. Co-authors launching experiments should follow the
+human-oriented [`experiments/iclr2027/RUNBOOK.md`](experiments/iclr2027/RUNBOOK.md).
 
 If you use this code or repository in your research, please cite:
 
