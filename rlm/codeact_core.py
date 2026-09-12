@@ -348,6 +348,17 @@ def format_code_execution_timeout_error(timeout_s: float) -> str:
     )
 
 
+def _tool_isolation_failure(output: str) -> bool:
+    return output.startswith("Error: TimeoutError: Code execution exceeded") or output.startswith(
+        "Error: RuntimeError: The isolated code process exited unexpectedly"
+    )
+
+
+def _reported_tool_timeout(output: str) -> str | None:
+    match = re.search(r"Code execution exceeded ([0-9.]+)s timeout", output)
+    return match.group(1) if match else None
+
+
 async def execute_code_with_timeout(
     code_execute_fn: Callable[[str], str],
     code: str,
@@ -749,18 +760,21 @@ class CodeActAgent(Workflow):
                 self.on_tool_complete(iteration, time.perf_counter() - tool_started, True)
             raise
         tool_duration = time.perf_counter() - tool_started
+        tool_failed = _tool_isolation_failure(output)
         if self.on_tool_complete is not None:
-            self.on_tool_complete(iteration, tool_duration, False)
+            self.on_tool_complete(iteration, tool_duration, tool_failed)
         tool_turn_metrics = await ctx.store.get("tool_turn_metrics", default=[])
         tool_turn_metrics.append(
             {
                 "iteration": iteration,
                 "tool_time_seconds": tool_duration,
+                "tool_failed": tool_failed,
             }
         )
         await ctx.store.set("tool_turn_metrics", tool_turn_metrics)
-        if output.startswith("Error: TimeoutError: Code execution exceeded"):
-            print(f"[CODE EXEC TIMEOUT] exceeded {self.code_execution_timeout_s:.1f}s")
+        reported_timeout = _reported_tool_timeout(output)
+        if reported_timeout is not None:
+            print(f"[CODE EXEC TIMEOUT] isolated process stopped after {reported_timeout}s")
         print("[OUTPUT]")
         print(output)
         print("[END OUTPUT]\n")
