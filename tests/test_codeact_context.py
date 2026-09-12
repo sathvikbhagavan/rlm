@@ -1,9 +1,12 @@
 from rlm.codeact_core import (
     FINAL_ANSWER_REQUIRED,
+    FINAL_ANSWER_ATTEMPTS,
     INDEX_CODEACT_SYSTEM_PROMPT,
     PRELOADED_LINES_REMINDER,
     _continuation_instruction,
+    _answer_only_attempts_exhausted,
     _has_final_answer,
+    _is_answer_only_turn,
     append_preloaded_lines_reminder,
 )
 
@@ -49,4 +52,17 @@ def test_last_allowed_action_forces_a_bounded_final_answer_turn() -> None:
             iteration=8, max_iterations=8, normal_instruction=normal
         )
         == FINAL_ANSWER_REQUIRED
+    )
+
+
+def test_answer_only_correction_has_one_retry_and_a_hard_stop() -> None:
+    max_iterations = 8
+
+    assert _is_answer_only_turn(iteration=9, max_iterations=max_iterations)
+    assert not _answer_only_attempts_exhausted(
+        iteration=9, max_iterations=max_iterations
+    )
+    assert _answer_only_attempts_exhausted(
+        iteration=max_iterations + FINAL_ANSWER_ATTEMPTS,
+        max_iterations=max_iterations,
     )

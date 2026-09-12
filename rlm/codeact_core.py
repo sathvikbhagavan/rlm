@@ -94,6 +94,7 @@ FINAL_ANSWER_REQUIRED = (
     "Respond now with ANSWER: followed by the exact output requested in the "
     "question. Include no reasoning or explanation."
 )
+FINAL_ANSWER_ATTEMPTS = 2
 
 PRELOADED_LINES_REMINDER = """<tool-data-reminder>
 The exact retrieved context rows are already available in Python as the list
@@ -254,6 +255,14 @@ def _continuation_instruction(
     if iteration >= max_iterations:
         return FINAL_ANSWER_REQUIRED
     return normal_instruction
+
+
+def _is_answer_only_turn(*, iteration: int, max_iterations: int) -> bool:
+    return iteration > max_iterations
+
+
+def _answer_only_attempts_exhausted(*, iteration: int, max_iterations: int) -> bool:
+    return iteration >= max_iterations + FINAL_ANSWER_ATTEMPTS
 
 
 def _iter_exception_chain(exc: BaseException):
@@ -496,8 +505,17 @@ class CodeActAgent(Workflow):
         )
         await ctx.store.set("llm_turn_metrics", llm_turn_metrics)
 
-        if _has_final_answer(content) or iteration > self.max_iterations:
+        if _has_final_answer(content) or _answer_only_attempts_exhausted(
+            iteration=iteration, max_iterations=self.max_iterations
+        ):
             return StopEvent(result=response)
+
+        if _is_answer_only_turn(
+            iteration=iteration, max_iterations=self.max_iterations
+        ):
+            memory.put(ChatMessage(role="user", content=FINAL_ANSWER_REQUIRED))
+            await ctx.store.set("memory", memory)
+            return InputEvent(input=await self._build_input_messages(ctx))
 
         code = self._parse_code(content)
         if not code:

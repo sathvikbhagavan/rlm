@@ -167,10 +167,11 @@ the context to a complete 390-token action using `lines`.
 The shared controller also accepts each task's own answer shape instead of
 assuming every answer is one comma-separated line. This matters for Tier 4,
 where a correct answer may contain several routes or reaction pairs. After the
-eighth permitted reasoning/tool turn, the controller allows one answer-only
-turn and explicitly forbids further code. A live Tier-4 Qwen check reached this
-boundary, returned a multi-line `ANSWER:` response, and stopped cleanly; tests
-cover the boundary and multi-line marker.
+eighth permitted reasoning/tool turn, the controller allows at most two
+answer-only attempts and explicitly forbids further code. If the first answer
+attempt still contains code, it is not executed and the model receives one final
+correction. Live Tier-4 Qwen checks exercised both a clean multi-line `ANSWER:`
+response and the correction path; tests cover the boundary and answer marker.
 
 Each CodeAct model turn also has a provider-independent 2,048-output-token
 limit. A final Qwen trial found one task-specific first turn repeatedly reaching

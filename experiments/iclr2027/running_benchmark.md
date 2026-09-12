@@ -297,8 +297,10 @@ repeats this instruction immediately after the question so it remains visible
 even when the context is very long.
 
 CodeAct permits at most eight reasoning/tool turns, followed—only when needed—by
-one answer-only turn. At that boundary the model is explicitly told not to run
-more code. Tier-4 answers may contain several lines; the controller recognizes
+up to two answer-only attempts. At that boundary the model is explicitly told not
+to run more code; if it nevertheless returns code, that code is not executed and
+the final correction is requested once more. Tier-4 answers may contain several
+lines; the controller recognizes
 the `ANSWER:` marker and leaves validation of the following task-specific format
 to the task's own parser.
 
