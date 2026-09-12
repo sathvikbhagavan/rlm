@@ -1,14 +1,20 @@
-# Standalone co-author pilot
+# Standalone annotator setup
 
 ## Setup
 
 1. Install `git` and [`uv`](https://docs.astral.sh/uv/getting-started/installation/).
-2. Clone and enter the pilot branch:
+2. Clone the repository's current `main` branch and enter it:
 
    ```bash
-   git clone --branch rxnhaystack-human-eval-pilot \
-     https://github.com/sathvikbhagavan/rlm.git
+   git clone https://github.com/sathvikbhagavan/rlm.git
    cd rlm
+   ```
+
+   If you already cloned it, update it before starting or resuming:
+
+   ```bash
+   git switch main
+   git pull --ff-only
    ```
 
 3. Launch:

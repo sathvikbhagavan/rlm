@@ -14,8 +14,15 @@ stopping limit; if you reach it without an answer, report “Suggested time exce
 
 ## Before starting
 
-1. Obtain the repository, cleaned dataset, and assigned study link or question list
-   from Amin.
+1. Obtain the repository and assigned study link or question list from Amin. Follow
+   `human_eval/STANDALONE_SETUP.md` for a first-time installation. If it is already
+   installed, update the application before starting or resuming:
+
+   ```bash
+   git switch main
+   git pull --ff-only
+   ```
+
 2. From the repository root, run `./human_eval/run.sh`, then open
    <http://127.0.0.1:8765> in the same computer's browser.
 3. Optionally complete the non-identifying expertise profile. Do not enter your
@@ -56,6 +63,9 @@ chemical definitions.
   save, pauses timing, and returns to the list.
 - To continue on the same computer, rerun `./human_eval/run.sh`, open the same URL,
   and choose **Begin or resume**. Keep `human_eval/local_state/`.
+- Updating the application does not erase saved work. If the interface warns that
+  a saved question has changed, review that question again before continuing; the
+  earlier submission and its version remain in the revision history and export.
 - **Export** downloads a checkpoint ZIP. On a fresh installation, choose
   **Restore**, upload that ZIP, and continue.
 - Abrupt power loss can still lose typing since the most recent confirmed save. Use
