@@ -16,10 +16,59 @@ import textwrap
 import threading
 import time
 from http.server import BaseHTTPRequestHandler, HTTPServer
+from pathlib import Path
 
 from rlm.core.comms_utils import LMRequest, send_lm_request, send_lm_request_batched
 from rlm.core.types import REPLResult, RLMChatCompletion
 from rlm.environments.base_env import NonIsolatedEnv
+
+DOCKER_MEMORY_CGROUP_ENV = "RXNHAYSTACK_DOCKER_MEMORY_CGROUP_PATH"
+DOCKER_RUN_TOKEN_ENV = "RXNHAYSTACK_DOCKER_RUN_TOKEN"
+DOCKER_RUN_LABEL = "rxnhaystack.run_token"
+
+
+def container_cgroup_path(
+    container_id: str,
+    *,
+    proc_root: Path = Path("/proc"),
+) -> str | None:
+    """Return a running container's unified cgroup-v2 path."""
+
+    result = subprocess.run(
+        ["docker", "inspect", "--format", "{{.State.Pid}}", container_id],
+        capture_output=True,
+        text=True,
+    )
+    if result.returncode != 0:
+        return None
+    try:
+        pid = int(result.stdout.strip())
+        cgroup_lines = (proc_root / str(pid) / "cgroup").read_text(encoding="utf-8")
+    except (OSError, UnicodeError, ValueError):
+        return None
+    for line in cgroup_lines.splitlines():
+        hierarchy, separator, remainder = line.partition(":")
+        controllers, second_separator, cgroup_path = remainder.partition(":")
+        if separator and second_separator and hierarchy == "0" and not controllers:
+            return cgroup_path
+    return None
+
+
+def publish_container_cgroup(container_id: str, registry_path: Path) -> None:
+    """Publish one cgroup path for launcher-side memory sampling."""
+
+    cgroup_path = container_cgroup_path(container_id)
+    if cgroup_path is None:
+        raise RuntimeError(f"Could not determine cgroup-v2 path for container {container_id}")
+    registry_path.parent.mkdir(parents=True, exist_ok=True)
+    descriptor = os.open(registry_path, os.O_WRONLY | os.O_APPEND | os.O_CREAT, 0o600)
+    try:
+        encoded = f"{cgroup_path}\n".encode()
+        written = os.write(descriptor, encoded)
+        if written != len(encoded):
+            raise OSError(f"Short Docker cgroup registry write: {written}/{len(encoded)} bytes")
+    finally:
+        os.close(descriptor)
 
 
 class LLMProxyHandler(BaseHTTPRequestHandler):
@@ -253,6 +302,12 @@ class DockerREPL(NonIsolatedEnv):
         self.proxy_thread = threading.Thread(target=self.proxy_server.serve_forever, daemon=True)
         self.proxy_thread.start()
 
+        cgroup_registry_value = os.environ.get(DOCKER_MEMORY_CGROUP_ENV)
+        cgroup_registry = Path(cgroup_registry_value) if cgroup_registry_value else None
+        if cgroup_registry is not None:
+            cgroup_registry.parent.mkdir(parents=True, exist_ok=True)
+            cgroup_registry.touch(mode=0o600, exist_ok=True)
+
         # Start Docker container
         run_cmd = [
             "docker",
@@ -264,6 +319,9 @@ class DockerREPL(NonIsolatedEnv):
             "--add-host",
             "host.docker.internal:host-gateway",
         ]
+        run_token = os.environ.get(DOCKER_RUN_TOKEN_ENV)
+        if run_token:
+            run_cmd.extend(["--label", f"{DOCKER_RUN_LABEL}={run_token}"])
         if self.memory_limit:
             # Hard RAM cap: disable swap so OOM kills the container process instead of spilling.
             run_cmd.extend(["--memory", self.memory_limit, "--memory-swap", self.memory_limit])
@@ -278,6 +336,17 @@ class DockerREPL(NonIsolatedEnv):
             raise RuntimeError(f"Failed to start container: {result.stderr}")
 
         self.container_id = result.stdout.strip()
+
+        if cgroup_registry is not None:
+            try:
+                publish_container_cgroup(self.container_id, cgroup_registry)
+            except Exception:
+                subprocess.run(
+                    ["docker", "container", "rm", "--force", self.container_id],
+                    capture_output=True,
+                )
+                self.container_id = None
+                raise
 
         if self.bootstrap_packages:
             subprocess.run(

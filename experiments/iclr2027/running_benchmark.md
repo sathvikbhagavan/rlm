@@ -375,8 +375,12 @@ Standalone development runs may still fall back to the local Python environment,
 and the other RLM tasks use that environment directly. Launcher-managed local
 RLM workers have an 8,192-MiB address-space limit; model-generated Python is
 temporarily limited to 4,096 MiB so the controller retains error-reporting
-headroom. The separate 30,720-MiB process-tree limit remains the final safeguard.
-Both local limits are recorded in `resource-trace.jsonl` when they apply.
+headroom. The separate 30,720-MiB combined host-and-Docker limit remains the
+final safeguard. Each RLM attempt gives its containers a unique label: if the
+worker is interrupted, the launcher removes only containers carrying that exact
+label. The timestamped resource trace reports host process-tree RAM, Docker
+memory, and their combined value. Both local limits are recorded there when
+they apply.
 
 Start with one open model, one job at a time:
 
@@ -416,7 +420,8 @@ For every trial job, inspect:
 
 - `metrics.json`: calls, input/output tokens, actual cost, total time, and tool
   time;
-- `metadata.json`: exact setting, completion state, and peak process-tree RAM;
+- `metadata.json`: exact setting, completion state, and peak host, Docker, and
+  combined memory;
 - `resource-trace.jsonl`: whether RAM grew steadily or spiked during a particular
   RLM iteration or subcall, and whether the expected local RLM memory limit was
   applied; for Claude CodeAct, also compare cached tokens, cache-write tokens,
@@ -451,7 +456,9 @@ Calls:
 Input / output tokens:
 Actual CHF cost:
 Wall time:
-Peak process-tree RAM:
+Peak host process-tree RAM:
+Peak Docker memory:
+Peak combined memory:
 Highest percentage of the job's hard RAM limit:
 RLM environment (Docker or local) and local-limit trace event, if applicable:
 Any 400, 401, 429, 5xx, timeout, parsing, or chemistry errors:

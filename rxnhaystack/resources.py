@@ -14,12 +14,15 @@ from pathlib import Path
 from typing import Any
 
 MIB = 1024 * 1024
+DOCKER_MEMORY_CGROUP_ENV = "RXNHAYSTACK_DOCKER_MEMORY_CGROUP_PATH"
 
 
 @dataclass(frozen=True)
 class ProcessUsage:
     return_code: int
-    peak_rss_mib: float
+    peak_combined_memory_mib: float
+    peak_host_rss_mib: float
+    peak_docker_memory_mib: float
     memory_limit_exceeded: bool
     cancelled: bool = False
 
@@ -112,6 +115,34 @@ def _read_linux_status(path: Path) -> tuple[int, int, int] | None:
     return pid, parent_pid, rss_kib * 1024
 
 
+def docker_cgroup_memory_bytes(
+    registry_path: Path | None,
+    *,
+    cgroup_root: Path = Path("/sys/fs/cgroup"),
+) -> int:
+    """Read a launcher-managed container's cgroup-v2 memory counter."""
+
+    if registry_path is None:
+        return 0
+    try:
+        cgroup_values = registry_path.read_text(encoding="utf-8").splitlines()
+    except (OSError, UnicodeError):
+        return 0
+    root = cgroup_root.resolve()
+    total = 0
+    for cgroup_value in set(cgroup_values):
+        if not cgroup_value:
+            continue
+        candidate = (root / cgroup_value.lstrip("/") / "memory.current").resolve()
+        try:
+            candidate.relative_to(root)
+            value = int(candidate.read_text(encoding="utf-8").strip())
+        except (OSError, UnicodeError, ValueError):
+            continue
+        total += max(0, value)
+    return total
+
+
 def wait_with_memory_watchdog(
     process: subprocess.Popen[str],
     *,
@@ -121,12 +152,15 @@ def wait_with_memory_watchdog(
     trace_path: Path | None = None,
     run_id: str | None = None,
     cancellation_event: threading.Event | None = None,
+    docker_memory_registry_path: Path | None = None,
 ) -> ProcessUsage:
-    """Wait for a process while measuring and optionally limiting its process-tree RSS."""
+    """Measure host descendants plus any launcher-managed Docker cgroup."""
 
     if memory_limit_mib is not None and not Path("/proc/self/status").is_file():
         raise RuntimeError("Per-run memory limits require a Linux /proc filesystem")
     peak_rss_bytes = 0
+    peak_host_rss_bytes = 0
+    peak_docker_memory_bytes = 0
     memory_limit_bytes = memory_limit_mib * MIB if memory_limit_mib is not None else None
     exceeded = False
     cancelled = False
@@ -140,15 +174,26 @@ def wait_with_memory_watchdog(
         )
     try:
         while True:
-            rss_bytes = process_tree_rss_bytes(process.pid)
+            host_rss_bytes = process_tree_rss_bytes(process.pid)
+            docker_memory_bytes = docker_cgroup_memory_bytes(
+                docker_memory_registry_path
+            )
+            rss_bytes = host_rss_bytes + docker_memory_bytes
             peak_rss_bytes = max(peak_rss_bytes, rss_bytes)
+            peak_host_rss_bytes = max(peak_host_rss_bytes, host_rss_bytes)
+            peak_docker_memory_bytes = max(
+                peak_docker_memory_bytes, docker_memory_bytes
+            )
             if trace_path is not None:
                 append_trace_event(
                     trace_path,
                     "resource_sample",
                     run_id=run_id,
                     root_pid=process.pid,
-                    process_tree_rss_mib=rss_bytes / MIB,
+                    process_tree_rss_mib=host_rss_bytes / MIB,
+                    combined_memory_mib=rss_bytes / MIB,
+                    host_process_tree_rss_mib=host_rss_bytes / MIB,
+                    docker_memory_mib=docker_memory_bytes / MIB,
                 )
             return_code = process.poll()
             if (
@@ -174,7 +219,10 @@ def wait_with_memory_watchdog(
                         "memory_limit_exceeded",
                         run_id=run_id,
                         root_pid=process.pid,
-                        process_tree_rss_mib=rss_bytes / MIB,
+                        process_tree_rss_mib=host_rss_bytes / MIB,
+                        combined_memory_mib=rss_bytes / MIB,
+                        host_process_tree_rss_mib=host_rss_bytes / MIB,
+                        docker_memory_mib=docker_memory_bytes / MIB,
                         memory_limit_mib=memory_limit_mib,
                     )
                 _terminate_process_group(process, grace_seconds=termination_grace_seconds)
@@ -192,13 +240,18 @@ def wait_with_memory_watchdog(
             run_id=run_id,
             root_pid=process.pid,
             return_code=return_code,
-            peak_process_tree_rss_mib=peak_rss_bytes / MIB,
+            peak_process_tree_rss_mib=peak_host_rss_bytes / MIB,
+            peak_combined_memory_mib=peak_rss_bytes / MIB,
+            peak_host_process_tree_rss_mib=peak_host_rss_bytes / MIB,
+            peak_docker_memory_mib=peak_docker_memory_bytes / MIB,
             memory_limit_exceeded=exceeded,
             cancelled=cancelled,
         )
     return ProcessUsage(
         return_code=return_code,
-        peak_rss_mib=peak_rss_bytes / MIB,
+        peak_combined_memory_mib=peak_rss_bytes / MIB,
+        peak_host_rss_mib=peak_host_rss_bytes / MIB,
+        peak_docker_memory_mib=peak_docker_memory_bytes / MIB,
         memory_limit_exceeded=exceeded,
         cancelled=cancelled,
     )

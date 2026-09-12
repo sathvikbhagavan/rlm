@@ -1,14 +1,18 @@
 from __future__ import annotations
 
 import json
+import subprocess
+import sys
 import threading
 from pathlib import Path
 
 from rxnhaystack.resources import (
     MemoryBudget,
     append_trace_event,
+    docker_cgroup_memory_bytes,
     process_tree_rss_bytes,
     rlm_trace_callbacks,
+    wait_with_memory_watchdog,
 )
 
 
@@ -28,6 +32,51 @@ def test_process_tree_rss_includes_descendants_but_not_unrelated_processes(
     write_status(tmp_path / "200", pid=200, parent_pid=1, rss_kib=1000)
 
     assert process_tree_rss_bytes(100, proc_root=tmp_path) == 60 * 1024
+
+
+def test_docker_cgroup_memory_sums_live_unique_registered_containers(tmp_path: Path) -> None:
+    cgroup_root = tmp_path / "cgroup"
+    first = cgroup_root / "system.slice/docker-first.scope"
+    second = cgroup_root / "system.slice/docker-second.scope"
+    first.mkdir(parents=True)
+    second.mkdir(parents=True)
+    (first / "memory.current").write_text("10485760\n")
+    (second / "memory.current").write_text("20971520\n")
+    registry = tmp_path / "docker-cgroups.txt"
+    registry.write_text(
+        "/system.slice/docker-first.scope\n"
+        "/system.slice/docker-second.scope\n"
+        "/system.slice/docker-first.scope\n"
+        "../../outside\n"
+    )
+
+    assert docker_cgroup_memory_bytes(registry, cgroup_root=cgroup_root) == 30 * 1024 * 1024
+
+
+def test_memory_watchdog_records_host_docker_and_combined_peaks(
+    tmp_path: Path, monkeypatch
+) -> None:
+    docker_bytes = 20 * 1024 * 1024
+    monkeypatch.setattr(
+        "rxnhaystack.resources.docker_cgroup_memory_bytes",
+        lambda _path: docker_bytes,
+    )
+    process = subprocess.Popen(
+        [sys.executable, "-c", "import time; time.sleep(0.25)"],
+        text=True,
+        start_new_session=True,
+    )
+    usage = wait_with_memory_watchdog(
+        process,
+        memory_limit_mib=None,
+        poll_interval_seconds=0.02,
+        docker_memory_registry_path=tmp_path / "registry",
+    )
+
+    assert usage.return_code == 0
+    assert usage.peak_host_rss_mib > 0
+    assert usage.peak_docker_memory_mib == 20
+    assert usage.peak_combined_memory_mib >= usage.peak_host_rss_mib + 20
 
 
 def test_memory_budget_blocks_until_a_reservation_is_released() -> None:

@@ -8,6 +8,7 @@ import subprocess
 import sys
 import threading
 import time
+import uuid
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from dataclasses import dataclass
 from datetime import UTC, datetime
@@ -18,7 +19,11 @@ from rxnhaystack.dataset import CLEANED_DATASET_ENV, RAW_DATASET_ENV
 from rxnhaystack.ledger import RunLedger, validate_metrics
 from rxnhaystack.manifest import ExperimentManifest, ManifestError, PlannedRun
 from rxnhaystack.metrics import METRICS_PATH_ENV, USD_TO_CHF_ENV
-from rxnhaystack.resources import MemoryBudget, wait_with_memory_watchdog
+from rxnhaystack.resources import (
+    DOCKER_MEMORY_CGROUP_ENV,
+    MemoryBudget,
+    wait_with_memory_watchdog,
+)
 from rxnhaystack.runtime import (
     RESOURCE_TRACE_PATH_ENV,
     Preflight,
@@ -35,6 +40,39 @@ class ExecutionResult:
     return_code: int | None
     artifact_dir: Path | None
     error: str | None
+
+
+DOCKER_RUN_TOKEN_ENV = "RXNHAYSTACK_DOCKER_RUN_TOKEN"
+DOCKER_RUN_LABEL = "rxnhaystack.run_token"
+
+
+def cleanup_labeled_docker_containers(run_token: str) -> str | None:
+    """Remove containers owned by exactly one launcher attempt."""
+
+    try:
+        query = subprocess.run(
+            ["docker", "ps", "-aq", "--filter", f"label={DOCKER_RUN_LABEL}={run_token}"],
+            capture_output=True,
+            text=True,
+        )
+    except OSError as error:
+        return f"Could not query attempt-owned Docker containers: {error}"
+    if query.returncode != 0:
+        return f"Could not query attempt-owned Docker containers: {query.stderr.strip()}"
+    container_ids = query.stdout.split()
+    if not container_ids:
+        return None
+    try:
+        removal = subprocess.run(
+            ["docker", "container", "rm", "--force", *container_ids],
+            capture_output=True,
+            text=True,
+        )
+    except OSError as error:
+        return f"Could not remove attempt-owned Docker containers: {error}"
+    if removal.returncode != 0:
+        return f"Could not remove attempt-owned Docker containers: {removal.stderr.strip()}"
+    return None
 
 
 def select_runs(runs: tuple[PlannedRun, ...], patterns: list[str]) -> list[PlannedRun]:
@@ -104,6 +142,8 @@ def execute_run(
     stdout_path = attempt_dir / "stdout.log"
     stderr_path = attempt_dir / "stderr.log"
     resource_trace_path = attempt_dir / "resource-trace.jsonl"
+    docker_cgroup_registry_path = attempt_dir / "docker-cgroups.txt"
+    docker_run_token = f"rxnhaystack-{uuid.uuid4().hex}" if run.method == "rlm" else None
     generated_env = build_run_environment(
         run,
         manifest=manifest,
@@ -111,6 +151,10 @@ def execute_run(
         attempt_dir=attempt_dir,
         metrics_path=metrics_path,
         resource_trace_path=resource_trace_path,
+        docker_cgroup_registry_path=(
+            docker_cgroup_registry_path if docker_run_token is not None else None
+        ),
+        docker_run_token=docker_run_token,
     )
     environment = os.environ.copy()
     environment.update(run.env)
@@ -141,7 +185,10 @@ def execute_run(
     error: str | None = None
     metrics: dict[str, Any] | None = None
     peak_rss_mib = 0.0
+    peak_host_rss_mib = 0.0
+    peak_docker_memory_mib = 0.0
     memory_limit_exceeded = False
+    docker_cleanup_error: str | None = None
     try:
         with (
             stdout_path.open("w", encoding="utf-8") as stdout,
@@ -156,15 +203,24 @@ def execute_run(
                 text=True,
                 start_new_session=True,
             )
-            usage = wait_with_memory_watchdog(
-                process,
-                memory_limit_mib=run.memory_limit_mib,
-                trace_path=resource_trace_path,
-                run_id=run.run_id,
-                cancellation_event=cancellation_event,
-            )
+            try:
+                usage = wait_with_memory_watchdog(
+                    process,
+                    memory_limit_mib=run.memory_limit_mib,
+                    trace_path=resource_trace_path,
+                    run_id=run.run_id,
+                    cancellation_event=cancellation_event,
+                    docker_memory_registry_path=(
+                        docker_cgroup_registry_path if docker_run_token is not None else None
+                    ),
+                )
+            finally:
+                if docker_run_token is not None and docker_cgroup_registry_path.exists():
+                    docker_cleanup_error = cleanup_labeled_docker_containers(docker_run_token)
         return_code = usage.return_code
-        peak_rss_mib = usage.peak_rss_mib
+        peak_rss_mib = usage.peak_combined_memory_mib
+        peak_host_rss_mib = usage.peak_host_rss_mib
+        peak_docker_memory_mib = usage.peak_docker_memory_mib
         memory_limit_exceeded = usage.memory_limit_exceeded
         if metrics_path.exists():
             try:
@@ -177,7 +233,12 @@ def execute_run(
         elif manifest.campaign.require_metrics:
             error = f"Command did not write required metrics to {metrics_path}"
         if memory_limit_exceeded:
-            error = f"Process-tree RSS exceeded the {run.memory_limit_mib} MiB memory limit" + (
+            measured = (
+                "Combined host-process and Docker memory"
+                if peak_docker_memory_mib > 0
+                else "Process-tree RSS"
+            )
+            error = f"{measured} exceeded the {run.memory_limit_mib} MiB memory limit" + (
                 f"; {error}" if error is not None else ""
             )
         elif usage.cancelled:
@@ -186,6 +247,8 @@ def execute_run(
             error = f"Command exited with status {return_code}" + (
                 f"; {error}" if error is not None else ""
             )
+        if docker_cleanup_error is not None:
+            error = docker_cleanup_error + (f"; {error}" if error is not None else "")
     except OSError as execution_error:
         error = f"Could not execute command: {execution_error}"
     finished_at = datetime.now(UTC).isoformat()
@@ -193,7 +256,10 @@ def execute_run(
     status = "succeeded" if return_code == 0 and error is None else "failed"
     resource_usage = {
         "process_wall_time_seconds": duration,
-        "peak_process_tree_rss_mib": peak_rss_mib,
+        "peak_process_tree_rss_mib": peak_host_rss_mib,
+        "peak_combined_memory_mib": peak_rss_mib,
+        "peak_host_process_tree_rss_mib": peak_host_rss_mib,
+        "peak_docker_memory_mib": peak_docker_memory_mib,
         "memory_reservation_mib": run.memory_reservation_mib,
         "memory_limit_mib": run.memory_limit_mib,
         "memory_limit_exceeded": memory_limit_exceeded,
@@ -300,6 +366,8 @@ def build_run_environment(
     attempt_dir: Path,
     metrics_path: Path,
     resource_trace_path: Path,
+    docker_cgroup_registry_path: Path | None = None,
+    docker_run_token: str | None = None,
 ) -> dict[str, str]:
     environment = {
         "RXNHAYSTACK_RUN_ID": run.run_id,
@@ -316,6 +384,10 @@ def build_run_environment(
         "RXNHAYSTACK_QUESTION_PARALLELISM": str(run.question_parallelism),
         RESOURCE_TRACE_PATH_ENV: str(resource_trace_path),
     }
+    if docker_cgroup_registry_path is not None:
+        environment[DOCKER_MEMORY_CGROUP_ENV] = str(docker_cgroup_registry_path)
+    if docker_run_token is not None:
+        environment[DOCKER_RUN_TOKEN_ENV] = docker_run_token
     if run.positive_cardinality is not None:
         environment["RXNHAYSTACK_POSITIVE_CARDINALITY"] = str(run.positive_cardinality)
     if preflight.dataset is not None:

@@ -47,12 +47,16 @@ the campaign with the exact missing names and an example command.
 When `campaign.max_parallel_memory_mib` is set, every run must declare a
 reservation. The scheduler starts a run only when its reservation fits alongside
 the currently active runs. The launcher independently samples the worker's whole
-process tree and terminates it if RSS exceeds `memory_limit_mib`. Observed peak
-RSS and whether the limit fired are written to both metadata and ledger metrics.
-The launcher also writes `resource-trace.jsonl`: timestamped process-tree RSS
+process tree. For a Docker RLM it also reads every attempt-owned container's
+Linux memory counter, adds that to host process-tree RAM, and applies
+`memory_limit_mib` to the combined value. Host, Docker, and combined peaks and
+whether the limit fired are written to both metadata and ledger metrics. The
+launcher also writes `resource-trace.jsonl`: timestamped host/Docker/combined
 samples and process boundaries. Migrated RLM workers add prompt-free iteration
 and subcall start/finish events to that same monotonic timeline, allowing memory
 peaks to be attributed to RLM activity without logging model inputs or outputs.
+An interrupted RLM attempt removes only Docker containers bearing its unique
+label.
 
 ## Secrets
 
@@ -102,7 +106,7 @@ construct an RLM per concurrent question; a mutable RLM instance is never
 shared between worker threads.
 
 Before a large campaign, profile representative cells with `--max-parallel 1`.
-Use the recorded `peak_process_tree_rss_mib` to set per-method reservations with
+Use the recorded `peak_combined_memory_mib` to set per-method reservations with
 headroom (start with 1.3x the measured peak) and hard limits (start with 1.5x).
 Profile the longest Tier-4 RLM task separately; do not extrapolate it from a
 one-shot LLM worker.

@@ -9,7 +9,11 @@ from pathlib import Path
 
 import pytest
 
-from rxnhaystack.launcher import enforce_remaining_budget, run_selected
+from rxnhaystack.launcher import (
+    cleanup_labeled_docker_containers,
+    enforce_remaining_budget,
+    run_selected,
+)
 from rxnhaystack.ledger import RunLedger
 from rxnhaystack.manifest import ManifestError, load_manifest
 from rxnhaystack.runtime import perform_preflight
@@ -132,6 +136,8 @@ def test_launcher_executes_parallel_runs_records_artifacts_and_resumes(tmp_path:
         stdout = (result.artifact_dir / "stdout.log").read_text()
         assert metadata["result"]["metrics"]["results"]["macro_f1"] == 0.75
         assert metadata["result"]["metrics"]["resources"]["peak_process_tree_rss_mib"] > 0
+        assert metadata["result"]["metrics"]["resources"]["peak_combined_memory_mib"] > 0
+        assert metadata["result"]["metrics"]["resources"]["peak_docker_memory_mib"] == 0
         assert metadata["execution"]["resources"]["process_wall_time_seconds"] > 0
         assert metadata["execution"]["resources"]["memory_limit_exceeded"] is False
         assert metrics["resources"] == metadata["execution"]["resources"]
@@ -154,6 +160,30 @@ def test_launcher_executes_parallel_runs_records_artifacts_and_resumes(tmp_path:
     assert [result.status for result in resumed] == ["skipped", "skipped"]
     ledger = RunLedger(manifest.campaign.artifact_dir / "ledger.sqlite3")
     assert len(ledger.list_attempts()) == 2
+
+
+def test_docker_cleanup_removes_only_exact_attempt_label(monkeypatch) -> None:
+    commands: list[list[str]] = []
+
+    def fake_run(command, **_kwargs):
+        commands.append(command)
+        if command[:3] == ["docker", "ps", "-aq"]:
+            return subprocess.CompletedProcess(command, 0, "abc\ndef\n", "")
+        return subprocess.CompletedProcess(command, 0, "abc\ndef\n", "")
+
+    monkeypatch.setattr("rxnhaystack.launcher.subprocess.run", fake_run)
+
+    assert cleanup_labeled_docker_containers("attempt-token") is None
+    assert commands == [
+        [
+            "docker",
+            "ps",
+            "-aq",
+            "--filter",
+            "label=rxnhaystack.run_token=attempt-token",
+        ],
+        ["docker", "container", "rm", "--force", "abc", "def"],
+    ]
 
 
 def test_launcher_fails_successful_process_that_omits_required_metrics(tmp_path: Path) -> None:

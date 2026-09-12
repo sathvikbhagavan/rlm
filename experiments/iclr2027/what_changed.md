@@ -213,7 +213,7 @@ fallback, and the remaining RLM tasks use local execution directly. Those local
 workers have an 8,192-MiB address-space limit, with a temporary 4,096-MiB limit
 around model-generated Python so the controller retains error-reporting
 headroom. Both values are recorded in the experiment files and resource trace.
-The outer 30-GiB process-tree monitor remains the final safeguard.
+The outer 30-GiB combined-memory monitor remains the final safeguard.
 
 We kept five repetitions as five independent jobs. A single `n=5` model request
 would not be equivalent for CodeAct or RLM because later calls depend on earlier
@@ -229,14 +229,17 @@ runner starts another worker only when the sum of active allowances fits within
 the machine-wide 48-GiB benchmark limit.
 
 While a worker runs, the code repeatedly measures the resident memory of the
-worker and all processes it started. This “process-tree RAM” includes Python,
-RLM helpers, and any child process, rather than looking at only the first
-process. A worker crossing its hard limit is stopped and recorded as failed.
+worker and all its host child processes. For Docker RLM work it additionally
+reads the container's Linux memory-control counter, which includes container
+processes and container-charged cache. The hard job limit applies to host and
+Docker memory added together, rather than overlooking a container because it is
+owned by the Docker daemon.
 
 Pressing Ctrl-C once now signals every active worker, terminates its isolated
-process tree, and records the interrupted attempt. If a machine stops too
-abruptly to record that transition, the next launch can recover the still-marked
-running attempt without deleting its history.
+process tree, removes only the Docker containers bearing that attempt's unique
+label, and records the interrupted attempt. If a machine stops too abruptly to
+record that transition, the next launch can recover the still-marked running
+attempt without deleting its history.
 
 Each attempt writes `resource-trace.jsonl`, a time-ordered memory record. RLM
 iteration and recursive-call events share the same timeline without storing
@@ -270,7 +273,8 @@ containing:
 - model/tool timing where available;
 - USD and converted CHF cost;
 - task-specific results;
-- peak process-tree RAM and whether the limit was reached.
+- peak host process-tree RAM, peak Docker memory, their combined peak, and
+  whether the limit was reached.
 
 SwissAI currently does not bill us per token, so those jobs record zero provider
 cost rather than an absent cost field. W&B settings now also identify the exact
