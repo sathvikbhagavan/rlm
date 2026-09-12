@@ -126,9 +126,12 @@ We currently support most major clients (OpenAI, Anthropic), as well as the rout
 This checkout also contains the RxnHaystack chemistry benchmark. See
 [`dataset/README.md`](dataset/README.md) to reconstruct its exact USPTO-2023
 corpus and [`experiments/iclr2027/README.md`](experiments/iclr2027/README.md)
-for the reproducible campaign launcher, run manifests, budget controls, and
-artifact contract. Co-authors launching experiments should follow the
-human-oriented [`experiments/iclr2027/RUNBOOK.md`](experiments/iclr2027/RUNBOOK.md).
+for the reproducible runner, experiment descriptions, budget controls, and
+result-file contract. People launching experiments should follow the
+human-oriented
+[`experiments/iclr2027/running_benchmark.md`](experiments/iclr2027/running_benchmark.md).
+For a plain-language summary of the code changes, see
+[`experiments/iclr2027/what_changed.md`](experiments/iclr2027/what_changed.md).
 
 If you use this code or repository in your research, please cite:
 

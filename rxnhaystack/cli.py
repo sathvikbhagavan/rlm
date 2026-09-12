@@ -79,6 +79,16 @@ def command_plan(args: argparse.Namespace) -> int:
         f"git {preflight.git.commit[:12]}; "
         f"parallel RAM budget={manifest.campaign.max_parallel_memory_mib or 'unlimited'} MiB"
     )
+    if preflight.dataset is not None:
+        print(
+            "Dataset raw: "
+            f"rows={preflight.dataset.raw_lines}; sha256={preflight.dataset.raw_sha256}"
+        )
+        print(
+            "Dataset cleaned: "
+            f"rows={preflight.dataset.cleaned_lines}; "
+            f"sha256={preflight.dataset.cleaned_sha256}"
+        )
     for run in selected:
         print(
             f"{run.run_id}\t{run.task}\t{run.condition}\t{run.method}\t"
