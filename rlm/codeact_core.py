@@ -23,6 +23,11 @@ You must follow this format for each step:
 1. THINK: Reason about what you need to do next
 2. ACT: Take an action (execute code)
 
+PRELOADED DATA:
+- `lines` is a list containing exactly the retrieved reaction-context rows for
+  this question.
+- Use `lines` directly in Python. Do not copy the <context> text into your code.
+
 AVAILABLE ACTIONS:
 - Execute Python code in a fenced block:
 ```python

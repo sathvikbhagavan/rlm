@@ -150,6 +150,15 @@ code allows bounded simultaneous work:
 CodeAct agents never share a mutable tool environment. Results are restored to
 the original question order before aggregate metrics are calculated.
 
+Every CodeAct tool now receives that question's retrieved reaction rows as the
+preloaded Python list `lines`. Tier 1 and one Tier-2 script already followed
+this design; three other Tier-2 scripts accepted the rows but did not insert
+them into the tool, and Tier 3--4
+left the tool namespace empty. This encouraged models to copy tens of thousands
+of tokens back into a Python literal. The system instruction now tells every
+model to operate on `lines` directly. A structural test checks all 34 CodeAct
+scripts.
+
 We kept five repetitions as five independent jobs. A single `n=5` model request
 would not be equivalent for CodeAct or RLM because later calls depend on earlier
 responses and tool outputs.

@@ -110,6 +110,7 @@ def build_question(weight_threshold: int, ring_x: int) -> str:
 
 def build_code_executor(lines: list[str]) -> object:
     return make_simple_code_executor(
+        extra_locals={"lines": lines},
         extra_globals={
             "np": __import__("numpy"),
             "rdkit": __import__("rdkit"),

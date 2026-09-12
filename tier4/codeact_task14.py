@@ -111,8 +111,9 @@ def parse_args() -> argparse.Namespace:
     return parser.parse_args()
 
 
-def build_code_executor():
+def build_code_executor(lines: list[str]):
     return make_simple_code_executor(
+        extra_locals={"lines": lines},
         extra_globals={
             "np": __import__("numpy"),
             "rdkit": __import__("rdkit"),
@@ -235,7 +236,7 @@ async def main(model_name: str, context_size: int, max_pairs_per_group: int) -> 
             context_coverage=context_coverage,
         )
 
-        executor = build_code_executor()
+        executor = build_code_executor(retrieved_lines)
         agent = CodeActAgent(
             code_execute_fn=executor.execute,
             llm=build_benchmark_llm(

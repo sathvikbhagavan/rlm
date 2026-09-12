@@ -105,6 +105,42 @@ def test_codeact_questions_own_agents_contexts_and_timing_callbacks() -> None:
             assert "build_benchmark_llm" in names, path
 
 
+def test_every_codeact_tool_preloads_only_its_retrieved_context() -> None:
+    paths = runners("codeact", include_tier1=True)
+    assert len(paths) == 34
+    for path in paths:
+        tree = ast.parse(path.read_text(encoding="utf-8"), path)
+        builders = [
+            node
+            for node in ast.walk(tree)
+            if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef))
+            and node.name == "build_code_executor"
+        ]
+        assert len(builders) == 1, path
+        builder = builders[0]
+        assert "lines" in {argument.arg for argument in builder.args.args}, path
+        assert any(
+            isinstance(node, ast.Dict)
+            and any(
+                isinstance(key, ast.Constant)
+                and key.value == "lines"
+                and isinstance(value, ast.Name)
+                and value.id == "lines"
+                for key, value in zip(node.keys, node.values, strict=True)
+            )
+            for node in ast.walk(builder)
+        ), path
+
+        calls = [
+            node
+            for node in ast.walk(tree)
+            if isinstance(node, ast.Call)
+            and ast.unparse(node.func) == "build_code_executor"
+        ]
+        assert len(calls) == 1, path
+        assert "retrieved_lines" in ast.unparse(calls[0]), path
+
+
 def test_all_rlm_instances_receive_campaign_instrumentation() -> None:
     for path in runners("rlm"):
         tree = ast.parse(path.read_text(encoding="utf-8"), path)

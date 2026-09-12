@@ -132,8 +132,9 @@ def build_question() -> str:
     """
 
 
-def build_code_executor():
+def build_code_executor(lines: list[str]):
     return make_simple_code_executor(
+        extra_locals={"lines": lines},
         extra_globals={
             "np": __import__("numpy"),
             "rdkit": __import__("rdkit"),
@@ -220,7 +221,7 @@ async def main(model_name: str, context_size: int) -> None:
     """
     print("Question 1/1 task=exactly_one_cc_formed")
 
-    executor = build_code_executor()
+    executor = build_code_executor(retrieved_lines)
     agent = CodeActAgent(
         code_execute_fn=executor.execute,
         llm=build_benchmark_llm(

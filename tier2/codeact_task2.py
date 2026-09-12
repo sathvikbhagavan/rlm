@@ -182,6 +182,7 @@ def build_question(threshold: int) -> str:
 
 def build_code_executor(lines: list[str]):
     return make_simple_code_executor(
+        extra_locals={"lines": lines},
         extra_globals={
             "np": __import__("numpy"),
             "rdkit": __import__("rdkit"),

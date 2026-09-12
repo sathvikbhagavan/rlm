@@ -290,6 +290,10 @@ We need to cover:
 4. at least one SwissAI model and every paid model before releasing that paid
    model's full set of jobs.
 
+In CodeAct, the retrieved rows are preloaded in each isolated Python tool as a
+list named `lines`. During trial review, confirm the model uses `lines` rather
+than copying the full `<context>` block into generated Python code.
+
 Start with one open model, one job at a time:
 
 ```bash
