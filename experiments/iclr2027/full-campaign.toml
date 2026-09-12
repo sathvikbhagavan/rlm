@@ -3,9 +3,9 @@
 schema_version = 1
 
 [campaign]
-name = "iclr2027-six-model-full-v15"
+name = "iclr2027-six-model-full-v16"
 project_root = "../.."
-artifact_dir = "artifacts/iclr2027-six-model-full-v15"
+artifact_dir = "artifacts/iclr2027-six-model-full-v16"
 budget_chf = 1500.0
 usd_to_chf = 0.80
 require_dataset = true

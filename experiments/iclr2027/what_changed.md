@@ -209,9 +209,12 @@ Docker-executed model code also has a 300-second wall-time limit per block. It
 terminates the complete in-container process group, including multiprocessing
 children, reports the timeout to the RLM, and leaves the container usable for a
 recovery turn. A live full-corpus Task-16 trajectory otherwise held about 23
-GiB of Docker memory and one CPU beyond five minutes. That same trial measured a
-23,963.6-MiB combined peak, so full-corpus RLM jobs now reserve 28,672 MiB and
-cannot run two at once within the 48-GiB machine-wide allowance.
+GiB of Docker memory and one CPU beyond five minutes. A second trial reached the
+30,720-MiB outer combined limit before Docker's former 30-GiB cap could return
+an OOM error to the controller. Task 16 now caps its container at 24 GiB, leaving
+the host controller headroom to survive and report a runaway tool. Full-corpus
+RLM jobs reserve 28,672 MiB and cannot run two at once within the 48-GiB
+machine-wide allowance.
 
 Recorded Tier-4 Tasks 16, 17, and 17b now require Docker isolation and fail
 before model calls rather than silently falling back when Docker is inaccessible.

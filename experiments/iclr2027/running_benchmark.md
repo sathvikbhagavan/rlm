@@ -385,10 +385,12 @@ they apply.
 Every block of model-written Python in the Docker RLM has a 300-second wall-time
 limit. On timeout, the sandbox terminates that program and its multiprocessing
 children, reports the timeout to the RLM, and keeps the container available for
-the next turn. A live Qwen Task-16 diagnostic reached 23,963.6 MiB combined
-memory while a generated calculation ran beyond five minutes. Full-corpus RLM
-jobs consequently reserve 28,672 MiB; the 49,152-MiB machine allowance therefore
-permits only one at a time, regardless of a larger `--max-parallel` value.
+the next turn. Live Qwen Task-16 diagnostics reached 23,963.6 MiB and then the
+30,720-MiB outer limit while generated calculations continued. Task 16 now has a
+24-GiB inner Docker cap so the sandbox can kill and report the generated process
+before the host controller is endangered. Full-corpus RLM jobs reserve 28,672
+MiB; the 49,152-MiB machine allowance therefore permits only one at a time,
+regardless of a larger `--max-parallel` value.
 
 Start with one open model, one job at a time:
 

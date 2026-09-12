@@ -54,7 +54,7 @@ CONTEXT_PIPELINE_NAME = "random"
 
 ENVIRONMENT = "docker"
 DOCKER_IMAGE = "rlm-sandbox"
-DOCKER_MEMORY_LIMIT = "30g"
+DOCKER_MEMORY_LIMIT = "24g"
 DOCKER_TOOL_TIMEOUT_SECONDS = 300
 VERBOSE = True
 SCRIPT_DIR = Path(__file__).resolve().parent
