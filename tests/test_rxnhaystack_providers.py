@@ -4,6 +4,8 @@ import pytest
 
 from rxnhaystack.manifest import ManifestError
 from rxnhaystack.providers import (
+    CODEACT_MAX_OUTPUT_TOKENS,
+    CODEACT_MAX_OUTPUT_TOKENS_ENV,
     SWISSAI_BASE_URL,
     SWISSAI_REQUEST_TIMEOUT_ENV,
     SWISSAI_REQUEST_TIMEOUT_SECONDS,
@@ -103,3 +105,38 @@ def test_swissai_requires_its_own_key(monkeypatch) -> None:
     monkeypatch.delenv("SWISSAI_RESEARCH_API_KEY", raising=False)
     with pytest.raises(ManifestError, match="SWISSAI_RESEARCH_API_KEY"):
         configure_rlm_for_provider({"backend_kwargs": {}})
+
+
+def test_codeact_caps_each_provider_completion(monkeypatch) -> None:
+    monkeypatch.setenv("RXNHAYSTACK_PROVIDER", "openrouter")
+    monkeypatch.setenv("RXNHAYSTACK_METHOD", "codeact")
+    monkeypatch.setenv(CODEACT_MAX_OUTPUT_TOKENS_ENV, str(CODEACT_MAX_OUTPUT_TOKENS))
+
+    client = build_benchmark_llm(
+        model="openai/gpt-5-mini",
+        api_key="private",
+        max_tokens=30_000,
+        additional_kwargs={"max_completion_tokens": 30_000},
+    )
+
+    assert client.max_tokens == CODEACT_MAX_OUTPUT_TOKENS
+    assert client.additional_kwargs["max_completion_tokens"] == CODEACT_MAX_OUTPUT_TOKENS
+
+    monkeypatch.setenv("RXNHAYSTACK_PROVIDER", "swissai")
+    monkeypatch.setenv("SWISSAI_RESEARCH_API_KEY", "private")
+    swiss_client = build_benchmark_llm(
+        model="RCP-AIaaS/Qwen/Qwen3.5-397B-A17B",
+        api_key="replaced",
+        max_tokens=30_000,
+        additional_kwargs={"max_completion_tokens": 30_000},
+    )
+
+    assert swiss_client.max_tokens == CODEACT_MAX_OUTPUT_TOKENS
+
+
+def test_codeact_rejects_invalid_output_guardrail(monkeypatch) -> None:
+    monkeypatch.setenv("RXNHAYSTACK_METHOD", "codeact")
+    monkeypatch.setenv(CODEACT_MAX_OUTPUT_TOKENS_ENV, "0")
+
+    with pytest.raises(ManifestError, match=CODEACT_MAX_OUTPUT_TOKENS_ENV):
+        build_benchmark_llm(model="openai/gpt-5-mini", api_key="private")

@@ -172,6 +172,12 @@ turn and explicitly forbids further code. A live Tier-4 Qwen check reached this
 boundary, returned a multi-line `ANSWER:` response, and stopped cleanly; tests
 cover the boundary and multi-line marker.
 
+Each CodeAct model turn also has a provider-independent 4,096-output-token
+limit. A final Qwen trial found one task-specific first turn repeatedly reaching
+the 300-second request deadline under the former 30,000-token allowance while
+other questions continued normally. The lower explicit limit preserves ordinary
+short actions while bounding a pathological turn's latency and paid cost.
+
 We kept five repetitions as five independent jobs. A single `n=5` model request
 would not be equivalent for CodeAct or RLM because later calls depend on earlier
 responses and tool outputs.

@@ -9,6 +9,9 @@ from llama_index.llms.openrouter import OpenRouter
 from rxnhaystack.manifest import ManifestError
 
 PROVIDER_ENV = "RXNHAYSTACK_PROVIDER"
+METHOD_ENV = "RXNHAYSTACK_METHOD"
+CODEACT_MAX_OUTPUT_TOKENS_ENV = "RXNHAYSTACK_CODEACT_OUTPUT_LIMIT"
+CODEACT_MAX_OUTPUT_TOKENS = 4096
 SWISSAI_API_KEY_ENV = "SWISSAI_RESEARCH_API_KEY"
 SWISSAI_BASE_URL = "https://api.swissai.svc.cscs.ch/v1"
 SWISSAI_REQUEST_TIMEOUT_ENV = "RXNHAYSTACK_SWISSAI_REQUEST_TIMEOUT_SECONDS"
@@ -29,9 +32,41 @@ def provider_reports_cost(environ: dict[str, str] | None = None) -> bool:
     return benchmark_provider(environ) == "openrouter"
 
 
+def _bounded_chat_kwargs(kwargs: dict[str, Any]) -> dict[str, Any]:
+    """Apply the recorded per-turn CodeAct output guardrail."""
+
+    configured = dict(kwargs)
+    if os.environ.get(METHOD_ENV) != "codeact":
+        return configured
+    raw_limit = os.environ.get(
+        CODEACT_MAX_OUTPUT_TOKENS_ENV, str(CODEACT_MAX_OUTPUT_TOKENS)
+    )
+    try:
+        limit = int(raw_limit)
+    except ValueError as error:
+        raise ManifestError(
+            f"{CODEACT_MAX_OUTPUT_TOKENS_ENV} must be a positive integer"
+        ) from error
+    if limit <= 0:
+        raise ManifestError(
+            f"{CODEACT_MAX_OUTPUT_TOKENS_ENV} must be a positive integer"
+        )
+
+    requested = int(configured.get("max_tokens", limit))
+    configured["max_tokens"] = min(requested, limit)
+    additional = dict(configured.get("additional_kwargs", {}) or {})
+    if "max_completion_tokens" in additional:
+        additional["max_completion_tokens"] = min(
+            int(additional["max_completion_tokens"]), limit
+        )
+    configured["additional_kwargs"] = additional
+    return configured
+
+
 def build_benchmark_llm(**kwargs: Any) -> OpenRouter | OpenAILike:
     """Build a LlamaIndex chat client without changing benchmark prompt semantics."""
 
+    kwargs = _bounded_chat_kwargs(kwargs)
     provider = benchmark_provider()
     if provider == "openrouter":
         return OpenRouter(**kwargs)

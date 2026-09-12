@@ -302,6 +302,12 @@ more code. Tier-4 answers may contain several lines; the controller recognizes
 the `ANSWER:` marker and leaves validation of the following task-specific format
 to the task's own parser.
 
+Each CodeAct model turn is capped at 4,096 output tokens. The older scripts
+requested as many as 30,000, which allowed a malformed action to occupy a
+provider for five minutes and could create an outsized paid bill. The cap is
+written into every CodeAct job in the experiment file and applied equally to
+SwissAI and OpenRouter models.
+
 Start with one open model, one job at a time:
 
 ```bash
