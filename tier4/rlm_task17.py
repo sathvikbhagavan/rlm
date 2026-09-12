@@ -49,6 +49,7 @@ MAX_CHAINS_PER_QUESTION = 0
 ENVIRONMENT = "docker"
 DOCKER_IMAGE = "rlm-sandbox"
 DOCKER_MEMORY_LIMIT = "20g"
+DOCKER_TOOL_TIMEOUT_SECONDS = 300
 
 
 def maybe_init_tracing() -> None:
@@ -118,6 +119,7 @@ def build_rlm_init_kwargs(*, model_name: str, environment: str) -> dict:
         kwargs["environment_kwargs"] = {
             "image": DOCKER_IMAGE,
             "memory_limit": DOCKER_MEMORY_LIMIT,
+            "execution_timeout_seconds": DOCKER_TOOL_TIMEOUT_SECONDS,
             "bootstrap_packages": False,
         }
     return kwargs
@@ -166,6 +168,9 @@ def main(
             "environment": environment,
             "docker_image": DOCKER_IMAGE if environment == "docker" else None,
             "docker_memory_limit": DOCKER_MEMORY_LIMIT if environment == "docker" else None,
+            "docker_tool_timeout_seconds": (
+                DOCKER_TOOL_TIMEOUT_SECONDS if environment == "docker" else None
+            ),
             "rlm_init_kwargs": rlm_init_kwargs,
             "task_description": "SMIRKS sequential 2-reaction chain discovery.",
             "ground_truth_definition": TASK17_GROUND_TRUTH_DEFINITION,

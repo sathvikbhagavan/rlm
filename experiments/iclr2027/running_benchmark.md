@@ -382,6 +382,14 @@ label. The timestamped resource trace reports host process-tree RAM, Docker
 memory, and their combined value. Both local limits are recorded there when
 they apply.
 
+Every block of model-written Python in the Docker RLM has a 300-second wall-time
+limit. On timeout, the sandbox terminates that program and its multiprocessing
+children, reports the timeout to the RLM, and keeps the container available for
+the next turn. A live Qwen Task-16 diagnostic reached 23,963.6 MiB combined
+memory while a generated calculation ran beyond five minutes. Full-corpus RLM
+jobs consequently reserve 28,672 MiB; the 49,152-MiB machine allowance therefore
+permits only one at a time, regardless of a larger `--max-parallel` value.
+
 Start with one open model, one job at a time:
 
 ```bash
@@ -442,6 +450,8 @@ Before scaling up, all trial jobs should satisfy these checks:
   2× before continuing;
 - peak RAM stays comfortably below the hard limit—use 80% as the point at which
   we stop and reassess;
+- isolated Docker code either finishes within 300 seconds or records a clean
+  timeout and continues; repeated timeouts require inspection before scaling;
 - there are no repeated authentication, rate-limit, or provider errors.
 
 Send this report for each trial group:

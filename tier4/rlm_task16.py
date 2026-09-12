@@ -55,6 +55,7 @@ CONTEXT_PIPELINE_NAME = "random"
 ENVIRONMENT = "docker"
 DOCKER_IMAGE = "rlm-sandbox"
 DOCKER_MEMORY_LIMIT = "30g"
+DOCKER_TOOL_TIMEOUT_SECONDS = 300
 VERBOSE = True
 SCRIPT_DIR = Path(__file__).resolve().parent
 VERBOSE_LOG_DIR = SCRIPT_DIR / "logs" / "task16_verbose"
@@ -99,6 +100,7 @@ def build_rlm_init_kwargs(*, model_name: str, environment: str, verbose: bool) -
         kwargs["environment_kwargs"] = {
             "image": DOCKER_IMAGE,
             "memory_limit": DOCKER_MEMORY_LIMIT,
+            "execution_timeout_seconds": DOCKER_TOOL_TIMEOUT_SECONDS,
             "bootstrap_packages": False,
         }
     return kwargs
@@ -226,6 +228,9 @@ def main(
             "environment": environment,
             "docker_image": DOCKER_IMAGE if environment == "docker" else None,
             "docker_memory_limit": DOCKER_MEMORY_LIMIT if environment == "docker" else None,
+            "docker_tool_timeout_seconds": (
+                DOCKER_TOOL_TIMEOUT_SECONDS if environment == "docker" else None
+            ),
             "task_description": "Truncated synthesis prefixes with withheld final reaction.",
             "ground_truth_definition": TASK16_GROUND_TRUTH_DEFINITION,
             "ground_truth_total_reactions": TASK16_TOTAL_REACTIONS,

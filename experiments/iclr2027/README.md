@@ -58,6 +58,15 @@ peaks to be attributed to RLM activity without logging model inputs or outputs.
 An interrupted RLM attempt removes only Docker containers bearing its unique
 label.
 
+Docker RLM code execution has a 300-second per-block wall-time limit. The limit
+runs inside the container and terminates the generated program's process group,
+so multiprocessing children cannot survive a timeout while the RLM controller
+continues. A live full-corpus Task-16 trial reached 23,963.6 MiB combined before
+an unbounded generated computation was stopped manually. Full-corpus RLM jobs
+therefore reserve 28,672 MiB, which prevents two such jobs from sharing the
+48-GiB scheduler allowance; the independent 30,720-MiB hard limit remains in
+force.
+
 ## Secrets
 
 Secret files must be mode `0600`. They are injected into child processes but

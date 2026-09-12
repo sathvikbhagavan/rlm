@@ -205,6 +205,14 @@ bound; a live full-corpus Qwen turn exceeded two minutes while ordinary turns
 used 129--860 output tokens. The 30-iteration and two-level recursion limits are
 unchanged.
 
+Docker-executed model code also has a 300-second wall-time limit per block. It
+terminates the complete in-container process group, including multiprocessing
+children, reports the timeout to the RLM, and leaves the container usable for a
+recovery turn. A live full-corpus Task-16 trajectory otherwise held about 23
+GiB of Docker memory and one CPU beyond five minutes. That same trial measured a
+23,963.6-MiB combined peak, so full-corpus RLM jobs now reserve 28,672 MiB and
+cannot run two at once within the 48-GiB machine-wide allowance.
+
 Recorded Tier-4 Tasks 16, 17, and 17b now require Docker isolation and fail
 before model calls rather than silently falling back when Docker is inaccessible.
 This boundary is necessary because model-generated native RDKit code can crash

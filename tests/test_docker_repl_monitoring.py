@@ -3,7 +3,11 @@ from __future__ import annotations
 import subprocess
 from pathlib import Path
 
-from rlm.environments.docker_repl import container_cgroup_path, publish_container_cgroup
+from rlm.environments.docker_repl import (
+    container_cgroup_path,
+    docker_exec_command,
+    publish_container_cgroup,
+)
 
 
 def test_container_cgroup_path_reads_unified_linux_cgroup(
@@ -41,3 +45,21 @@ def test_publish_container_cgroup_appends_without_overwriting(
     publish_container_cgroup("example", registry)
 
     assert registry.read_text() == "/existing\n/new-container\n"
+
+
+def test_docker_exec_command_applies_in_container_process_group_timeout() -> None:
+    assert docker_exec_command(
+        "container-id", "print(42)", execution_timeout_seconds=300
+    ) == [
+        "docker",
+        "exec",
+        "container-id",
+        "timeout",
+        "--verbose",
+        "--signal=TERM",
+        "--kill-after=5s",
+        "300s",
+        "python",
+        "-c",
+        "print(42)",
+    ]

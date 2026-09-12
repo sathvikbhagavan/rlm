@@ -71,6 +71,29 @@ def publish_container_cgroup(container_id: str, registry_path: Path) -> None:
         os.close(descriptor)
 
 
+def docker_exec_command(
+    container_id: str,
+    script: str,
+    *,
+    execution_timeout_seconds: float | None,
+) -> list[str]:
+    """Build a Docker exec command with an optional in-container process-group timeout."""
+
+    command = ["docker", "exec", container_id]
+    if execution_timeout_seconds is not None:
+        command.extend(
+            [
+                "timeout",
+                "--verbose",
+                "--signal=TERM",
+                "--kill-after=5s",
+                f"{execution_timeout_seconds:g}s",
+            ]
+        )
+    command.extend(["python", "-c", script])
+    return command
+
+
 class LLMProxyHandler(BaseHTTPRequestHandler):
     """HTTP handler for LLM requests from the container."""
 
@@ -252,6 +275,7 @@ class DockerREPL(NonIsolatedEnv):
         persistent: bool = False,
         depth: int = 1,
         memory_limit: str | None = None,
+        execution_timeout_seconds: float | None = None,
         bootstrap_packages: bool = True,
         **kwargs,
     ):
@@ -263,6 +287,9 @@ class DockerREPL(NonIsolatedEnv):
 
         self.image = image
         self.memory_limit = memory_limit
+        if execution_timeout_seconds is not None and execution_timeout_seconds <= 0:
+            raise ValueError("execution_timeout_seconds must be positive when set")
+        self.execution_timeout_seconds = execution_timeout_seconds
         self.bootstrap_packages = bootstrap_packages
         self.lm_handler_address = lm_handler_address
         self.container_id: str | None = None
@@ -379,7 +406,11 @@ class DockerREPL(NonIsolatedEnv):
 
         script = _build_exec_script(code, self.proxy_port, self.depth)
         result = subprocess.run(
-            ["docker", "exec", self.container_id, "python", "-c", script],
+            docker_exec_command(
+                self.container_id,
+                script,
+                execution_timeout_seconds=self.execution_timeout_seconds,
+            ),
             capture_output=True,
             text=True,
         )
@@ -389,7 +420,13 @@ class DockerREPL(NonIsolatedEnv):
             self.pending_calls.clear()
 
         stderr = result.stderr or ""
-        if result.returncode != 0:
+        if result.returncode == 124 and self.execution_timeout_seconds is not None:
+            timeout = self.execution_timeout_seconds
+            stderr = (
+                f"Container code execution timed out after {timeout:g} seconds; "
+                f"its process group was terminated.\n{stderr}"
+            )
+        elif result.returncode != 0:
             oom_hint = ""
             if result.returncode == 137 or "Killed" in stderr:
                 limit = self.memory_limit or "container memory limit"

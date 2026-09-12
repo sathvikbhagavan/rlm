@@ -3,9 +3,9 @@
 schema_version = 1
 
 [campaign]
-name = "iclr2027-six-model-full-v14"
+name = "iclr2027-six-model-full-v15"
 project_root = "../.."
-artifact_dir = "artifacts/iclr2027-six-model-full-v14"
+artifact_dir = "artifacts/iclr2027-six-model-full-v15"
 budget_chf = 1500.0
 usd_to_chf = 0.80
 require_dataset = true
@@ -120,7 +120,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.000000
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -232,7 +232,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.000000
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -344,7 +344,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.000000
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -456,7 +456,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.000000
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -568,7 +568,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.000000
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -680,7 +680,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.000000
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -792,7 +792,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.000000
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -904,7 +904,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.000000
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -1016,7 +1016,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.000000
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -1128,7 +1128,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.000000
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -1240,7 +1240,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.000000
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -1352,7 +1352,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.000000
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -1464,7 +1464,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.000000
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -1576,7 +1576,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.000000
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -1688,7 +1688,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.000000
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -1800,7 +1800,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.000000
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -1912,7 +1912,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.000000
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -2024,7 +2024,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.000000
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -2136,7 +2136,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.000000
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -2248,7 +2248,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.000000
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -2360,7 +2360,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.000000
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -2472,7 +2472,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.000000
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -2584,7 +2584,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.000000
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -2696,7 +2696,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.000000
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -2808,7 +2808,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.000000
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -2920,7 +2920,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.000000
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -3032,7 +3032,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.000000
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -3144,7 +3144,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.000000
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -3256,7 +3256,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.000000
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -3368,7 +3368,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.000000
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -3480,7 +3480,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.000000
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -3592,7 +3592,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.000000
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -3704,7 +3704,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.000000
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -3816,7 +3816,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.000000
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -3928,7 +3928,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.000000
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -4040,7 +4040,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.000000
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -4152,7 +4152,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.000000
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -4264,7 +4264,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.000000
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -4376,7 +4376,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.000000
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -4488,7 +4488,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.000000
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -4600,7 +4600,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.000000
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -4712,7 +4712,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.000000
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -4824,7 +4824,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.000000
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -4936,7 +4936,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.000000
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -5048,7 +5048,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.000000
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -5160,7 +5160,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.000000
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -5272,7 +5272,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.000000
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -5384,7 +5384,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.000000
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -5496,7 +5496,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.000000
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -5608,7 +5608,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.000000
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -5720,7 +5720,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.000000
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -5832,7 +5832,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.000000
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -5944,7 +5944,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.000000
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -6056,7 +6056,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.000000
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -6168,7 +6168,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.000000
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -6280,7 +6280,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.000000
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -6392,7 +6392,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.000000
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -6504,7 +6504,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.000000
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -6616,7 +6616,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.000000
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -6728,7 +6728,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.000000
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -6840,7 +6840,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.000000
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -6952,7 +6952,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.000000
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -7064,7 +7064,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.000000
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -7176,7 +7176,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.000000
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -7288,7 +7288,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.000000
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -7400,7 +7400,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.000000
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -7512,7 +7512,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.000000
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -7624,7 +7624,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.000000
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -7736,7 +7736,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.000000
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -7848,7 +7848,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.000000
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -7960,7 +7960,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.000000
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -8072,7 +8072,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.000000
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -8184,7 +8184,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.000000
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -8296,7 +8296,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.000000
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -8408,7 +8408,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.000000
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -8520,7 +8520,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.000000
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -8632,7 +8632,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.000000
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -8744,7 +8744,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.000000
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -8856,7 +8856,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.000000
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -8968,7 +8968,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.000000
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -9080,7 +9080,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.000000
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -9192,7 +9192,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.000000
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -9304,7 +9304,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.000000
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -9416,7 +9416,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.000000
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -9528,7 +9528,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.000000
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -9640,7 +9640,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.000000
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -9752,7 +9752,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.000000
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -9864,7 +9864,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.000000
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -9976,7 +9976,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.000000
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -10088,7 +10088,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.000000
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -10200,7 +10200,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.455347
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -10312,7 +10312,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.273208
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -10424,7 +10424,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.227673
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -10536,7 +10536,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.227673
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -10648,7 +10648,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.182139
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -10760,7 +10760,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.182139
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -10872,7 +10872,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.227673
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -10984,7 +10984,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.091069
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -11096,7 +11096,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.182139
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -11208,7 +11208,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.227673
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -11320,7 +11320,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.227673
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -11432,7 +11432,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.045535
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -11544,7 +11544,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.045535
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -11656,7 +11656,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.045535
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -11768,7 +11768,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.045535
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -11880,7 +11880,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.045535
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -11992,7 +11992,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.045535
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -12104,7 +12104,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.045535
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -12216,7 +12216,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.045535
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -12328,7 +12328,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.045535
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -12440,7 +12440,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.045535
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -12552,7 +12552,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.091069
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -12664,7 +12664,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.091069
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -12776,7 +12776,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.045535
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -12888,7 +12888,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.182139
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -13000,7 +13000,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.091069
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -13112,7 +13112,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.182139
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -13224,7 +13224,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.455347
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -13336,7 +13336,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.227673
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -13448,7 +13448,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.227673
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -13560,7 +13560,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 1.214258
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -13672,7 +13672,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.728555
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -13784,7 +13784,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.607129
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -13896,7 +13896,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.607129
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -14008,7 +14008,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.485703
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -14120,7 +14120,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.485703
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -14232,7 +14232,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.607129
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -14344,7 +14344,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.242852
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -14456,7 +14456,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.485703
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -14568,7 +14568,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.607129
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -14680,7 +14680,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.607129
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -14792,7 +14792,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.121426
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -14904,7 +14904,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.121426
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -15016,7 +15016,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.121426
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -15128,7 +15128,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.121426
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -15240,7 +15240,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.121426
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -15352,7 +15352,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.121426
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -15464,7 +15464,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.121426
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -15576,7 +15576,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.121426
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -15688,7 +15688,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.121426
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -15800,7 +15800,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.121426
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -15912,7 +15912,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.242852
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -16024,7 +16024,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.242852
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -16136,7 +16136,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.121426
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -16248,7 +16248,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.485703
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -16360,7 +16360,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.242852
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -16472,7 +16472,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.485703
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -16584,7 +16584,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 1.214258
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -16696,7 +16696,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.607129
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -16808,7 +16808,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.607129
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -16920,7 +16920,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.193531
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -17032,7 +17032,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.116119
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -17144,7 +17144,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.096765
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -17256,7 +17256,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.096765
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -17368,7 +17368,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.077412
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -17480,7 +17480,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.077412
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -17592,7 +17592,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.096765
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -17704,7 +17704,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.038706
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -17816,7 +17816,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.077412
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -17928,7 +17928,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.096765
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -18040,7 +18040,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.096765
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -18152,7 +18152,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.019353
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -18264,7 +18264,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.019353
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -18376,7 +18376,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.019353
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -18488,7 +18488,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.019353
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -18600,7 +18600,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.019353
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -18712,7 +18712,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.019353
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -18824,7 +18824,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.019353
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -18936,7 +18936,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.019353
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -19048,7 +19048,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.019353
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -19160,7 +19160,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.019353
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -19272,7 +19272,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.038706
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -19384,7 +19384,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.038706
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -19496,7 +19496,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.019353
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -19608,7 +19608,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.077412
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -19720,7 +19720,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.038706
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -19832,7 +19832,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.077412
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -19944,7 +19944,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.193531
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -20056,7 +20056,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.096765
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
@@ -20168,7 +20168,7 @@ corpus_size = "full"
 seed = 42
 repetitions = 5
 estimated_cost_chf = 0.096765
-memory_reservation_mib = 16384
+memory_reservation_mib = 28672
 memory_limit_mib = 30720
 question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
