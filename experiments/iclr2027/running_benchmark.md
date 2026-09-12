@@ -514,10 +514,12 @@ can be overridden for a launch by setting
 `RXNHAYSTACK_SWISSAI_REQUEST_TIMEOUT_SECONDS`; do not change it between
 benchmark jobs without recording and justifying the deviation.
 
-For SwissAI, the LLM baseline's low-reasoning setting is sent as the endpoint's
-native `enable_thinking=false` option. CodeAct's high-reasoning setting keeps
-thinking enabled. This is a transport setting, not a change to the chemistry
-prompt.
+SwissAI chat calls use the endpoint's native `enable_thinking=false` option.
+Live trials showed that its separately returned hidden thinking channel could
+consume a 30,000-token allowance without producing final content, and
+LlamaIndex cannot pass that channel to CodeAct. CodeAct retains its visible
+multi-turn reasoning and tool loop. This is a transport setting, not a change to
+the chemistry prompt, and it must be disclosed as a cross-provider difference.
 
 Stop and report before retrying when:
 

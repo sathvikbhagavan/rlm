@@ -185,10 +185,12 @@ inheriting the chat client's 60-second default. Hidden client-level retries are
 disabled so a single slow request cannot silently multiply that deadline;
 CodeAct and whole-job retries remain visible in the result history.
 
-Low-reasoning LLM calls are translated to SwissAI's native
-`enable_thinking=false` chat-template setting. This keeps Qwen from spending its
-entire answer allowance in separately returned chain-of-thought text before it
-emits the requested final answer. High-reasoning CodeAct calls retain thinking.
+SwissAI chat calls use the endpoint's native `enable_thinking=false`
+chat-template setting. Live trials showed that Qwen otherwise spent 30,000-token
+allowances in a separately returned hidden chain of thought before emitting any
+final content. LlamaIndex cannot pass that hidden channel to CodeAct, so CodeAct
+keeps its visible multi-turn reasoning/tool loop but not the unusable server-side
+thinking channel. This transport difference must be reported with the results.
 
 ## 8. Time, tokens, calls, and cost are recorded consistently
 

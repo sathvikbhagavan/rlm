@@ -67,21 +67,20 @@ def build_benchmark_llm(**kwargs: Any) -> OpenRouter | OpenAILike:
     configured["max_retries"] = 0
     # This OpenAI-compatible endpoint does not advertise OpenRouter's normalized
     # reasoning_effort or max_completion_tokens extensions.
-    reasoning_effort = configured.pop("reasoning_effort", None)
+    configured.pop("reasoning_effort", None)
     additional = dict(configured.pop("additional_kwargs", {}) or {})
     additional.pop("max_completion_tokens", None)
-    if reasoning_effort in {"none", "minimal", "low"}:
-        # SwissAI's vLLM endpoint returns Qwen's chain of thought separately as
-        # reasoning_content. Without this native template option, even a trivial
-        # low-reasoning request can exhaust its output allowance before emitting
-        # final content. Translate the intent without changing the user prompt.
-        extra_body = dict(additional.get("extra_body", {}) or {})
-        chat_template_kwargs = dict(extra_body.get("chat_template_kwargs", {}) or {})
-        chat_template_kwargs["enable_thinking"] = False
-        extra_body["chat_template_kwargs"] = chat_template_kwargs
-        additional["extra_body"] = extra_body
-    if additional:
-        configured["additional_kwargs"] = additional
+    # SwissAI's vLLM endpoint returns Qwen's chain of thought separately as
+    # reasoning_content, which LlamaIndex does not expose to the agent. In live
+    # trials, thinking consumed 30k-token allowances and timed out before any
+    # final content. Disable that hidden channel for every SwissAI chat call;
+    # CodeAct still performs its visible multi-turn reasoning and tool loop.
+    extra_body = dict(additional.get("extra_body", {}) or {})
+    chat_template_kwargs = dict(extra_body.get("chat_template_kwargs", {}) or {})
+    chat_template_kwargs["enable_thinking"] = False
+    extra_body["chat_template_kwargs"] = chat_template_kwargs
+    additional["extra_body"] = extra_body
+    configured["additional_kwargs"] = additional
     return OpenAILike(**configured)
 
 
@@ -98,6 +97,16 @@ def configure_rlm_for_provider(kwargs: dict[str, Any]) -> dict[str, Any]:
         if not api_key:
             raise ManifestError(f"{SWISSAI_API_KEY_ENV} is required for SwissAI models")
         configured["backend"] = "openai"
-        backend_kwargs.update({"api_key": api_key, "base_url": SWISSAI_BASE_URL})
+        backend_kwargs.update(
+            {
+                "api_key": api_key,
+                "base_url": SWISSAI_BASE_URL,
+                "timeout": SWISSAI_REQUEST_TIMEOUT_SECONDS,
+                "max_retries": 0,
+                "chat_completion_extra_body": {
+                    "chat_template_kwargs": {"enable_thinking": False}
+                },
+            }
+        )
     configured["backend_kwargs"] = backend_kwargs
     return configured

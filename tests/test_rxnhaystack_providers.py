@@ -40,6 +40,11 @@ def test_swissai_rlm_uses_openai_compatible_transport(monkeypatch) -> None:
         "model_name": "RCP-AIaaS/Qwen/Qwen3.5-397B-A17B",
         "api_key": "private",
         "base_url": SWISSAI_BASE_URL,
+        "timeout": SWISSAI_REQUEST_TIMEOUT_SECONDS,
+        "max_retries": 0,
+        "chat_completion_extra_body": {
+            "chat_template_kwargs": {"enable_thinking": False}
+        },
     }
 
 
@@ -58,17 +63,19 @@ def test_swissai_llamaindex_client_preserves_chat_interface(monkeypatch) -> None
     assert client.metadata.is_chat_model
     assert client.timeout == SWISSAI_REQUEST_TIMEOUT_SECONDS
     assert client.max_retries == 0
-    assert client.additional_kwargs == {}
+    assert client.additional_kwargs == {
+        "extra_body": {"chat_template_kwargs": {"enable_thinking": False}}
+    }
 
 
-def test_swissai_translates_low_reasoning_to_native_no_thinking(monkeypatch) -> None:
+def test_swissai_uses_native_no_thinking_for_high_reasoning_chat(monkeypatch) -> None:
     monkeypatch.setenv("RXNHAYSTACK_PROVIDER", "swissai")
     monkeypatch.setenv("SWISSAI_RESEARCH_API_KEY", "private")
 
     client = build_benchmark_llm(
         model="model",
         api_key="replaced",
-        reasoning_effort="low",
+        reasoning_effort="high",
         additional_kwargs={"max_completion_tokens": 100},
     )
 

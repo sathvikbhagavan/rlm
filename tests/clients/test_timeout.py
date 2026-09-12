@@ -72,6 +72,35 @@ class TestOpenAIClientTimeout:
                 with pytest.raises(httpx.TimeoutException):
                     client.completion("Hello")
 
+    def test_chat_completion_extra_body_is_request_scoped(self):
+        """Provider-specific completion fields are not sent to the client constructor."""
+        from rlm.clients.openai import OpenAIClient
+
+        mock_client = MagicMock()
+        response = mock_client.chat.completions.create.return_value
+        response.choices[0].message.content = "answer"
+        response.usage.prompt_tokens = 2
+        response.usage.completion_tokens = 1
+        response.usage.total_tokens = 3
+        response.usage.cost = None
+        response.usage.model_extra = None
+
+        with patch("rlm.clients.openai.openai.OpenAI", return_value=mock_client) as constructor:
+            with patch("rlm.clients.openai.openai.AsyncOpenAI"):
+                client = OpenAIClient(
+                    api_key="test-key",
+                    model_name="model",
+                    chat_completion_extra_body={
+                        "chat_template_kwargs": {"enable_thinking": False}
+                    },
+                )
+                assert client.completion("Hello") == "answer"
+
+        assert "chat_completion_extra_body" not in constructor.call_args.kwargs
+        assert mock_client.chat.completions.create.call_args.kwargs["extra_body"] == {
+            "chat_template_kwargs": {"enable_thinking": False}
+        }
+
 
 class TestAnthropicClientTimeout:
     """Tests for Anthropic client timeout."""
