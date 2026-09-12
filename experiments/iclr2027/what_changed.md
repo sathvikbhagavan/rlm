@@ -159,6 +159,11 @@ of tokens back into a Python literal. The system instruction now tells every
 model to operate on `lines` directly. A structural test checks all 34 CodeAct
 scripts.
 
+Because the context can be tens of thousands of tokens long, the same short
+instruction is repeated after the question at the end of the initial user
+message. A live 53k-token Qwen probe changed from an unclosed 4,096-token copy of
+the context to a complete 390-token action using `lines`.
+
 We kept five repetitions as five independent jobs. A single `n=5` model request
 would not be equivalent for CodeAct or RLM because later calls depend on earlier
 responses and tool outputs.

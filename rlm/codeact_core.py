@@ -90,6 +90,18 @@ INDEX_OBSERVATION_FOLLOWUP = (
     "If not sufficient, continue with THINK and one Python code block."
 )
 
+PRELOADED_LINES_REMINDER = """<tool-data-reminder>
+The exact retrieved context rows are already available in Python as the list
+`lines`. Use `lines` directly. Never copy or redefine the <context> rows in
+generated code.
+</tool-data-reminder>"""
+
+
+def append_preloaded_lines_reminder(user_input: str) -> str:
+    """Keep the tool-data instruction near the question in long CodeAct prompts."""
+
+    return f"{user_input.rstrip()}\n\n{PRELOADED_LINES_REMINDER}"
+
 
 class SimpleCodeExecutor:
     """
@@ -387,6 +399,7 @@ class CodeActAgent(Workflow):
         user_input = ev.get("user_input")
         if user_input is None:
             raise ValueError("user_input kwarg is required")
+        user_input = append_preloaded_lines_reminder(user_input)
         await ctx.store.set("initial_user_input", user_input)
         memory.put(ChatMessage(role="user", content=user_input))
         await ctx.store.set("memory", memory)

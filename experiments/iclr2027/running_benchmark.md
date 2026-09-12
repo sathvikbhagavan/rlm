@@ -292,7 +292,9 @@ We need to cover:
 
 In CodeAct, the retrieved rows are preloaded in each isolated Python tool as a
 list named `lines`. During trial review, confirm the model uses `lines` rather
-than copying the full `<context>` block into generated Python code.
+than copying the full `<context>` block into generated Python code. The prompt
+repeats this instruction immediately after the question so it remains visible
+even when the context is very long.
 
 Start with one open model, one job at a time:
 
