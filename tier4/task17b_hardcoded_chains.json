@@ -651,9 +651,9 @@
     "question_id": "boronic_suzuki",
     "label": "Boronic acid preparation \u2192 Suzuki coupling",
     "path_length": 2,
-    "chain_count": 8,
-    "chain_count_no_persistence": 8,
-    "support_index_count": 11,
+    "chain_count": 9,
+    "chain_count_no_persistence": 9,
+    "support_index_count": 13,
     "example_chain": [
       14078,
       36748
@@ -690,6 +690,10 @@
       [
         71587,
         93021
+      ],
+      [
+        120327,
+        120341
       ]
     ],
     "chain_details": [
@@ -772,11 +776,21 @@
           "Cc1c(Br)cccc1B(O)O",
           "Cc1c(Br)cccc1-c1ccc2c(c1)N(C)C(=O)CCC2N(CCOC(=O)OC(C)(C)C)C(=O)OC(C)(C)C"
         ]
+      },
+      {
+        "reaction_indices": [
+          120327,
+          120341
+        ],
+        "spine_smiles": [
+          "CC(C)(C)OC(=O)Nc1nc2c(B(O)O)ccc(F)c2s1",
+          "CC(C)(C)OC(=O)Nc1nc2c(-c3c(Cl)cc4c(N5CCN(C(=O)OC(C)(C)C)CC5)c(C#N)c(N=C(c5ccccc5)c5ccccc5)nc4c3F)ccc(F)c2s1"
+        ]
       }
     ],
     "step_reaction_counts": [
-      22,
-      2345
+      42,
+      2430
     ],
     "smirks": {
       "chain_length": 2,
@@ -897,7 +911,7 @@
     ],
     "step_reaction_counts": [
       53,
-      4119
+      4461
     ],
     "smirks": {
       "chain_length": 2,
@@ -969,7 +983,7 @@
     ],
     "step_reaction_counts": [
       1185,
-      2345,
+      2430,
       1141
     ],
     "smirks": {

@@ -3,9 +3,9 @@
     "question_id": "boc_buchwald",
     "label": "Boc protect \u2192 Buchwald-Hartwig",
     "path_length": 2,
-    "chain_count": 30,
-    "chain_count_no_persistence": 30,
-    "support_index_count": 46,
+    "chain_count": 31,
+    "chain_count_no_persistence": 31,
+    "support_index_count": 48,
     "example_chain": [
       4789,
       4790
@@ -18,6 +18,10 @@
       [
         4789,
         48529
+      ],
+      [
+        14563,
+        14564
       ],
       [
         23737,
@@ -151,6 +155,16 @@
         "spine_smiles": [
           "CC(C)(C)OC(=O)N1CCc2cc(Br)ccc2C1",
           "CC(C)(C)OC(=O)N1CCc2cc(N3CCC(c4ccc([N+](=O)[O-])cc4)CC3)ccc2C1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          14563,
+          14564
+        ],
+        "spine_smiles": [
+          "COc1ccc(CN2C(=O)COc3ccc(N4CC(CCN(CC5Cc6cc(I)nc(C)c6C5)C(=O)OC(C)(C)C)OC4=O)nc32)cc1",
+          "COc1ccc(CN2C(=O)COc3ccc(N4CC(CCN(CC5Cc6cc(N(C)C)nc(C)c6C5)C(=O)OC(C)(C)C)OC4=O)nc32)cc1"
         ]
       },
       {
@@ -435,7 +449,7 @@
       }
     ],
     "step1_reaction_count": 585,
-    "step2_reaction_count": 4119,
+    "step2_reaction_count": 4461,
     "smirks": {
       "step1_template_name": "Boc amine protection with Boc anhydride",
       "step1_template_occurrence": 0,
@@ -451,9 +465,9 @@
     "question_id": "nitro_reduction_amide",
     "label": "Nitro reduction \u2192 Schotten-Baumann acylation",
     "path_length": 2,
-    "chain_count": 190,
-    "chain_count_no_persistence": 190,
-    "support_index_count": 372,
+    "chain_count": 192,
+    "chain_count_no_persistence": 192,
+    "support_index_count": 376,
     "example_chain": [
       5107,
       5108
@@ -594,6 +608,10 @@
       [
         47840,
         61253
+      ],
+      [
+        51472,
+        51473
       ],
       [
         53446,
@@ -994,6 +1012,10 @@
       [
         77244,
         77245
+      ],
+      [
+        79273,
+        79330
       ],
       [
         79587,
@@ -1559,6 +1581,16 @@
         "spine_smiles": [
           "CC(C)(C)OC(=O)N1CCC(n2cc(N)cn2)CC1",
           "CC(C)(C)OC(=O)N1CCC(n2cc(NC(=O)OCc3ccccc3)cn2)CC1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          51472,
+          51473
+        ],
+        "spine_smiles": [
+          "Cc1cc(C(F)(F)F)cc(N)c1N",
+          "CCOC(=O)Nc1cc(C(F)(F)F)cc(C)c1N"
         ]
       },
       {
@@ -2563,6 +2595,16 @@
       },
       {
         "reaction_indices": [
+          79273,
+          79330
+        ],
+        "spine_smiles": [
+          "CCCCCOc1cc(N)ccc1OC",
+          "CCCCCOc1cc(NC(=O)Oc2ccc([N+](=O)[O-])cc2)ccc1OC"
+        ]
+      },
+      {
+        "reaction_indices": [
           79587,
           79588
         ],
@@ -3123,7 +3165,7 @@
       }
     ],
     "step1_reaction_count": 2053,
-    "step2_reaction_count": 1347,
+    "step2_reaction_count": 1400,
     "smirks": {
       "step1_template_name": "Reduction of nitro groups to amines",
       "step1_template_occurrence": 0,
@@ -3346,7 +3388,7 @@
         ]
       }
     ],
-    "step1_reaction_count": 2345,
+    "step1_reaction_count": 2430,
     "step2_reaction_count": 1141,
     "smirks": {
       "step1_template_name": "{Suzuki}",
@@ -3363,79 +3405,121 @@
     "question_id": "wittig_hydrogenation",
     "label": "Wittig olefination \u2192 alkene hydrogenation",
     "path_length": 2,
-    "chain_count": 3,
-    "chain_count_no_persistence": 3,
-    "support_index_count": 6,
+    "chain_count": 6,
+    "chain_count_no_persistence": 6,
+    "support_index_count": 12,
     "example_chain": [
-      18439,
-      18440
+      9173,
+      9174
     ],
     "chains": [
       [
-        18439,
-        18440
+        9173,
+        9174
       ],
       [
-        25750,
-        25751
+        13686,
+        13360
       ],
       [
-        88149,
-        88150
+        17750,
+        17751
+      ],
+      [
+        58671,
+        58672
+      ],
+      [
+        92347,
+        92348
+      ],
+      [
+        103262,
+        103263
       ]
     ],
     "chain_details": [
       {
         "reaction_indices": [
-          18439,
-          18440
+          9173,
+          9174
         ],
         "spine_smiles": [
-          "N#CC=CCCCC(F)(F)CC(F)(F)F",
-          "N#CCCCCCC(F)(F)CC(F)(F)F"
+          "COc1cccc(C=CCCC(=O)O)c1F",
+          "COc1cccc(CCCCC(=O)O)c1F"
         ]
       },
       {
         "reaction_indices": [
-          25750,
-          25751
+          13686,
+          13360
         ],
         "spine_smiles": [
-          "COC(=O)c1ccc(C=C2CCN(C(=O)OC(C)(C)C)CC2)cc1",
-          "COC(=O)c1ccc(CC2CCN(C(=O)OC(C)(C)C)CC2)cc1"
+          "CCOC(=O)C1CC(=Cc2ccccc2)C1",
+          "CCOC(=O)C1CC(Cc2ccccc2)C1"
         ]
       },
       {
         "reaction_indices": [
-          88149,
-          88150
+          17750,
+          17751
         ],
         "spine_smiles": [
-          "N#CC=C1CCOCC1",
-          "N#CCC1CCOCC1"
+          "CC=C1CC(C(=O)OC)(c2cccc(Br)c2)C1",
+          "CCC1CC(C(=O)OC)(c2cccc(Br)c2)C1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          58671,
+          58672
+        ],
+        "spine_smiles": [
+          "CCOC(=O)c1cn(Cc2cn3nccc(C=C4COC4)c3n2)nn1",
+          "CCOC(=O)c1cn(Cc2cn3nccc(CC4COC4)c3n2)nn1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          92347,
+          92348
+        ],
+        "spine_smiles": [
+          "COC(=O)C=C(C)CO",
+          "COC(=O)CC(C)CO"
+        ]
+      },
+      {
+        "reaction_indices": [
+          103262,
+          103263
+        ],
+        "spine_smiles": [
+          "Cc1ccc(C=CCC(=O)O)cc1F",
+          "Cc1ccc(CCCC(=O)O)cc1F"
         ]
       }
     ],
-    "step1_reaction_count": 22,
+    "step1_reaction_count": 28,
     "step2_reaction_count": 887,
     "smirks": {
       "step1_template_name": "Wittig with Phosphonium",
-      "step1_template_occurrence": 0,
-      "step1_smirks": "[#6:1]-[#6;+0:2](=O).O-P(=O)(-O)-[C;H2;D2;+0:3]-[*:4]>>[#6:1]-[#6;+0:2]=[C;H1;D2;+0:3]-[*:4]",
+      "step1_template_occurrence": 1,
+      "step1_smirks": "[#6:1]-[#6;+0:2](=O).[P;+1]-[C;H2;D2;+0:3]-[*:4]>>[#6:1]-[#6;+0:2]=[C;H1;D2;+0:3]-[*:4]",
       "step2_template_name": "Hydrogenation (double to single)",
       "step2_template_occurrence": 0,
       "step2_smirks": "[C;+0:0]=[C;+0:1]>>[C;+0:0]-[C;+0:1]"
     },
-    "step1_template_key": "Wittig with Phosphonium::55",
+    "step1_template_key": "Wittig with Phosphonium::56",
     "step2_template_key": "Hydrogenation (double to single)::190"
   },
   "alcohol_oxidation_reductive_amination": {
     "question_id": "alcohol_oxidation_reductive_amination",
     "label": "Alcohol oxidation \u2192 reductive amination",
     "path_length": 2,
-    "chain_count": 133,
-    "chain_count_no_persistence": 349,
-    "support_index_count": 189,
+    "chain_count": 138,
+    "chain_count_no_persistence": 364,
+    "support_index_count": 197,
     "example_chain": [
       3804,
       3805
@@ -3604,6 +3688,10 @@
       [
         18943,
         26746
+      ],
+      [
+        18943,
+        105759
       ],
       [
         18943,
@@ -3838,6 +3926,14 @@
         62022
       ],
       [
+        70167,
+        70168
+      ],
+      [
+        70174,
+        70175
+      ],
+      [
         70472,
         70473
       ],
@@ -3895,6 +3991,10 @@
       ],
       [
         92948,
+        92985
+      ],
+      [
+        92948,
         93092
       ],
       [
@@ -3940,6 +4040,10 @@
       [
         104174,
         104275
+      ],
+      [
+        110573,
+        110115
       ],
       [
         111127,
@@ -4383,6 +4487,16 @@
         "spine_smiles": [
           "CC(C)(C)OC(=O)N1CC(C=O)C1",
           "CC(C)(C)OC(=O)N1CC(CN2CCN(c3ccc(C(=O)Nc4n[nH]c5ccc(Cc6cc(F)cc(F)c6)cc45)c(NC4CCOCC4)c3)CC2)C1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          18943,
+          105759
+        ],
+        "spine_smiles": [
+          "CC(C)(C)OC(=O)N1CC(C=O)C1",
+          "CC(C)NCC1CN(C(=O)OC(C)(C)C)C1"
         ]
       },
       {
@@ -4967,6 +5081,26 @@
       },
       {
         "reaction_indices": [
+          70167,
+          70168
+        ],
+        "spine_smiles": [
+          "Cc1c(Nc2cccc3cc(C=O)cnc23)cccc1-c1ccccc1",
+          "Cc1c(Nc2cccc3cc(CNCCO)cnc23)cccc1-c1ccccc1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          70174,
+          70175
+        ],
+        "spine_smiles": [
+          "Cc1c(Nc2nccc3c(Cl)c(C=O)cnc23)cccc1-c1ccccc1",
+          "Cc1c(Nc2nccc3c(Cl)c(CNCCO)cnc23)cccc1-c1ccccc1"
+        ]
+      },
+      {
+        "reaction_indices": [
           70472,
           70473
         ],
@@ -5108,6 +5242,16 @@
       {
         "reaction_indices": [
           92948,
+          92985
+        ],
+        "spine_smiles": [
+          "Cc1c(Br)cccc1-c1ccn2c(=O)c(C=O)cnc2c1",
+          "Cc1c(Br)cccc1-c1ccn2c(=O)c(CNCCO)cnc2c1"
+        ]
+      },
+      {
+        "reaction_indices": [
+          92948,
           93092
         ],
         "spine_smiles": [
@@ -5227,6 +5371,16 @@
       },
       {
         "reaction_indices": [
+          110573,
+          110115
+        ],
+        "spine_smiles": [
+          "O=CCCC1CCCCC1",
+          "OCCNCCCC1CCCCC1"
+        ]
+      },
+      {
+        "reaction_indices": [
           111127,
           111128
         ],
@@ -5307,7 +5461,7 @@
       }
     ],
     "step1_reaction_count": 1193,
-    "step2_reaction_count": 1589,
+    "step2_reaction_count": 1740,
     "smirks": {
       "step1_template_name": "Oxidation or Dehydrogenation of Alcohols to Aldehydes and Ketones",
       "step1_template_occurrence": 1,
