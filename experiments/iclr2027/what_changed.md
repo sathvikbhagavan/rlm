@@ -189,11 +189,13 @@ unchanged.
 
 For launcher-managed RLM work, Docker remains the preferred isolated execution
 environment. When Docker is unavailable and RLM uses the local Python fallback,
-the worker applies an 8,192-MiB address-space limit recorded in the experiment
-file. A runaway model-generated allocation then becomes a `MemoryError` visible
-to the RLM instead of immediately consuming the machine's 30-GiB per-job limit.
-The outer process-tree monitor remains active and stops the job if the RLM does
-not recover. A trace event records the effective local limit for later audit.
+the worker has an 8,192-MiB address-space limit and model-generated Python has a
+temporary 4,096-MiB limit. Restoring the larger limit before error reporting
+reserves controller and logging headroom, so a runaway tool allocation becomes
+a `MemoryError` visible to the RLM instead of crashing the worker. Both values
+are recorded in the experiment files. The outer 30-GiB process-tree monitor
+remains active and stops the job if the RLM does not recover; a trace event
+records the effective local limits for later audit.
 
 We kept five repetitions as five independent jobs. A single `n=5` model request
 would not be equivalent for CodeAct or RLM because later calls depend on earlier

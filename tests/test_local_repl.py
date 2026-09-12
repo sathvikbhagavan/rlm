@@ -1,8 +1,10 @@
 """Comprehensive tests for LocalREPL environment."""
 
 import os
+import resource
+from unittest.mock import patch
 
-from rlm.environments.local_repl import LocalREPL
+from rlm.environments.local_repl import RLM_LOCAL_TOOL_MEMORY_LIMIT_ENV, LocalREPL
 
 
 class TestLocalREPLBasic:
@@ -38,6 +40,29 @@ class TestLocalREPLBasic:
         repl = LocalREPL(custom_tools={"exhaust_memory": exhaust_memory})
         result = repl.execute_code("exhaust_memory()")
         assert "MemoryError: address-space limit reached" in result.stderr
+        repl.cleanup()
+
+    def test_tool_memory_limit_is_restored_before_error_formatting(self, monkeypatch):
+        """The worker regains its reserved headroom after model code exits."""
+        worker_limit = 8192 * 1024 * 1024
+        tool_limit = 4096 * 1024 * 1024
+        monkeypatch.setenv(RLM_LOCAL_TOOL_MEMORY_LIMIT_ENV, "4096")
+
+        with (
+            patch(
+                "rlm.environments.local_repl.resource.getrlimit",
+                return_value=(worker_limit, resource.RLIM_INFINITY),
+            ),
+            patch("rlm.environments.local_repl.resource.setrlimit") as setrlimit,
+        ):
+            repl = LocalREPL()
+            result = repl.execute_code("x = 1")
+
+        assert result.stderr == ""
+        assert [call.args[1] for call in setrlimit.call_args_list] == [
+            (tool_limit, resource.RLIM_INFINITY),
+            (worker_limit, resource.RLIM_INFINITY),
+        ]
         repl.cleanup()
 
     def test_syntax_error(self):

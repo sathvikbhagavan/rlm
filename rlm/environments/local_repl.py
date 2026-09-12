@@ -2,6 +2,7 @@ import copy
 import io
 import json
 import os
+import resource
 import shutil
 import sys
 import tempfile
@@ -20,6 +21,8 @@ from rlm.environments.base_env import (
     extract_tool_value,
     validate_custom_tools,
 )
+
+RLM_LOCAL_TOOL_MEMORY_LIMIT_ENV = "RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB"
 
 # =============================================================================
 # Safe Builtins
@@ -147,6 +150,7 @@ class LocalREPL(NonIsolatedEnv):
         self._context_count: int = 0
         self._history_count: int = 0
         self.compaction = compaction
+        self.tool_memory_limit_mib = self._read_tool_memory_limit()
 
         # Custom tools: functions available in the REPL
         self.custom_tools = custom_tools or {}
@@ -479,6 +483,42 @@ class LocalREPL(NonIsolatedEnv):
             elif name == "history" and self.compaction:
                 self.locals["history"] = self._compaction_history
 
+    def _read_tool_memory_limit(self) -> int | None:
+        raw_limit = os.environ.get(RLM_LOCAL_TOOL_MEMORY_LIMIT_ENV)
+        if raw_limit is None:
+            return None
+        try:
+            limit_mib = int(raw_limit)
+        except ValueError as error:
+            raise ValueError(
+                f"{RLM_LOCAL_TOOL_MEMORY_LIMIT_ENV} must be a positive integer"
+            ) from error
+        if limit_mib <= 0:
+            raise ValueError(
+                f"{RLM_LOCAL_TOOL_MEMORY_LIMIT_ENV} must be a positive integer"
+            )
+        return limit_mib
+
+    @contextmanager
+    def _bounded_tool_memory(self):
+        """Reserve worker headroom while model-generated Python executes."""
+
+        if self.tool_memory_limit_mib is None:
+            yield
+            return
+
+        original_soft, original_hard = resource.getrlimit(resource.RLIMIT_AS)
+        tool_soft = self.tool_memory_limit_mib * 1024 * 1024
+        if original_soft != resource.RLIM_INFINITY:
+            tool_soft = min(tool_soft, original_soft)
+        if original_hard != resource.RLIM_INFINITY:
+            tool_soft = min(tool_soft, original_hard)
+        resource.setrlimit(resource.RLIMIT_AS, (tool_soft, original_hard))
+        try:
+            yield
+        finally:
+            resource.setrlimit(resource.RLIMIT_AS, (original_soft, original_hard))
+
     def execute_code(self, code: str) -> REPLResult:
         """Execute code in the persistent namespace and return result."""
         start_time = time.perf_counter()
@@ -489,7 +529,8 @@ class LocalREPL(NonIsolatedEnv):
         with self._capture_output() as (stdout_buf, stderr_buf), self._temp_cwd():
             try:
                 combined = {**self.globals, **self.locals}
-                exec(code, combined, combined)
+                with self._bounded_tool_memory():
+                    exec(code, combined, combined)
 
                 # Update locals with new variables
                 for key, value in combined.items():

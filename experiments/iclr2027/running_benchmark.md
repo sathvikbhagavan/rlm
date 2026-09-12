@@ -319,13 +319,15 @@ two recursion levels remain unchanged.
 
 RLM should use the Docker environment when it is available. If Docker is not
 available to the user running the benchmark, the code falls back to its local
-Python environment. Every launcher-managed local RLM job now has an explicit
-8,192-MiB address-space limit. A model-generated allocation that reaches this
-limit is returned to the model as `MemoryError`, allowing it to choose a less
-memory-intensive approach. The separate 30,720-MiB process-tree limit remains
-in force and stops the whole job if recovery fails. The 8,192-MiB value is
-written in both experiment files, and `resource-trace.jsonl` records a
-`rlm_local_memory_limit_set` event when it is applied.
+Python environment. Every launcher-managed local RLM worker has an explicit
+8,192-MiB address-space limit. While model-generated Python executes, that limit
+is temporarily lowered to 4,096 MiB; it is restored before errors are formatted
+or logged. This reserves approximately 4 GiB for the RLM controller to turn an
+oversized allocation into `MemoryError` and ask the model to try a smaller
+approach. The separate 30,720-MiB process-tree limit remains in force and stops
+the whole job if recovery fails. Both local limits are written in the experiment
+files, and `resource-trace.jsonl` records them in an
+`rlm_local_memory_limit_set` event.
 
 Start with one open model, one job at a time:
 

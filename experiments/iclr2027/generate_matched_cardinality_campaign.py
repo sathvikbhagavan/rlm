@@ -123,9 +123,9 @@ def render() -> str:
         "schema_version = 1",
         "",
         "[campaign]",
-        'name = "iclr2027-matched-cardinality-v4"',
+        'name = "iclr2027-matched-cardinality-v5"',
         'project_root = "../.."',
-        'artifact_dir = "artifacts/iclr2027-matched-cardinality-v4"',
+        'artifact_dir = "artifacts/iclr2027-matched-cardinality-v5"',
         "budget_chf = 100.0",
         f"usd_to_chf = {USD_TO_CHF:.2f}",
         "require_dataset = true",
@@ -156,7 +156,8 @@ def render() -> str:
                         f"RXNHAYSTACK_CONTEXT_SIZE = {quote(str(context_size))}, "
                         f"RXNHAYSTACK_PROVIDER = {quote(model.provider)}, "
                         'RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", '
-                        'RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192"'
+                        'RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", '
+                        'RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096"'
                     )
                     lines.extend(
                         [

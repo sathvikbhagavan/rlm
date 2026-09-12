@@ -14,6 +14,8 @@ from rxnhaystack.runtime import WorkerConfig
 
 RLM_LOCAL_MEMORY_LIMIT_ENV = "RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB"
 RLM_LOCAL_MEMORY_LIMIT_MIB = 8192
+RLM_LOCAL_TOOL_MEMORY_LIMIT_ENV = "RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB"
+RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = 4096
 
 
 @dataclass(frozen=True)
@@ -164,17 +166,17 @@ def instrument_rlm_from_environment(
 def _apply_local_rlm_address_space_limit(*, trace_path: Path) -> None:
     """Make runaway local REPL allocations raise MemoryError inside the tool."""
 
-    raw_limit = os.environ.get(
-        RLM_LOCAL_MEMORY_LIMIT_ENV, str(RLM_LOCAL_MEMORY_LIMIT_MIB)
+    limit_mib = _positive_memory_limit(
+        RLM_LOCAL_MEMORY_LIMIT_ENV, RLM_LOCAL_MEMORY_LIMIT_MIB
     )
-    try:
-        limit_mib = int(raw_limit)
-    except ValueError as error:
+    tool_limit_mib = _positive_memory_limit(
+        RLM_LOCAL_TOOL_MEMORY_LIMIT_ENV, RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB
+    )
+    if tool_limit_mib > limit_mib:
         raise ManifestError(
-            f"{RLM_LOCAL_MEMORY_LIMIT_ENV} must be a positive integer"
-        ) from error
-    if limit_mib <= 0:
-        raise ManifestError(f"{RLM_LOCAL_MEMORY_LIMIT_ENV} must be a positive integer")
+            f"{RLM_LOCAL_TOOL_MEMORY_LIMIT_ENV} must not exceed "
+            f"{RLM_LOCAL_MEMORY_LIMIT_ENV}"
+        )
 
     requested_bytes = limit_mib * 1024 * 1024
     current_soft, current_hard = resource.getrlimit(resource.RLIMIT_AS)
@@ -190,8 +192,20 @@ def _apply_local_rlm_address_space_limit(*, trace_path: Path) -> None:
         "rlm_local_memory_limit_set",
         requested_memory_limit_mib=limit_mib,
         effective_memory_limit_mib=new_soft // (1024 * 1024),
+        tool_memory_limit_mib=tool_limit_mib,
         address_space_limit_bytes=new_soft,
     )
+
+
+def _positive_memory_limit(name: str, default: int) -> int:
+    raw_limit = os.environ.get(name, str(default))
+    try:
+        limit_mib = int(raw_limit)
+    except ValueError as error:
+        raise ManifestError(f"{name} must be a positive integer") from error
+    if limit_mib <= 0:
+        raise ManifestError(f"{name} must be a positive integer")
+    return limit_mib
 
 
 def codeact_callbacks_from_environment(*, sample_id: str | int) -> dict[str, Any]:

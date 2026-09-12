@@ -2,9 +2,9 @@
 schema_version = 1
 
 [campaign]
-name = "iclr2027-matched-cardinality-v4"
+name = "iclr2027-matched-cardinality-v5"
 project_root = "../.."
-artifact_dir = "artifacts/iclr2027-matched-cardinality-v4"
+artifact_dir = "artifacts/iclr2027-matched-cardinality-v5"
 budget_chf = 100.0
 usd_to_chf = 0.80
 require_dataset = true
@@ -27,7 +27,7 @@ estimated_cost_chf = 0.000000
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "100", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "100", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier1/rlm_task1.py"]
 
 [[runs]]
@@ -44,7 +44,7 @@ estimated_cost_chf = 0.000000
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "500", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "500", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier1/rlm_task1.py"]
 
 [[runs]]
@@ -61,7 +61,7 @@ estimated_cost_chf = 0.000000
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier1/rlm_task1.py"]
 
 [[runs]]
@@ -78,7 +78,7 @@ estimated_cost_chf = 0.000000
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "50000", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "50000", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier1/rlm_task1.py"]
 
 [[runs]]
@@ -95,7 +95,7 @@ estimated_cost_chf = 0.000000
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier1/rlm_task1.py"]
 
 [[runs]]
@@ -112,7 +112,7 @@ estimated_cost_chf = 0.000000
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "100", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "100", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier2/rlm_task2.py"]
 
 [[runs]]
@@ -129,7 +129,7 @@ estimated_cost_chf = 0.000000
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "500", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "500", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier2/rlm_task2.py"]
 
 [[runs]]
@@ -146,7 +146,7 @@ estimated_cost_chf = 0.000000
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier2/rlm_task2.py"]
 
 [[runs]]
@@ -163,7 +163,7 @@ estimated_cost_chf = 0.000000
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "50000", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "50000", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier2/rlm_task2.py"]
 
 [[runs]]
@@ -180,7 +180,7 @@ estimated_cost_chf = 0.000000
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier2/rlm_task2.py"]
 
 [[runs]]
@@ -197,7 +197,7 @@ estimated_cost_chf = 0.000000
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier2/rlm_task2.py"]
 
 [[runs]]
@@ -214,7 +214,7 @@ estimated_cost_chf = 0.000000
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier2/rlm_task2.py"]
 
 [[runs]]
@@ -231,7 +231,7 @@ estimated_cost_chf = 0.000000
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "100", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "100", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier2/rlm_task3.py"]
 
 [[runs]]
@@ -248,7 +248,7 @@ estimated_cost_chf = 0.000000
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "500", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "500", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier2/rlm_task3.py"]
 
 [[runs]]
@@ -265,7 +265,7 @@ estimated_cost_chf = 0.000000
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier2/rlm_task3.py"]
 
 [[runs]]
@@ -282,7 +282,7 @@ estimated_cost_chf = 0.000000
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "50000", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "50000", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier2/rlm_task3.py"]
 
 [[runs]]
@@ -299,7 +299,7 @@ estimated_cost_chf = 0.000000
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier2/rlm_task3.py"]
 
 [[runs]]
@@ -316,7 +316,7 @@ estimated_cost_chf = 0.000000
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier2/rlm_task3.py"]
 
 [[runs]]
@@ -333,7 +333,7 @@ estimated_cost_chf = 0.000000
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier2/rlm_task3.py"]
 
 [[runs]]
@@ -350,7 +350,7 @@ estimated_cost_chf = 0.000000
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "100", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "100", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier2/rlm_task4.py"]
 
 [[runs]]
@@ -367,7 +367,7 @@ estimated_cost_chf = 0.000000
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "500", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "500", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier2/rlm_task4.py"]
 
 [[runs]]
@@ -384,7 +384,7 @@ estimated_cost_chf = 0.000000
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier2/rlm_task4.py"]
 
 [[runs]]
@@ -401,7 +401,7 @@ estimated_cost_chf = 0.000000
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "50000", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "50000", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier2/rlm_task4.py"]
 
 [[runs]]
@@ -418,7 +418,7 @@ estimated_cost_chf = 0.000000
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier2/rlm_task4.py"]
 
 [[runs]]
@@ -435,7 +435,7 @@ estimated_cost_chf = 0.000000
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier2/rlm_task4.py"]
 
 [[runs]]
@@ -452,7 +452,7 @@ estimated_cost_chf = 0.000000
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier2/rlm_task4.py"]
 
 [[runs]]
@@ -469,7 +469,7 @@ estimated_cost_chf = 0.000000
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "100", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "100", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier2/rlm_task5.py"]
 
 [[runs]]
@@ -486,7 +486,7 @@ estimated_cost_chf = 0.000000
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "500", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "500", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier2/rlm_task5.py"]
 
 [[runs]]
@@ -503,7 +503,7 @@ estimated_cost_chf = 0.000000
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier2/rlm_task5.py"]
 
 [[runs]]
@@ -520,7 +520,7 @@ estimated_cost_chf = 0.000000
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "50000", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "50000", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier2/rlm_task5.py"]
 
 [[runs]]
@@ -537,7 +537,7 @@ estimated_cost_chf = 0.000000
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier2/rlm_task5.py"]
 
 [[runs]]
@@ -554,7 +554,7 @@ estimated_cost_chf = 0.000000
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier2/rlm_task5.py"]
 
 [[runs]]
@@ -571,7 +571,7 @@ estimated_cost_chf = 0.000000
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier2/rlm_task5.py"]
 
 [[runs]]
@@ -588,7 +588,7 @@ estimated_cost_chf = 0.000000
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "100", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "100", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task6.py"]
 
 [[runs]]
@@ -605,7 +605,7 @@ estimated_cost_chf = 0.000000
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "500", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "500", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task6.py"]
 
 [[runs]]
@@ -622,7 +622,7 @@ estimated_cost_chf = 0.000000
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task6.py"]
 
 [[runs]]
@@ -639,7 +639,7 @@ estimated_cost_chf = 0.000000
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "50000", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "50000", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task6.py"]
 
 [[runs]]
@@ -656,7 +656,7 @@ estimated_cost_chf = 0.000000
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task6.py"]
 
 [[runs]]
@@ -673,7 +673,7 @@ estimated_cost_chf = 0.000000
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task6.py"]
 
 [[runs]]
@@ -690,7 +690,7 @@ estimated_cost_chf = 0.000000
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task6.py"]
 
 [[runs]]
@@ -707,7 +707,7 @@ estimated_cost_chf = 0.000000
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "100", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "100", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task7.py"]
 
 [[runs]]
@@ -724,7 +724,7 @@ estimated_cost_chf = 0.000000
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "500", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "500", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task7.py"]
 
 [[runs]]
@@ -741,7 +741,7 @@ estimated_cost_chf = 0.000000
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task7.py"]
 
 [[runs]]
@@ -758,7 +758,7 @@ estimated_cost_chf = 0.000000
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "50000", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "50000", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task7.py"]
 
 [[runs]]
@@ -775,7 +775,7 @@ estimated_cost_chf = 0.000000
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task7.py"]
 
 [[runs]]
@@ -792,7 +792,7 @@ estimated_cost_chf = 0.000000
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task7.py"]
 
 [[runs]]
@@ -809,7 +809,7 @@ estimated_cost_chf = 0.000000
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task7.py"]
 
 [[runs]]
@@ -826,7 +826,7 @@ estimated_cost_chf = 0.000000
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "100", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "100", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task8.py"]
 
 [[runs]]
@@ -843,7 +843,7 @@ estimated_cost_chf = 0.000000
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "500", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "500", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task8.py"]
 
 [[runs]]
@@ -860,7 +860,7 @@ estimated_cost_chf = 0.000000
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task8.py"]
 
 [[runs]]
@@ -877,7 +877,7 @@ estimated_cost_chf = 0.000000
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "50000", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "50000", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task8.py"]
 
 [[runs]]
@@ -894,7 +894,7 @@ estimated_cost_chf = 0.000000
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task8.py"]
 
 [[runs]]
@@ -911,7 +911,7 @@ estimated_cost_chf = 0.000000
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task8.py"]
 
 [[runs]]
@@ -928,7 +928,7 @@ estimated_cost_chf = 0.000000
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task8.py"]
 
 [[runs]]
@@ -945,7 +945,7 @@ estimated_cost_chf = 0.000000
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "100", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "100", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task9.py"]
 
 [[runs]]
@@ -962,7 +962,7 @@ estimated_cost_chf = 0.000000
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "500", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "500", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task9.py"]
 
 [[runs]]
@@ -979,7 +979,7 @@ estimated_cost_chf = 0.000000
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task9.py"]
 
 [[runs]]
@@ -996,7 +996,7 @@ estimated_cost_chf = 0.000000
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "50000", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "50000", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task9.py"]
 
 [[runs]]
@@ -1013,7 +1013,7 @@ estimated_cost_chf = 0.000000
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task9.py"]
 
 [[runs]]
@@ -1030,7 +1030,7 @@ estimated_cost_chf = 0.000000
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task9.py"]
 
 [[runs]]
@@ -1047,7 +1047,7 @@ estimated_cost_chf = 0.000000
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task9.py"]
 
 [[runs]]
@@ -1064,7 +1064,7 @@ estimated_cost_chf = 0.000000
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "100", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "100", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task10.py"]
 
 [[runs]]
@@ -1081,7 +1081,7 @@ estimated_cost_chf = 0.000000
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "500", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "500", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task10.py"]
 
 [[runs]]
@@ -1098,7 +1098,7 @@ estimated_cost_chf = 0.000000
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task10.py"]
 
 [[runs]]
@@ -1115,7 +1115,7 @@ estimated_cost_chf = 0.000000
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "50000", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "50000", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task10.py"]
 
 [[runs]]
@@ -1132,7 +1132,7 @@ estimated_cost_chf = 0.000000
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task10.py"]
 
 [[runs]]
@@ -1149,7 +1149,7 @@ estimated_cost_chf = 0.000000
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task10.py"]
 
 [[runs]]
@@ -1166,7 +1166,7 @@ estimated_cost_chf = 0.000000
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task10.py"]
 
 [[runs]]
@@ -1183,7 +1183,7 @@ estimated_cost_chf = 0.000000
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "100", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "100", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task10b.py"]
 
 [[runs]]
@@ -1200,7 +1200,7 @@ estimated_cost_chf = 0.000000
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "500", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "500", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task10b.py"]
 
 [[runs]]
@@ -1217,7 +1217,7 @@ estimated_cost_chf = 0.000000
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task10b.py"]
 
 [[runs]]
@@ -1234,7 +1234,7 @@ estimated_cost_chf = 0.000000
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "50000", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "50000", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task10b.py"]
 
 [[runs]]
@@ -1251,7 +1251,7 @@ estimated_cost_chf = 0.000000
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task10b.py"]
 
 [[runs]]
@@ -1268,7 +1268,7 @@ estimated_cost_chf = 0.000000
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task10b.py"]
 
 [[runs]]
@@ -1285,7 +1285,7 @@ estimated_cost_chf = 0.000000
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task10b.py"]
 
 [[runs]]
@@ -1302,7 +1302,7 @@ estimated_cost_chf = 0.000000
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "100", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "100", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task13.py"]
 
 [[runs]]
@@ -1319,7 +1319,7 @@ estimated_cost_chf = 0.000000
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "500", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "500", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task13.py"]
 
 [[runs]]
@@ -1336,7 +1336,7 @@ estimated_cost_chf = 0.000000
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task13.py"]
 
 [[runs]]
@@ -1353,7 +1353,7 @@ estimated_cost_chf = 0.000000
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "50000", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "50000", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task13.py"]
 
 [[runs]]
@@ -1370,7 +1370,7 @@ estimated_cost_chf = 0.000000
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task13.py"]
 
 [[runs]]
@@ -1387,7 +1387,7 @@ estimated_cost_chf = 0.000000
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task13.py"]
 
 [[runs]]
@@ -1404,7 +1404,7 @@ estimated_cost_chf = 0.000000
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task13.py"]
 
 [[runs]]
@@ -1421,7 +1421,7 @@ estimated_cost_chf = 0.000000
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "100", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "100", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task14.py"]
 
 [[runs]]
@@ -1438,7 +1438,7 @@ estimated_cost_chf = 0.000000
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "500", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "500", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task14.py"]
 
 [[runs]]
@@ -1455,7 +1455,7 @@ estimated_cost_chf = 0.000000
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task14.py"]
 
 [[runs]]
@@ -1472,7 +1472,7 @@ estimated_cost_chf = 0.000000
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "50000", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "50000", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task14.py"]
 
 [[runs]]
@@ -1489,7 +1489,7 @@ estimated_cost_chf = 0.000000
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task14.py"]
 
 [[runs]]
@@ -1506,7 +1506,7 @@ estimated_cost_chf = 0.000000
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task14.py"]
 
 [[runs]]
@@ -1523,7 +1523,7 @@ estimated_cost_chf = 0.000000
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task14.py"]
 
 [[runs]]
@@ -1540,7 +1540,7 @@ estimated_cost_chf = 0.000000
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "100", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "100", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task15.py"]
 
 [[runs]]
@@ -1557,7 +1557,7 @@ estimated_cost_chf = 0.000000
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "500", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "500", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task15.py"]
 
 [[runs]]
@@ -1574,7 +1574,7 @@ estimated_cost_chf = 0.000000
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task15.py"]
 
 [[runs]]
@@ -1591,7 +1591,7 @@ estimated_cost_chf = 0.000000
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "50000", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "50000", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task15.py"]
 
 [[runs]]
@@ -1608,7 +1608,7 @@ estimated_cost_chf = 0.000000
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task15.py"]
 
 [[runs]]
@@ -1625,7 +1625,7 @@ estimated_cost_chf = 0.000000
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task15.py"]
 
 [[runs]]
@@ -1642,7 +1642,7 @@ estimated_cost_chf = 0.000000
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task15.py"]
 
 [[runs]]
@@ -1659,7 +1659,7 @@ estimated_cost_chf = 0.000000
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "100", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "100", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task17.py"]
 
 [[runs]]
@@ -1676,7 +1676,7 @@ estimated_cost_chf = 0.000000
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "500", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "500", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task17.py"]
 
 [[runs]]
@@ -1693,7 +1693,7 @@ estimated_cost_chf = 0.000000
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task17.py"]
 
 [[runs]]
@@ -1710,7 +1710,7 @@ estimated_cost_chf = 0.000000
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "50000", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "50000", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task17.py"]
 
 [[runs]]
@@ -1727,7 +1727,7 @@ estimated_cost_chf = 0.000000
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task17.py"]
 
 [[runs]]
@@ -1744,7 +1744,7 @@ estimated_cost_chf = 0.000000
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task17.py"]
 
 [[runs]]
@@ -1761,7 +1761,7 @@ estimated_cost_chf = 0.000000
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task17.py"]
 
 [[runs]]
@@ -1778,7 +1778,7 @@ estimated_cost_chf = 0.000000
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "100", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "100", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task18.py"]
 
 [[runs]]
@@ -1795,7 +1795,7 @@ estimated_cost_chf = 0.000000
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "500", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "500", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task18.py"]
 
 [[runs]]
@@ -1812,7 +1812,7 @@ estimated_cost_chf = 0.000000
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task18.py"]
 
 [[runs]]
@@ -1829,7 +1829,7 @@ estimated_cost_chf = 0.000000
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "50000", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "50000", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task18.py"]
 
 [[runs]]
@@ -1846,7 +1846,7 @@ estimated_cost_chf = 0.000000
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task18.py"]
 
 [[runs]]
@@ -1863,7 +1863,7 @@ estimated_cost_chf = 0.000000
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task18.py"]
 
 [[runs]]
@@ -1880,7 +1880,7 @@ estimated_cost_chf = 0.000000
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task18.py"]
 
 [[runs]]
@@ -1897,7 +1897,7 @@ estimated_cost_chf = 0.000000
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "100", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "100", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task20.py"]
 
 [[runs]]
@@ -1914,7 +1914,7 @@ estimated_cost_chf = 0.000000
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "500", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "500", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task20.py"]
 
 [[runs]]
@@ -1931,7 +1931,7 @@ estimated_cost_chf = 0.000000
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task20.py"]
 
 [[runs]]
@@ -1948,7 +1948,7 @@ estimated_cost_chf = 0.000000
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "50000", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "50000", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task20.py"]
 
 [[runs]]
@@ -1965,7 +1965,7 @@ estimated_cost_chf = 0.000000
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task20.py"]
 
 [[runs]]
@@ -1982,7 +1982,7 @@ estimated_cost_chf = 0.000000
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task20.py"]
 
 [[runs]]
@@ -1999,7 +1999,7 @@ estimated_cost_chf = 0.000000
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task20.py"]
 
 [[runs]]
@@ -2016,7 +2016,7 @@ estimated_cost_chf = 0.000000
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "100", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "100", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task21.py"]
 
 [[runs]]
@@ -2033,7 +2033,7 @@ estimated_cost_chf = 0.000000
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "500", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "500", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task21.py"]
 
 [[runs]]
@@ -2050,7 +2050,7 @@ estimated_cost_chf = 0.000000
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task21.py"]
 
 [[runs]]
@@ -2067,7 +2067,7 @@ estimated_cost_chf = 0.000000
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "50000", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "50000", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task21.py"]
 
 [[runs]]
@@ -2084,7 +2084,7 @@ estimated_cost_chf = 0.000000
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task21.py"]
 
 [[runs]]
@@ -2101,7 +2101,7 @@ estimated_cost_chf = 0.000000
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task21.py"]
 
 [[runs]]
@@ -2118,7 +2118,7 @@ estimated_cost_chf = 0.000000
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task21.py"]
 
 [[runs]]
@@ -2135,7 +2135,7 @@ estimated_cost_chf = 0.000000
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "100", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "100", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task22.py"]
 
 [[runs]]
@@ -2152,7 +2152,7 @@ estimated_cost_chf = 0.000000
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "500", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "500", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task22.py"]
 
 [[runs]]
@@ -2169,7 +2169,7 @@ estimated_cost_chf = 0.000000
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task22.py"]
 
 [[runs]]
@@ -2186,7 +2186,7 @@ estimated_cost_chf = 0.000000
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "50000", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "50000", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task22.py"]
 
 [[runs]]
@@ -2203,7 +2203,7 @@ estimated_cost_chf = 0.000000
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task22.py"]
 
 [[runs]]
@@ -2220,7 +2220,7 @@ estimated_cost_chf = 0.000000
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task22.py"]
 
 [[runs]]
@@ -2237,7 +2237,7 @@ estimated_cost_chf = 0.000000
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task22.py"]
 
 [[runs]]
@@ -2254,7 +2254,7 @@ estimated_cost_chf = 0.000000
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "100", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "100", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task23.py"]
 
 [[runs]]
@@ -2271,7 +2271,7 @@ estimated_cost_chf = 0.000000
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "500", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "500", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task23.py"]
 
 [[runs]]
@@ -2288,7 +2288,7 @@ estimated_cost_chf = 0.000000
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task23.py"]
 
 [[runs]]
@@ -2305,7 +2305,7 @@ estimated_cost_chf = 0.000000
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "50000", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "50000", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task23.py"]
 
 [[runs]]
@@ -2322,7 +2322,7 @@ estimated_cost_chf = 0.000000
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task23.py"]
 
 [[runs]]
@@ -2339,7 +2339,7 @@ estimated_cost_chf = 0.000000
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task23.py"]
 
 [[runs]]
@@ -2356,7 +2356,7 @@ estimated_cost_chf = 0.000000
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task23.py"]
 
 [[runs]]
@@ -2373,7 +2373,7 @@ estimated_cost_chf = 0.000000
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "100", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "100", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task24.py"]
 
 [[runs]]
@@ -2390,7 +2390,7 @@ estimated_cost_chf = 0.000000
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "500", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "500", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task24.py"]
 
 [[runs]]
@@ -2407,7 +2407,7 @@ estimated_cost_chf = 0.000000
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task24.py"]
 
 [[runs]]
@@ -2424,7 +2424,7 @@ estimated_cost_chf = 0.000000
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "50000", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "50000", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task24.py"]
 
 [[runs]]
@@ -2441,7 +2441,7 @@ estimated_cost_chf = 0.000000
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task24.py"]
 
 [[runs]]
@@ -2458,7 +2458,7 @@ estimated_cost_chf = 0.000000
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task24.py"]
 
 [[runs]]
@@ -2475,7 +2475,7 @@ estimated_cost_chf = 0.000000
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task24.py"]
 
 [[runs]]
@@ -2492,7 +2492,7 @@ estimated_cost_chf = 0.266564
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "100", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "100", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier1/rlm_task1.py"]
 
 [[runs]]
@@ -2509,7 +2509,7 @@ estimated_cost_chf = 0.359128
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "500", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "500", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier1/rlm_task1.py"]
 
 [[runs]]
@@ -2526,7 +2526,7 @@ estimated_cost_chf = 0.359128
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier1/rlm_task1.py"]
 
 [[runs]]
@@ -2543,7 +2543,7 @@ estimated_cost_chf = 0.359128
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "50000", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "50000", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier1/rlm_task1.py"]
 
 [[runs]]
@@ -2560,7 +2560,7 @@ estimated_cost_chf = 0.232237
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier1/rlm_task1.py"]
 
 [[runs]]
@@ -2577,7 +2577,7 @@ estimated_cost_chf = 0.159938
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "100", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "100", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier2/rlm_task2.py"]
 
 [[runs]]
@@ -2594,7 +2594,7 @@ estimated_cost_chf = 0.215477
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "500", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "500", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier2/rlm_task2.py"]
 
 [[runs]]
@@ -2611,7 +2611,7 @@ estimated_cost_chf = 0.215477
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier2/rlm_task2.py"]
 
 [[runs]]
@@ -2628,7 +2628,7 @@ estimated_cost_chf = 0.215477
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "50000", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "50000", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier2/rlm_task2.py"]
 
 [[runs]]
@@ -2645,7 +2645,7 @@ estimated_cost_chf = 0.139342
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier2/rlm_task2.py"]
 
 [[runs]]
@@ -2662,7 +2662,7 @@ estimated_cost_chf = 0.215477
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier2/rlm_task2.py"]
 
 [[runs]]
@@ -2679,7 +2679,7 @@ estimated_cost_chf = 0.215477
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier2/rlm_task2.py"]
 
 [[runs]]
@@ -2696,7 +2696,7 @@ estimated_cost_chf = 0.133282
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "100", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "100", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier2/rlm_task3.py"]
 
 [[runs]]
@@ -2713,7 +2713,7 @@ estimated_cost_chf = 0.179564
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "500", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "500", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier2/rlm_task3.py"]
 
 [[runs]]
@@ -2730,7 +2730,7 @@ estimated_cost_chf = 0.179564
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier2/rlm_task3.py"]
 
 [[runs]]
@@ -2747,7 +2747,7 @@ estimated_cost_chf = 0.179564
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "50000", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "50000", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier2/rlm_task3.py"]
 
 [[runs]]
@@ -2764,7 +2764,7 @@ estimated_cost_chf = 0.116119
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier2/rlm_task3.py"]
 
 [[runs]]
@@ -2781,7 +2781,7 @@ estimated_cost_chf = 0.179564
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier2/rlm_task3.py"]
 
 [[runs]]
@@ -2798,7 +2798,7 @@ estimated_cost_chf = 0.179564
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier2/rlm_task3.py"]
 
 [[runs]]
@@ -2815,7 +2815,7 @@ estimated_cost_chf = 0.133282
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "100", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "100", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier2/rlm_task4.py"]
 
 [[runs]]
@@ -2832,7 +2832,7 @@ estimated_cost_chf = 0.179564
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "500", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "500", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier2/rlm_task4.py"]
 
 [[runs]]
@@ -2849,7 +2849,7 @@ estimated_cost_chf = 0.179564
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier2/rlm_task4.py"]
 
 [[runs]]
@@ -2866,7 +2866,7 @@ estimated_cost_chf = 0.179564
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "50000", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "50000", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier2/rlm_task4.py"]
 
 [[runs]]
@@ -2883,7 +2883,7 @@ estimated_cost_chf = 0.116119
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier2/rlm_task4.py"]
 
 [[runs]]
@@ -2900,7 +2900,7 @@ estimated_cost_chf = 0.179564
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier2/rlm_task4.py"]
 
 [[runs]]
@@ -2917,7 +2917,7 @@ estimated_cost_chf = 0.179564
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier2/rlm_task4.py"]
 
 [[runs]]
@@ -2934,7 +2934,7 @@ estimated_cost_chf = 0.106625
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "100", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "100", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier2/rlm_task5.py"]
 
 [[runs]]
@@ -2951,7 +2951,7 @@ estimated_cost_chf = 0.143651
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "500", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "500", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier2/rlm_task5.py"]
 
 [[runs]]
@@ -2968,7 +2968,7 @@ estimated_cost_chf = 0.143651
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier2/rlm_task5.py"]
 
 [[runs]]
@@ -2985,7 +2985,7 @@ estimated_cost_chf = 0.143651
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "50000", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "50000", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier2/rlm_task5.py"]
 
 [[runs]]
@@ -3002,7 +3002,7 @@ estimated_cost_chf = 0.092895
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier2/rlm_task5.py"]
 
 [[runs]]
@@ -3019,7 +3019,7 @@ estimated_cost_chf = 0.143651
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier2/rlm_task5.py"]
 
 [[runs]]
@@ -3036,7 +3036,7 @@ estimated_cost_chf = 0.143651
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier2/rlm_task5.py"]
 
 [[runs]]
@@ -3053,7 +3053,7 @@ estimated_cost_chf = 0.106625
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "100", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "100", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task6.py"]
 
 [[runs]]
@@ -3070,7 +3070,7 @@ estimated_cost_chf = 0.143651
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "500", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "500", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task6.py"]
 
 [[runs]]
@@ -3087,7 +3087,7 @@ estimated_cost_chf = 0.143651
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task6.py"]
 
 [[runs]]
@@ -3104,7 +3104,7 @@ estimated_cost_chf = 0.143651
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "50000", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "50000", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task6.py"]
 
 [[runs]]
@@ -3121,7 +3121,7 @@ estimated_cost_chf = 0.092895
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task6.py"]
 
 [[runs]]
@@ -3138,7 +3138,7 @@ estimated_cost_chf = 0.143651
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task6.py"]
 
 [[runs]]
@@ -3155,7 +3155,7 @@ estimated_cost_chf = 0.143651
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task6.py"]
 
 [[runs]]
@@ -3172,7 +3172,7 @@ estimated_cost_chf = 0.133282
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "100", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "100", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task7.py"]
 
 [[runs]]
@@ -3189,7 +3189,7 @@ estimated_cost_chf = 0.179564
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "500", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "500", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task7.py"]
 
 [[runs]]
@@ -3206,7 +3206,7 @@ estimated_cost_chf = 0.179564
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task7.py"]
 
 [[runs]]
@@ -3223,7 +3223,7 @@ estimated_cost_chf = 0.179564
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "50000", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "50000", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task7.py"]
 
 [[runs]]
@@ -3240,7 +3240,7 @@ estimated_cost_chf = 0.116119
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task7.py"]
 
 [[runs]]
@@ -3257,7 +3257,7 @@ estimated_cost_chf = 0.179564
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task7.py"]
 
 [[runs]]
@@ -3274,7 +3274,7 @@ estimated_cost_chf = 0.179564
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task7.py"]
 
 [[runs]]
@@ -3291,7 +3291,7 @@ estimated_cost_chf = 0.053313
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "100", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "100", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task8.py"]
 
 [[runs]]
@@ -3308,7 +3308,7 @@ estimated_cost_chf = 0.071826
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "500", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "500", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task8.py"]
 
 [[runs]]
@@ -3325,7 +3325,7 @@ estimated_cost_chf = 0.071826
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task8.py"]
 
 [[runs]]
@@ -3342,7 +3342,7 @@ estimated_cost_chf = 0.071826
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "50000", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "50000", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task8.py"]
 
 [[runs]]
@@ -3359,7 +3359,7 @@ estimated_cost_chf = 0.046447
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task8.py"]
 
 [[runs]]
@@ -3376,7 +3376,7 @@ estimated_cost_chf = 0.071826
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task8.py"]
 
 [[runs]]
@@ -3393,7 +3393,7 @@ estimated_cost_chf = 0.071826
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task8.py"]
 
 [[runs]]
@@ -3410,7 +3410,7 @@ estimated_cost_chf = 0.106625
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "100", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "100", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task9.py"]
 
 [[runs]]
@@ -3427,7 +3427,7 @@ estimated_cost_chf = 0.143651
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "500", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "500", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task9.py"]
 
 [[runs]]
@@ -3444,7 +3444,7 @@ estimated_cost_chf = 0.143651
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task9.py"]
 
 [[runs]]
@@ -3461,7 +3461,7 @@ estimated_cost_chf = 0.143651
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "50000", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "50000", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task9.py"]
 
 [[runs]]
@@ -3478,7 +3478,7 @@ estimated_cost_chf = 0.092895
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task9.py"]
 
 [[runs]]
@@ -3495,7 +3495,7 @@ estimated_cost_chf = 0.143651
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task9.py"]
 
 [[runs]]
@@ -3512,7 +3512,7 @@ estimated_cost_chf = 0.143651
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task9.py"]
 
 [[runs]]
@@ -3529,7 +3529,7 @@ estimated_cost_chf = 0.133282
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "100", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "100", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task10.py"]
 
 [[runs]]
@@ -3546,7 +3546,7 @@ estimated_cost_chf = 0.179564
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "500", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "500", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task10.py"]
 
 [[runs]]
@@ -3563,7 +3563,7 @@ estimated_cost_chf = 0.179564
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task10.py"]
 
 [[runs]]
@@ -3580,7 +3580,7 @@ estimated_cost_chf = 0.179564
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "50000", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "50000", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task10.py"]
 
 [[runs]]
@@ -3597,7 +3597,7 @@ estimated_cost_chf = 0.116119
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task10.py"]
 
 [[runs]]
@@ -3614,7 +3614,7 @@ estimated_cost_chf = 0.179564
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task10.py"]
 
 [[runs]]
@@ -3631,7 +3631,7 @@ estimated_cost_chf = 0.179564
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task10.py"]
 
 [[runs]]
@@ -3648,7 +3648,7 @@ estimated_cost_chf = 0.133282
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "100", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "100", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task10b.py"]
 
 [[runs]]
@@ -3665,7 +3665,7 @@ estimated_cost_chf = 0.179564
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "500", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "500", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task10b.py"]
 
 [[runs]]
@@ -3682,7 +3682,7 @@ estimated_cost_chf = 0.179564
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task10b.py"]
 
 [[runs]]
@@ -3699,7 +3699,7 @@ estimated_cost_chf = 0.179564
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "50000", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "50000", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task10b.py"]
 
 [[runs]]
@@ -3716,7 +3716,7 @@ estimated_cost_chf = 0.116119
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task10b.py"]
 
 [[runs]]
@@ -3733,7 +3733,7 @@ estimated_cost_chf = 0.179564
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task10b.py"]
 
 [[runs]]
@@ -3750,7 +3750,7 @@ estimated_cost_chf = 0.179564
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task10b.py"]
 
 [[runs]]
@@ -3767,7 +3767,7 @@ estimated_cost_chf = 0.026656
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "100", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "100", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task13.py"]
 
 [[runs]]
@@ -3784,7 +3784,7 @@ estimated_cost_chf = 0.035913
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "500", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "500", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task13.py"]
 
 [[runs]]
@@ -3801,7 +3801,7 @@ estimated_cost_chf = 0.035913
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task13.py"]
 
 [[runs]]
@@ -3818,7 +3818,7 @@ estimated_cost_chf = 0.035913
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "50000", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "50000", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task13.py"]
 
 [[runs]]
@@ -3835,7 +3835,7 @@ estimated_cost_chf = 0.023224
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task13.py"]
 
 [[runs]]
@@ -3852,7 +3852,7 @@ estimated_cost_chf = 0.035913
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task13.py"]
 
 [[runs]]
@@ -3869,7 +3869,7 @@ estimated_cost_chf = 0.035913
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task13.py"]
 
 [[runs]]
@@ -3886,7 +3886,7 @@ estimated_cost_chf = 0.026656
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "100", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "100", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task14.py"]
 
 [[runs]]
@@ -3903,7 +3903,7 @@ estimated_cost_chf = 0.035913
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "500", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "500", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task14.py"]
 
 [[runs]]
@@ -3920,7 +3920,7 @@ estimated_cost_chf = 0.035913
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task14.py"]
 
 [[runs]]
@@ -3937,7 +3937,7 @@ estimated_cost_chf = 0.035913
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "50000", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "50000", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task14.py"]
 
 [[runs]]
@@ -3954,7 +3954,7 @@ estimated_cost_chf = 0.023224
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task14.py"]
 
 [[runs]]
@@ -3971,7 +3971,7 @@ estimated_cost_chf = 0.035913
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task14.py"]
 
 [[runs]]
@@ -3988,7 +3988,7 @@ estimated_cost_chf = 0.035913
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task14.py"]
 
 [[runs]]
@@ -4005,7 +4005,7 @@ estimated_cost_chf = 0.026656
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "100", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "100", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task15.py"]
 
 [[runs]]
@@ -4022,7 +4022,7 @@ estimated_cost_chf = 0.035913
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "500", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "500", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task15.py"]
 
 [[runs]]
@@ -4039,7 +4039,7 @@ estimated_cost_chf = 0.035913
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task15.py"]
 
 [[runs]]
@@ -4056,7 +4056,7 @@ estimated_cost_chf = 0.035913
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "50000", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "50000", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task15.py"]
 
 [[runs]]
@@ -4073,7 +4073,7 @@ estimated_cost_chf = 0.023224
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task15.py"]
 
 [[runs]]
@@ -4090,7 +4090,7 @@ estimated_cost_chf = 0.035913
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task15.py"]
 
 [[runs]]
@@ -4107,7 +4107,7 @@ estimated_cost_chf = 0.035913
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task15.py"]
 
 [[runs]]
@@ -4124,7 +4124,7 @@ estimated_cost_chf = 0.026656
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "100", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "100", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task17.py"]
 
 [[runs]]
@@ -4141,7 +4141,7 @@ estimated_cost_chf = 0.035913
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "500", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "500", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task17.py"]
 
 [[runs]]
@@ -4158,7 +4158,7 @@ estimated_cost_chf = 0.035913
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task17.py"]
 
 [[runs]]
@@ -4175,7 +4175,7 @@ estimated_cost_chf = 0.035913
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "50000", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "50000", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task17.py"]
 
 [[runs]]
@@ -4192,7 +4192,7 @@ estimated_cost_chf = 0.023224
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task17.py"]
 
 [[runs]]
@@ -4209,7 +4209,7 @@ estimated_cost_chf = 0.035913
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task17.py"]
 
 [[runs]]
@@ -4226,7 +4226,7 @@ estimated_cost_chf = 0.035913
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task17.py"]
 
 [[runs]]
@@ -4243,7 +4243,7 @@ estimated_cost_chf = 0.026656
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "100", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "100", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task18.py"]
 
 [[runs]]
@@ -4260,7 +4260,7 @@ estimated_cost_chf = 0.035913
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "500", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "500", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task18.py"]
 
 [[runs]]
@@ -4277,7 +4277,7 @@ estimated_cost_chf = 0.035913
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task18.py"]
 
 [[runs]]
@@ -4294,7 +4294,7 @@ estimated_cost_chf = 0.035913
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "50000", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "50000", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task18.py"]
 
 [[runs]]
@@ -4311,7 +4311,7 @@ estimated_cost_chf = 0.023224
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task18.py"]
 
 [[runs]]
@@ -4328,7 +4328,7 @@ estimated_cost_chf = 0.035913
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task18.py"]
 
 [[runs]]
@@ -4345,7 +4345,7 @@ estimated_cost_chf = 0.035913
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task18.py"]
 
 [[runs]]
@@ -4362,7 +4362,7 @@ estimated_cost_chf = 0.026656
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "100", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "100", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task20.py"]
 
 [[runs]]
@@ -4379,7 +4379,7 @@ estimated_cost_chf = 0.035913
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "500", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "500", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task20.py"]
 
 [[runs]]
@@ -4396,7 +4396,7 @@ estimated_cost_chf = 0.035913
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task20.py"]
 
 [[runs]]
@@ -4413,7 +4413,7 @@ estimated_cost_chf = 0.035913
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "50000", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "50000", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task20.py"]
 
 [[runs]]
@@ -4430,7 +4430,7 @@ estimated_cost_chf = 0.023224
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task20.py"]
 
 [[runs]]
@@ -4447,7 +4447,7 @@ estimated_cost_chf = 0.035913
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task20.py"]
 
 [[runs]]
@@ -4464,7 +4464,7 @@ estimated_cost_chf = 0.035913
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task20.py"]
 
 [[runs]]
@@ -4481,7 +4481,7 @@ estimated_cost_chf = 0.026656
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "100", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "100", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task21.py"]
 
 [[runs]]
@@ -4498,7 +4498,7 @@ estimated_cost_chf = 0.035913
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "500", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "500", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task21.py"]
 
 [[runs]]
@@ -4515,7 +4515,7 @@ estimated_cost_chf = 0.035913
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task21.py"]
 
 [[runs]]
@@ -4532,7 +4532,7 @@ estimated_cost_chf = 0.035913
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "50000", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "50000", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task21.py"]
 
 [[runs]]
@@ -4549,7 +4549,7 @@ estimated_cost_chf = 0.023224
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task21.py"]
 
 [[runs]]
@@ -4566,7 +4566,7 @@ estimated_cost_chf = 0.035913
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task21.py"]
 
 [[runs]]
@@ -4583,7 +4583,7 @@ estimated_cost_chf = 0.035913
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task21.py"]
 
 [[runs]]
@@ -4600,7 +4600,7 @@ estimated_cost_chf = 0.026656
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "100", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "100", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task22.py"]
 
 [[runs]]
@@ -4617,7 +4617,7 @@ estimated_cost_chf = 0.035913
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "500", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "500", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task22.py"]
 
 [[runs]]
@@ -4634,7 +4634,7 @@ estimated_cost_chf = 0.035913
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task22.py"]
 
 [[runs]]
@@ -4651,7 +4651,7 @@ estimated_cost_chf = 0.035913
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "50000", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "50000", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task22.py"]
 
 [[runs]]
@@ -4668,7 +4668,7 @@ estimated_cost_chf = 0.023224
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task22.py"]
 
 [[runs]]
@@ -4685,7 +4685,7 @@ estimated_cost_chf = 0.035913
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task22.py"]
 
 [[runs]]
@@ -4702,7 +4702,7 @@ estimated_cost_chf = 0.035913
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task22.py"]
 
 [[runs]]
@@ -4719,7 +4719,7 @@ estimated_cost_chf = 0.026656
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "100", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "100", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task23.py"]
 
 [[runs]]
@@ -4736,7 +4736,7 @@ estimated_cost_chf = 0.035913
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "500", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "500", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task23.py"]
 
 [[runs]]
@@ -4753,7 +4753,7 @@ estimated_cost_chf = 0.035913
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task23.py"]
 
 [[runs]]
@@ -4770,7 +4770,7 @@ estimated_cost_chf = 0.035913
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "50000", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "50000", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task23.py"]
 
 [[runs]]
@@ -4787,7 +4787,7 @@ estimated_cost_chf = 0.023224
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task23.py"]
 
 [[runs]]
@@ -4804,7 +4804,7 @@ estimated_cost_chf = 0.035913
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task23.py"]
 
 [[runs]]
@@ -4821,7 +4821,7 @@ estimated_cost_chf = 0.035913
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task23.py"]
 
 [[runs]]
@@ -4838,7 +4838,7 @@ estimated_cost_chf = 0.026656
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "100", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "100", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task24.py"]
 
 [[runs]]
@@ -4855,7 +4855,7 @@ estimated_cost_chf = 0.035913
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "500", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "500", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task24.py"]
 
 [[runs]]
@@ -4872,7 +4872,7 @@ estimated_cost_chf = 0.035913
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task24.py"]
 
 [[runs]]
@@ -4889,7 +4889,7 @@ estimated_cost_chf = 0.035913
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "50000", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "50000", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task24.py"]
 
 [[runs]]
@@ -4906,7 +4906,7 @@ estimated_cost_chf = 0.023224
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task24.py"]
 
 [[runs]]
@@ -4923,7 +4923,7 @@ estimated_cost_chf = 0.035913
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task24.py"]
 
 [[runs]]
@@ -4940,5 +4940,5 @@ estimated_cost_chf = 0.035913
 memory_reservation_mib = 16384
 memory_limit_mib = 30720
 question_parallelism = 1
-env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192" }
+env = { RXNHAYSTACK_CONTEXT_SIZE = "5000", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096" }
 command = ["uv", "run", "--frozen", "python", "tier3/rlm_task24.py"]

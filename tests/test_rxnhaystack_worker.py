@@ -8,6 +8,7 @@ import pytest
 from rxnhaystack.manifest import ManifestError
 from rxnhaystack.worker import (
     RLM_LOCAL_MEMORY_LIMIT_ENV,
+    RLM_LOCAL_TOOL_MEMORY_LIMIT_ENV,
     BenchmarkRuntime,
     instrument_rlm_from_environment,
 )
@@ -84,6 +85,7 @@ def test_local_rlm_sets_address_space_limit_and_records_it(
     monkeypatch.setenv("RXNHAYSTACK_RESOURCE_TRACE_PATH", str(trace_path))
     monkeypatch.setenv("RXNHAYSTACK_PROVIDER", "openrouter")
     monkeypatch.setenv(RLM_LOCAL_MEMORY_LIMIT_ENV, "4096")
+    monkeypatch.setenv(RLM_LOCAL_TOOL_MEMORY_LIMIT_ENV, "2048")
 
     with (
         patch("rxnhaystack.worker.resource.getrlimit", return_value=(-1, -1)),
@@ -97,6 +99,7 @@ def test_local_rlm_sets_address_space_limit_and_records_it(
     assert setrlimit.call_args.args[1][0] == 4096 * 1024 * 1024
     assert configured["environment"] == "local"
     assert '"event":"rlm_local_memory_limit_set"' in trace_path.read_text()
+    assert '"tool_memory_limit_mib":2048' in trace_path.read_text()
 
 
 def test_local_rlm_rejects_invalid_memory_limit(tmp_path: Path, monkeypatch) -> None:
@@ -107,6 +110,22 @@ def test_local_rlm_rejects_invalid_memory_limit(tmp_path: Path, monkeypatch) -> 
     monkeypatch.setenv(RLM_LOCAL_MEMORY_LIMIT_ENV, "0")
 
     with pytest.raises(ManifestError, match=RLM_LOCAL_MEMORY_LIMIT_ENV):
+        instrument_rlm_from_environment(
+            {"backend": "openrouter", "environment": "local"}
+        )
+
+
+def test_local_rlm_rejects_tool_limit_above_worker_limit(
+    tmp_path: Path, monkeypatch
+) -> None:
+    monkeypatch.setenv(
+        "RXNHAYSTACK_RESOURCE_TRACE_PATH", str(tmp_path / "resource-trace.jsonl")
+    )
+    monkeypatch.setenv("RXNHAYSTACK_PROVIDER", "openrouter")
+    monkeypatch.setenv(RLM_LOCAL_MEMORY_LIMIT_ENV, "4096")
+    monkeypatch.setenv(RLM_LOCAL_TOOL_MEMORY_LIMIT_ENV, "8192")
+
+    with pytest.raises(ManifestError, match="must not exceed"):
         instrument_rlm_from_environment(
             {"backend": "openrouter", "environment": "local"}
         )
