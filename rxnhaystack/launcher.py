@@ -6,6 +6,7 @@ import os
 import platform
 import subprocess
 import sys
+import threading
 import time
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from dataclasses import dataclass
@@ -79,6 +80,7 @@ def execute_run(
     secrets: dict[str, str],
     retry_failed: bool,
     recover_running: bool,
+    cancellation_event: threading.Event | None = None,
 ) -> ExecutionResult:
     attempt = ledger.claim(
         run.run_id,
@@ -159,6 +161,7 @@ def execute_run(
                 memory_limit_mib=run.memory_limit_mib,
                 trace_path=resource_trace_path,
                 run_id=run.run_id,
+                cancellation_event=cancellation_event,
             )
         return_code = usage.return_code
         peak_rss_mib = usage.peak_rss_mib
@@ -177,6 +180,8 @@ def execute_run(
             error = f"Process-tree RSS exceeded the {run.memory_limit_mib} MiB memory limit" + (
                 f"; {error}" if error is not None else ""
             )
+        elif usage.cancelled:
+            error = "Run interrupted by launcher shutdown"
         elif return_code != 0:
             error = f"Command exited with status {return_code}" + (
                 f"; {error}" if error is not None else ""
@@ -239,6 +244,7 @@ def execute_run_safely(
     secrets: dict[str, str],
     retry_failed: bool,
     recover_running: bool,
+    cancellation_event: threading.Event | None = None,
 ) -> ExecutionResult:
     try:
         return execute_run(
@@ -249,6 +255,7 @@ def execute_run_safely(
             secrets=secrets,
             retry_failed=retry_failed,
             recover_running=recover_running,
+            cancellation_event=cancellation_event,
         )
     except Exception as unexpected_error:
         record = ledger.get(run.run_id)
@@ -334,6 +341,7 @@ def run_selected(
     enforce_remaining_budget(manifest, ledger)
     results: list[ExecutionResult] = []
     memory_budget = MemoryBudget(manifest.campaign.max_parallel_memory_mib)
+    cancellation_event = threading.Event()
 
     def execute_with_reservation(run: PlannedRun) -> ExecutionResult:
         with memory_budget.reserve(run.memory_reservation_mib):
@@ -345,10 +353,20 @@ def run_selected(
                 secrets=secrets,
                 retry_failed=retry_failed,
                 recover_running=recover_running,
+                cancellation_event=cancellation_event,
             )
 
-    with ThreadPoolExecutor(max_workers=max_parallel) as executor:
+    executor = ThreadPoolExecutor(max_workers=max_parallel)
+    try:
         futures = {executor.submit(execute_with_reservation, run): run.run_id for run in selected}
         for future in as_completed(futures):
             results.append(future.result())
+    except KeyboardInterrupt:
+        cancellation_event.set()
+        for future in futures:
+            future.cancel()
+        executor.shutdown(wait=True, cancel_futures=True)
+        raise
+    else:
+        executor.shutdown(wait=True)
     return sorted(results, key=lambda result: result.run_id)

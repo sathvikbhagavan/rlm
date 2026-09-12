@@ -1,8 +1,10 @@
 from __future__ import annotations
 
 import json
+import os
 import subprocess
 import sys
+import time
 from pathlib import Path
 
 import pytest
@@ -302,3 +304,53 @@ command = [{json.dumps(sys.executable)}, {json.dumps(str(worker))}]
     record = RunLedger(manifest.campaign.artifact_dir / "ledger.sqlite3").get(result.run_id)
     assert record.status == "failed"
     assert "memory limit" in (record.error or "")
+
+
+def test_keyboard_interrupt_terminates_worker_and_records_failure(
+    tmp_path: Path, monkeypatch
+) -> None:
+    project_root = tmp_path / "project"
+    project_root.mkdir()
+    initialize_git_repository(project_root)
+    worker = project_root / "sleep_worker.py"
+    pid_path = project_root / "worker.pid"
+    worker.write_text(
+        "import os\n"
+        "import time\n"
+        "from pathlib import Path\n"
+        f"Path({str(pid_path)!r}).write_text(str(os.getpid()))\n"
+        "time.sleep(30)\n"
+    )
+    manifest = load_manifest(write_campaign(tmp_path, project_root, worker, repetitions=1))
+
+    def interrupt_after_worker_starts(_futures):
+        deadline = time.monotonic() + 5
+        while not pid_path.exists() and time.monotonic() < deadline:
+            time.sleep(0.01)
+        assert pid_path.exists()
+        raise KeyboardInterrupt
+
+    monkeypatch.setattr("rxnhaystack.launcher.as_completed", interrupt_after_worker_starts)
+
+    with pytest.raises(KeyboardInterrupt):
+        run_selected(
+            manifest,
+            preflight=perform_preflight(manifest),
+            selected=list(manifest.runs),
+            secrets={},
+            max_parallel=1,
+            retry_failed=False,
+            recover_running=False,
+        )
+
+    worker_pid = int(pid_path.read_text())
+    with pytest.raises(ProcessLookupError):
+        os.kill(worker_pid, 0)
+    ledger = RunLedger(manifest.campaign.artifact_dir / "ledger.sqlite3")
+    record = ledger.get("integration-cell")
+    assert record.status == "failed"
+    assert record.error == "Run interrupted by launcher shutdown"
+    metadata = json.loads(
+        (manifest.campaign.artifact_dir / "runs/integration-cell/attempt-001/metadata.json").read_text()
+    )
+    assert metadata["result"]["error"] == "Run interrupted by launcher shutdown"

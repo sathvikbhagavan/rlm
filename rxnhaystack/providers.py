@@ -11,6 +11,8 @@ from rxnhaystack.manifest import ManifestError
 PROVIDER_ENV = "RXNHAYSTACK_PROVIDER"
 SWISSAI_API_KEY_ENV = "SWISSAI_RESEARCH_API_KEY"
 SWISSAI_BASE_URL = "https://api.swissai.svc.cscs.ch/v1"
+SWISSAI_REQUEST_TIMEOUT_ENV = "RXNHAYSTACK_SWISSAI_REQUEST_TIMEOUT_SECONDS"
+SWISSAI_REQUEST_TIMEOUT_SECONDS = 300.0
 
 
 def benchmark_provider(environ: dict[str, str] | None = None) -> str:
@@ -36,6 +38,27 @@ def build_benchmark_llm(**kwargs: Any) -> OpenRouter | OpenAILike:
     configured["api_base"] = SWISSAI_BASE_URL
     configured["is_chat_model"] = True
     configured["context_window"] = int(os.environ.get("RXNHAYSTACK_MODEL_CONTEXT_WINDOW", "262144"))
+    try:
+        request_timeout = float(
+            os.environ.get(
+                SWISSAI_REQUEST_TIMEOUT_ENV,
+                str(SWISSAI_REQUEST_TIMEOUT_SECONDS),
+            )
+        )
+    except ValueError as error:
+        raise ManifestError(
+            f"{SWISSAI_REQUEST_TIMEOUT_ENV} must be a positive number of seconds"
+        ) from error
+    if request_timeout <= 0:
+        raise ManifestError(
+            f"{SWISSAI_REQUEST_TIMEOUT_ENV} must be a positive number of seconds"
+        )
+    # The endpoint's large models can legitimately take longer than the
+    # OpenAILike default of 60 seconds. Keep one explicit request deadline and
+    # avoid nested SDK retries multiplying it invisibly; CodeAct and the job
+    # ledger already provide auditable retry boundaries.
+    configured["timeout"] = request_timeout
+    configured["max_retries"] = 0
     # This OpenAI-compatible endpoint does not advertise OpenRouter's normalized
     # reasoning_effort or max_completion_tokens extensions.
     configured.pop("reasoning_effort", None)

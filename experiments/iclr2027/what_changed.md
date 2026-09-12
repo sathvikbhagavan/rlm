@@ -168,12 +168,22 @@ worker and all processes it started. This “process-tree RAM” includes Python
 RLM helpers, and any child process, rather than looking at only the first
 process. A worker crossing its hard limit is stopped and recorded as failed.
 
+Pressing Ctrl-C once now signals every active worker, terminates its isolated
+process tree, and records the interrupted attempt. If a machine stops too
+abruptly to record that transition, the next launch can recover the still-marked
+running attempt without deleting its history.
+
 Each attempt writes `resource-trace.jsonl`, a time-ordered memory record. RLM
 iteration and recursive-call events share the same timeline without storing
 private prompt text, so a memory spike can be associated with the work occurring
 at that moment.
 
 See [`rxnhaystack/resources.py`](../../rxnhaystack/resources.py).
+
+SwissAI's large models use an explicit 300-second request deadline instead of
+inheriting the chat client's 60-second default. Hidden client-level retries are
+disabled so a single slow request cannot silently multiply that deadline;
+CodeAct and whole-job retries remain visible in the result history.
 
 ## 8. Time, tokens, calls, and cost are recorded consistently
 

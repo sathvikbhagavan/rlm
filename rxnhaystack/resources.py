@@ -21,6 +21,7 @@ class ProcessUsage:
     return_code: int
     peak_rss_mib: float
     memory_limit_exceeded: bool
+    cancelled: bool = False
 
 
 class MemoryBudget:
@@ -119,6 +120,7 @@ def wait_with_memory_watchdog(
     termination_grace_seconds: float = 5.0,
     trace_path: Path | None = None,
     run_id: str | None = None,
+    cancellation_event: threading.Event | None = None,
 ) -> ProcessUsage:
     """Wait for a process while measuring and optionally limiting its process-tree RSS."""
 
@@ -127,6 +129,7 @@ def wait_with_memory_watchdog(
     peak_rss_bytes = 0
     memory_limit_bytes = memory_limit_mib * MIB if memory_limit_mib is not None else None
     exceeded = False
+    cancelled = False
     if trace_path is not None:
         append_trace_event(
             trace_path,
@@ -148,6 +151,21 @@ def wait_with_memory_watchdog(
                     process_tree_rss_mib=rss_bytes / MIB,
                 )
             return_code = process.poll()
+            if (
+                return_code is None
+                and cancellation_event is not None
+                and cancellation_event.is_set()
+            ):
+                cancelled = True
+                if trace_path is not None:
+                    append_trace_event(
+                        trace_path,
+                        "interruption_requested",
+                        run_id=run_id,
+                        root_pid=process.pid,
+                    )
+                _terminate_process_group(process, grace_seconds=termination_grace_seconds)
+                return_code = process.wait()
             if memory_limit_bytes is not None and rss_bytes > memory_limit_bytes:
                 exceeded = True
                 if trace_path is not None:
@@ -176,11 +194,13 @@ def wait_with_memory_watchdog(
             return_code=return_code,
             peak_process_tree_rss_mib=peak_rss_bytes / MIB,
             memory_limit_exceeded=exceeded,
+            cancelled=cancelled,
         )
     return ProcessUsage(
         return_code=return_code,
         peak_rss_mib=peak_rss_bytes / MIB,
         memory_limit_exceeded=exceeded,
+        cancelled=cancelled,
     )
 
 

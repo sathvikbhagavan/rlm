@@ -500,6 +500,20 @@ If a machine stopped while jobs were recorded as running, add
 `--recover-running`. The incomplete attempt is retained and a new attempt is
 created.
 
+Press Ctrl-C once to stop a launcher. It signals each active worker, terminates
+that worker's isolated process tree, records the attempt as interrupted, and
+leaves successful jobs untouched. Wait for the command to return to the shell;
+do not press Ctrl-C repeatedly. If the machine or Python process was killed too
+abruptly to finish that bookkeeping, the next launch reports those jobs as
+running and `--recover-running` performs the recovery described above.
+
+SwissAI requests use an explicit 300-second request deadline because its large
+models can take longer than the client library's 60-second default. There are no
+hidden client retries multiplying that deadline. For diagnosis only, the value
+can be overridden for a launch by setting
+`RXNHAYSTACK_SWISSAI_REQUEST_TIMEOUT_SECONDS`; do not change it between
+benchmark jobs without recording and justifying the deviation.
+
 Stop and report before retrying when:
 
 - authentication fails;

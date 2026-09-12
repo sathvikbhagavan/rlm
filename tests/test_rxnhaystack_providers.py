@@ -5,6 +5,8 @@ import pytest
 from rxnhaystack.manifest import ManifestError
 from rxnhaystack.providers import (
     SWISSAI_BASE_URL,
+    SWISSAI_REQUEST_TIMEOUT_ENV,
+    SWISSAI_REQUEST_TIMEOUT_SECONDS,
     benchmark_provider,
     build_benchmark_llm,
     configure_rlm_for_provider,
@@ -46,6 +48,22 @@ def test_swissai_llamaindex_client_preserves_chat_interface(monkeypatch) -> None
     assert client.api_base == SWISSAI_BASE_URL
     assert client.api_key == "private"
     assert client.metadata.is_chat_model
+    assert client.timeout == SWISSAI_REQUEST_TIMEOUT_SECONDS
+    assert client.max_retries == 0
+
+
+def test_swissai_llamaindex_timeout_is_configurable_and_validated(monkeypatch) -> None:
+    monkeypatch.setenv("RXNHAYSTACK_PROVIDER", "swissai")
+    monkeypatch.setenv("SWISSAI_RESEARCH_API_KEY", "private")
+    monkeypatch.setenv(SWISSAI_REQUEST_TIMEOUT_ENV, "450")
+
+    client = build_benchmark_llm(model="model", api_key="replaced")
+
+    assert client.timeout == 450
+
+    monkeypatch.setenv(SWISSAI_REQUEST_TIMEOUT_ENV, "invalid")
+    with pytest.raises(ManifestError, match=SWISSAI_REQUEST_TIMEOUT_ENV):
+        build_benchmark_llm(model="model", api_key="replaced")
 
 
 def test_swissai_requires_its_own_key(monkeypatch) -> None:
