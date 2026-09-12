@@ -1,8 +1,16 @@
 from __future__ import annotations
 
 from pathlib import Path
+from unittest.mock import patch
 
-from rxnhaystack.worker import BenchmarkRuntime
+import pytest
+
+from rxnhaystack.manifest import ManifestError
+from rxnhaystack.worker import (
+    RLM_LOCAL_MEMORY_LIMIT_ENV,
+    BenchmarkRuntime,
+    instrument_rlm_from_environment,
+)
 
 
 def test_benchmark_runtime_preserves_standalone_defaults(tmp_path: Path, monkeypatch) -> None:
@@ -67,3 +75,38 @@ def test_benchmark_runtime_uses_typed_campaign_values(tmp_path: Path, monkeypatc
         "on_iteration_start",
         "on_iteration_complete",
     }
+
+
+def test_local_rlm_sets_address_space_limit_and_records_it(
+    tmp_path: Path, monkeypatch
+) -> None:
+    trace_path = tmp_path / "resource-trace.jsonl"
+    monkeypatch.setenv("RXNHAYSTACK_RESOURCE_TRACE_PATH", str(trace_path))
+    monkeypatch.setenv("RXNHAYSTACK_PROVIDER", "openrouter")
+    monkeypatch.setenv(RLM_LOCAL_MEMORY_LIMIT_ENV, "4096")
+
+    with (
+        patch("rxnhaystack.worker.resource.getrlimit", return_value=(-1, -1)),
+        patch("rxnhaystack.worker.resource.setrlimit") as setrlimit,
+    ):
+        configured = instrument_rlm_from_environment(
+            {"backend": "openrouter", "environment": "local"}
+        )
+
+    setrlimit.assert_called_once()
+    assert setrlimit.call_args.args[1][0] == 4096 * 1024 * 1024
+    assert configured["environment"] == "local"
+    assert '"event":"rlm_local_memory_limit_set"' in trace_path.read_text()
+
+
+def test_local_rlm_rejects_invalid_memory_limit(tmp_path: Path, monkeypatch) -> None:
+    monkeypatch.setenv(
+        "RXNHAYSTACK_RESOURCE_TRACE_PATH", str(tmp_path / "resource-trace.jsonl")
+    )
+    monkeypatch.setenv("RXNHAYSTACK_PROVIDER", "openrouter")
+    monkeypatch.setenv(RLM_LOCAL_MEMORY_LIMIT_ENV, "0")
+
+    with pytest.raises(ManifestError, match=RLM_LOCAL_MEMORY_LIMIT_ENV):
+        instrument_rlm_from_environment(
+            {"backend": "openrouter", "environment": "local"}
+        )

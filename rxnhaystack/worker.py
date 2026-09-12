@@ -1,14 +1,19 @@
 from __future__ import annotations
 
 import os
+import resource
 import time
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
+from rxnhaystack.manifest import ManifestError
 from rxnhaystack.providers import configure_rlm_for_provider
-from rxnhaystack.resources import rlm_trace_callbacks
+from rxnhaystack.resources import append_trace_event, rlm_trace_callbacks
 from rxnhaystack.runtime import WorkerConfig
+
+RLM_LOCAL_MEMORY_LIMIT_ENV = "RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB"
+RLM_LOCAL_MEMORY_LIMIT_MIB = 8192
 
 
 @dataclass(frozen=True)
@@ -149,9 +154,44 @@ def instrument_rlm_from_environment(
 
     configured = configure_rlm_for_provider(kwargs)
     trace_path = os.environ.get("RXNHAYSTACK_RESOURCE_TRACE_PATH")
+    if configured.get("environment") == "local" and trace_path:
+        _apply_local_rlm_address_space_limit(trace_path=Path(trace_path).resolve())
     if trace_path:
         configured.update(rlm_trace_callbacks(Path(trace_path).resolve(), sample_id=sample_id))
     return configured
+
+
+def _apply_local_rlm_address_space_limit(*, trace_path: Path) -> None:
+    """Make runaway local REPL allocations raise MemoryError inside the tool."""
+
+    raw_limit = os.environ.get(
+        RLM_LOCAL_MEMORY_LIMIT_ENV, str(RLM_LOCAL_MEMORY_LIMIT_MIB)
+    )
+    try:
+        limit_mib = int(raw_limit)
+    except ValueError as error:
+        raise ManifestError(
+            f"{RLM_LOCAL_MEMORY_LIMIT_ENV} must be a positive integer"
+        ) from error
+    if limit_mib <= 0:
+        raise ManifestError(f"{RLM_LOCAL_MEMORY_LIMIT_ENV} must be a positive integer")
+
+    requested_bytes = limit_mib * 1024 * 1024
+    current_soft, current_hard = resource.getrlimit(resource.RLIMIT_AS)
+    new_soft = requested_bytes
+    if current_soft != resource.RLIM_INFINITY:
+        new_soft = min(new_soft, current_soft)
+    if current_hard != resource.RLIM_INFINITY:
+        new_soft = min(new_soft, current_hard)
+    resource.setrlimit(resource.RLIMIT_AS, (new_soft, current_hard))
+
+    append_trace_event(
+        trace_path,
+        "rlm_local_memory_limit_set",
+        requested_memory_limit_mib=limit_mib,
+        effective_memory_limit_mib=new_soft // (1024 * 1024),
+        address_space_limit_bytes=new_soft,
+    )
 
 
 def codeact_callbacks_from_environment(*, sample_id: str | int) -> dict[str, Any]:

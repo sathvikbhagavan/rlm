@@ -30,6 +30,16 @@ class TestLocalREPLBasic:
         assert "ZeroDivisionError" in result.stderr
         repl.cleanup()
 
+    def test_memory_error_is_returned_to_the_model(self):
+        """A bounded allocation failure must not terminate the RLM worker."""
+        def exhaust_memory() -> None:
+            raise MemoryError("address-space limit reached")
+
+        repl = LocalREPL(custom_tools={"exhaust_memory": exhaust_memory})
+        result = repl.execute_code("exhaust_memory()")
+        assert "MemoryError: address-space limit reached" in result.stderr
+        repl.cleanup()
+
     def test_syntax_error(self):
         """Test syntax error handling."""
         repl = LocalREPL()

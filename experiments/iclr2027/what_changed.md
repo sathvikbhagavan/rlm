@@ -187,6 +187,14 @@ bound; a live full-corpus Qwen turn exceeded two minutes while ordinary turns
 used 129--860 output tokens. The 30-iteration and two-level recursion limits are
 unchanged.
 
+For launcher-managed RLM work, Docker remains the preferred isolated execution
+environment. When Docker is unavailable and RLM uses the local Python fallback,
+the worker applies an 8,192-MiB address-space limit recorded in the experiment
+file. A runaway model-generated allocation then becomes a `MemoryError` visible
+to the RLM instead of immediately consuming the machine's 30-GiB per-job limit.
+The outer process-tree monitor remains active and stops the job if the RLM does
+not recover. A trace event records the effective local limit for later audit.
+
 We kept five repetitions as five independent jobs. A single `n=5` model request
 would not be equivalent for CodeAct or RLM because later calls depend on earlier
 responses and tool outputs.
@@ -360,9 +368,9 @@ The tests cover:
 - importability and migration of all 102 task runners;
 - dataset fingerprints printed by `plan`.
 
-At the time of this guide, the full local suite passes with 369 tests and 10
-optional skips. The skips cover optional environments not required for the
-benchmark.
+The exact current test count is reported by the required full-suite check in
+[`running_benchmark.md`](running_benchmark.md). Optional skips cover environments
+that are not required for the benchmark.
 
 ## 13. Human chemistry review support
 

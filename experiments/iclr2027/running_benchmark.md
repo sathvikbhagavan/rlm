@@ -317,6 +317,16 @@ turns normally used 129--860 output tokens; without a request bound, one turn
 continued for more than two minutes. The RLM-level limits of 30 iterations and
 two recursion levels remain unchanged.
 
+RLM should use the Docker environment when it is available. If Docker is not
+available to the user running the benchmark, the code falls back to its local
+Python environment. Every launcher-managed local RLM job now has an explicit
+8,192-MiB address-space limit. A model-generated allocation that reaches this
+limit is returned to the model as `MemoryError`, allowing it to choose a less
+memory-intensive approach. The separate 30,720-MiB process-tree limit remains
+in force and stops the whole job if recovery fails. The 8,192-MiB value is
+written in both experiment files, and `resource-trace.jsonl` records a
+`rlm_local_memory_limit_set` event when it is applied.
+
 Start with one open model, one job at a time:
 
 ```bash
@@ -357,7 +367,8 @@ For every trial job, inspect:
   time;
 - `metadata.json`: exact setting, completion state, and peak process-tree RAM;
 - `resource-trace.jsonl`: whether RAM grew steadily or spiked during a particular
-  RLM iteration or subcall;
+  RLM iteration or subcall, and whether the expected local RLM memory limit was
+  applied;
 - `stdout.log` and `stderr.log`: parse failures, authentication errors, 400/429/
   5xx responses, retries, or chemistry-tool errors;
 - W&B: the run exists once, has the expected model/provider labels, and contains
@@ -389,6 +400,7 @@ Actual CHF cost:
 Wall time:
 Peak process-tree RAM:
 Highest percentage of the job's hard RAM limit:
+RLM environment (Docker or local) and local-limit trace event, if applicable:
 Any 400, 401, 429, 5xx, timeout, parsing, or chemistry errors:
 W&B link or run name:
 Anything surprising in the answers or logs:
