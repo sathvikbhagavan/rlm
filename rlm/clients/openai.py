@@ -33,10 +33,12 @@ class OpenAIClient(BaseLM):
         model_name: str | None = None,
         base_url: str | None = None,
         chat_completion_extra_body: dict[str, Any] | None = None,
+        max_output_tokens: int | None = None,
         **kwargs,
     ):
         super().__init__(model_name=model_name, **kwargs)
         self.chat_completion_extra_body = dict(chat_completion_extra_body or {})
+        self.max_output_tokens = max_output_tokens
 
         if api_key is None:
             if base_url == "https://api.openai.com/v1" or base_url is None:
@@ -84,9 +86,10 @@ class OpenAIClient(BaseLM):
         if self.client.base_url == DEFAULT_PRIME_INTELLECT_BASE_URL:
             extra_body["usage"] = {"include": True}
 
-        response = self.client.chat.completions.create(
-            model=model, messages=messages, extra_body=extra_body
-        )
+        request_kwargs = {"model": model, "messages": messages, "extra_body": extra_body}
+        if self.max_output_tokens is not None:
+            request_kwargs["max_tokens"] = self.max_output_tokens
+        response = self.client.chat.completions.create(**request_kwargs)
         self._track_cost(response, model)
         return response.choices[0].message.content
 
@@ -108,9 +111,10 @@ class OpenAIClient(BaseLM):
         if self.client.base_url == DEFAULT_PRIME_INTELLECT_BASE_URL:
             extra_body["usage"] = {"include": True}
 
-        response = await self.async_client.chat.completions.create(
-            model=model, messages=messages, extra_body=extra_body
-        )
+        request_kwargs = {"model": model, "messages": messages, "extra_body": extra_body}
+        if self.max_output_tokens is not None:
+            request_kwargs["max_tokens"] = self.max_output_tokens
+        response = await self.async_client.chat.completions.create(**request_kwargs)
         self._track_cost(response, model)
         return response.choices[0].message.content
 

@@ -6,6 +6,8 @@ from rxnhaystack.manifest import ManifestError
 from rxnhaystack.providers import (
     CODEACT_MAX_OUTPUT_TOKENS,
     CODEACT_MAX_OUTPUT_TOKENS_ENV,
+    RLM_MAX_OUTPUT_TOKENS,
+    RLM_MAX_OUTPUT_TOKENS_ENV,
     SWISSAI_BASE_URL,
     SWISSAI_REQUEST_TIMEOUT_ENV,
     SWISSAI_REQUEST_TIMEOUT_SECONDS,
@@ -40,6 +42,7 @@ def test_swissai_rlm_uses_openai_compatible_transport(monkeypatch) -> None:
     assert configured["backend"] == "openai"
     assert configured["backend_kwargs"] == {
         "model_name": "RCP-AIaaS/Qwen/Qwen3.5-397B-A17B",
+        "max_output_tokens": RLM_MAX_OUTPUT_TOKENS,
         "api_key": "private",
         "base_url": SWISSAI_BASE_URL,
         "timeout": SWISSAI_REQUEST_TIMEOUT_SECONDS,
@@ -104,6 +107,21 @@ def test_swissai_requires_its_own_key(monkeypatch) -> None:
     monkeypatch.setenv("RXNHAYSTACK_PROVIDER", "swissai")
     monkeypatch.delenv("SWISSAI_RESEARCH_API_KEY", raising=False)
     with pytest.raises(ManifestError, match="SWISSAI_RESEARCH_API_KEY"):
+        configure_rlm_for_provider({"backend_kwargs": {}})
+
+
+def test_rlm_output_guardrail_is_provider_independent_and_validated(monkeypatch) -> None:
+    monkeypatch.setenv("RXNHAYSTACK_PROVIDER", "openrouter")
+    monkeypatch.setenv(RLM_MAX_OUTPUT_TOKENS_ENV, "1024")
+
+    configured = configure_rlm_for_provider(
+        {"backend": "openrouter", "backend_kwargs": {"model_name": "model"}}
+    )
+
+    assert configured["backend_kwargs"]["max_output_tokens"] == 1024
+
+    monkeypatch.setenv(RLM_MAX_OUTPUT_TOKENS_ENV, "invalid")
+    with pytest.raises(ManifestError, match=RLM_MAX_OUTPUT_TOKENS_ENV):
         configure_rlm_for_provider({"backend_kwargs": {}})
 
 

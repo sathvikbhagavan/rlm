@@ -123,9 +123,9 @@ def render() -> str:
         "schema_version = 1",
         "",
         "[campaign]",
-        'name = "iclr2027-matched-cardinality-v2"',
+        'name = "iclr2027-matched-cardinality-v3"',
         'project_root = "../.."',
-        'artifact_dir = "artifacts/iclr2027-matched-cardinality-v2"',
+        'artifact_dir = "artifacts/iclr2027-matched-cardinality-v3"',
         "budget_chf = 100.0",
         f"usd_to_chf = {USD_TO_CHF:.2f}",
         "require_dataset = true",
@@ -154,7 +154,8 @@ def render() -> str:
                     run_id = f"matched-{model.alias}-{tier}-task{task_id}-{label}"
                     env = (
                         f"RXNHAYSTACK_CONTEXT_SIZE = {quote(str(context_size))}, "
-                        f"RXNHAYSTACK_PROVIDER = {quote(model.provider)}"
+                        f"RXNHAYSTACK_PROVIDER = {quote(model.provider)}, "
+                        'RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048"'
                     )
                     lines.extend(
                         [

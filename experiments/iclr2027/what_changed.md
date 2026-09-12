@@ -181,6 +181,12 @@ short actions while bounding a pathological turn's latency and paid cost. A
 4,096-token follow-up trial still exceeded three minutes; the known-good action
 on the same long prompt required only 390 tokens.
 
+RLM now sends the same 2,048-token limit on every root and recursive request.
+Its prior OpenAI-compatible client had a 300-second deadline but no output-token
+bound; a live full-corpus Qwen turn exceeded two minutes while ordinary turns
+used 129--860 output tokens. The 30-iteration and two-level recursion limits are
+unchanged.
+
 We kept five repetitions as five independent jobs. A single `n=5` model request
 would not be equivalent for CodeAct or RLM because later calls depend on earlier
 responses and tool outputs.

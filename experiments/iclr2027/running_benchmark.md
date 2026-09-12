@@ -312,6 +312,11 @@ action used 390 tokens. The final cap is
 written into every CodeAct job in the experiment file and applied equally to
 SwissAI and OpenRouter models.
 
+RLM requests use the same 2,048-token per-call output bound. Live full-corpus
+turns normally used 129--860 output tokens; without a request bound, one turn
+continued for more than two minutes. The RLM-level limits of 30 iterations and
+two recursion levels remain unchanged.
+
 Start with one open model, one job at a time:
 
 ```bash

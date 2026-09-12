@@ -12,6 +12,8 @@ PROVIDER_ENV = "RXNHAYSTACK_PROVIDER"
 METHOD_ENV = "RXNHAYSTACK_METHOD"
 CODEACT_MAX_OUTPUT_TOKENS_ENV = "RXNHAYSTACK_CODEACT_OUTPUT_LIMIT"
 CODEACT_MAX_OUTPUT_TOKENS = 2048
+RLM_MAX_OUTPUT_TOKENS_ENV = "RXNHAYSTACK_RLM_OUTPUT_LIMIT"
+RLM_MAX_OUTPUT_TOKENS = 2048
 SWISSAI_API_KEY_ENV = "SWISSAI_RESEARCH_API_KEY"
 SWISSAI_BASE_URL = "https://api.swissai.svc.cscs.ch/v1"
 SWISSAI_REQUEST_TIMEOUT_ENV = "RXNHAYSTACK_SWISSAI_REQUEST_TIMEOUT_SECONDS"
@@ -124,6 +126,18 @@ def configure_rlm_for_provider(kwargs: dict[str, Any]) -> dict[str, Any]:
 
     configured = dict(kwargs)
     backend_kwargs = dict(configured.get("backend_kwargs", {}))
+    raw_output_limit = os.environ.get(
+        RLM_MAX_OUTPUT_TOKENS_ENV, str(RLM_MAX_OUTPUT_TOKENS)
+    )
+    try:
+        output_limit = int(raw_output_limit)
+    except ValueError as error:
+        raise ManifestError(
+            f"{RLM_MAX_OUTPUT_TOKENS_ENV} must be a positive integer"
+        ) from error
+    if output_limit <= 0:
+        raise ManifestError(f"{RLM_MAX_OUTPUT_TOKENS_ENV} must be a positive integer")
+    backend_kwargs["max_output_tokens"] = output_limit
     model = os.environ.get("RXNHAYSTACK_MODEL")
     if model:
         backend_kwargs["model_name"] = model

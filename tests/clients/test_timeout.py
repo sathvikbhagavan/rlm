@@ -101,6 +101,31 @@ class TestOpenAIClientTimeout:
             "chat_template_kwargs": {"enable_thinking": False}
         }
 
+    def test_output_limit_is_request_scoped(self):
+        """RLM bounds each completion without passing request fields to the client."""
+        from rlm.clients.openai import OpenAIClient
+
+        mock_client = MagicMock()
+        response = mock_client.chat.completions.create.return_value
+        response.choices[0].message.content = "answer"
+        response.usage.prompt_tokens = 2
+        response.usage.completion_tokens = 1
+        response.usage.total_tokens = 3
+        response.usage.cost = None
+        response.usage.model_extra = None
+
+        with patch("rlm.clients.openai.openai.OpenAI", return_value=mock_client) as constructor:
+            with patch("rlm.clients.openai.openai.AsyncOpenAI"):
+                client = OpenAIClient(
+                    api_key="test-key",
+                    model_name="model",
+                    max_output_tokens=2048,
+                )
+                assert client.completion("Hello") == "answer"
+
+        assert "max_output_tokens" not in constructor.call_args.kwargs
+        assert mock_client.chat.completions.create.call_args.kwargs["max_tokens"] == 2048
+
 
 class TestAnthropicClientTimeout:
     """Tests for Anthropic client timeout."""
