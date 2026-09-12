@@ -20,7 +20,7 @@ from .schema import Question
 
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_DATASET = Path.home() / "datasets/rxnhaystack/reactionSmilesFigShareUSPTO2023_cleaned.txt"
-DEFAULT_BUNDLE = ROOT / "human_eval/generated/canonical-v1"
+DEFAULT_BUNDLE = ROOT / "human_eval/generated/canonical-v2"
 DEFAULT_STATE = ROOT / "human_eval/local_state"
 
 

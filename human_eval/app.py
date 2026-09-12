@@ -359,6 +359,33 @@ def create_app(
             elapsed_seconds=float(payload.get("elapsed_seconds", 0)),
         )
 
+    @app.get("/api/annotation-version/{mode}/{item_id}")
+    def annotation_version(mode: str, item_id: str):
+        if mode not in VALID_MODES:
+            raise HTTPException(400, "Invalid mode")
+        draft = store.draft(profile["annotator_id"], mode, item_id)
+        if not draft["updated_at"]:
+            return {"changed": False}
+        prior = draft["annotation_context"]
+        compared_fields = {
+            "bundle_version",
+            "questions_sha256",
+            "protected_answers_sha256",
+            "dataset_sha256",
+        }
+        changed = not prior or any(
+            prior.get(key) != annotation_context.get(key) for key in compared_fields
+        )
+        return {
+            "changed": changed,
+            "message": (
+                "This question or its stored answer changed after your response was saved. "
+                "Your earlier work remains preserved; re-check the current definition before revising."
+                if changed
+                else ""
+            ),
+        }
+
     @app.post("/api/attachment/{mode}/{item_id}")
     async def upload_attachment(mode: str, item_id: str, request: Request):
         if mode not in VALID_MODES:

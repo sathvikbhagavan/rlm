@@ -66,6 +66,19 @@ def test_question_filters_accept_empty_values_and_combine(
     assert "1 questions shown." in client.get(
         "/questions?mode=baseline&tier=1&category=structural-lookup&status=completed"
     ).text
+    assert client.get(
+        "/api/annotation-version/baseline/rxh-t1-fixture"
+    ).json() == {"changed": False, "message": ""}
+    app.state.store.save_draft(
+        app.state.profile["annotator_id"],
+        "baseline",
+        "rxh-t1-fixture",
+        {"answer_exact": "1"},
+        annotation_context={"bundle_version": "older-bundle"},
+    )
+    version = client.get("/api/annotation-version/baseline/rxh-t1-fixture").json()
+    assert version["changed"] is True
+    assert "changed after your response was saved" in version["message"]
 
 
 def test_browser_smoke_leakage_autosave_and_export(

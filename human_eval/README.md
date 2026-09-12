@@ -121,3 +121,6 @@ See [ANNOTATOR_INSTRUCTIONS.md](ANNOTATOR_INSTRUCTIONS.md),
 ready-to-send [INVITATION.md](INVITATION.md). The separate
 [SPECIALIST_REVIEW_INSTRUCTIONS.md](SPECIALIST_REVIEW_INSTRUCTIONS.md) should only
 be sent to people explicitly assigned audit or candidate-route work.
+
+See [BUNDLE_CHANGELOG.md](BUNDLE_CHANGELOG.md) for question and protected-answer
+changes between canonical study versions.
