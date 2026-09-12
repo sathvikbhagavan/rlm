@@ -31,7 +31,7 @@ FIXED_QUESTIONS: list[QuestionSpec] = list(BUILTIN_QUESTIONS)
 HARDCODED_GT_CHAIN_COUNTS: dict[str, int] = {
     "azide_staudinger": 37,
     "aryl_brom_negishi": 4,
-    "boronic_suzuki": 8,
+    "boronic_suzuki": 9,
     "boc_deprot_buchwald": 6,
     "aryl_brom_suzuki_ester_red": 2,
 }

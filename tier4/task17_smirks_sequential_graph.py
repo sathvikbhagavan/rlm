@@ -18,6 +18,8 @@ RDLogger.DisableLog("rdApp.*")
 
 CHAIN_LENGTH = 2
 MIN_HEAVY_ATOMS = 3
+# Offer the reagent field as candidate reactants when matching multi-reactant SMIRKS.
+CLASSIFY_INCLUDE_REAGENTS = True
 DATASET_TOTAL_REACTIONS = 122_456
 SMIRKS_PATH = Path(__file__).resolve().parent / "data" / "smirks.json"
 
@@ -92,10 +94,24 @@ def build_reaction_query(smarts: str) -> rdChemReactions.ChemicalReaction:
     return query
 
 
-def parse_reaction_mols(indexed_line: str) -> tuple[list[Chem.Mol], list[Chem.Mol]]:
+def parse_reaction_mols(
+    indexed_line: str,
+    *,
+    include_reagents: bool = CLASSIFY_INCLUDE_REAGENTS,
+) -> tuple[list[Chem.Mol], list[Chem.Mol]]:
+    """Reactant-side and product-side mols for SMIRKS matching.
+
+    USPTO records frequently place the second coupling partner (acyl chloride, boronic
+    acid, amine, Boc2O) in the reagent field rather than the reactant field. Multi-reactant
+    SMIRKS templates cannot match those records unless reagents are offered as candidate
+    reactants, so ``include_reagents`` defaults to True for classification. Chain LINKING
+    still uses the reactant field alone (see ``ReactionRecord``), matching the prompt.
+    """
     _, reaction_smiles = indexed_line.split(" ", 1)
     parts = reaction_smiles.split(">")
     reactant_smiles = [s for s in parts[0].split(".") if s]
+    if include_reagents and len(parts) == 3:
+        reactant_smiles += [s for s in parts[1].split(".") if s]
     product_smiles = [s for s in parts[-1].split(".") if s]
     reactants = [Chem.MolFromSmiles(s) for s in reactant_smiles]
     products = [Chem.MolFromSmiles(s) for s in product_smiles]
@@ -141,11 +157,15 @@ def reaction_matches_smirks(
     return reaction_matches_smirks_cached(reactants, products, query_reaction)
 
 
-def build_line_mol_cache(lines: list[str]) -> dict[int, tuple[list[Chem.Mol], list[Chem.Mol]]]:
+def build_line_mol_cache(
+    lines: list[str],
+    *,
+    include_reagents: bool = CLASSIFY_INCLUDE_REAGENTS,
+) -> dict[int, tuple[list[Chem.Mol], list[Chem.Mol]]]:
     cache: dict[int, tuple[list[Chem.Mol], list[Chem.Mol]]] = {}
     for line in lines:
         idx_str, _ = line.split(" ", 1)
-        cache[int(idx_str)] = parse_reaction_mols(line)
+        cache[int(idx_str)] = parse_reaction_mols(line, include_reagents=include_reagents)
     return cache
 
 
@@ -422,6 +442,9 @@ def build_question_specs(entries: list[dict[str, str]] | None = None) -> list[Qu
                 "under catalytic H₂ and Pd to a saturated C–C single bond."
             ),
             step1_template_name="Wittig with Phosphonium",
+            # occurrence 0 is the phosphonate (HWE) variant; occurrence 1 is the
+            # phosphonium ylide the step summary actually describes.
+            step1_template_occurrence=1,
             step2_template_name="Hydrogenation (double to single)",
             persistence_summary=(
                 "The alkene installed in step 1 is the substrate for step 2; the product "
@@ -437,8 +460,8 @@ def build_question_specs(entries: list[dict[str, str]] | None = None) -> list[Qu
                 "The carbonyl is the intermediate that bridges the two steps."
             ),
             step1_summary=(
-                "Alcohol oxidation: a primary or secondary alcohol on the substrate is "
-                "oxidized to the corresponding aldehyde or ketone."
+                "Alcohol oxidation: a hydroxyl group on a carbon of the substrate is "
+                "oxidized to the corresponding carbonyl (C-OH becomes C=O)."
             ),
             step2_summary=(
                 "Reductive amination: a substrate carbonyl condenses with an amine and is "
@@ -677,6 +700,10 @@ Find ALL valid {CHAIN_LENGTH}-reaction chains [r_0, r_1] in the context where:
 - Step 2 (r_1): {spec.step2_summary}
 - At least one canonical-SMILES product component of r_0 must be identical to at least one
   canonical-SMILES reactant component of r_1 (exact equality on dot-separated components).
+  The shared component is the substrate carried between the steps: it must have at least
+  {MIN_HEAVY_ATOMS} heavy atoms, so a link through a small by-product or counter-ion
+  (for example Cl, O, or Br) does not count as a chain.
+- Persistence: {spec.persistence_summary}
 - Do not reuse the same reaction index twice in one chain.
 - Only use reactions present in the provided context.
 

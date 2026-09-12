@@ -41,18 +41,18 @@ CHAINS_JSON_PATH = TIER4_DIR / "task17_hardcoded_chains.json"
 FIXED_QUESTIONS: list[QuestionSpec] = list(BUILTIN_QUESTIONS)
 
 HARDCODED_GT_CHAIN_COUNTS: dict[str, int] = {
-    "boc_buchwald": 30,
-    "nitro_reduction_amide": 190,
+    "boc_buchwald": 31,
+    "nitro_reduction_amide": 192,
     "suzuki_carbonyl_reduction": 14,
-    "wittig_hydrogenation": 3,
-    "alcohol_oxidation_reductive_amination": 133,
+    "wittig_hydrogenation": 6,
+    "alcohol_oxidation_reductive_amination": 138,
 }
 
 HARDCODED_GT_EXAMPLE: dict[str, tuple[int, ...]] = {
     "boc_buchwald": (4789, 4790),
     "nitro_reduction_amide": (5107, 5108),
     "suzuki_carbonyl_reduction": (19676, 24317),
-    "wittig_hydrogenation": (18439, 18440),
+    "wittig_hydrogenation": (9173, 9174),
     "alcohol_oxidation_reductive_amination": (3804, 3805),
 }
 

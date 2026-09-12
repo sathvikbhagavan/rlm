@@ -8,6 +8,7 @@ from typing import Callable
 
 from task17_smirks_sequential_graph import (
     DATASET_TOTAL_REACTIONS,
+    MIN_HEAVY_ATOMS,
     PATT_ALCOHOL,
     PATT_ARYL_AMINE,
     PATT_ARYL_N,
@@ -151,8 +152,8 @@ def build_question_specs() -> list[QuestionSpec]:
             ),
             chain_length=2,
             step_summaries=(
-                "Azide formation: a substrate-attached halide (chloride, bromide, or iodide) is "
-                "converted to an organic azide using a sodium-azide source (e.g. NaN₃).",
+                "Azide formation: a substrate-attached halide (chloride, fluoride, bromide, or "
+                "iodide) is displaced by an azide group, giving an organic azide at that carbon.",
                 "Staudinger reduction: the substrate azide is reduced with a phosphine reagent "
                 "to a primary amine at the same carbon.",
             ),
@@ -174,11 +175,11 @@ def build_question_specs() -> list[QuestionSpec]:
             ),
             chain_length=2,
             step_summaries=(
-                "Aromatic bromination: electrophilic bromination converts an aromatic C–H to "
-                "C–Br (aryl bromide), typically with NBS or another brominating agent.",
-                "Negishi coupling: an aryl halide couples with an organozinc reagent under "
-                "Pd catalysis to form a new aryl–aryl C–C bond (not a boronic-acid Suzuki "
-                "coupling).",
+                "Aromatic bromination: an aromatic C–H on the substrate becomes C–Br, so the "
+                "product carries one more aryl bromide than the starting material.",
+                "Cross-coupling of two halides: two carbon-bound halides (each carbon attached to "
+                "carbon only, not to S, N, O, or P) couple to form a new C–C bond between "
+                "those two carbons, both halogens being lost.",
             ),
             step_template_names=(
                 "Aromatic bromination",
@@ -198,9 +199,9 @@ def build_question_specs() -> list[QuestionSpec]:
             ),
             chain_length=2,
             step_summaries=(
-                "Boronic acid preparation: an aryl or vinyl bromide on the substrate is "
-                "converted to an aryl boronic acid via lithiation and reaction with a "
-                "boronate ester.",
+                "Boronic acid preparation: a boronate ester on the substrate (or an aryl/vinyl "
+                "bromide plus a diboron reagent) is converted to the free aryl boronic "
+                "acid, B(OH)2.",
                 "Suzuki coupling: an aryl halide couples with an aryl boronic acid (not an "
                 "organozinc reagent) under Pd catalysis to form a new aryl–aryl C–C bond.",
             ),
@@ -222,8 +223,8 @@ def build_question_specs() -> list[QuestionSpec]:
             ),
             chain_length=2,
             step_summaries=(
-                "Boc deprotection: a tert-butoxycarbonyl (Boc) carbamate on nitrogen is removed "
-                "under acidic conditions, yielding a free amine.",
+                "Boc deprotection: a nitrogen bearing TWO tert-butoxycarbonyl (Boc) carbamates "
+                "is fully deprotected, yielding a primary amine (-NH2) at that nitrogen.",
                 "Buchwald–Hartwig N-arylation: an aryl halide (chloride, bromide, or iodide) "
                 "couples to an aniline-type amine nitrogen under Pd catalysis, forming a new "
                 "aryl–N bond.",
@@ -232,8 +233,15 @@ def build_question_specs() -> list[QuestionSpec]:
                 "Boc amine deprotection",
                 "{Buchwald-Hartwig}",
             ),
+            # occurrence 0 is the bis-Boc variant (N(Boc)Boc -> NH2). The general mono-Boc
+            # template (occurrence 1) matches 4734 reactions and, because the persistence
+            # predicate below cannot express "the SAME nitrogen is arylated in step 2",
+            # yields a degenerate 10723-chain near-complete join. The step summary is
+            # written to describe the bis-Boc template that is actually scored.
+            step_template_occurrences=(0, 0),
             persistence_summary=(
-                "The Boc group is absent after step 1; step 2 adds a new aryl–N bond on the deprotected amine."
+                "No Boc carbamate remains on the substrate after step 1, and step 2 adds a "
+                "new aryl–N bond to the molecule."
             ),
         ),
         QuestionSpec(
@@ -245,8 +253,8 @@ def build_question_specs() -> list[QuestionSpec]:
             ),
             chain_length=3,
             step_summaries=(
-                "Aromatic bromination: electrophilic bromination converts an aromatic C–H to "
-                "C–Br (aryl bromide), typically with NBS or another brominating agent.",
+                "Aromatic bromination: an aromatic C–H on the substrate becomes C–Br, so the "
+                "product carries one more aryl bromide than the starting material.",
                 "Suzuki coupling: an aryl halide couples with an aryl boronic acid under Pd "
                 "catalysis to form a new aryl–aryl C–C bond.",
                 "Ester reduction to primary alcohol: a carboxylic ester on the substrate is "
@@ -489,7 +497,10 @@ Find ALL valid {spec.chain_length}-reaction chains [{indices}] in the context wh
 {step_lines}
 - Consecutive reactions must link: at least one canonical-SMILES product component of r_i must be
   identical to at least one canonical-SMILES reactant component of r_{{i+1}} (exact equality on
-  dot-separated components), for each i.
+  dot-separated components), for each i. The shared component is the substrate carried between
+  the steps: it must have at least {MIN_HEAVY_ATOMS} heavy atoms, so a link through a small
+  by-product or counter-ion (for example Cl, O, or Br) does not count as a chain.
+- Persistence: {spec.persistence_summary}
 - Do not reuse the same reaction index twice in one chain.
 - Only use reactions present in the provided context.
 
