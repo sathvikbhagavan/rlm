@@ -2,17 +2,17 @@ import random
 import time
 import uuid
 
-import wandb
 from task1_hardcoded_cases import (
     TASK1_HARDCODED_GROUND_TRUTH_INDICES,
     TASK1_HARDCODED_PRODUCTS,
 )
 
+import wandb
 from rlm import RLM
-from rxnhaystack.worker import instrument_rlm_from_environment
 from rlm.codeact_helpers import build_context_pipeline, precision_recall_f1
 from rlm.tracing import init_tracing, using_tracing_attributes
 from rxnhaystack.metrics import RunMetrics, cost_chf_from_usd, write_run_metrics
+from rxnhaystack.providers import provider_reports_cost
 from rxnhaystack.worker import BenchmarkRuntime
 
 # os.environ["WANDB_MODE"] = "disabled"
@@ -284,7 +284,7 @@ def main() -> None:
         run.summary["total_cost_usd"] = total_cost_usd
         run.summary["avg_cost_per_sample_usd"] = total_cost_usd / samples_with_cost
     if runtime.launched:
-        if samples_with_cost != total:
+        if provider_reports_cost() and samples_with_cost != total:
             raise RuntimeError("OpenRouter did not report cost for every launched sample")
         write_run_metrics(
             RunMetrics(

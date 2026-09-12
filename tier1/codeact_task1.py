@@ -5,14 +5,13 @@ import random
 import time
 import uuid
 
-import wandb
 from llama_index.core.workflow import Context
-from rxnhaystack.providers import build_benchmark_llm
 from task1_hardcoded_cases import (
     TASK1_HARDCODED_GROUND_TRUTH_INDICES,
     TASK1_HARDCODED_PRODUCTS,
 )
 
+import wandb
 from rlm.codeact_core import (
     INDEX_CODEACT_SYSTEM_PROMPT,
     INDEX_FORCE_LOOP_MESSAGE,
@@ -32,6 +31,7 @@ from rlm.tracing import get_tracer, init_tracing, using_tracing_attributes
 from rlm.utils.token_utils import count_tokens
 from rxnhaystack.concurrency import map_async_bounded
 from rxnhaystack.metrics import RunMetrics, cost_chf_from_usd, write_run_metrics
+from rxnhaystack.providers import build_benchmark_llm, provider_reports_cost
 from rxnhaystack.worker import BenchmarkRuntime
 
 DATASET_PATH = "~/datasets/rxnhaystack/reactionSmilesFigShareUSPTO2023_cleaned.txt"
@@ -396,7 +396,7 @@ async def main(
         run.summary["total_cost_usd"] = total_cost_usd
         run.summary["avg_cost_per_sample_usd"] = total_cost_usd / samples_with_cost
     if runtime.launched:
-        if samples_with_cost != total:
+        if provider_reports_cost() and samples_with_cost != total:
             raise RuntimeError("OpenRouter did not report cost for every launched sample")
         write_run_metrics(
             RunMetrics(

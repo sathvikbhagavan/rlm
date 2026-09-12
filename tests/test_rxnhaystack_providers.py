@@ -10,12 +10,20 @@ from rxnhaystack.providers import (
     benchmark_provider,
     build_benchmark_llm,
     configure_rlm_for_provider,
+    provider_reports_cost,
 )
 
 
 def test_provider_defaults_to_openrouter(monkeypatch) -> None:
     monkeypatch.delenv("RXNHAYSTACK_PROVIDER", raising=False)
     assert benchmark_provider() == "openrouter"
+    assert provider_reports_cost()
+
+
+def test_swissai_records_zero_cost_without_provider_price(monkeypatch) -> None:
+    monkeypatch.setenv("RXNHAYSTACK_PROVIDER", "swissai")
+
+    assert not provider_reports_cost()
 
 
 def test_swissai_rlm_uses_openai_compatible_transport(monkeypatch) -> None:

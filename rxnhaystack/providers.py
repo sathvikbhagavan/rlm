@@ -23,6 +23,12 @@ def benchmark_provider(environ: dict[str, str] | None = None) -> str:
     return provider
 
 
+def provider_reports_cost(environ: dict[str, str] | None = None) -> bool:
+    """Whether missing per-request price data must fail a benchmark job."""
+
+    return benchmark_provider(environ) == "openrouter"
+
+
 def build_benchmark_llm(**kwargs: Any) -> OpenRouter | OpenAILike:
     """Build a LlamaIndex chat client without changing benchmark prompt semantics."""
 
