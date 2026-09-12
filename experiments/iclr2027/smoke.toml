@@ -1,9 +1,9 @@
 schema_version = 1
 
 [campaign]
-name = "iclr2027-infrastructure-smoke-v3"
+name = "iclr2027-infrastructure-smoke-v4"
 project_root = "../.."
-artifact_dir = "artifacts/iclr2027-infrastructure-smoke-v3"
+artifact_dir = "artifacts/iclr2027-infrastructure-smoke-v4"
 budget_chf = 0
 usd_to_chf = 0.80
 require_dataset = true
@@ -12,7 +12,7 @@ require_metrics = true
 max_parallel_memory_mib = 512
 
 [[runs]]
-id = "infrastructure-smoke-v3"
+id = "infrastructure-smoke-v4"
 task = "infrastructure/dataset-access"
 condition = "verified-corpus"
 method = "deterministic"
