@@ -170,22 +170,25 @@ procedure.
 
 These are calibration results, not a balanced scientific comparison.
 
-## Proposed v18 pilots
+## Completed v18 pilots
 
 The broad v16 LLM and CodeAct trials do not need to be repeated: the subsequent
 changes affect RLM limits and telemetry, not their prompts or scoring. The
 smallest useful v18 release check is one single-question, 100-row RLM job for
 each of the six models using Tier-3 Task 13, repetition 1.
 
-| Pilot | Planned CHF |
-| --- | ---: |
-| DeepSeek-V4-Flash Task-13 RLM x100 | 0 |
-| GLM-5.2 Task-13 RLM x100 | 0 |
-| Qwen3.5-397B Task-13 RLM x100 | 0 |
-| Gemini-3.7-Flash Task-13 RLM x100 | 0.053619 |
-| Claude-Sonnet-5 Task-13 RLM x100 | 0.142984 |
-| GPT-5-mini Task-13 RLM x100 | 0.022214 |
-| **Total** | **0.218817** |
+The pilots were run on 13 September 2026 from commit `8ecd2a6`, two at a time.
+All six succeeded on their first attempt and answered the question exactly.
+
+| Pilot | Calls | Wall time | Actual CHF | Peak memory |
+| --- | ---: | ---: | ---: | ---: |
+| DeepSeek-V4-Flash Task-13 RLM x100 | 4 | 39.57 s | 0 | 359.3 MiB |
+| GLM-5.2 Task-13 RLM x100 | 1 | 28.07 s | 0 | 368.6 MiB |
+| Qwen3.5-397B Task-13 RLM x100 | 5 | 23.04 s | 0 | 357.6 MiB |
+| Gemini-3.7-Flash Task-13 RLM x100 | 2 | 7.03 s | 0.005554 | 359.9 MiB |
+| Claude-Sonnet-5 Task-13 RLM x100 | 3 | 9.03 s | 0.038804 | 358.4 MiB |
+| GPT-5-mini Task-13 RLM x100 | 3 | 12.04 s | 0.002442 | 358.8 MiB |
+| **Total** | **18** | **under 2 min elapsed** | **0.046800** | **368.6 MiB maximum** |
 
 They verify that every exact model can complete the final RLM request path, that
 v18 records a normal result and usage, and that the two provider transports
@@ -193,20 +196,16 @@ produce compatible artifacts. They are genuine v18 cells: successful jobs are
 kept and skipped during the later full launch, so their time and money are not
 wasted.
 
-The likely duration is several minutes per job, but no defensible tight estimate
-exists because no successful RLM job has yet been recorded in the final setup.
-Each pilot has one question. Its configured upper bound is roughly 35 minutes
-plus the final answer call: 30 minutes before cutoff and up to five minutes for
-an already-running tool. Sequential worst case is therefore roughly 3.5 hours
-for all six. At `--max-parallel 2`, the scheduling reservations permit two at a
-time, making the configured worst case roughly 1.75 hours in three waves. The
-expected time should be much lower for a 100-row, single-question Tier-3 task.
+Every run recorded calls, tokens, cost, score, a W&B URL, resource usage, and an
+explicit zero for `results.rlm_timeout_finalizations`. No iteration error,
+memory-limit event, cancellation, or timeout finalization occurred. The actual
+CHF 0.046800 total was well below the planned CHF 0.218817 upper estimate.
 
-These six pilots are **recommended but not mathematically necessary**. The
-timeout and metrics path can be—and is—tested deterministically without paid
-models. Skipping the pilots saves at most CHF 0.22, but moves discovery of a
-model-specific response or artifact problem into the large run. Because the
-pilots count toward the final experiment, the prudent choice is to run them.
+These results verify provider and recording compatibility on a short Tier-3
+case. They do **not** prove that the time, turn, response-length, or memory
+limits are neutral on the hardest Tier-4 full-corpus questions. Those limits
+remain explicit computational budgets and their boundary events must be
+reported in the final results.
 
 A second full-corpus Task-16 stress-test sweep is not necessary. Running Task 16
 once for Qwen, Gemini, Claude, and GPT would have a planned paid cost of
@@ -216,7 +215,9 @@ cells, not disposable pilots.
 
 ## Final release check
 
-Before starting the six small pilots or any larger selection:
+The following checks were completed before and after the six small pilots. They
+must be repeated after any code or experiment-description change and before any
+larger selection:
 
 1. confirm a clean checkout at the pushed `main` commit;
 2. run the complete test suite;
