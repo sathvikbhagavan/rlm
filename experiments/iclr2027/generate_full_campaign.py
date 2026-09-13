@@ -20,12 +20,12 @@ COST_MULTIPLIERS = {
     ("claude-haiku-4.5", "codeact", 500): 1.75,
 }
 
-# GLM could not reliably schedule 500-row CodeAct turns when each request
-# reserved 30,000 output tokens. Its completed Task-16 trajectory used 5,272
-# output tokens in total across nine turns, so 8,192 preserves substantial
-# per-turn headroom while keeping the provider request schedulable.
+# GLM could not reliably schedule concurrent 500-row CodeAct turns with either
+# 30,000 or 8,192 reserved output tokens. Its completed Task-16 trajectory used
+# 5,272 output tokens in total across nine turns. A 4,096 per-turn limit plus
+# serial questions matches the request shape proven by its complete LLM phase.
 CODEACT_OUTPUT_LIMITS = {
-    "glm-5.2": 8192,
+    "glm-5.2": 4096,
 }
 
 # Historical GPT-5-mini tokens for one repetition of each 100-question condition.
@@ -95,9 +95,9 @@ def render() -> str:
         "schema_version = 1",
         "",
         "[campaign]",
-        'name = "iclr2027-six-model-full-v29"',
+        'name = "iclr2027-six-model-full-v30"',
         'project_root = "../.."',
-        'artifact_dir = "artifacts/iclr2027-six-model-full-v29"',
+        'artifact_dir = "artifacts/iclr2027-six-model-full-v30"',
         "budget_chf = 1250.0",
         f"usd_to_chf = {USD_TO_CHF:.2f}",
         "require_dataset = true",
@@ -150,6 +150,8 @@ def render() -> str:
                     env_text = ", ".join(f"{key} = {quote(value)}" for key, value in env.items())
                     question_parallelism = condition.question_parallelism
                     if condition.method == "llm" and model.provider == "swissai":
+                        question_parallelism = 1
+                    if condition.method == "codeact" and model.alias == "glm-5.2":
                         question_parallelism = 1
                     lines.extend(
                         [

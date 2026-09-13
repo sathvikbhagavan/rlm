@@ -10,7 +10,7 @@ broader engineering history, read [`what_changed.md`](what_changed.md).
 
 ## Current status
 
-- The final experiment descriptions are full benchmark v29 and
+- The final experiment descriptions are full benchmark v30 and
   matched-cardinality v7.
 - The full benchmark contains 6,300 jobs and has a planned ceiling of
   CHF 743.72.
@@ -30,8 +30,9 @@ broader engineering history, read [`what_changed.md`](what_changed.md).
 
 The v16 through v27 directories contain calibration and diagnostic work. The
 v28 directory contains the authoritative completed GLM LLM phase plus the
-failed 30,000-token CodeAct release check. Full benchmark v29 contains the
-revised GLM CodeAct specification and is used for the remaining GLM methods.
+failed 30,000-token and 8,192-token CodeAct release checks. Full benchmark v30
+contains the revised GLM CodeAct specification and is used for the remaining
+GLM methods.
 
 ## Why the final testing took so long
 
@@ -142,14 +143,14 @@ full experiment. Qwen uses the SwissAI 2,048-token/no-hidden-thinking path.
 | Matched planned cost | CHF 100 declared; CHF 70.98 currently planned | Same rolling check in its separate ledger. Together the declarations leave CHF 150 for all diagnostics under the CHF 1,500 project limit; CHF 35.91 is conservatively accounted for already. |
 | Active-worker memory | 49,152 MiB total scheduling allowance | A worker waits until its declared reservation fits. |
 | LLM parallelism | 4 questions per worker | Further questions wait. |
-| CodeAct parallelism | 2 isolated questions per worker | Further questions wait. |
+| CodeAct parallelism | 2 isolated questions per worker, except 1 for GLM | Further questions wait. GLM is serialized because concurrent x500 requests did not schedule reliably. |
 | RLM parallelism | 1 question per worker | Questions run sequentially within the task job. |
 | SwissAI request starts | 15 requests/minute per credential, spaced by 4.25 seconds across local worker processes | Further request starts wait on a credential-specific local lock. Different co-authors use different credentials. |
 | SwissAI rejected request | At most 2 retries | An HTTP 429 that produced no model answer waits for the provider's `Retry-After` duration and is retried visibly. |
 | LLM worker memory | 2–4 GiB reserved; 4–8 GiB hard limit | The launcher terminates a worker exceeding its combined hard limit. |
 | CodeAct worker memory | 4–6 GiB reserved; 8–12 GiB hard limit | Same combined-memory enforcement. |
 | RLM worker memory | 8/10/28 GiB reserved for 100/500/full context; 16/20/30 GiB hard limit | Same combined-memory enforcement. |
-| CodeAct response | 30,000 output tokens per model turn, except 8,192 for GLM | The provider response is truncated at the recorded bound. GLM's 30,000-token reservation caused repeated 300-second scheduling timeouts on Task-16 x500; its completed nine-turn trajectory used 5,272 output tokens in total, so v29 records 8,192 per turn for GLM. |
+| CodeAct response | 30,000 output tokens per model turn, except 4,096 for GLM | The provider response is truncated at the recorded bound. GLM's 30,000-token request failed after repeated timeouts; 8,192 with two concurrent questions also failed to return either initial response. Its completed nine-turn trajectory used 5,272 output tokens in total across turns. V30 therefore uses the already proven 4,096-token serial GLM request shape. |
 | LLM/CodeAct reasoning | `low` in Tier 1; `high` in Tiers 2–4 | This preserves the collaborator's original task settings. SwissAI disables only its separate hidden-thinking channel. |
 | SwissAI LLM response | 4,096 output tokens per request | Keeps large-context requests schedulable; 500 reaction indices fit within the bound. OpenRouter LLM limits are unchanged. |
 | CodeAct reasoning loop | 8 tool/reasoning turns, then at most 2 answer-only attempts | Further code is not executed; the controller asks for the final answer. |

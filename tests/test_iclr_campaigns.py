@@ -43,12 +43,17 @@ def test_full_campaign_is_generated_and_covers_six_models() -> None:
         run.env["RXNHAYSTACK_CODEACT_OUTPUT_LIMIT"]
         for run in codeact_runs
         if run.model == "CSCS-Inference/zai-org/GLM-5.2"
-    } == {"8192"}
+    } == {"4096"}
     assert {
         run.env["RXNHAYSTACK_CODEACT_OUTPUT_LIMIT"]
         for run in codeact_runs
         if run.model != "CSCS-Inference/zai-org/GLM-5.2"
     } == {"30000"}
+    assert {
+        run.question_parallelism
+        for run in codeact_runs
+        if run.model == "CSCS-Inference/zai-org/GLM-5.2"
+    } == {1}
     llm_runs = [run for run in manifest.runs if run.method == "llm"]
     swissai_llm_runs = [run for run in llm_runs if run.env["RXNHAYSTACK_PROVIDER"] == "swissai"]
     openrouter_llm_runs = [run for run in llm_runs if run not in swissai_llm_runs]

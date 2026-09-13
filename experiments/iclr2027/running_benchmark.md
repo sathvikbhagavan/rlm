@@ -376,8 +376,11 @@ every call—and cost CHF 1.239, below that cell's CHF 3.255 allowance. The
 GLM's Tier-4 Task-16 x500 release check completed a nine-turn trajectory but
 then suffered repeated 300-second provider timeouts with that reservation. The
 completed trajectory used 5,272 output tokens across all nine turns. Full
-benchmark v29 therefore records 8,192 output tokens per GLM CodeAct turn. The
-other models remain at 30,000.
+benchmark v29 tested 8,192 output tokens, but neither of two concurrent initial
+requests returned before the five-minute deadline. Full benchmark v30 therefore
+records 4,096 output tokens per GLM CodeAct turn and serializes GLM CodeAct
+questions. This is the request shape already proven by GLM's complete LLM
+phase. The other models remain at 30,000 and two questions per worker.
 
 RLM requests use an explicit per-call bound. SwissAI models use 2,048 tokens and
 their hidden thinking channel is disabled. OpenRouter models use a 4,096-token
