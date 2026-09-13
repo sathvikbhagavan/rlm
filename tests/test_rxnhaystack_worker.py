@@ -7,13 +7,29 @@ import pytest
 
 from rxnhaystack.manifest import ManifestError
 from rxnhaystack.worker import (
+    CODEACT_WORKFLOW_TIMEOUT_ENV,
     RLM_LOCAL_MEMORY_LIMIT_ENV,
     RLM_LOCAL_TOOL_MEMORY_LIMIT_ENV,
     RLM_MAX_TIMEOUT_ENV,
     BenchmarkRuntime,
+    codeact_workflow_timeout,
     instrument_rlm_from_environment,
     resolve_rlm_environment,
 )
+
+
+def test_codeact_workflow_timeout_is_read_from_environment(monkeypatch) -> None:
+    monkeypatch.setenv(CODEACT_WORKFLOW_TIMEOUT_ENV, "1800")
+
+    assert codeact_workflow_timeout(default=900.0) == 1800.0
+
+
+@pytest.mark.parametrize("value", ["0", "-1", "not-a-number"])
+def test_codeact_workflow_timeout_must_be_positive(monkeypatch, value: str) -> None:
+    monkeypatch.setenv(CODEACT_WORKFLOW_TIMEOUT_ENV, value)
+
+    with pytest.raises(ManifestError, match=CODEACT_WORKFLOW_TIMEOUT_ENV):
+        codeact_workflow_timeout(default=900.0)
 
 
 def test_benchmark_runtime_preserves_standalone_defaults(tmp_path: Path, monkeypatch) -> None:

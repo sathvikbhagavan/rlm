@@ -96,9 +96,9 @@ def render() -> str:
         "schema_version = 1",
         "",
         "[campaign]",
-        'name = "iclr2027-six-model-full-v31"',
+        'name = "iclr2027-six-model-full-v32"',
         'project_root = "../.."',
-        'artifact_dir = "artifacts/iclr2027-six-model-full-v31"',
+        'artifact_dir = "artifacts/iclr2027-six-model-full-v32"',
         "budget_chf = 1250.0",
         f"usd_to_chf = {USD_TO_CHF:.2f}",
         "require_dataset = true",
@@ -137,6 +137,7 @@ def render() -> str:
                         env["RXNHAYSTACK_CODEACT_OUTPUT_LIMIT"] = str(
                             CODEACT_OUTPUT_LIMITS.get(model.alias, 30000)
                         )
+                        env["RXNHAYSTACK_CODEACT_WORKFLOW_TIMEOUT_SECONDS"] = "1800"
                         env["RXNHAYSTACK_CODEACT_TOOL_TIMEOUT_SECONDS"] = "60"
                         env["RXNHAYSTACK_CODEACT_TOOL_MEMORY_LIMIT_MIB"] = "4096"
                     if condition.method == "rlm":

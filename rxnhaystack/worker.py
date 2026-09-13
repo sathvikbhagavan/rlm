@@ -19,6 +19,24 @@ RLM_LOCAL_MEMORY_LIMIT_MIB = 8192
 RLM_LOCAL_TOOL_MEMORY_LIMIT_ENV = "RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB"
 RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = 4096
 RLM_MAX_TIMEOUT_ENV = "RXNHAYSTACK_RLM_MAX_TIMEOUT_SECONDS"
+CODEACT_WORKFLOW_TIMEOUT_ENV = "RXNHAYSTACK_CODEACT_WORKFLOW_TIMEOUT_SECONDS"
+
+
+def codeact_workflow_timeout(*, default: float) -> float:
+    """Return the positive recorded per-question CodeAct deadline."""
+
+    raw = os.environ.get(CODEACT_WORKFLOW_TIMEOUT_ENV, str(default))
+    try:
+        value = float(raw)
+    except ValueError as error:
+        raise ManifestError(
+            f"{CODEACT_WORKFLOW_TIMEOUT_ENV} must be a positive number of seconds"
+        ) from error
+    if value <= 0:
+        raise ManifestError(
+            f"{CODEACT_WORKFLOW_TIMEOUT_ENV} must be a positive number of seconds"
+        )
+    return value
 
 
 def docker_is_available() -> bool:

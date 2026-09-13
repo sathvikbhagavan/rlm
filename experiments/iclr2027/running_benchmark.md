@@ -384,6 +384,14 @@ tokens per GLM CodeAct turn and serializes GLM CodeAct questions, isolating the
 concurrency problem without truncating ordinary turns. The other models remain
 at 30,000 and two questions per worker.
 
+The final experiment gives each CodeAct question 1,800 seconds in total. This
+is intentionally longer than the previous 600/900-second script defaults:
+three 300-second provider attempts plus the recorded 2- and 4-second backoffs
+already require 906 seconds. The former outer limit could therefore cancel the
+last retry prematurely. The per-request limit remains 300 seconds, generated
+tools remain limited to 60 seconds, and all limits are written into the run
+metadata.
+
 RLM requests use an explicit per-call bound. SwissAI models use 2,048 tokens and
 their hidden thinking channel is disabled. OpenRouter models use a 4,096-token
 total response ceiling with `low` reasoning effort. A live GPT-5-mini trial at

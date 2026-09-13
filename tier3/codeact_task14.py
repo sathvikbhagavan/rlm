@@ -7,7 +7,10 @@ import uuid
 import wandb
 
 from rxnhaystack.campaign_metrics import install_campaign_metrics
-from rxnhaystack.worker import codeact_callbacks_from_environment
+from rxnhaystack.worker import (
+    codeact_callbacks_from_environment,
+    codeact_workflow_timeout,
+)
 
 from llama_index.core.workflow import Context
 from rxnhaystack.providers import build_benchmark_llm
@@ -45,7 +48,7 @@ DATASET_PATH = __import__("os").environ.get("RXNHAYSTACK_CLEANED_DATASET", __imp
 MODEL_NAME = __import__("os").environ.get("RXNHAYSTACK_MODEL", "openai/gpt-5-mini")
 OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
 ENABLE_TRACING = True
-WORKFLOW_TIMEOUT_S = 900.0
+WORKFLOW_TIMEOUT_S = codeact_workflow_timeout(default=900.0)
 SEED = int(__import__("os").environ.get("RXNHAYSTACK_SEED", "42"))
 CONTEXT_SIZE = int(__import__("os").environ.get("RXNHAYSTACK_CONTEXT_SIZE", "100"))
 CONTEXT_PIPELINE_NAME = "random"

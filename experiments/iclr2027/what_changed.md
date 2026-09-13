@@ -515,6 +515,18 @@ but consecutive legitimate CodeAct turns hit the output ceiling. Full benchmark
 v31 therefore combines serialization with 8,192 output tokens per GLM CodeAct
 turn. V31 is used for GLM CodeAct and RLM if its release cell completes.
 
+## 18. CodeAct retry and workflow deadline alignment
+
+The v31 GLM release cell exposed a mismatch between two existing safety limits:
+three 300-second provider attempts plus 2- and 4-second backoffs require at
+least 906 seconds, while most CodeAct question workflows stopped at 900 seconds
+(and Task 5 stopped at 600). The outer deadline therefore cancelled the final
+retry before it could receive its full allowance. Full benchmark v32 explicitly
+records `RXNHAYSTACK_CODEACT_WORKFLOW_TIMEOUT_SECONDS=1800` for every CodeAct
+job. All 34 CodeAct scripts read and report this value; their historical
+standalone defaults remain unchanged. Per-request, tool, turn, and memory limits
+are unchanged.
+
 ## What has not been hidden or simplified away
 
 - The three API/W&B credential values are currently required before any selected

@@ -10,7 +10,7 @@ broader engineering history, read [`what_changed.md`](what_changed.md).
 
 ## Current status
 
-- The final experiment descriptions are full benchmark v31 and
+- The final experiment descriptions are full benchmark v32 and
   matched-cardinality v7.
 - The full benchmark contains 6,300 jobs and has a planned ceiling of
   CHF 743.72.
@@ -31,9 +31,9 @@ broader engineering history, read [`what_changed.md`](what_changed.md).
 The v16 through v27 directories contain calibration and diagnostic work. The
 v28 directory contains the authoritative completed GLM LLM phase plus the
 failed 30,000-token concurrent, 8,192-token concurrent, and 4,096-token serial
-CodeAct release checks. Full benchmark v31 tests the isolated 8,192-token serial
-GLM CodeAct specification and is used for the remaining GLM methods if its
-release cell completes.
+CodeAct release checks. Full benchmark v32 uses the isolated 8,192-token serial
+GLM CodeAct specification and aligns the CodeAct workflow and request-retry
+deadlines.
 
 ## Why the final testing took so long
 
@@ -157,7 +157,7 @@ full experiment. Qwen uses the SwissAI 2,048-token/no-hidden-thinking path.
 | CodeAct reasoning loop | 8 tool/reasoning turns, then at most 2 answer-only attempts | Further code is not executed; the controller asks for the final answer. |
 | CodeAct generated tool | 60 seconds and 4,096 MiB | Its complete child process group is stopped and a clean namespace is restored. |
 | CodeAct provider request | 300 seconds; at most 2 timeout retries | A timed-out request is retried with recorded backoff; other errors are not silently retried. |
-| CodeAct question workflow | 900 seconds | The question workflow stops instead of running indefinitely. |
+| CodeAct question workflow | 1,800 seconds in the final experiment | This contains three 300-second request attempts plus backoff and still leaves time for successful reasoning/tool turns. Standalone scripts retain their historical 600/900-second defaults unless this recorded setting is supplied. |
 | RLM provider request | 300 seconds | The request fails visibly rather than hanging forever. |
 | RLM response, SwissAI | 2,048 output tokens; hidden thinking disabled | The visible response remains bounded. |
 | RLM response, OpenRouter | 4,096 total output tokens; `low` reasoning | Hidden and visible output share this bound. |

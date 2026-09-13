@@ -50,10 +50,15 @@ def test_full_campaign_is_generated_and_covers_six_models() -> None:
         if run.model != "CSCS-Inference/zai-org/GLM-5.2"
     } == {"30000"}
     assert {
+        run.env["RXNHAYSTACK_CODEACT_WORKFLOW_TIMEOUT_SECONDS"] for run in codeact_runs
+    } == {"1800"}
+    assert {
         run.question_parallelism
         for run in codeact_runs
         if run.model == "CSCS-Inference/zai-org/GLM-5.2"
     } == {1}
+    for script in ROOT.glob("tier*/codeact_task*.py"):
+        assert "codeact_workflow_timeout(" in script.read_text()
     llm_runs = [run for run in manifest.runs if run.method == "llm"]
     swissai_llm_runs = [run for run in llm_runs if run.env["RXNHAYSTACK_PROVIDER"] == "swissai"]
     openrouter_llm_runs = [run for run in llm_runs if run not in swissai_llm_runs]

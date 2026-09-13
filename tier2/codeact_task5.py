@@ -7,7 +7,10 @@ import uuid
 import wandb
 
 from rxnhaystack.campaign_metrics import install_campaign_metrics
-from rxnhaystack.worker import codeact_callbacks_from_environment
+from rxnhaystack.worker import (
+    codeact_callbacks_from_environment,
+    codeact_workflow_timeout,
+)
 from rxnhaystack.concurrency import (
     OrderedAsyncGate,
     map_async_bounded,
@@ -47,7 +50,7 @@ DATASET_PATH = __import__("os").environ.get("RXNHAYSTACK_CLEANED_DATASET", __imp
 MODEL_NAME = __import__("os").environ.get("RXNHAYSTACK_MODEL", "openai/gpt-5-mini")
 OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
 ENABLE_TRACING = True
-WORKFLOW_TIMEOUT_S = 600.0
+WORKFLOW_TIMEOUT_S = codeact_workflow_timeout(default=600.0)
 WEIGHT_THRESHOLDS_DA = TASK5_WEIGHT_THRESHOLDS_DA
 RING_X_VALUES = TASK5_RING_X_VALUES
 SEED = int(__import__("os").environ.get("RXNHAYSTACK_SEED", "42"))

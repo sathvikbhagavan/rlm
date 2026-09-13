@@ -32,13 +32,13 @@ from rlm.utils.token_utils import count_tokens
 from rxnhaystack.concurrency import map_async_bounded
 from rxnhaystack.metrics import RunMetrics, cost_chf_from_usd, write_run_metrics
 from rxnhaystack.providers import build_benchmark_llm, provider_reports_cost
-from rxnhaystack.worker import BenchmarkRuntime
+from rxnhaystack.worker import BenchmarkRuntime, codeact_workflow_timeout
 
 DATASET_PATH = "~/datasets/rxnhaystack/reactionSmilesFigShareUSPTO2023_cleaned.txt"
 MODEL_NAME = __import__("os").environ.get("RXNHAYSTACK_MODEL", "openai/gpt-5-mini")
 OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
 ENABLE_TRACING = True
-WORKFLOW_TIMEOUT_S = 900.0
+WORKFLOW_TIMEOUT_S = codeact_workflow_timeout(default=900.0)
 NUM_QUESTIONS = 10
 SEED = int(__import__("os").environ.get("RXNHAYSTACK_SEED", "42"))
 CONTEXT_SIZE = int(__import__("os").environ.get("RXNHAYSTACK_CONTEXT_SIZE", "500"))
