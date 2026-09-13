@@ -8,6 +8,7 @@ from rlm.codeact_core import (
     _has_final_answer,
     _is_answer_only_turn,
     append_preloaded_lines_reminder,
+    code_action_for_turn,
     parse_code_action,
 )
 
@@ -89,3 +90,21 @@ def test_codeact_does_not_execute_other_xml_tools_or_truncated_calls() -> None:
 
     assert parse_code_action(other_tool) is None
     assert parse_code_action(truncated) is None
+
+
+def test_codeact_executes_code_before_proposed_answer_on_tool_turn() -> None:
+    response = """<invoke name="execute_python">
+<parameter name="code">print(len(lines))</parameter>
+</invoke>
+ANSWER: -1"""
+
+    assert code_action_for_turn(response, iteration=2, max_iterations=8) == ("print(len(lines))")
+
+
+def test_codeact_never_executes_code_on_answer_only_turn() -> None:
+    response = """```python
+print(len(lines))
+```
+ANSWER: -1"""
+
+    assert code_action_for_turn(response, iteration=9, max_iterations=8) is None

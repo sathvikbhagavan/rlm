@@ -151,6 +151,14 @@ def parse_code_action(response: str) -> str | None:
     return None
 
 
+def code_action_for_turn(response: str, *, iteration: int, max_iterations: int) -> str | None:
+    """Return a code action only while tool-use turns remain available."""
+
+    if _is_answer_only_turn(iteration=iteration, max_iterations=max_iterations):
+        return None
+    return parse_code_action(response)
+
+
 class SimpleCodeExecutor:
     """
     Executes Python code with persistent state.
@@ -746,27 +754,32 @@ class CodeActAgent(Workflow):
         )
         await ctx.store.set("llm_turn_metrics", llm_turn_metrics)
 
-        if _has_final_answer(content) or _answer_only_attempts_exhausted(
-            iteration=iteration, max_iterations=self.max_iterations
-        ):
+        if _answer_only_attempts_exhausted(iteration=iteration, max_iterations=self.max_iterations):
             return StopEvent(result=response)
 
         if _is_answer_only_turn(iteration=iteration, max_iterations=self.max_iterations):
+            if _has_final_answer(content):
+                return StopEvent(result=response)
             memory.put(ChatMessage(role="user", content=FINAL_ANSWER_REQUIRED))
             await ctx.store.set("memory", memory)
             return InputEvent(input=await self._build_input_messages(ctx))
 
-        code = self._parse_code(content)
-        if not code:
-            correction = _continuation_instruction(
-                iteration=iteration,
-                max_iterations=self.max_iterations,
-                normal_instruction=self.force_loop_message,
-            )
-            memory.put(ChatMessage(role="user", content=correction))
-            await ctx.store.set("memory", memory)
-            return InputEvent(input=await self._build_input_messages(ctx))
-        return CodeExecutionEvent(code=code)
+        code = code_action_for_turn(
+            content, iteration=iteration, max_iterations=self.max_iterations
+        )
+        if code:
+            return CodeExecutionEvent(code=code)
+        if _has_final_answer(content):
+            return StopEvent(result=response)
+
+        correction = _continuation_instruction(
+            iteration=iteration,
+            max_iterations=self.max_iterations,
+            normal_instruction=self.force_loop_message,
+        )
+        memory.put(ChatMessage(role="user", content=correction))
+        await ctx.store.set("memory", memory)
+        return InputEvent(input=await self._build_input_messages(ctx))
 
     @step
     async def handle_code_execution(self, ctx: Context, ev: CodeExecutionEvent) -> InputEvent:
