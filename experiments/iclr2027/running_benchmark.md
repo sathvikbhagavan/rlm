@@ -371,8 +371,13 @@ GPT-5-mini completed safely, but Haiku still truncated legitimate Python before
 the action could close. After the provider-neutral prompt/parser correction,
 the final Haiku Task-16 x500 pilot made 44 calls and 34 tool executions with
 zero 30,000-token hits. It used 139,497 output tokens in total—not 30,000 on
-every call—and cost CHF 1.239, below that cell's CHF 3.255 allowance. The same
-30,000-token ceiling is written into every model's CodeAct job.
+every call—and cost CHF 1.239, below that cell's CHF 3.255 allowance. The
+30,000-token ceiling is written into every model's CodeAct job except GLM.
+GLM's Tier-4 Task-16 x500 release check completed a nine-turn trajectory but
+then suffered repeated 300-second provider timeouts with that reservation. The
+completed trajectory used 5,272 output tokens across all nine turns. Full
+benchmark v29 therefore records 8,192 output tokens per GLM CodeAct turn. The
+other models remain at 30,000.
 
 RLM requests use an explicit per-call bound. SwissAI models use 2,048 tokens and
 their hidden thinking channel is disabled. OpenRouter models use a 4,096-token

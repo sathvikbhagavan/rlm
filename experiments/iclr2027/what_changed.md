@@ -499,6 +499,17 @@ identical 4,096-token allowance it returned in 33 seconds and used 42 output
 tokens. Full benchmark v28 applies that bound to SwissAI LLM requests only;
 OpenRouter LLM, CodeAct, and RLM retain their separately recorded limits.
 
+## 17. GLM CodeAct scheduling bound
+
+The final v28 GLM LLM phase completed all 300 jobs and 1,000 answers. The first
+GLM Task-16 CodeAct x500 check subsequently completed one nine-turn trajectory
+but then encountered repeated 300-second provider timeouts while reserving
+30,000 output tokens per turn. That completed trajectory used 5,272 output
+tokens in total across all nine turns. Full benchmark v29 therefore records an
+8,192-token per-turn CodeAct limit for GLM only. Other models retain the
+30,000-token CodeAct limit. The v28 LLM artifacts remain unchanged and are the
+authoritative GLM LLM results; v29 is used for GLM CodeAct and RLM.
+
 ## What has not been hidden or simplified away
 
 - The three API/W&B credential values are currently required before any selected
