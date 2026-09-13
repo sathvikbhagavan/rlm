@@ -6,6 +6,10 @@ need to run, the order, how different we can divide the work, what to check afte
 We first run a few small tests with real models, check their cost, memory use, outputs,
 and logs, and only then choose how much parallelism each machine can safely use.
 
+The findings that produced the final timeout and memory settings are collected
+in [`testing_and_safety_report.md`](testing_and_safety_report.md). Read its
+“Effective limits” table before assigning or launching work.
+
 ## What we need to run
 
 There are three experiment-description files, but only two contain new work:
@@ -318,14 +322,17 @@ conclusions. It is to measure how the actual provider, model, method, and machin
 behave so we can choose safe parallelism and detect broken outputs while only a
 few API calls are at risk.
 
-We need to cover:
+The completed v16/v17 profiling already covered:
 
 1. a small LLM job, to check the simplest prompt and token accounting;
 2. a CodeAct job, to check isolated agents and tool timing;
 3. a difficult full-corpus Tier-4 RLM job, to check long trajectories and peak
    memory;
-4. at least one SwissAI model and every paid model before releasing that paid
-   model's full set of jobs.
+4. SwissAI plus all three paid models.
+
+Do not repeat those broad LLM, CodeAct, and full-corpus Task-16 diagnostics just
+because the final result directory is called v18. The remaining release check
+is the small six-model RLM set below.
 
 In CodeAct, the retrieved rows are preloaded in each isolated Python tool as a
 list named `lines`. During trial review, confirm the model uses `lines` rather
@@ -411,39 +418,37 @@ The selected ceiling preserves every observed successful trajectory while
 bounding that runaway pattern. A forced final answer is a valid recorded
 outcome, but repeated forced answers still require inspection before scaling.
 
-Start with one open model, one job at a time:
+Run one single-question, 100-row Tier-3 Task-13 RLM job for each model. These are
+real v18 benchmark cells, so successful results remain part of the final data
+and are skipped during the later full launch:
 
 ```bash
 uv run --frozen rxnhaystack run experiments/iclr2027/full-campaign.toml \
-  --select 'full-qwen3.5-397b-tier1-task1-llm-x100-r01' \
-  --select 'full-qwen3.5-397b-tier4-task16-codeact-x500-r01' \
-  --select 'full-qwen3.5-397b-tier4-task16-rlm-xfull-r01' \
-  --max-parallel 1 \
+  --select 'full-deepseek-v4-flash-tier3-task13-rlm-x100-r01' \
+  --select 'full-glm-5.2-tier3-task13-rlm-x100-r01' \
+  --select 'full-qwen3.5-397b-tier3-task13-rlm-x100-r01' \
+  --select 'full-gemini-3.7-flash-tier3-task13-rlm-x100-r01' \
+  --select 'full-claude-sonnet-5-tier3-task13-rlm-x100-r01' \
+  --select 'full-gpt-5-mini-tier3-task13-rlm-x100-r01' \
+  --max-parallel 2 \
   --secret-file OPENROUTER_API_KEY=~/.openrouter_api_key \
   --secret-file SWISSAI_RESEARCH_API_KEY=~/.swissai_research_api_key \
   --secret-file WANDB_API_KEY=~/.wandb_api_key
 ```
 
-Then repeat the same three method/context types with Gemini, Claude, and
-GPT-5-mini. The exact paid job IDs are:
+The three open-model jobs are free. The planned paid amounts are CHF 0.053619
+for Gemini, CHF 0.142984 for Claude, and CHF 0.022214 for GPT-5-mini: CHF
+0.218817 total. Each job contains one question. The likely duration is several
+minutes per job, but the configured upper bound is about 35 minutes plus the
+answer-only model call. With two jobs at a time, the three-wave configured worst
+case is roughly 1.75 hours.
 
-```text
-full-gemini-3.7-flash-tier1-task1-llm-x100-r01
-full-gemini-3.7-flash-tier4-task16-codeact-x500-r01
-full-gemini-3.7-flash-tier4-task16-rlm-xfull-r01
-
-full-claude-sonnet-5-tier1-task1-llm-x100-r01
-full-claude-sonnet-5-tier4-task16-codeact-x500-r01
-full-claude-sonnet-5-tier4-task16-rlm-xfull-r01
-
-full-gpt-5-mini-tier1-task1-llm-x100-r01
-full-gpt-5-mini-tier4-task16-codeact-x500-r01
-full-gpt-5-mini-tier4-task16-rlm-xfull-r01
-```
-
-Use these after `--select` in the same form as the Qwen examples, and keep
-`--max-parallel 1`. A previously successful job is skipped, so these trials
-become part of the final dataset rather than being thrown away.
+These release checks are recommended, not strictly necessary. Deterministic
+tests already verify the cutoff and telemetry paths. Their purpose is to catch
+model-specific formatting, provider, W&B, or artifact problems before thousands
+of jobs are released. Skipping them saves only CHF 0.22 and moves that risk into
+the large run. See the detailed necessity discussion in
+[`testing_and_safety_report.md`](testing_and_safety_report.md).
 
 For every trial job, inspect:
 
@@ -494,6 +499,7 @@ Peak Docker memory:
 Peak combined memory:
 Highest percentage of the job's hard RAM limit:
 RLM environment (Docker or local) and local-limit trace event, if applicable:
+RLM timeout finalizations (`results.rlm_timeout_finalizations`):
 Any 400, 401, 429, 5xx, timeout, parsing, or chemistry errors:
 W&B link or run name:
 Anything surprising in the answers or logs:

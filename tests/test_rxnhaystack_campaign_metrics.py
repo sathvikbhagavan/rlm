@@ -7,6 +7,7 @@ from types import SimpleNamespace
 import pytest
 
 from rxnhaystack.campaign_metrics import install_campaign_metrics
+from rxnhaystack.resources import rlm_trace_callbacks
 
 
 class FakeWandb:
@@ -98,22 +99,30 @@ def test_capture_reads_current_wandb_summary_object(monkeypatch, tmp_path: Path)
     assert metrics["results"] == {"macro_f1": 0.625}
 
 
-def test_capture_uses_exact_recursive_trace_metrics(monkeypatch, tmp_path: Path) -> None:
+@pytest.mark.parametrize(
+    ("stopped_by_timeout", "expected_finalizations"),
+    [(False, 0), (True, 1)],
+)
+def test_capture_uses_exact_recursive_trace_metrics(
+    monkeypatch,
+    tmp_path: Path,
+    stopped_by_timeout: bool,
+    expected_finalizations: int,
+) -> None:
     metrics_path = configure_campaign(monkeypatch, tmp_path, method="rlm")
     trace_path = Path(str(tmp_path / "trace.jsonl"))
-    trace_path.write_text(
-        json.dumps(
-            {
-                "event": "rlm_completion_metrics",
-                "calls": 3,
-                "input_tokens": 20,
-                "output_tokens": 10,
-                "cost_usd": 0.25,
-                "tool_time_seconds": 1.5,
-                "stopped_by_timeout": True,
-            }
-        )
-        + "\n"
+    callbacks = rlm_trace_callbacks(trace_path, sample_id="question-0")
+    callbacks["on_completion_metrics"](
+        {
+            "calls": 3,
+            "input_tokens": 20,
+            "output_tokens": 10,
+            "cost_usd": 0.25,
+            "execution_time_seconds": 4.0,
+            "model_time_seconds": 2.0,
+            "tool_time_seconds": 1.5,
+            "stopped_by_timeout": stopped_by_timeout,
+        }
     )
     wandb = FakeWandb()
     install_campaign_metrics(wandb)
@@ -132,7 +141,7 @@ def test_capture_uses_exact_recursive_trace_metrics(monkeypatch, tmp_path: Path)
     metrics = json.loads(metrics_path.read_text())
     assert metrics["calls"] == 3
     assert metrics["tool_time_seconds"] == 1.5
-    assert metrics["results"]["rlm_timeout_finalizations"] == 1
+    assert metrics["results"]["rlm_timeout_finalizations"] == expected_finalizations
 
 
 def test_capture_rejects_missing_provider_cost(monkeypatch, tmp_path: Path) -> None:

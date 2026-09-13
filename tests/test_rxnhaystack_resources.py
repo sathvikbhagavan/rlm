@@ -126,6 +126,8 @@ def test_resource_trace_combines_samples_and_prompt_free_rlm_events(tmp_path: Pa
             "iteration_cost_usd": 0.01,
             "model_time_s": 2.0,
             "tool_time_s": 1.0,
+            "code_block_count": 1,
+            "had_error": True,
         },
     )
     callbacks["on_completion_metrics"](
@@ -137,6 +139,7 @@ def test_resource_trace_combines_samples_and_prompt_free_rlm_events(tmp_path: Pa
             "execution_time_seconds": 5.0,
             "model_time_seconds": 3.0,
             "tool_time_seconds": 1.5,
+            "stopped_by_timeout": True,
         }
     )
 
@@ -154,7 +157,10 @@ def test_resource_trace_combines_samples_and_prompt_free_rlm_events(tmp_path: Pa
     assert all("monotonic_seconds" in event for event in events)
     assert events[2]["sample_id"] == "question-2"
     assert events[3]["failed"] is True
+    assert events[-2]["code_block_count"] == 1
+    assert events[-2]["had_error"] is True
     assert events[-1]["calls"] == 3
     assert events[-1]["tool_time_seconds"] == 1.5
+    assert events[-1]["stopped_by_timeout"] is True
     assert "secret prompt" not in text
     assert "private error" not in text

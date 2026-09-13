@@ -175,15 +175,11 @@ def wait_with_memory_watchdog(
     try:
         while True:
             host_rss_bytes = process_tree_rss_bytes(process.pid)
-            docker_memory_bytes = docker_cgroup_memory_bytes(
-                docker_memory_registry_path
-            )
+            docker_memory_bytes = docker_cgroup_memory_bytes(docker_memory_registry_path)
             rss_bytes = host_rss_bytes + docker_memory_bytes
             peak_rss_bytes = max(peak_rss_bytes, rss_bytes)
             peak_host_rss_bytes = max(peak_host_rss_bytes, host_rss_bytes)
-            peak_docker_memory_bytes = max(
-                peak_docker_memory_bytes, docker_memory_bytes
-            )
+            peak_docker_memory_bytes = max(peak_docker_memory_bytes, docker_memory_bytes)
             if trace_path is not None:
                 append_trace_event(
                     trace_path,
@@ -358,6 +354,8 @@ def rlm_trace_callbacks(
             cost_usd=float(metrics.get("iteration_cost_usd", 0.0)),
             model_time_seconds=float(metrics.get("model_time_s") or 0.0),
             tool_time_seconds=float(metrics.get("tool_time_s") or 0.0),
+            code_block_count=int(metrics.get("code_block_count", 0)),
+            had_error=bool(metrics.get("had_error", False)),
         )
 
     def on_completion_metrics(metrics: dict[str, Any]) -> None:
@@ -372,6 +370,7 @@ def rlm_trace_callbacks(
             execution_time_seconds=float(metrics.get("execution_time_seconds", 0.0)),
             model_time_seconds=float(metrics.get("model_time_seconds", 0.0)),
             tool_time_seconds=float(metrics.get("tool_time_seconds", 0.0)),
+            stopped_by_timeout=bool(metrics.get("stopped_by_timeout", False)),
         )
 
     return {

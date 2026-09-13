@@ -6,6 +6,8 @@ and what should be checked before we spend API credit.
 
 For the exact sequence of commands and reporting steps, read
 [`running_benchmark.md`](running_benchmark.md) after this document.
+The overnight real-model findings and complete safety-limit table are in
+[`testing_and_safety_report.md`](testing_and_safety_report.md).
 
 ## Short version
 

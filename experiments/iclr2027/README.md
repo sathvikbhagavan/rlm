@@ -1,5 +1,10 @@
 # ICLR 2027 experiment operations
 
+Read [`testing_and_safety_report.md`](testing_and_safety_report.md) for the
+real-model findings, Docker corrections, effective limits, and minimal v18 pilot
+proposal. The step-by-step launch instructions are in
+[`running_benchmark.md`](running_benchmark.md).
+
 The campaign launcher treats an experiment matrix as immutable scientific input.
 Changing a command, model, seed, condition, or other run field requires a new run
 ID; the ledger rejects reuse of an existing ID with a changed specification.
