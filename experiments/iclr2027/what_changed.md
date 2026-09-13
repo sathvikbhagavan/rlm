@@ -462,18 +462,25 @@ tests. The v18 results remain diagnostics and are not mixed with v19.
 The first v19 GLM LLM phase produced 214 complete jobs, but 63 later requests
 reached the five-minute provider deadline, three received provider 5xx errors,
 and four active jobs were interrupted when the launcher was stopped. These are
-diagnostic records; no v19 work is mixed into the final v20 result directory.
+diagnostic records; no v19 work is mixed into the final result directory.
 
 Claude Sonnet 5 was replaced by the pinned `anthropic/claude-haiku-4.5` model.
 Haiku supports reasoning and tool use at half Sonnet's list-token prices, which
 reduces the full six-model estimate from CHF 1,161.22 to CHF 743.72. The combined
 full and matched-cardinality estimate is now CHF 814.70.
 
-The CodeAct response allowance increased from 2,048 to 8,192 tokens. In the
-hardest x500 calibration, 31/96 Sonnet turns and 30/57 GPT-5-mini turns ended at
-exactly 2,048 tokens. This showed a real truncation risk. The 8,192-token bound
-is materially safer without restoring the original 30,000-token exposure; it
-must be checked on Haiku and GPT-5-mini before broad CodeAct launch.
+The CodeAct response allowance ultimately increased from 2,048 to 30,000
+tokens. The 8,192-token intermediate check was enough for GPT-5-mini but still
+truncated Haiku actions on Task 16. Claude also rendered Python actions as
+`execute_python` or `execute_code` XML and sometimes appended a proposed answer
+to the same turn. The controller now accepts those two exact wrappers, executes
+the action before scoring a normal-turn answer, and explicitly prohibits
+copying the already-preloaded reaction rows into generated code.
+
+The final v25 Haiku Task-16 x500 job completed all ten questions, made 44 model
+calls and 34 tool executions, hit the 30,000-token bound zero times, cost CHF
+1.239, and obtained 1/10 exact match with macro-F1 0.195. This is the evidence
+for retaining the much cheaper Haiku model and the larger bounded allowance.
 
 ## What has not been hidden or simplified away
 
@@ -516,6 +523,12 @@ b423506  Add standalone RxnHaystack human validation pilot
 ac826ea  Update human evaluation for revised Tier 4 questions
 3c47e3e  Build reproducible multi-provider benchmark experiments
 b662deb  Add the first collaborative execution guide
+9eab451  Use Claude Haiku and raise CodeAct output limit
+24f583f  Accept Claude CodeAct tool syntax
+711f9f6  Execute CodeAct tools before proposed answers
+e4b2959  Prevent CodeAct context duplication
+5b0358c  Raise CodeAct turn limit for hard tasks
+06afdd6  Support Claude execute-code actions
 ```
 
 The current documentation revision supersedes the first execution guide. Use

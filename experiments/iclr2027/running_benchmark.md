@@ -79,12 +79,15 @@ The full experiment already includes every GPT-5-mini setting from the optional
 baseline reproduction. We should not run `baseline-campaign.toml` as well unless
 we explicitly want a second, independent GPT-5-mini reproduction.
 
-The provisional estimated total for the full and matched-cardinality experiments
-is CHF 814.70. The estimates include a 25% general safety margin, a further
-Claude CodeAct allowance based on a live Tier-4 trial, and a 50% margin for the
-matched-cardinality experiment. They are spending ceilings, not expected
-charges. Freeze the final figure only after the Docker-based RLM trial described
-below.
+The estimated total for the full and matched-cardinality experiments is CHF
+814.70. Adding all preparation through the valid Haiku v25 check, while charging
+each interrupted check at its full reserved amount, gives CHF 850.61. The full
+and matched experiment files declare separate CHF 1,250 and CHF 100 rolling
+limits, leaving CHF 150 of the CHF 1,500 project limit for all diagnostics;
+CHF 35.91 is conservatively accounted for already, leaving CHF 114.09. The
+estimates include a 25% general margin, an additional Claude CodeAct allowance,
+and a 50% margin for matched cardinality; they are conservative plans, not
+predictions of the final invoice.
 
 ### Models and methods
 
@@ -362,14 +365,14 @@ thread-based timeout could report a timeout while an infinite loop continued in
 the background and prevented the worker from exiting. Both values are written
 into every CodeAct job in the experiment file.
 
-Each CodeAct model turn is capped at 8,192 output tokens. A live Tier-4 x500
-audit found that 31/96 Claude Sonnet turns and 30/57 GPT-5-mini turns ended
-exactly at the former 2,048-token ceiling, making truncation a material concern.
-The original 30,000-token request remains too permissive across as many as eight
-tool turns. The 8,192-token compromise is written into every CodeAct job and
-applied equally to SwissAI and OpenRouter models. Its paid-model cost and
-truncation behavior must be checked on matched Task-16 cells before broad
-CodeAct execution.
+Each CodeAct model turn is capped at 30,000 output tokens. At 2,048 tokens,
+31/96 Claude Sonnet turns and 30/57 GPT-5-mini turns hit the ceiling. At 8,192,
+GPT-5-mini completed safely, but Haiku still truncated legitimate Python before
+the action could close. After the provider-neutral prompt/parser correction,
+the final Haiku Task-16 x500 pilot made 44 calls and 34 tool executions with
+zero 30,000-token hits. It used 139,497 output tokens in total—not 30,000 on
+every call—and cost CHF 1.239, below that cell's CHF 3.255 allowance. The same
+30,000-token ceiling is written into every model's CodeAct job.
 
 RLM requests use an explicit per-call bound. SwissAI models use 2,048 tokens and
 their hidden thinking channel is disabled. OpenRouter models use a 4,096-token
@@ -424,7 +427,7 @@ bounding that runaway pattern. A forced final answer is a valid recorded
 outcome, but repeated forced answers still require inspection before scaling.
 
 The following six v18 RLM checks have already finished and must not be repeated.
-They are retained as calibration evidence rather than v19 benchmark cells:
+They are retained as calibration evidence rather than final benchmark cells:
 
 ```bash
 uv run --frozen rxnhaystack run experiments/iclr2027/full-campaign.toml \
@@ -448,10 +451,11 @@ answer-only model call. With two jobs at a time, the three-wave configured worst
 case is roughly 1.75 hours.
 
 The v19 GLM LLM phase is diagnostic because excessive in-flight requests caused
-63 provider timeouts. Before broad v20 execution, run the 8,192-token Haiku and
-GPT-5-mini Task-16 x500 CodeAct checks and a lower-concurrency SwissAI LLM cell.
-Inspect successful retries, complete metrics, output-boundary frequency, and
-provider timeouts before proceeding to another method or model.
+63 provider timeouts. The paid CodeAct calibration checks are now complete. The
+v25 Haiku record is the first final job; the v20 GPT-5-mini record validated the
+limit but predates the final prompt and must remain diagnostic. A
+lower-concurrency SwissAI LLM cell still needs to demonstrate an acceptable
+provider-timeout rate before broad SwissAI execution.
 
 For every trial job, inspect:
 

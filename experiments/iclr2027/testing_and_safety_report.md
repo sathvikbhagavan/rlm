@@ -10,7 +10,7 @@ broader engineering history, read [`what_changed.md`](what_changed.md).
 
 ## Current status
 
-- The final experiment descriptions are full benchmark v20 and
+- The final experiment descriptions are full benchmark v25 and
   matched-cardinality v7.
 - The full benchmark contains 6,300 jobs and has a planned ceiling of
   CHF 743.72.
@@ -18,16 +18,18 @@ broader engineering history, read [`what_changed.md`](what_changed.md).
   ceiling of CHF 70.98.
 - The combined planned amount is CHF 814.70. These are conservative planning
   figures, not predictions of the final invoice.
-- All locally recorded ICLR preparation and diagnostic metrics through v19 sum
-  to CHF 19.78. Adding that amount to the current planned ceiling gives
-  CHF 834.48 before the new v20 checks.
+- All locally recorded ICLR preparation and diagnostics are conservatively
+  bounded at CHF 35.91 through the successful v25 Haiku check. This charges the
+  four interrupted Haiku checks at their full planned ceilings even though they
+  were stopped early. Adding it to both planned experiments gives CHF 850.61.
 - The exact USPTO raw and cleaned files, all six model identifiers, all three
   credentials, and the Docker image have been verified on Amin's machine.
-- After the final telemetry correction, the complete automated suite reports
-  421 passed and 10 skipped tests.
+- After the Claude compatibility correction, the complete automated suite
+  reports 430 passed and 10 skipped tests; the focused final checks report 14
+  passed.
 
-The v16 through v19 directories contain calibration and diagnostic work. They
-are deliberately separate from v20 and will not be mistaken for final results.
+The v16 through v24 directories contain calibration and diagnostic work. They
+are deliberately separate from v25 and will not be mistaken for final results.
 
 ## Why the final testing took so long
 
@@ -119,8 +121,10 @@ Claude CodeAct and RLM calls use a stable OpenRouter session and explicit
 provider-side prompt caching. Cache reads, writes, and actual cost are recorded.
 The experiment generator uses the observed Claude CodeAct cost plus headroom.
 The experiment descriptions are also rejected if their planned total exceeds
-their declared CHF ceiling. This is a planning safeguard; it is not a real-time
-stop on the provider account.
+their declared CHF ceiling. Before each new job, the launcher replaces available
+estimates with recorded actual costs and rechecks the remaining work. This is a
+rolling launch guard, not a provider-account limit: already-running calls can
+finish, and the two experiment files have separate ledgers.
 
 ### Matched-cardinality settings were reconciled
 
@@ -132,8 +136,8 @@ full experiment. Qwen uses the SwissAI 2,048-token/no-hidden-thinking path.
 
 | Area | Effective limit | What happens at the boundary |
 | --- | --- | --- |
-| Full planned cost | CHF 1,500 declared; CHF 743.72 currently planned | Validation rejects an experiment description whose planned work exceeds the declaration. |
-| Matched planned cost | CHF 100 declared; CHF 70.98 currently planned | Same planning check; this is not live provider-account enforcement. |
+| Full planned cost | CHF 1,250 declared; CHF 743.72 currently planned | Validation rejects excess work; the launcher rechecks recorded actual plus remaining estimated cost before each job. |
+| Matched planned cost | CHF 100 declared; CHF 70.98 currently planned | Same rolling check in its separate ledger. Together the declarations leave CHF 150 for all diagnostics under the CHF 1,500 project limit; CHF 35.91 is conservatively accounted for already. |
 | Active-worker memory | 49,152 MiB total scheduling allowance | A worker waits until its declared reservation fits. |
 | LLM parallelism | 4 questions per worker | Further questions wait. |
 | CodeAct parallelism | 2 isolated questions per worker | Further questions wait. |
@@ -143,7 +147,8 @@ full experiment. Qwen uses the SwissAI 2,048-token/no-hidden-thinking path.
 | LLM worker memory | 2–4 GiB reserved; 4–8 GiB hard limit | The launcher terminates a worker exceeding its combined hard limit. |
 | CodeAct worker memory | 4–6 GiB reserved; 8–12 GiB hard limit | Same combined-memory enforcement. |
 | RLM worker memory | 8/10/28 GiB reserved for 100/500/full context; 16/20/30 GiB hard limit | Same combined-memory enforcement. |
-| CodeAct response | 8,192 output tokens per model turn | The provider response is truncated at the recorded bound. |
+| CodeAct response | 30,000 output tokens per model turn | The provider response is truncated at the recorded bound; the valid Haiku Task-16 pilot hit it zero times. |
+| LLM/CodeAct reasoning | `low` in Tier 1; `high` in Tiers 2–4 | This preserves the collaborator's original task settings. SwissAI disables only its separate hidden-thinking channel. |
 | CodeAct reasoning loop | 8 tool/reasoning turns, then at most 2 answer-only attempts | Further code is not executed; the controller asks for the final answer. |
 | CodeAct generated tool | 60 seconds and 4,096 MiB | Its complete child process group is stopped and a clean namespace is restored. |
 | CodeAct provider request | 300 seconds; at most 2 timeout retries | A timed-out request is retried with recorded backoff; other errors are not silently retried. |
@@ -224,21 +229,29 @@ The v19 GLM LLM phase subsequently established that request-start pacing alone
 does not bound the number of slow requests already in flight. It preserved 214
 complete jobs, while 63 jobs reached the 300-second provider deadline and three
 received provider 5xx errors; four more were interrupted when the launcher was
-stopped. These remain diagnostics. The v20 launch must use lower SwissAI
+stopped. These remain diagnostics. The final launch must use lower SwissAI
 in-flight concurrency and first demonstrate that the timeout rate is acceptable.
 
-Before v20, Claude Sonnet 5 was replaced by the pinned Claude Haiku 4.5 model at
-half the input and output list prices. CodeAct's former 2,048-token response
-allowance was also raised to 8,192 after the Task-16 x500 trace showed 31/96
-Sonnet turns and 30/57 GPT-5-mini turns exactly at the old ceiling. Haiku and
-GPT-5-mini must complete matched 8,192-token Task-16 checks before broad CodeAct
-execution.
+Claude Sonnet 5 was replaced by the pinned Claude Haiku 4.5 model at half the
+input and output list prices. The first 8,192-token Haiku checks exposed two
+provider-format variants and showed that otherwise valid code was still being
+truncated. The controller now accepts fenced Python and Claude's explicit
+`execute_python`/`execute_code` wrappers, always executes a normal-turn action
+before considering a proposed answer, and tells every model not to duplicate
+the preloaded `lines` context.
 
-A second full-corpus Task-16 stress-test sweep is not necessary. Running Task 16
-once for Qwen, Gemini, Claude, and GPT would have a planned paid cost of
-CHF 1.863 total, could take hours, and would repeat failure modes already used to
-design the safeguards. Such jobs should now be treated as ordinary production
-cells, not disposable pilots.
+The final 30,000-token v25 check completed all ten Task-16 x500 questions in
+9.7 minutes with 44 model calls, 34 isolated tool executions, zero output-limit
+hits, an 860.1-MiB memory peak, and CHF 1.239 actual cost. It achieved 1/10
+exact match and macro-F1 0.195. GPT-5-mini's matched 8,192-token check completed
+in 6.2 minutes for CHF 0.292, with 1/10 exact match and macro-F1 0.244. These
+checks establish that Haiku is usable and that 30,000 is a ceiling rather than
+routine per-turn consumption.
+
+A second Task-16 stress-test sweep is not necessary. The v25 Haiku cell is the
+first final measurement. The v20 GPT-5-mini cell remains calibration because it
+predates the final prompt; its v25 repetitions should be launched only by their
+assigned owner.
 
 ## Final release check
 

@@ -203,19 +203,21 @@ OpenRouter models, for 6,300 cells total. `RXNHAYSTACK_PROVIDER` selects the
 transport without changing task prompts. LLM and CodeAct use the shared
 LlamaIndex chat interface; RLM uses its native OpenAI-compatible client.
 
-The provisional CHF 743.72 planning estimate uses the submitted GPT-5-mini
+The CHF 743.72 planning estimate uses the submitted GPT-5-mini
 token footprint, current per-token list prices for the three closed models,
 0.80 CHF/USD, and a 25% general margin. A live Claude CodeAct x500 trial showed
 longer conversations than GPT-5-mini, so Claude's CodeAct allowance has a
 further measured safety factor. SwissAI-hosted models are budgeted at CHF 0.
-Freeze the estimate only after the Docker-based RLM calibration.
+The final Haiku Task-16 x500 CodeAct check cost CHF 1.239 against its CHF 3.255
+allowance, so that margin remains conservative after raising the per-turn
+output ceiling to 30,000 tokens.
 
 Anthropic CodeAct and RLM conversations enable OpenRouter prompt caching and use
 the immutable job name to keep turns on the same provider endpoint. This does
 not change benchmark prompts or outputs. CodeAct cache reads and writes are
-recorded in the timestamped resource trace. The live 10-question Claude trial
-cost CHF 4.79 with caching versus CHF 12.13 without it; the recorded allowance
-for that cell is CHF 6.51.
+recorded in the timestamped resource trace. The earlier Sonnet cache trials
+remain diagnostic. The final 10-question Haiku CodeAct check used caching, cost
+CHF 1.239, and has a CHF 3.255 recorded allowance.
 
 ```bash
 uv run --frozen python experiments/iclr2027/generate_full_campaign.py --check

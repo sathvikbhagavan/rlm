@@ -90,7 +90,7 @@ def render() -> str:
         'name = "iclr2027-six-model-full-v25"',
         'project_root = "../.."',
         'artifact_dir = "artifacts/iclr2027-six-model-full-v25"',
-        "budget_chf = 1500.0",
+        "budget_chf = 1250.0",
         f"usd_to_chf = {USD_TO_CHF:.2f}",
         "require_dataset = true",
         "require_clean_git = true",
