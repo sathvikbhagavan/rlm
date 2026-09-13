@@ -510,9 +510,10 @@ tokens in total across all nine turns. Full benchmark v29 therefore records an
 30,000-token CodeAct limit. The v28 LLM artifacts remain unchanged and are the
 authoritative GLM LLM results. An 8,192-token v29 comparison with two concurrent
 questions also returned neither initial response before the five-minute
-deadline and was stopped. Full benchmark v30 therefore uses 4,096 output tokens
-per GLM CodeAct turn and one question at a time. V30 is used for GLM CodeAct and
-RLM.
+deadline and was stopped. A v30 comparison serialized requests at 4,096 tokens,
+but consecutive legitimate CodeAct turns hit the output ceiling. Full benchmark
+v31 therefore combines serialization with 8,192 output tokens per GLM CodeAct
+turn. V31 is used for GLM CodeAct and RLM if its release cell completes.
 
 ## What has not been hidden or simplified away
 

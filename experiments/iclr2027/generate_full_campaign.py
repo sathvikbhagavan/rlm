@@ -20,12 +20,13 @@ COST_MULTIPLIERS = {
     ("claude-haiku-4.5", "codeact", 500): 1.75,
 }
 
-# GLM could not reliably schedule concurrent 500-row CodeAct turns with either
-# 30,000 or 8,192 reserved output tokens. Its completed Task-16 trajectory used
-# 5,272 output tokens in total across nine turns. A 4,096 per-turn limit plus
-# serial questions matches the request shape proven by its complete LLM phase.
+# GLM could not reliably schedule concurrent 500-row CodeAct turns. Its
+# completed Task-16 trajectory used 5,272 output tokens in total across nine
+# turns, while 4,096 truncated consecutive legitimate turns. An 8,192 per-turn
+# limit plus serial questions isolates the concurrency failure while preserving
+# useful generation headroom.
 CODEACT_OUTPUT_LIMITS = {
-    "glm-5.2": 4096,
+    "glm-5.2": 8192,
 }
 
 # Historical GPT-5-mini tokens for one repetition of each 100-question condition.
@@ -95,9 +96,9 @@ def render() -> str:
         "schema_version = 1",
         "",
         "[campaign]",
-        'name = "iclr2027-six-model-full-v30"',
+        'name = "iclr2027-six-model-full-v31"',
         'project_root = "../.."',
-        'artifact_dir = "artifacts/iclr2027-six-model-full-v30"',
+        'artifact_dir = "artifacts/iclr2027-six-model-full-v31"',
         "budget_chf = 1250.0",
         f"usd_to_chf = {USD_TO_CHF:.2f}",
         "require_dataset = true",

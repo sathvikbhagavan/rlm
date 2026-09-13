@@ -43,7 +43,7 @@ def test_full_campaign_is_generated_and_covers_six_models() -> None:
         run.env["RXNHAYSTACK_CODEACT_OUTPUT_LIMIT"]
         for run in codeact_runs
         if run.model == "CSCS-Inference/zai-org/GLM-5.2"
-    } == {"4096"}
+    } == {"8192"}
     assert {
         run.env["RXNHAYSTACK_CODEACT_OUTPUT_LIMIT"]
         for run in codeact_runs
