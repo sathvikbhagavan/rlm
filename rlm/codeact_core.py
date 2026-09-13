@@ -3,6 +3,7 @@ from __future__ import annotations
 import ast
 import asyncio
 import contextlib
+import html
 import importlib
 import io
 import json
@@ -120,6 +121,34 @@ def append_preloaded_lines_reminder(user_input: str) -> str:
     """Keep the tool-data instruction near the question in long CodeAct prompts."""
 
     return f"{user_input.rstrip()}\n\n{PRELOADED_LINES_REMINDER}"
+
+
+def parse_code_action(response: str) -> str | None:
+    """Extract executable Python from supported CodeAct response wrappers.
+
+    The benchmark asks every model for a fenced Python block. Some Anthropic
+    models instead render the same requested action using their textual
+    ``execute_python`` tool-call wrapper. Accepting that wrapper keeps the
+    controller provider-neutral while executing only explicitly named code
+    parameters.
+    """
+
+    fenced_matches = re.findall(r"```python\s*(.*?)```", response, re.DOTALL | re.IGNORECASE)
+    if fenced_matches:
+        return "\n\n".join(block.strip() for block in fenced_matches if block.strip())
+
+    anthropic_matches = re.findall(
+        r"<invoke\b[^>]*\bname\s*=\s*[\"']execute_python[\"'][^>]*>"
+        r".*?<parameter\b[^>]*\bname\s*=\s*[\"']code[\"'][^>]*>"
+        r"(.*?)</parameter>.*?</invoke>",
+        response,
+        re.DOTALL | re.IGNORECASE,
+    )
+    if anthropic_matches:
+        return "\n\n".join(
+            html.unescape(block).strip() for block in anthropic_matches if block.strip()
+        )
+    return None
 
 
 class SimpleCodeExecutor:
@@ -613,10 +642,7 @@ class CodeActAgent(Workflow):
         return [self.system_message, *messages]
 
     def _parse_code(self, response: str) -> str | None:
-        fenced_matches = re.findall(r"```python\s*(.*?)```", response, re.DOTALL | re.IGNORECASE)
-        if fenced_matches:
-            return "\n\n".join(block.strip() for block in fenced_matches if block.strip())
-        return None
+        return parse_code_action(response)
 
     @step
     async def prepare_chat_history(self, ctx: Context, ev: StartEvent) -> InputEvent:
@@ -725,9 +751,7 @@ class CodeActAgent(Workflow):
         ):
             return StopEvent(result=response)
 
-        if _is_answer_only_turn(
-            iteration=iteration, max_iterations=self.max_iterations
-        ):
+        if _is_answer_only_turn(iteration=iteration, max_iterations=self.max_iterations):
             memory.put(ChatMessage(role="user", content=FINAL_ANSWER_REQUIRED))
             await ctx.store.set("memory", memory)
             return InputEvent(input=await self._build_input_messages(ctx))

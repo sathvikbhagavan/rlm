@@ -1,13 +1,14 @@
 from rlm.codeact_core import (
-    FINAL_ANSWER_REQUIRED,
     FINAL_ANSWER_ATTEMPTS,
+    FINAL_ANSWER_REQUIRED,
     INDEX_CODEACT_SYSTEM_PROMPT,
     PRELOADED_LINES_REMINDER,
-    _continuation_instruction,
     _answer_only_attempts_exhausted,
+    _continuation_instruction,
     _has_final_answer,
     _is_answer_only_turn,
     append_preloaded_lines_reminder,
+    parse_code_action,
 )
 
 
@@ -42,15 +43,11 @@ def test_last_allowed_action_forces_a_bounded_final_answer_turn() -> None:
     normal = "continue with code"
 
     assert (
-        _continuation_instruction(
-            iteration=7, max_iterations=8, normal_instruction=normal
-        )
+        _continuation_instruction(iteration=7, max_iterations=8, normal_instruction=normal)
         == normal
     )
     assert (
-        _continuation_instruction(
-            iteration=8, max_iterations=8, normal_instruction=normal
-        )
+        _continuation_instruction(iteration=8, max_iterations=8, normal_instruction=normal)
         == FINAL_ANSWER_REQUIRED
     )
 
@@ -59,10 +56,36 @@ def test_answer_only_correction_has_one_retry_and_a_hard_stop() -> None:
     max_iterations = 8
 
     assert _is_answer_only_turn(iteration=9, max_iterations=max_iterations)
-    assert not _answer_only_attempts_exhausted(
-        iteration=9, max_iterations=max_iterations
-    )
+    assert not _answer_only_attempts_exhausted(iteration=9, max_iterations=max_iterations)
     assert _answer_only_attempts_exhausted(
         iteration=max_iterations + FINAL_ANSWER_ATTEMPTS,
         max_iterations=max_iterations,
     )
+
+
+def test_codeact_extracts_fenced_python_action() -> None:
+    response = "THINK: inspect the rows\n```python\nprint(len(lines))\n```"
+
+    assert parse_code_action(response) == "print(len(lines))"
+
+
+def test_codeact_extracts_anthropic_execute_python_action() -> None:
+    response = """THINK: inspect the rows
+<function_calls>
+<invoke name="execute_python">
+<parameter name="code">values = [x for x in lines if x &lt; "z"]
+print(len(values))</parameter>
+</invoke>
+</function_calls>"""
+
+    assert parse_code_action(response) == (
+        'values = [x for x in lines if x < "z"]\nprint(len(values))'
+    )
+
+
+def test_codeact_does_not_execute_other_xml_tools_or_truncated_calls() -> None:
+    other_tool = '<invoke name="search"><parameter name="code">print(1)</parameter></invoke>'
+    truncated = '<invoke name="execute_python"><parameter name="code">print(1)'
+
+    assert parse_code_action(other_tool) is None
+    assert parse_code_action(truncated) is None
