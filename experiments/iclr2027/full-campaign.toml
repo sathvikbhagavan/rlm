@@ -3,9 +3,9 @@
 schema_version = 1
 
 [campaign]
-name = "iclr2027-six-model-full-v26"
+name = "iclr2027-six-model-full-v27"
 project_root = "../.."
-artifact_dir = "artifacts/iclr2027-six-model-full-v26"
+artifact_dir = "artifacts/iclr2027-six-model-full-v27"
 budget_chf = 1250.0
 usd_to_chf = 0.80
 require_dataset = true
@@ -26,7 +26,7 @@ repetitions = 5
 estimated_cost_chf = 0.000000
 memory_reservation_mib = 2048
 memory_limit_mib = 4096
-question_parallelism = 4
+question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "100", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_SWISSAI_REQUESTS_PER_MINUTE = "15", RXNHAYSTACK_SWISSAI_RATE_LIMIT_RETRIES = "2" }
 command = ["uv", "run", "--frozen", "python", "tier1/llm_task1.py"]
 
@@ -42,7 +42,7 @@ repetitions = 5
 estimated_cost_chf = 0.000000
 memory_reservation_mib = 4096
 memory_limit_mib = 8192
-question_parallelism = 4
+question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "500", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_SWISSAI_REQUESTS_PER_MINUTE = "15", RXNHAYSTACK_SWISSAI_RATE_LIMIT_RETRIES = "2" }
 command = ["uv", "run", "--frozen", "python", "tier1/llm_task1.py"]
 
@@ -138,7 +138,7 @@ repetitions = 5
 estimated_cost_chf = 0.000000
 memory_reservation_mib = 2048
 memory_limit_mib = 4096
-question_parallelism = 4
+question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "100", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_SWISSAI_REQUESTS_PER_MINUTE = "15", RXNHAYSTACK_SWISSAI_RATE_LIMIT_RETRIES = "2" }
 command = ["uv", "run", "--frozen", "python", "tier2/llm_task2.py"]
 
@@ -154,7 +154,7 @@ repetitions = 5
 estimated_cost_chf = 0.000000
 memory_reservation_mib = 4096
 memory_limit_mib = 8192
-question_parallelism = 4
+question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "500", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_SWISSAI_REQUESTS_PER_MINUTE = "15", RXNHAYSTACK_SWISSAI_RATE_LIMIT_RETRIES = "2" }
 command = ["uv", "run", "--frozen", "python", "tier2/llm_task2.py"]
 
@@ -250,7 +250,7 @@ repetitions = 5
 estimated_cost_chf = 0.000000
 memory_reservation_mib = 2048
 memory_limit_mib = 4096
-question_parallelism = 4
+question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "100", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_SWISSAI_REQUESTS_PER_MINUTE = "15", RXNHAYSTACK_SWISSAI_RATE_LIMIT_RETRIES = "2" }
 command = ["uv", "run", "--frozen", "python", "tier2/llm_task3.py"]
 
@@ -266,7 +266,7 @@ repetitions = 5
 estimated_cost_chf = 0.000000
 memory_reservation_mib = 4096
 memory_limit_mib = 8192
-question_parallelism = 4
+question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "500", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_SWISSAI_REQUESTS_PER_MINUTE = "15", RXNHAYSTACK_SWISSAI_RATE_LIMIT_RETRIES = "2" }
 command = ["uv", "run", "--frozen", "python", "tier2/llm_task3.py"]
 
@@ -362,7 +362,7 @@ repetitions = 5
 estimated_cost_chf = 0.000000
 memory_reservation_mib = 2048
 memory_limit_mib = 4096
-question_parallelism = 4
+question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "100", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_SWISSAI_REQUESTS_PER_MINUTE = "15", RXNHAYSTACK_SWISSAI_RATE_LIMIT_RETRIES = "2" }
 command = ["uv", "run", "--frozen", "python", "tier2/llm_task4.py"]
 
@@ -378,7 +378,7 @@ repetitions = 5
 estimated_cost_chf = 0.000000
 memory_reservation_mib = 4096
 memory_limit_mib = 8192
-question_parallelism = 4
+question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "500", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_SWISSAI_REQUESTS_PER_MINUTE = "15", RXNHAYSTACK_SWISSAI_RATE_LIMIT_RETRIES = "2" }
 command = ["uv", "run", "--frozen", "python", "tier2/llm_task4.py"]
 
@@ -474,7 +474,7 @@ repetitions = 5
 estimated_cost_chf = 0.000000
 memory_reservation_mib = 2048
 memory_limit_mib = 4096
-question_parallelism = 4
+question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "100", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_SWISSAI_REQUESTS_PER_MINUTE = "15", RXNHAYSTACK_SWISSAI_RATE_LIMIT_RETRIES = "2" }
 command = ["uv", "run", "--frozen", "python", "tier2/llm_task5.py"]
 
@@ -490,7 +490,7 @@ repetitions = 5
 estimated_cost_chf = 0.000000
 memory_reservation_mib = 4096
 memory_limit_mib = 8192
-question_parallelism = 4
+question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "500", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_SWISSAI_REQUESTS_PER_MINUTE = "15", RXNHAYSTACK_SWISSAI_RATE_LIMIT_RETRIES = "2" }
 command = ["uv", "run", "--frozen", "python", "tier2/llm_task5.py"]
 
@@ -586,7 +586,7 @@ repetitions = 5
 estimated_cost_chf = 0.000000
 memory_reservation_mib = 2048
 memory_limit_mib = 4096
-question_parallelism = 4
+question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "100", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_SWISSAI_REQUESTS_PER_MINUTE = "15", RXNHAYSTACK_SWISSAI_RATE_LIMIT_RETRIES = "2" }
 command = ["uv", "run", "--frozen", "python", "tier3/llm_task6.py"]
 
@@ -602,7 +602,7 @@ repetitions = 5
 estimated_cost_chf = 0.000000
 memory_reservation_mib = 4096
 memory_limit_mib = 8192
-question_parallelism = 4
+question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "500", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_SWISSAI_REQUESTS_PER_MINUTE = "15", RXNHAYSTACK_SWISSAI_RATE_LIMIT_RETRIES = "2" }
 command = ["uv", "run", "--frozen", "python", "tier3/llm_task6.py"]
 
@@ -698,7 +698,7 @@ repetitions = 5
 estimated_cost_chf = 0.000000
 memory_reservation_mib = 2048
 memory_limit_mib = 4096
-question_parallelism = 4
+question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "100", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_SWISSAI_REQUESTS_PER_MINUTE = "15", RXNHAYSTACK_SWISSAI_RATE_LIMIT_RETRIES = "2" }
 command = ["uv", "run", "--frozen", "python", "tier3/llm_task7.py"]
 
@@ -714,7 +714,7 @@ repetitions = 5
 estimated_cost_chf = 0.000000
 memory_reservation_mib = 4096
 memory_limit_mib = 8192
-question_parallelism = 4
+question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "500", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_SWISSAI_REQUESTS_PER_MINUTE = "15", RXNHAYSTACK_SWISSAI_RATE_LIMIT_RETRIES = "2" }
 command = ["uv", "run", "--frozen", "python", "tier3/llm_task7.py"]
 
@@ -810,7 +810,7 @@ repetitions = 5
 estimated_cost_chf = 0.000000
 memory_reservation_mib = 2048
 memory_limit_mib = 4096
-question_parallelism = 4
+question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "100", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_SWISSAI_REQUESTS_PER_MINUTE = "15", RXNHAYSTACK_SWISSAI_RATE_LIMIT_RETRIES = "2" }
 command = ["uv", "run", "--frozen", "python", "tier3/llm_task8.py"]
 
@@ -826,7 +826,7 @@ repetitions = 5
 estimated_cost_chf = 0.000000
 memory_reservation_mib = 4096
 memory_limit_mib = 8192
-question_parallelism = 4
+question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "500", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_SWISSAI_REQUESTS_PER_MINUTE = "15", RXNHAYSTACK_SWISSAI_RATE_LIMIT_RETRIES = "2" }
 command = ["uv", "run", "--frozen", "python", "tier3/llm_task8.py"]
 
@@ -922,7 +922,7 @@ repetitions = 5
 estimated_cost_chf = 0.000000
 memory_reservation_mib = 2048
 memory_limit_mib = 4096
-question_parallelism = 4
+question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "100", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_SWISSAI_REQUESTS_PER_MINUTE = "15", RXNHAYSTACK_SWISSAI_RATE_LIMIT_RETRIES = "2" }
 command = ["uv", "run", "--frozen", "python", "tier3/llm_task9.py"]
 
@@ -938,7 +938,7 @@ repetitions = 5
 estimated_cost_chf = 0.000000
 memory_reservation_mib = 4096
 memory_limit_mib = 8192
-question_parallelism = 4
+question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "500", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_SWISSAI_REQUESTS_PER_MINUTE = "15", RXNHAYSTACK_SWISSAI_RATE_LIMIT_RETRIES = "2" }
 command = ["uv", "run", "--frozen", "python", "tier3/llm_task9.py"]
 
@@ -1034,7 +1034,7 @@ repetitions = 5
 estimated_cost_chf = 0.000000
 memory_reservation_mib = 2048
 memory_limit_mib = 4096
-question_parallelism = 4
+question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "100", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_SWISSAI_REQUESTS_PER_MINUTE = "15", RXNHAYSTACK_SWISSAI_RATE_LIMIT_RETRIES = "2" }
 command = ["uv", "run", "--frozen", "python", "tier3/llm_task10.py"]
 
@@ -1050,7 +1050,7 @@ repetitions = 5
 estimated_cost_chf = 0.000000
 memory_reservation_mib = 4096
 memory_limit_mib = 8192
-question_parallelism = 4
+question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "500", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_SWISSAI_REQUESTS_PER_MINUTE = "15", RXNHAYSTACK_SWISSAI_RATE_LIMIT_RETRIES = "2" }
 command = ["uv", "run", "--frozen", "python", "tier3/llm_task10.py"]
 
@@ -1146,7 +1146,7 @@ repetitions = 5
 estimated_cost_chf = 0.000000
 memory_reservation_mib = 2048
 memory_limit_mib = 4096
-question_parallelism = 4
+question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "100", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_SWISSAI_REQUESTS_PER_MINUTE = "15", RXNHAYSTACK_SWISSAI_RATE_LIMIT_RETRIES = "2" }
 command = ["uv", "run", "--frozen", "python", "tier3/llm_task10b.py"]
 
@@ -1162,7 +1162,7 @@ repetitions = 5
 estimated_cost_chf = 0.000000
 memory_reservation_mib = 4096
 memory_limit_mib = 8192
-question_parallelism = 4
+question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "500", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_SWISSAI_REQUESTS_PER_MINUTE = "15", RXNHAYSTACK_SWISSAI_RATE_LIMIT_RETRIES = "2" }
 command = ["uv", "run", "--frozen", "python", "tier3/llm_task10b.py"]
 
@@ -1258,7 +1258,7 @@ repetitions = 5
 estimated_cost_chf = 0.000000
 memory_reservation_mib = 2048
 memory_limit_mib = 4096
-question_parallelism = 4
+question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "100", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_SWISSAI_REQUESTS_PER_MINUTE = "15", RXNHAYSTACK_SWISSAI_RATE_LIMIT_RETRIES = "2" }
 command = ["uv", "run", "--frozen", "python", "tier3/llm_task13.py"]
 
@@ -1274,7 +1274,7 @@ repetitions = 5
 estimated_cost_chf = 0.000000
 memory_reservation_mib = 4096
 memory_limit_mib = 8192
-question_parallelism = 4
+question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "500", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_SWISSAI_REQUESTS_PER_MINUTE = "15", RXNHAYSTACK_SWISSAI_RATE_LIMIT_RETRIES = "2" }
 command = ["uv", "run", "--frozen", "python", "tier3/llm_task13.py"]
 
@@ -1370,7 +1370,7 @@ repetitions = 5
 estimated_cost_chf = 0.000000
 memory_reservation_mib = 2048
 memory_limit_mib = 4096
-question_parallelism = 4
+question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "100", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_SWISSAI_REQUESTS_PER_MINUTE = "15", RXNHAYSTACK_SWISSAI_RATE_LIMIT_RETRIES = "2" }
 command = ["uv", "run", "--frozen", "python", "tier3/llm_task14.py"]
 
@@ -1386,7 +1386,7 @@ repetitions = 5
 estimated_cost_chf = 0.000000
 memory_reservation_mib = 4096
 memory_limit_mib = 8192
-question_parallelism = 4
+question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "500", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_SWISSAI_REQUESTS_PER_MINUTE = "15", RXNHAYSTACK_SWISSAI_RATE_LIMIT_RETRIES = "2" }
 command = ["uv", "run", "--frozen", "python", "tier3/llm_task14.py"]
 
@@ -1482,7 +1482,7 @@ repetitions = 5
 estimated_cost_chf = 0.000000
 memory_reservation_mib = 2048
 memory_limit_mib = 4096
-question_parallelism = 4
+question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "100", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_SWISSAI_REQUESTS_PER_MINUTE = "15", RXNHAYSTACK_SWISSAI_RATE_LIMIT_RETRIES = "2" }
 command = ["uv", "run", "--frozen", "python", "tier3/llm_task15.py"]
 
@@ -1498,7 +1498,7 @@ repetitions = 5
 estimated_cost_chf = 0.000000
 memory_reservation_mib = 4096
 memory_limit_mib = 8192
-question_parallelism = 4
+question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "500", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_SWISSAI_REQUESTS_PER_MINUTE = "15", RXNHAYSTACK_SWISSAI_RATE_LIMIT_RETRIES = "2" }
 command = ["uv", "run", "--frozen", "python", "tier3/llm_task15.py"]
 
@@ -1594,7 +1594,7 @@ repetitions = 5
 estimated_cost_chf = 0.000000
 memory_reservation_mib = 2048
 memory_limit_mib = 4096
-question_parallelism = 4
+question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "100", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_SWISSAI_REQUESTS_PER_MINUTE = "15", RXNHAYSTACK_SWISSAI_RATE_LIMIT_RETRIES = "2" }
 command = ["uv", "run", "--frozen", "python", "tier3/llm_task17.py"]
 
@@ -1610,7 +1610,7 @@ repetitions = 5
 estimated_cost_chf = 0.000000
 memory_reservation_mib = 4096
 memory_limit_mib = 8192
-question_parallelism = 4
+question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "500", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_SWISSAI_REQUESTS_PER_MINUTE = "15", RXNHAYSTACK_SWISSAI_RATE_LIMIT_RETRIES = "2" }
 command = ["uv", "run", "--frozen", "python", "tier3/llm_task17.py"]
 
@@ -1706,7 +1706,7 @@ repetitions = 5
 estimated_cost_chf = 0.000000
 memory_reservation_mib = 2048
 memory_limit_mib = 4096
-question_parallelism = 4
+question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "100", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_SWISSAI_REQUESTS_PER_MINUTE = "15", RXNHAYSTACK_SWISSAI_RATE_LIMIT_RETRIES = "2" }
 command = ["uv", "run", "--frozen", "python", "tier3/llm_task18.py"]
 
@@ -1722,7 +1722,7 @@ repetitions = 5
 estimated_cost_chf = 0.000000
 memory_reservation_mib = 4096
 memory_limit_mib = 8192
-question_parallelism = 4
+question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "500", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_SWISSAI_REQUESTS_PER_MINUTE = "15", RXNHAYSTACK_SWISSAI_RATE_LIMIT_RETRIES = "2" }
 command = ["uv", "run", "--frozen", "python", "tier3/llm_task18.py"]
 
@@ -1818,7 +1818,7 @@ repetitions = 5
 estimated_cost_chf = 0.000000
 memory_reservation_mib = 2048
 memory_limit_mib = 4096
-question_parallelism = 4
+question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "100", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_SWISSAI_REQUESTS_PER_MINUTE = "15", RXNHAYSTACK_SWISSAI_RATE_LIMIT_RETRIES = "2" }
 command = ["uv", "run", "--frozen", "python", "tier3/llm_task20.py"]
 
@@ -1834,7 +1834,7 @@ repetitions = 5
 estimated_cost_chf = 0.000000
 memory_reservation_mib = 4096
 memory_limit_mib = 8192
-question_parallelism = 4
+question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "500", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_SWISSAI_REQUESTS_PER_MINUTE = "15", RXNHAYSTACK_SWISSAI_RATE_LIMIT_RETRIES = "2" }
 command = ["uv", "run", "--frozen", "python", "tier3/llm_task20.py"]
 
@@ -1930,7 +1930,7 @@ repetitions = 5
 estimated_cost_chf = 0.000000
 memory_reservation_mib = 2048
 memory_limit_mib = 4096
-question_parallelism = 4
+question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "100", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_SWISSAI_REQUESTS_PER_MINUTE = "15", RXNHAYSTACK_SWISSAI_RATE_LIMIT_RETRIES = "2" }
 command = ["uv", "run", "--frozen", "python", "tier3/llm_task21.py"]
 
@@ -1946,7 +1946,7 @@ repetitions = 5
 estimated_cost_chf = 0.000000
 memory_reservation_mib = 4096
 memory_limit_mib = 8192
-question_parallelism = 4
+question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "500", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_SWISSAI_REQUESTS_PER_MINUTE = "15", RXNHAYSTACK_SWISSAI_RATE_LIMIT_RETRIES = "2" }
 command = ["uv", "run", "--frozen", "python", "tier3/llm_task21.py"]
 
@@ -2042,7 +2042,7 @@ repetitions = 5
 estimated_cost_chf = 0.000000
 memory_reservation_mib = 2048
 memory_limit_mib = 4096
-question_parallelism = 4
+question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "100", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_SWISSAI_REQUESTS_PER_MINUTE = "15", RXNHAYSTACK_SWISSAI_RATE_LIMIT_RETRIES = "2" }
 command = ["uv", "run", "--frozen", "python", "tier3/llm_task22.py"]
 
@@ -2058,7 +2058,7 @@ repetitions = 5
 estimated_cost_chf = 0.000000
 memory_reservation_mib = 4096
 memory_limit_mib = 8192
-question_parallelism = 4
+question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "500", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_SWISSAI_REQUESTS_PER_MINUTE = "15", RXNHAYSTACK_SWISSAI_RATE_LIMIT_RETRIES = "2" }
 command = ["uv", "run", "--frozen", "python", "tier3/llm_task22.py"]
 
@@ -2154,7 +2154,7 @@ repetitions = 5
 estimated_cost_chf = 0.000000
 memory_reservation_mib = 2048
 memory_limit_mib = 4096
-question_parallelism = 4
+question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "100", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_SWISSAI_REQUESTS_PER_MINUTE = "15", RXNHAYSTACK_SWISSAI_RATE_LIMIT_RETRIES = "2" }
 command = ["uv", "run", "--frozen", "python", "tier3/llm_task23.py"]
 
@@ -2170,7 +2170,7 @@ repetitions = 5
 estimated_cost_chf = 0.000000
 memory_reservation_mib = 4096
 memory_limit_mib = 8192
-question_parallelism = 4
+question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "500", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_SWISSAI_REQUESTS_PER_MINUTE = "15", RXNHAYSTACK_SWISSAI_RATE_LIMIT_RETRIES = "2" }
 command = ["uv", "run", "--frozen", "python", "tier3/llm_task23.py"]
 
@@ -2266,7 +2266,7 @@ repetitions = 5
 estimated_cost_chf = 0.000000
 memory_reservation_mib = 2048
 memory_limit_mib = 4096
-question_parallelism = 4
+question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "100", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_SWISSAI_REQUESTS_PER_MINUTE = "15", RXNHAYSTACK_SWISSAI_RATE_LIMIT_RETRIES = "2" }
 command = ["uv", "run", "--frozen", "python", "tier3/llm_task24.py"]
 
@@ -2282,7 +2282,7 @@ repetitions = 5
 estimated_cost_chf = 0.000000
 memory_reservation_mib = 4096
 memory_limit_mib = 8192
-question_parallelism = 4
+question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "500", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_SWISSAI_REQUESTS_PER_MINUTE = "15", RXNHAYSTACK_SWISSAI_RATE_LIMIT_RETRIES = "2" }
 command = ["uv", "run", "--frozen", "python", "tier3/llm_task24.py"]
 
@@ -2378,7 +2378,7 @@ repetitions = 5
 estimated_cost_chf = 0.000000
 memory_reservation_mib = 2048
 memory_limit_mib = 4096
-question_parallelism = 4
+question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "100", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_SWISSAI_REQUESTS_PER_MINUTE = "15", RXNHAYSTACK_SWISSAI_RATE_LIMIT_RETRIES = "2" }
 command = ["uv", "run", "--frozen", "python", "tier4/llm_task11.py"]
 
@@ -2394,7 +2394,7 @@ repetitions = 5
 estimated_cost_chf = 0.000000
 memory_reservation_mib = 4096
 memory_limit_mib = 8192
-question_parallelism = 4
+question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "500", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_SWISSAI_REQUESTS_PER_MINUTE = "15", RXNHAYSTACK_SWISSAI_RATE_LIMIT_RETRIES = "2" }
 command = ["uv", "run", "--frozen", "python", "tier4/llm_task11.py"]
 
@@ -2490,7 +2490,7 @@ repetitions = 5
 estimated_cost_chf = 0.000000
 memory_reservation_mib = 2048
 memory_limit_mib = 4096
-question_parallelism = 4
+question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "100", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_SWISSAI_REQUESTS_PER_MINUTE = "15", RXNHAYSTACK_SWISSAI_RATE_LIMIT_RETRIES = "2" }
 command = ["uv", "run", "--frozen", "python", "tier4/llm_task12.py"]
 
@@ -2506,7 +2506,7 @@ repetitions = 5
 estimated_cost_chf = 0.000000
 memory_reservation_mib = 4096
 memory_limit_mib = 8192
-question_parallelism = 4
+question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "500", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_SWISSAI_REQUESTS_PER_MINUTE = "15", RXNHAYSTACK_SWISSAI_RATE_LIMIT_RETRIES = "2" }
 command = ["uv", "run", "--frozen", "python", "tier4/llm_task12.py"]
 
@@ -2602,7 +2602,7 @@ repetitions = 5
 estimated_cost_chf = 0.000000
 memory_reservation_mib = 2048
 memory_limit_mib = 4096
-question_parallelism = 4
+question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "100", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_SWISSAI_REQUESTS_PER_MINUTE = "15", RXNHAYSTACK_SWISSAI_RATE_LIMIT_RETRIES = "2" }
 command = ["uv", "run", "--frozen", "python", "tier4/llm_task12b.py"]
 
@@ -2618,7 +2618,7 @@ repetitions = 5
 estimated_cost_chf = 0.000000
 memory_reservation_mib = 4096
 memory_limit_mib = 8192
-question_parallelism = 4
+question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "500", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_SWISSAI_REQUESTS_PER_MINUTE = "15", RXNHAYSTACK_SWISSAI_RATE_LIMIT_RETRIES = "2" }
 command = ["uv", "run", "--frozen", "python", "tier4/llm_task12b.py"]
 
@@ -2714,7 +2714,7 @@ repetitions = 5
 estimated_cost_chf = 0.000000
 memory_reservation_mib = 2048
 memory_limit_mib = 4096
-question_parallelism = 4
+question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "100", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_SWISSAI_REQUESTS_PER_MINUTE = "15", RXNHAYSTACK_SWISSAI_RATE_LIMIT_RETRIES = "2" }
 command = ["uv", "run", "--frozen", "python", "tier4/llm_task13.py"]
 
@@ -2730,7 +2730,7 @@ repetitions = 5
 estimated_cost_chf = 0.000000
 memory_reservation_mib = 4096
 memory_limit_mib = 8192
-question_parallelism = 4
+question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "500", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_SWISSAI_REQUESTS_PER_MINUTE = "15", RXNHAYSTACK_SWISSAI_RATE_LIMIT_RETRIES = "2" }
 command = ["uv", "run", "--frozen", "python", "tier4/llm_task13.py"]
 
@@ -2826,7 +2826,7 @@ repetitions = 5
 estimated_cost_chf = 0.000000
 memory_reservation_mib = 2048
 memory_limit_mib = 4096
-question_parallelism = 4
+question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "100", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_SWISSAI_REQUESTS_PER_MINUTE = "15", RXNHAYSTACK_SWISSAI_RATE_LIMIT_RETRIES = "2" }
 command = ["uv", "run", "--frozen", "python", "tier4/llm_task14.py"]
 
@@ -2842,7 +2842,7 @@ repetitions = 5
 estimated_cost_chf = 0.000000
 memory_reservation_mib = 4096
 memory_limit_mib = 8192
-question_parallelism = 4
+question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "500", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_SWISSAI_REQUESTS_PER_MINUTE = "15", RXNHAYSTACK_SWISSAI_RATE_LIMIT_RETRIES = "2" }
 command = ["uv", "run", "--frozen", "python", "tier4/llm_task14.py"]
 
@@ -2938,7 +2938,7 @@ repetitions = 5
 estimated_cost_chf = 0.000000
 memory_reservation_mib = 2048
 memory_limit_mib = 4096
-question_parallelism = 4
+question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "100", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_SWISSAI_REQUESTS_PER_MINUTE = "15", RXNHAYSTACK_SWISSAI_RATE_LIMIT_RETRIES = "2" }
 command = ["uv", "run", "--frozen", "python", "tier4/llm_task15.py"]
 
@@ -2954,7 +2954,7 @@ repetitions = 5
 estimated_cost_chf = 0.000000
 memory_reservation_mib = 4096
 memory_limit_mib = 8192
-question_parallelism = 4
+question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "500", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_SWISSAI_REQUESTS_PER_MINUTE = "15", RXNHAYSTACK_SWISSAI_RATE_LIMIT_RETRIES = "2" }
 command = ["uv", "run", "--frozen", "python", "tier4/llm_task15.py"]
 
@@ -3050,7 +3050,7 @@ repetitions = 5
 estimated_cost_chf = 0.000000
 memory_reservation_mib = 2048
 memory_limit_mib = 4096
-question_parallelism = 4
+question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "100", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_SWISSAI_REQUESTS_PER_MINUTE = "15", RXNHAYSTACK_SWISSAI_RATE_LIMIT_RETRIES = "2" }
 command = ["uv", "run", "--frozen", "python", "tier4/llm_task16.py"]
 
@@ -3066,7 +3066,7 @@ repetitions = 5
 estimated_cost_chf = 0.000000
 memory_reservation_mib = 4096
 memory_limit_mib = 8192
-question_parallelism = 4
+question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "500", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_SWISSAI_REQUESTS_PER_MINUTE = "15", RXNHAYSTACK_SWISSAI_RATE_LIMIT_RETRIES = "2" }
 command = ["uv", "run", "--frozen", "python", "tier4/llm_task16.py"]
 
@@ -3162,7 +3162,7 @@ repetitions = 5
 estimated_cost_chf = 0.000000
 memory_reservation_mib = 2048
 memory_limit_mib = 4096
-question_parallelism = 4
+question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "100", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_SWISSAI_REQUESTS_PER_MINUTE = "15", RXNHAYSTACK_SWISSAI_RATE_LIMIT_RETRIES = "2" }
 command = ["uv", "run", "--frozen", "python", "tier4/llm_task17.py"]
 
@@ -3178,7 +3178,7 @@ repetitions = 5
 estimated_cost_chf = 0.000000
 memory_reservation_mib = 4096
 memory_limit_mib = 8192
-question_parallelism = 4
+question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "500", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_SWISSAI_REQUESTS_PER_MINUTE = "15", RXNHAYSTACK_SWISSAI_RATE_LIMIT_RETRIES = "2" }
 command = ["uv", "run", "--frozen", "python", "tier4/llm_task17.py"]
 
@@ -3274,7 +3274,7 @@ repetitions = 5
 estimated_cost_chf = 0.000000
 memory_reservation_mib = 2048
 memory_limit_mib = 4096
-question_parallelism = 4
+question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "100", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_SWISSAI_REQUESTS_PER_MINUTE = "15", RXNHAYSTACK_SWISSAI_RATE_LIMIT_RETRIES = "2" }
 command = ["uv", "run", "--frozen", "python", "tier4/llm_task17b.py"]
 
@@ -3290,7 +3290,7 @@ repetitions = 5
 estimated_cost_chf = 0.000000
 memory_reservation_mib = 4096
 memory_limit_mib = 8192
-question_parallelism = 4
+question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "500", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_SWISSAI_REQUESTS_PER_MINUTE = "15", RXNHAYSTACK_SWISSAI_RATE_LIMIT_RETRIES = "2" }
 command = ["uv", "run", "--frozen", "python", "tier4/llm_task17b.py"]
 
@@ -3386,7 +3386,7 @@ repetitions = 5
 estimated_cost_chf = 0.000000
 memory_reservation_mib = 2048
 memory_limit_mib = 4096
-question_parallelism = 4
+question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "100", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_SWISSAI_REQUESTS_PER_MINUTE = "15", RXNHAYSTACK_SWISSAI_RATE_LIMIT_RETRIES = "2" }
 command = ["uv", "run", "--frozen", "python", "tier1/llm_task1.py"]
 
@@ -3402,7 +3402,7 @@ repetitions = 5
 estimated_cost_chf = 0.000000
 memory_reservation_mib = 4096
 memory_limit_mib = 8192
-question_parallelism = 4
+question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "500", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_SWISSAI_REQUESTS_PER_MINUTE = "15", RXNHAYSTACK_SWISSAI_RATE_LIMIT_RETRIES = "2" }
 command = ["uv", "run", "--frozen", "python", "tier1/llm_task1.py"]
 
@@ -3498,7 +3498,7 @@ repetitions = 5
 estimated_cost_chf = 0.000000
 memory_reservation_mib = 2048
 memory_limit_mib = 4096
-question_parallelism = 4
+question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "100", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_SWISSAI_REQUESTS_PER_MINUTE = "15", RXNHAYSTACK_SWISSAI_RATE_LIMIT_RETRIES = "2" }
 command = ["uv", "run", "--frozen", "python", "tier2/llm_task2.py"]
 
@@ -3514,7 +3514,7 @@ repetitions = 5
 estimated_cost_chf = 0.000000
 memory_reservation_mib = 4096
 memory_limit_mib = 8192
-question_parallelism = 4
+question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "500", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_SWISSAI_REQUESTS_PER_MINUTE = "15", RXNHAYSTACK_SWISSAI_RATE_LIMIT_RETRIES = "2" }
 command = ["uv", "run", "--frozen", "python", "tier2/llm_task2.py"]
 
@@ -3610,7 +3610,7 @@ repetitions = 5
 estimated_cost_chf = 0.000000
 memory_reservation_mib = 2048
 memory_limit_mib = 4096
-question_parallelism = 4
+question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "100", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_SWISSAI_REQUESTS_PER_MINUTE = "15", RXNHAYSTACK_SWISSAI_RATE_LIMIT_RETRIES = "2" }
 command = ["uv", "run", "--frozen", "python", "tier2/llm_task3.py"]
 
@@ -3626,7 +3626,7 @@ repetitions = 5
 estimated_cost_chf = 0.000000
 memory_reservation_mib = 4096
 memory_limit_mib = 8192
-question_parallelism = 4
+question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "500", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_SWISSAI_REQUESTS_PER_MINUTE = "15", RXNHAYSTACK_SWISSAI_RATE_LIMIT_RETRIES = "2" }
 command = ["uv", "run", "--frozen", "python", "tier2/llm_task3.py"]
 
@@ -3722,7 +3722,7 @@ repetitions = 5
 estimated_cost_chf = 0.000000
 memory_reservation_mib = 2048
 memory_limit_mib = 4096
-question_parallelism = 4
+question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "100", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_SWISSAI_REQUESTS_PER_MINUTE = "15", RXNHAYSTACK_SWISSAI_RATE_LIMIT_RETRIES = "2" }
 command = ["uv", "run", "--frozen", "python", "tier2/llm_task4.py"]
 
@@ -3738,7 +3738,7 @@ repetitions = 5
 estimated_cost_chf = 0.000000
 memory_reservation_mib = 4096
 memory_limit_mib = 8192
-question_parallelism = 4
+question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "500", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_SWISSAI_REQUESTS_PER_MINUTE = "15", RXNHAYSTACK_SWISSAI_RATE_LIMIT_RETRIES = "2" }
 command = ["uv", "run", "--frozen", "python", "tier2/llm_task4.py"]
 
@@ -3834,7 +3834,7 @@ repetitions = 5
 estimated_cost_chf = 0.000000
 memory_reservation_mib = 2048
 memory_limit_mib = 4096
-question_parallelism = 4
+question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "100", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_SWISSAI_REQUESTS_PER_MINUTE = "15", RXNHAYSTACK_SWISSAI_RATE_LIMIT_RETRIES = "2" }
 command = ["uv", "run", "--frozen", "python", "tier2/llm_task5.py"]
 
@@ -3850,7 +3850,7 @@ repetitions = 5
 estimated_cost_chf = 0.000000
 memory_reservation_mib = 4096
 memory_limit_mib = 8192
-question_parallelism = 4
+question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "500", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_SWISSAI_REQUESTS_PER_MINUTE = "15", RXNHAYSTACK_SWISSAI_RATE_LIMIT_RETRIES = "2" }
 command = ["uv", "run", "--frozen", "python", "tier2/llm_task5.py"]
 
@@ -3946,7 +3946,7 @@ repetitions = 5
 estimated_cost_chf = 0.000000
 memory_reservation_mib = 2048
 memory_limit_mib = 4096
-question_parallelism = 4
+question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "100", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_SWISSAI_REQUESTS_PER_MINUTE = "15", RXNHAYSTACK_SWISSAI_RATE_LIMIT_RETRIES = "2" }
 command = ["uv", "run", "--frozen", "python", "tier3/llm_task6.py"]
 
@@ -3962,7 +3962,7 @@ repetitions = 5
 estimated_cost_chf = 0.000000
 memory_reservation_mib = 4096
 memory_limit_mib = 8192
-question_parallelism = 4
+question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "500", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_SWISSAI_REQUESTS_PER_MINUTE = "15", RXNHAYSTACK_SWISSAI_RATE_LIMIT_RETRIES = "2" }
 command = ["uv", "run", "--frozen", "python", "tier3/llm_task6.py"]
 
@@ -4058,7 +4058,7 @@ repetitions = 5
 estimated_cost_chf = 0.000000
 memory_reservation_mib = 2048
 memory_limit_mib = 4096
-question_parallelism = 4
+question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "100", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_SWISSAI_REQUESTS_PER_MINUTE = "15", RXNHAYSTACK_SWISSAI_RATE_LIMIT_RETRIES = "2" }
 command = ["uv", "run", "--frozen", "python", "tier3/llm_task7.py"]
 
@@ -4074,7 +4074,7 @@ repetitions = 5
 estimated_cost_chf = 0.000000
 memory_reservation_mib = 4096
 memory_limit_mib = 8192
-question_parallelism = 4
+question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "500", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_SWISSAI_REQUESTS_PER_MINUTE = "15", RXNHAYSTACK_SWISSAI_RATE_LIMIT_RETRIES = "2" }
 command = ["uv", "run", "--frozen", "python", "tier3/llm_task7.py"]
 
@@ -4170,7 +4170,7 @@ repetitions = 5
 estimated_cost_chf = 0.000000
 memory_reservation_mib = 2048
 memory_limit_mib = 4096
-question_parallelism = 4
+question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "100", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_SWISSAI_REQUESTS_PER_MINUTE = "15", RXNHAYSTACK_SWISSAI_RATE_LIMIT_RETRIES = "2" }
 command = ["uv", "run", "--frozen", "python", "tier3/llm_task8.py"]
 
@@ -4186,7 +4186,7 @@ repetitions = 5
 estimated_cost_chf = 0.000000
 memory_reservation_mib = 4096
 memory_limit_mib = 8192
-question_parallelism = 4
+question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "500", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_SWISSAI_REQUESTS_PER_MINUTE = "15", RXNHAYSTACK_SWISSAI_RATE_LIMIT_RETRIES = "2" }
 command = ["uv", "run", "--frozen", "python", "tier3/llm_task8.py"]
 
@@ -4282,7 +4282,7 @@ repetitions = 5
 estimated_cost_chf = 0.000000
 memory_reservation_mib = 2048
 memory_limit_mib = 4096
-question_parallelism = 4
+question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "100", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_SWISSAI_REQUESTS_PER_MINUTE = "15", RXNHAYSTACK_SWISSAI_RATE_LIMIT_RETRIES = "2" }
 command = ["uv", "run", "--frozen", "python", "tier3/llm_task9.py"]
 
@@ -4298,7 +4298,7 @@ repetitions = 5
 estimated_cost_chf = 0.000000
 memory_reservation_mib = 4096
 memory_limit_mib = 8192
-question_parallelism = 4
+question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "500", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_SWISSAI_REQUESTS_PER_MINUTE = "15", RXNHAYSTACK_SWISSAI_RATE_LIMIT_RETRIES = "2" }
 command = ["uv", "run", "--frozen", "python", "tier3/llm_task9.py"]
 
@@ -4394,7 +4394,7 @@ repetitions = 5
 estimated_cost_chf = 0.000000
 memory_reservation_mib = 2048
 memory_limit_mib = 4096
-question_parallelism = 4
+question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "100", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_SWISSAI_REQUESTS_PER_MINUTE = "15", RXNHAYSTACK_SWISSAI_RATE_LIMIT_RETRIES = "2" }
 command = ["uv", "run", "--frozen", "python", "tier3/llm_task10.py"]
 
@@ -4410,7 +4410,7 @@ repetitions = 5
 estimated_cost_chf = 0.000000
 memory_reservation_mib = 4096
 memory_limit_mib = 8192
-question_parallelism = 4
+question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "500", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_SWISSAI_REQUESTS_PER_MINUTE = "15", RXNHAYSTACK_SWISSAI_RATE_LIMIT_RETRIES = "2" }
 command = ["uv", "run", "--frozen", "python", "tier3/llm_task10.py"]
 
@@ -4506,7 +4506,7 @@ repetitions = 5
 estimated_cost_chf = 0.000000
 memory_reservation_mib = 2048
 memory_limit_mib = 4096
-question_parallelism = 4
+question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "100", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_SWISSAI_REQUESTS_PER_MINUTE = "15", RXNHAYSTACK_SWISSAI_RATE_LIMIT_RETRIES = "2" }
 command = ["uv", "run", "--frozen", "python", "tier3/llm_task10b.py"]
 
@@ -4522,7 +4522,7 @@ repetitions = 5
 estimated_cost_chf = 0.000000
 memory_reservation_mib = 4096
 memory_limit_mib = 8192
-question_parallelism = 4
+question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "500", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_SWISSAI_REQUESTS_PER_MINUTE = "15", RXNHAYSTACK_SWISSAI_RATE_LIMIT_RETRIES = "2" }
 command = ["uv", "run", "--frozen", "python", "tier3/llm_task10b.py"]
 
@@ -4618,7 +4618,7 @@ repetitions = 5
 estimated_cost_chf = 0.000000
 memory_reservation_mib = 2048
 memory_limit_mib = 4096
-question_parallelism = 4
+question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "100", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_SWISSAI_REQUESTS_PER_MINUTE = "15", RXNHAYSTACK_SWISSAI_RATE_LIMIT_RETRIES = "2" }
 command = ["uv", "run", "--frozen", "python", "tier3/llm_task13.py"]
 
@@ -4634,7 +4634,7 @@ repetitions = 5
 estimated_cost_chf = 0.000000
 memory_reservation_mib = 4096
 memory_limit_mib = 8192
-question_parallelism = 4
+question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "500", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_SWISSAI_REQUESTS_PER_MINUTE = "15", RXNHAYSTACK_SWISSAI_RATE_LIMIT_RETRIES = "2" }
 command = ["uv", "run", "--frozen", "python", "tier3/llm_task13.py"]
 
@@ -4730,7 +4730,7 @@ repetitions = 5
 estimated_cost_chf = 0.000000
 memory_reservation_mib = 2048
 memory_limit_mib = 4096
-question_parallelism = 4
+question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "100", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_SWISSAI_REQUESTS_PER_MINUTE = "15", RXNHAYSTACK_SWISSAI_RATE_LIMIT_RETRIES = "2" }
 command = ["uv", "run", "--frozen", "python", "tier3/llm_task14.py"]
 
@@ -4746,7 +4746,7 @@ repetitions = 5
 estimated_cost_chf = 0.000000
 memory_reservation_mib = 4096
 memory_limit_mib = 8192
-question_parallelism = 4
+question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "500", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_SWISSAI_REQUESTS_PER_MINUTE = "15", RXNHAYSTACK_SWISSAI_RATE_LIMIT_RETRIES = "2" }
 command = ["uv", "run", "--frozen", "python", "tier3/llm_task14.py"]
 
@@ -4842,7 +4842,7 @@ repetitions = 5
 estimated_cost_chf = 0.000000
 memory_reservation_mib = 2048
 memory_limit_mib = 4096
-question_parallelism = 4
+question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "100", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_SWISSAI_REQUESTS_PER_MINUTE = "15", RXNHAYSTACK_SWISSAI_RATE_LIMIT_RETRIES = "2" }
 command = ["uv", "run", "--frozen", "python", "tier3/llm_task15.py"]
 
@@ -4858,7 +4858,7 @@ repetitions = 5
 estimated_cost_chf = 0.000000
 memory_reservation_mib = 4096
 memory_limit_mib = 8192
-question_parallelism = 4
+question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "500", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_SWISSAI_REQUESTS_PER_MINUTE = "15", RXNHAYSTACK_SWISSAI_RATE_LIMIT_RETRIES = "2" }
 command = ["uv", "run", "--frozen", "python", "tier3/llm_task15.py"]
 
@@ -4954,7 +4954,7 @@ repetitions = 5
 estimated_cost_chf = 0.000000
 memory_reservation_mib = 2048
 memory_limit_mib = 4096
-question_parallelism = 4
+question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "100", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_SWISSAI_REQUESTS_PER_MINUTE = "15", RXNHAYSTACK_SWISSAI_RATE_LIMIT_RETRIES = "2" }
 command = ["uv", "run", "--frozen", "python", "tier3/llm_task17.py"]
 
@@ -4970,7 +4970,7 @@ repetitions = 5
 estimated_cost_chf = 0.000000
 memory_reservation_mib = 4096
 memory_limit_mib = 8192
-question_parallelism = 4
+question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "500", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_SWISSAI_REQUESTS_PER_MINUTE = "15", RXNHAYSTACK_SWISSAI_RATE_LIMIT_RETRIES = "2" }
 command = ["uv", "run", "--frozen", "python", "tier3/llm_task17.py"]
 
@@ -5066,7 +5066,7 @@ repetitions = 5
 estimated_cost_chf = 0.000000
 memory_reservation_mib = 2048
 memory_limit_mib = 4096
-question_parallelism = 4
+question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "100", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_SWISSAI_REQUESTS_PER_MINUTE = "15", RXNHAYSTACK_SWISSAI_RATE_LIMIT_RETRIES = "2" }
 command = ["uv", "run", "--frozen", "python", "tier3/llm_task18.py"]
 
@@ -5082,7 +5082,7 @@ repetitions = 5
 estimated_cost_chf = 0.000000
 memory_reservation_mib = 4096
 memory_limit_mib = 8192
-question_parallelism = 4
+question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "500", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_SWISSAI_REQUESTS_PER_MINUTE = "15", RXNHAYSTACK_SWISSAI_RATE_LIMIT_RETRIES = "2" }
 command = ["uv", "run", "--frozen", "python", "tier3/llm_task18.py"]
 
@@ -5178,7 +5178,7 @@ repetitions = 5
 estimated_cost_chf = 0.000000
 memory_reservation_mib = 2048
 memory_limit_mib = 4096
-question_parallelism = 4
+question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "100", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_SWISSAI_REQUESTS_PER_MINUTE = "15", RXNHAYSTACK_SWISSAI_RATE_LIMIT_RETRIES = "2" }
 command = ["uv", "run", "--frozen", "python", "tier3/llm_task20.py"]
 
@@ -5194,7 +5194,7 @@ repetitions = 5
 estimated_cost_chf = 0.000000
 memory_reservation_mib = 4096
 memory_limit_mib = 8192
-question_parallelism = 4
+question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "500", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_SWISSAI_REQUESTS_PER_MINUTE = "15", RXNHAYSTACK_SWISSAI_RATE_LIMIT_RETRIES = "2" }
 command = ["uv", "run", "--frozen", "python", "tier3/llm_task20.py"]
 
@@ -5290,7 +5290,7 @@ repetitions = 5
 estimated_cost_chf = 0.000000
 memory_reservation_mib = 2048
 memory_limit_mib = 4096
-question_parallelism = 4
+question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "100", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_SWISSAI_REQUESTS_PER_MINUTE = "15", RXNHAYSTACK_SWISSAI_RATE_LIMIT_RETRIES = "2" }
 command = ["uv", "run", "--frozen", "python", "tier3/llm_task21.py"]
 
@@ -5306,7 +5306,7 @@ repetitions = 5
 estimated_cost_chf = 0.000000
 memory_reservation_mib = 4096
 memory_limit_mib = 8192
-question_parallelism = 4
+question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "500", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_SWISSAI_REQUESTS_PER_MINUTE = "15", RXNHAYSTACK_SWISSAI_RATE_LIMIT_RETRIES = "2" }
 command = ["uv", "run", "--frozen", "python", "tier3/llm_task21.py"]
 
@@ -5402,7 +5402,7 @@ repetitions = 5
 estimated_cost_chf = 0.000000
 memory_reservation_mib = 2048
 memory_limit_mib = 4096
-question_parallelism = 4
+question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "100", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_SWISSAI_REQUESTS_PER_MINUTE = "15", RXNHAYSTACK_SWISSAI_RATE_LIMIT_RETRIES = "2" }
 command = ["uv", "run", "--frozen", "python", "tier3/llm_task22.py"]
 
@@ -5418,7 +5418,7 @@ repetitions = 5
 estimated_cost_chf = 0.000000
 memory_reservation_mib = 4096
 memory_limit_mib = 8192
-question_parallelism = 4
+question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "500", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_SWISSAI_REQUESTS_PER_MINUTE = "15", RXNHAYSTACK_SWISSAI_RATE_LIMIT_RETRIES = "2" }
 command = ["uv", "run", "--frozen", "python", "tier3/llm_task22.py"]
 
@@ -5514,7 +5514,7 @@ repetitions = 5
 estimated_cost_chf = 0.000000
 memory_reservation_mib = 2048
 memory_limit_mib = 4096
-question_parallelism = 4
+question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "100", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_SWISSAI_REQUESTS_PER_MINUTE = "15", RXNHAYSTACK_SWISSAI_RATE_LIMIT_RETRIES = "2" }
 command = ["uv", "run", "--frozen", "python", "tier3/llm_task23.py"]
 
@@ -5530,7 +5530,7 @@ repetitions = 5
 estimated_cost_chf = 0.000000
 memory_reservation_mib = 4096
 memory_limit_mib = 8192
-question_parallelism = 4
+question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "500", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_SWISSAI_REQUESTS_PER_MINUTE = "15", RXNHAYSTACK_SWISSAI_RATE_LIMIT_RETRIES = "2" }
 command = ["uv", "run", "--frozen", "python", "tier3/llm_task23.py"]
 
@@ -5626,7 +5626,7 @@ repetitions = 5
 estimated_cost_chf = 0.000000
 memory_reservation_mib = 2048
 memory_limit_mib = 4096
-question_parallelism = 4
+question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "100", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_SWISSAI_REQUESTS_PER_MINUTE = "15", RXNHAYSTACK_SWISSAI_RATE_LIMIT_RETRIES = "2" }
 command = ["uv", "run", "--frozen", "python", "tier3/llm_task24.py"]
 
@@ -5642,7 +5642,7 @@ repetitions = 5
 estimated_cost_chf = 0.000000
 memory_reservation_mib = 4096
 memory_limit_mib = 8192
-question_parallelism = 4
+question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "500", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_SWISSAI_REQUESTS_PER_MINUTE = "15", RXNHAYSTACK_SWISSAI_RATE_LIMIT_RETRIES = "2" }
 command = ["uv", "run", "--frozen", "python", "tier3/llm_task24.py"]
 
@@ -5738,7 +5738,7 @@ repetitions = 5
 estimated_cost_chf = 0.000000
 memory_reservation_mib = 2048
 memory_limit_mib = 4096
-question_parallelism = 4
+question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "100", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_SWISSAI_REQUESTS_PER_MINUTE = "15", RXNHAYSTACK_SWISSAI_RATE_LIMIT_RETRIES = "2" }
 command = ["uv", "run", "--frozen", "python", "tier4/llm_task11.py"]
 
@@ -5754,7 +5754,7 @@ repetitions = 5
 estimated_cost_chf = 0.000000
 memory_reservation_mib = 4096
 memory_limit_mib = 8192
-question_parallelism = 4
+question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "500", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_SWISSAI_REQUESTS_PER_MINUTE = "15", RXNHAYSTACK_SWISSAI_RATE_LIMIT_RETRIES = "2" }
 command = ["uv", "run", "--frozen", "python", "tier4/llm_task11.py"]
 
@@ -5850,7 +5850,7 @@ repetitions = 5
 estimated_cost_chf = 0.000000
 memory_reservation_mib = 2048
 memory_limit_mib = 4096
-question_parallelism = 4
+question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "100", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_SWISSAI_REQUESTS_PER_MINUTE = "15", RXNHAYSTACK_SWISSAI_RATE_LIMIT_RETRIES = "2" }
 command = ["uv", "run", "--frozen", "python", "tier4/llm_task12.py"]
 
@@ -5866,7 +5866,7 @@ repetitions = 5
 estimated_cost_chf = 0.000000
 memory_reservation_mib = 4096
 memory_limit_mib = 8192
-question_parallelism = 4
+question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "500", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_SWISSAI_REQUESTS_PER_MINUTE = "15", RXNHAYSTACK_SWISSAI_RATE_LIMIT_RETRIES = "2" }
 command = ["uv", "run", "--frozen", "python", "tier4/llm_task12.py"]
 
@@ -5962,7 +5962,7 @@ repetitions = 5
 estimated_cost_chf = 0.000000
 memory_reservation_mib = 2048
 memory_limit_mib = 4096
-question_parallelism = 4
+question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "100", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_SWISSAI_REQUESTS_PER_MINUTE = "15", RXNHAYSTACK_SWISSAI_RATE_LIMIT_RETRIES = "2" }
 command = ["uv", "run", "--frozen", "python", "tier4/llm_task12b.py"]
 
@@ -5978,7 +5978,7 @@ repetitions = 5
 estimated_cost_chf = 0.000000
 memory_reservation_mib = 4096
 memory_limit_mib = 8192
-question_parallelism = 4
+question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "500", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_SWISSAI_REQUESTS_PER_MINUTE = "15", RXNHAYSTACK_SWISSAI_RATE_LIMIT_RETRIES = "2" }
 command = ["uv", "run", "--frozen", "python", "tier4/llm_task12b.py"]
 
@@ -6074,7 +6074,7 @@ repetitions = 5
 estimated_cost_chf = 0.000000
 memory_reservation_mib = 2048
 memory_limit_mib = 4096
-question_parallelism = 4
+question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "100", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_SWISSAI_REQUESTS_PER_MINUTE = "15", RXNHAYSTACK_SWISSAI_RATE_LIMIT_RETRIES = "2" }
 command = ["uv", "run", "--frozen", "python", "tier4/llm_task13.py"]
 
@@ -6090,7 +6090,7 @@ repetitions = 5
 estimated_cost_chf = 0.000000
 memory_reservation_mib = 4096
 memory_limit_mib = 8192
-question_parallelism = 4
+question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "500", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_SWISSAI_REQUESTS_PER_MINUTE = "15", RXNHAYSTACK_SWISSAI_RATE_LIMIT_RETRIES = "2" }
 command = ["uv", "run", "--frozen", "python", "tier4/llm_task13.py"]
 
@@ -6186,7 +6186,7 @@ repetitions = 5
 estimated_cost_chf = 0.000000
 memory_reservation_mib = 2048
 memory_limit_mib = 4096
-question_parallelism = 4
+question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "100", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_SWISSAI_REQUESTS_PER_MINUTE = "15", RXNHAYSTACK_SWISSAI_RATE_LIMIT_RETRIES = "2" }
 command = ["uv", "run", "--frozen", "python", "tier4/llm_task14.py"]
 
@@ -6202,7 +6202,7 @@ repetitions = 5
 estimated_cost_chf = 0.000000
 memory_reservation_mib = 4096
 memory_limit_mib = 8192
-question_parallelism = 4
+question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "500", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_SWISSAI_REQUESTS_PER_MINUTE = "15", RXNHAYSTACK_SWISSAI_RATE_LIMIT_RETRIES = "2" }
 command = ["uv", "run", "--frozen", "python", "tier4/llm_task14.py"]
 
@@ -6298,7 +6298,7 @@ repetitions = 5
 estimated_cost_chf = 0.000000
 memory_reservation_mib = 2048
 memory_limit_mib = 4096
-question_parallelism = 4
+question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "100", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_SWISSAI_REQUESTS_PER_MINUTE = "15", RXNHAYSTACK_SWISSAI_RATE_LIMIT_RETRIES = "2" }
 command = ["uv", "run", "--frozen", "python", "tier4/llm_task15.py"]
 
@@ -6314,7 +6314,7 @@ repetitions = 5
 estimated_cost_chf = 0.000000
 memory_reservation_mib = 4096
 memory_limit_mib = 8192
-question_parallelism = 4
+question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "500", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_SWISSAI_REQUESTS_PER_MINUTE = "15", RXNHAYSTACK_SWISSAI_RATE_LIMIT_RETRIES = "2" }
 command = ["uv", "run", "--frozen", "python", "tier4/llm_task15.py"]
 
@@ -6410,7 +6410,7 @@ repetitions = 5
 estimated_cost_chf = 0.000000
 memory_reservation_mib = 2048
 memory_limit_mib = 4096
-question_parallelism = 4
+question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "100", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_SWISSAI_REQUESTS_PER_MINUTE = "15", RXNHAYSTACK_SWISSAI_RATE_LIMIT_RETRIES = "2" }
 command = ["uv", "run", "--frozen", "python", "tier4/llm_task16.py"]
 
@@ -6426,7 +6426,7 @@ repetitions = 5
 estimated_cost_chf = 0.000000
 memory_reservation_mib = 4096
 memory_limit_mib = 8192
-question_parallelism = 4
+question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "500", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_SWISSAI_REQUESTS_PER_MINUTE = "15", RXNHAYSTACK_SWISSAI_RATE_LIMIT_RETRIES = "2" }
 command = ["uv", "run", "--frozen", "python", "tier4/llm_task16.py"]
 
@@ -6522,7 +6522,7 @@ repetitions = 5
 estimated_cost_chf = 0.000000
 memory_reservation_mib = 2048
 memory_limit_mib = 4096
-question_parallelism = 4
+question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "100", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_SWISSAI_REQUESTS_PER_MINUTE = "15", RXNHAYSTACK_SWISSAI_RATE_LIMIT_RETRIES = "2" }
 command = ["uv", "run", "--frozen", "python", "tier4/llm_task17.py"]
 
@@ -6538,7 +6538,7 @@ repetitions = 5
 estimated_cost_chf = 0.000000
 memory_reservation_mib = 4096
 memory_limit_mib = 8192
-question_parallelism = 4
+question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "500", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_SWISSAI_REQUESTS_PER_MINUTE = "15", RXNHAYSTACK_SWISSAI_RATE_LIMIT_RETRIES = "2" }
 command = ["uv", "run", "--frozen", "python", "tier4/llm_task17.py"]
 
@@ -6634,7 +6634,7 @@ repetitions = 5
 estimated_cost_chf = 0.000000
 memory_reservation_mib = 2048
 memory_limit_mib = 4096
-question_parallelism = 4
+question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "100", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_SWISSAI_REQUESTS_PER_MINUTE = "15", RXNHAYSTACK_SWISSAI_RATE_LIMIT_RETRIES = "2" }
 command = ["uv", "run", "--frozen", "python", "tier4/llm_task17b.py"]
 
@@ -6650,7 +6650,7 @@ repetitions = 5
 estimated_cost_chf = 0.000000
 memory_reservation_mib = 4096
 memory_limit_mib = 8192
-question_parallelism = 4
+question_parallelism = 1
 env = { RXNHAYSTACK_CONTEXT_SIZE = "500", RXNHAYSTACK_PROVIDER = "swissai", RXNHAYSTACK_SWISSAI_REQUESTS_PER_MINUTE = "15", RXNHAYSTACK_SWISSAI_RATE_LIMIT_RETRIES = "2" }
 command = ["uv", "run", "--frozen", "python", "tier4/llm_task17b.py"]
 

@@ -482,15 +482,16 @@ calls and 34 tool executions, hit the 30,000-token bound zero times, cost CHF
 1.239, and obtained 1/10 exact match with macro-F1 0.195. This is the evidence
 for retaining the much cheaper Haiku model and the larger bounded allowance.
 
-## 16. Qwen one-shot concurrency
+## 16. SwissAI one-shot concurrency
 
 The first final-style Qwen Tier-1 check ran four questions concurrently. Nine
 of ten returned correctly, but one exceeded the five-minute provider deadline,
 so the job failed rather than writing partial metrics. A health request returned
 in 1.5 seconds, and all ten benchmark questions subsequently completed in 36
-seconds with concurrency one. Full benchmark v26 therefore uses one-question
-parallelism for Qwen LLM only. This changes throughput, not prompts, sampling,
-or inference limits.
+seconds with concurrency one. A broader GLM attempt then returned 5/6 answers
+on three hard Task-2 jobs before one request in each batch timed out. Full
+benchmark v27 therefore uses one-question parallelism for every SwissAI LLM
+model. This changes throughput, not prompts, sampling, or inference limits.
 
 ## What has not been hidden or simplified away
 

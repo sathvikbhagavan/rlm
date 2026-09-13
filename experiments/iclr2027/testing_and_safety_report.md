@@ -10,7 +10,7 @@ broader engineering history, read [`what_changed.md`](what_changed.md).
 
 ## Current status
 
-- The final experiment descriptions are full benchmark v26 and
+- The final experiment descriptions are full benchmark v27 and
   matched-cardinality v7.
 - The full benchmark contains 6,300 jobs and has a planned ceiling of
   CHF 743.72.
@@ -28,8 +28,8 @@ broader engineering history, read [`what_changed.md`](what_changed.md).
   reports 430 passed and 10 skipped tests; the focused final checks report 14
   passed.
 
-The v16 through v25 directories contain calibration and diagnostic work. They
-are deliberately separate from v26 and will not be mistaken for final results.
+The v16 through v26 directories contain calibration and diagnostic work. They
+are deliberately separate from v27 and will not be mistaken for final results.
 
 ## Why the final testing took so long
 
@@ -236,18 +236,22 @@ The final v25 GLM release check used `--max-parallel 1`: two Tier-1 jobs coverin
 20 question trajectories completed in 43.5 and 44.6 seconds. All 20 responses
 were recorded with no 429, timeout, or provider error; peak memory was 328.4 MiB
 and the x100/x500 macro-F1 scores were 0.880/0.773. This supports one SwissAI LLM
-job at a time on each credential, while each job retains its four-question
-internal concurrency.
+job at a time on each credential.
 
 The equivalent Qwen check showed that four-question internal concurrency was
 too high for the 397B endpoint: 9/10 x100 questions returned, but one exceeded
 the 300-second request deadline, which correctly failed the incomplete job. A
 single tiny endpoint request returned in 1.5 seconds, and the same ten benchmark
 questions then completed serially in 36 seconds with 10/10 answers and macro-F1
-1.0. Full benchmark v26 therefore records Qwen LLM question parallelism as one;
-other one-shot models remain at four. The exact v26 x100 and x500 launcher jobs
+1.0. Full benchmark v26 therefore recorded Qwen LLM question parallelism as one.
+The exact v26 x100 and x500 launcher jobs
 then both passed in 42.7 and 172.5 seconds, with zero timeout/provider errors,
 macro-F1 0.967/1.0, and peak memory below 331 MiB.
+
+The subsequent broad GLM phase showed the same long-tail effect on the harder
+Tier-2 Task-2 prompts: three jobs returned 5/6 answers before the sixth request
+timed out. Full benchmark v27 therefore serializes LLM questions for all three
+SwissAI models. OpenRouter LLM jobs retain four-question concurrency.
 
 Claude Sonnet 5 was replaced by the pinned Claude Haiku 4.5 model at half the
 input and output list prices. The first 8,192-token Haiku checks exposed two

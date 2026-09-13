@@ -87,9 +87,9 @@ def render() -> str:
         "schema_version = 1",
         "",
         "[campaign]",
-        'name = "iclr2027-six-model-full-v26"',
+        'name = "iclr2027-six-model-full-v27"',
         'project_root = "../.."',
-        'artifact_dir = "artifacts/iclr2027-six-model-full-v26"',
+        'artifact_dir = "artifacts/iclr2027-six-model-full-v27"',
         "budget_chf = 1250.0",
         f"usd_to_chf = {USD_TO_CHF:.2f}",
         "require_dataset = true",
@@ -137,7 +137,7 @@ def render() -> str:
                         env["RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB"] = "4096"
                     env_text = ", ".join(f"{key} = {quote(value)}" for key, value in env.items())
                     question_parallelism = condition.question_parallelism
-                    if condition.method == "llm" and model.alias == "qwen3.5-397b":
+                    if condition.method == "llm" and model.provider == "swissai":
                         question_parallelism = 1
                     lines.extend(
                         [
