@@ -86,6 +86,17 @@ print(len(values))</parameter>
     )
 
 
+def test_codeact_extracts_anthropic_execute_code_actions_in_order() -> None:
+    response = """<invoke name="execute_code">
+<parameter name="code">values = list(lines)</parameter>
+</invoke>
+<invoke name="execute_code">
+<parameter name="code">print(len(values))</parameter>
+</invoke>"""
+
+    assert parse_code_action(response) == "values = list(lines)\n\nprint(len(values))"
+
+
 def test_codeact_does_not_execute_other_xml_tools_or_truncated_calls() -> None:
     other_tool = '<invoke name="search"><parameter name="code">print(1)</parameter></invoke>'
     truncated = '<invoke name="execute_python"><parameter name="code">print(1)'

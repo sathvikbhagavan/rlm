@@ -146,7 +146,7 @@ def parse_code_action(response: str) -> str | None:
         return "\n\n".join(block.strip() for block in fenced_matches if block.strip())
 
     anthropic_matches = re.findall(
-        r"<invoke\b[^>]*\bname\s*=\s*[\"']execute_python[\"'][^>]*>"
+        r"<invoke\b[^>]*\bname\s*=\s*[\"']execute_(?:python|code)[\"'][^>]*>"
         r".*?<parameter\b[^>]*\bname\s*=\s*[\"']code[\"'][^>]*>"
         r"(.*?)</parameter>.*?</invoke>",
         response,
