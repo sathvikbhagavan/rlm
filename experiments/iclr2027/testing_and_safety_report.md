@@ -245,7 +245,9 @@ the 300-second request deadline, which correctly failed the incomplete job. A
 single tiny endpoint request returned in 1.5 seconds, and the same ten benchmark
 questions then completed serially in 36 seconds with 10/10 answers and macro-F1
 1.0. Full benchmark v26 therefore records Qwen LLM question parallelism as one;
-other one-shot models remain at four.
+other one-shot models remain at four. The exact v26 x100 and x500 launcher jobs
+then both passed in 42.7 and 172.5 seconds, with zero timeout/provider errors,
+macro-F1 0.967/1.0, and peak memory below 331 MiB.
 
 Claude Sonnet 5 was replaced by the pinned Claude Haiku 4.5 model at half the
 input and output list prices. The first 8,192-token Haiku checks exposed two

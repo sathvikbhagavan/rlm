@@ -463,7 +463,9 @@ four-question check returned 9/10 answers but lost one request at the 300-second
 deadline; the identical ten-question check completed in 36 seconds when run
 serially. This is recorded directly in full benchmark v26. It does not require a
 special launch flag: Qwen LLM jobs say `question_parallelism = 1`, while the
-other LLM jobs retain four.
+other LLM jobs retain four. The exact v26 x100/x500 launcher checks subsequently
+completed all 20 questions in 42.7/172.5 seconds with no timeout, 429, or provider
+error.
 
 For every trial job, inspect:
 
