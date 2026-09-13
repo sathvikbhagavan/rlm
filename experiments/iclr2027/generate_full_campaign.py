@@ -87,9 +87,9 @@ def render() -> str:
         "schema_version = 1",
         "",
         "[campaign]",
-        'name = "iclr2027-six-model-full-v25"',
+        'name = "iclr2027-six-model-full-v26"',
         'project_root = "../.."',
-        'artifact_dir = "artifacts/iclr2027-six-model-full-v25"',
+        'artifact_dir = "artifacts/iclr2027-six-model-full-v26"',
         "budget_chf = 1250.0",
         f"usd_to_chf = {USD_TO_CHF:.2f}",
         "require_dataset = true",
@@ -136,6 +136,9 @@ def render() -> str:
                         env["RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB"] = "8192"
                         env["RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB"] = "4096"
                     env_text = ", ".join(f"{key} = {quote(value)}" for key, value in env.items())
+                    question_parallelism = condition.question_parallelism
+                    if condition.method == "llm" and model.alias == "qwen3.5-397b":
+                        question_parallelism = 1
                     lines.extend(
                         [
                             "[[runs]]",
@@ -150,7 +153,7 @@ def render() -> str:
                             f"estimated_cost_chf = {cost:.6f}",
                             f"memory_reservation_mib = {condition.memory_reservation_mib}",
                             f"memory_limit_mib = {condition.memory_limit_mib}",
-                            f"question_parallelism = {condition.question_parallelism}",
+                            f"question_parallelism = {question_parallelism}",
                             f"env = {{ {env_text} }}",
                             f"command = [{', '.join(map(quote, ('uv', 'run', '--frozen', 'python', script)))}]",
                             "",

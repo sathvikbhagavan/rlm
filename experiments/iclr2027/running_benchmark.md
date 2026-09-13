@@ -458,6 +458,13 @@ GLM check also passed: two jobs and 20 questions completed without a 429,
 timeout, or provider error at `--max-parallel 1`. Broad SwissAI LLM work should
 therefore retain one launcher job at a time per credential.
 
+Qwen additionally requires one question at a time inside each LLM job. Its
+four-question check returned 9/10 answers but lost one request at the 300-second
+deadline; the identical ten-question check completed in 36 seconds when run
+serially. This is recorded directly in full benchmark v26. It does not require a
+special launch flag: Qwen LLM jobs say `question_parallelism = 1`, while the
+other LLM jobs retain four.
+
 For every trial job, inspect:
 
 - `metrics.json`: calls, input/output tokens, actual cost, total time, and tool

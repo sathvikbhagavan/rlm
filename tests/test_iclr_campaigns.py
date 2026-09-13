@@ -40,6 +40,11 @@ def test_full_campaign_is_generated_and_covers_six_models() -> None:
     assert {run.env["RXNHAYSTACK_RLM_MAX_TIMEOUT_SECONDS"] for run in rlm_runs} == {"1800"}
     codeact_runs = [run for run in manifest.runs if run.method == "codeact"]
     assert {run.env["RXNHAYSTACK_CODEACT_OUTPUT_LIMIT"] for run in codeact_runs} == {"30000"}
+    llm_runs = [run for run in manifest.runs if run.method == "llm"]
+    qwen_llm_runs = [run for run in llm_runs if run.model.startswith("RCP-AIaaS/Qwen/")]
+    other_llm_runs = [run for run in llm_runs if run not in qwen_llm_runs]
+    assert {run.question_parallelism for run in qwen_llm_runs} == {1}
+    assert {run.question_parallelism for run in other_llm_runs} == {4}
 
     with pytest.raises(ManifestError, match="SWISSAI_RESEARCH_API_KEY"):
         resolve_required_secrets(

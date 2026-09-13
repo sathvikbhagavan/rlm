@@ -10,7 +10,7 @@ broader engineering history, read [`what_changed.md`](what_changed.md).
 
 ## Current status
 
-- The final experiment descriptions are full benchmark v25 and
+- The final experiment descriptions are full benchmark v26 and
   matched-cardinality v7.
 - The full benchmark contains 6,300 jobs and has a planned ceiling of
   CHF 743.72.
@@ -28,8 +28,8 @@ broader engineering history, read [`what_changed.md`](what_changed.md).
   reports 430 passed and 10 skipped tests; the focused final checks report 14
   passed.
 
-The v16 through v24 directories contain calibration and diagnostic work. They
-are deliberately separate from v25 and will not be mistaken for final results.
+The v16 through v25 directories contain calibration and diagnostic work. They
+are deliberately separate from v26 and will not be mistaken for final results.
 
 ## Why the final testing took so long
 
@@ -238,6 +238,14 @@ were recorded with no 429, timeout, or provider error; peak memory was 328.4 MiB
 and the x100/x500 macro-F1 scores were 0.880/0.773. This supports one SwissAI LLM
 job at a time on each credential, while each job retains its four-question
 internal concurrency.
+
+The equivalent Qwen check showed that four-question internal concurrency was
+too high for the 397B endpoint: 9/10 x100 questions returned, but one exceeded
+the 300-second request deadline, which correctly failed the incomplete job. A
+single tiny endpoint request returned in 1.5 seconds, and the same ten benchmark
+questions then completed serially in 36 seconds with 10/10 answers and macro-F1
+1.0. Full benchmark v26 therefore records Qwen LLM question parallelism as one;
+other one-shot models remain at four.
 
 Claude Sonnet 5 was replaced by the pinned Claude Haiku 4.5 model at half the
 input and output list prices. The first 8,192-token Haiku checks exposed two
