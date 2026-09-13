@@ -9,6 +9,7 @@ from rxnhaystack.providers import (
     CODEACT_MAX_OUTPUT_TOKENS_ENV,
     RLM_MAX_OUTPUT_TOKENS,
     RLM_MAX_OUTPUT_TOKENS_ENV,
+    RLM_REASONING_EFFORT_ENV,
     SWISSAI_BASE_URL,
     SWISSAI_REQUEST_TIMEOUT_ENV,
     SWISSAI_REQUEST_TIMEOUT_SECONDS,
@@ -222,6 +223,31 @@ def test_anthropic_rlm_enables_openrouter_prompt_cache(monkeypatch) -> None:
         "cache_control": ANTHROPIC_CACHE_CONTROL,
         "session_id": "full-claude-rlm-r01",
     }
+
+
+def test_openrouter_rlm_records_reasoning_effort_and_larger_total_limit(
+    monkeypatch,
+) -> None:
+    monkeypatch.setenv("RXNHAYSTACK_PROVIDER", "openrouter")
+    monkeypatch.setenv("RXNHAYSTACK_MODEL", "openai/gpt-5-mini")
+    monkeypatch.setenv(RLM_MAX_OUTPUT_TOKENS_ENV, "4096")
+    monkeypatch.setenv(RLM_REASONING_EFFORT_ENV, "low")
+
+    configured = configure_rlm_for_provider({"backend": "openrouter"})
+
+    assert configured["backend_kwargs"]["max_output_tokens"] == 4096
+    assert configured["backend_kwargs"]["chat_completion_extra_body"] == {
+        "reasoning": {"effort": "low"}
+    }
+
+
+def test_reasoning_effort_is_rejected_for_swissai(monkeypatch) -> None:
+    monkeypatch.setenv("RXNHAYSTACK_PROVIDER", "swissai")
+    monkeypatch.setenv("SWISSAI_RESEARCH_API_KEY", "private")
+    monkeypatch.setenv(RLM_REASONING_EFFORT_ENV, "low")
+
+    with pytest.raises(ManifestError, match="only supported by the OpenRouter"):
+        configure_rlm_for_provider({"backend": "openrouter"})
 
 
 def test_anthropic_cache_routing_rejects_overlong_run_id(monkeypatch) -> None:

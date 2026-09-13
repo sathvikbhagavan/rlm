@@ -359,10 +359,14 @@ action used 390 tokens. The final cap is
 written into every CodeAct job in the experiment file and applied equally to
 SwissAI and OpenRouter models.
 
-RLM requests use the same 2,048-token per-call output bound. Live full-corpus
-turns normally used 129--860 output tokens; without a request bound, one turn
-continued for more than two minutes. The RLM-level limits of 30 iterations and
-two recursion levels remain unchanged.
+RLM requests use an explicit per-call bound. SwissAI models use 2,048 tokens and
+their hidden thinking channel is disabled. OpenRouter models use a 4,096-token
+total response ceiling with `low` reasoning effort. A live GPT-5-mini trial at
+the former 2,048-token ceiling produced five consecutive calls with 2,048 billed
+output tokens but zero visible words or actions: mandatory hidden reasoning had
+consumed the whole allowance. The current setting retains bounded spend while
+leaving most tokens for visible RLM code. The RLM-level limits of 30 iterations
+and two recursion levels remain unchanged.
 
 Tier-4 Tasks 16, 17, and 17b require the Docker environment for recorded
 benchmark jobs. There is no automatic local fallback during these archival

@@ -90,9 +90,9 @@ def render() -> str:
         "schema_version = 1",
         "",
         "[campaign]",
-        'name = "iclr2027-six-model-full-v16"',
+        'name = "iclr2027-six-model-full-v17"',
         'project_root = "../.."',
-        'artifact_dir = "artifacts/iclr2027-six-model-full-v16"',
+        'artifact_dir = "artifacts/iclr2027-six-model-full-v17"',
         "budget_chf = 1500.0",
         f"usd_to_chf = {USD_TO_CHF:.2f}",
         "require_dataset = true",
@@ -127,7 +127,11 @@ def render() -> str:
                         env["RXNHAYSTACK_CODEACT_TOOL_TIMEOUT_SECONDS"] = "60"
                         env["RXNHAYSTACK_CODEACT_TOOL_MEMORY_LIMIT_MIB"] = "4096"
                     if condition.method == "rlm":
-                        env["RXNHAYSTACK_RLM_OUTPUT_LIMIT"] = "2048"
+                        if model.provider == "openrouter":
+                            env["RXNHAYSTACK_RLM_OUTPUT_LIMIT"] = "4096"
+                            env["RXNHAYSTACK_RLM_REASONING_EFFORT"] = "low"
+                        else:
+                            env["RXNHAYSTACK_RLM_OUTPUT_LIMIT"] = "2048"
                         env["RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB"] = "8192"
                         env["RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB"] = "4096"
                     env_text = ", ".join(f"{key} = {quote(value)}" for key, value in env.items())

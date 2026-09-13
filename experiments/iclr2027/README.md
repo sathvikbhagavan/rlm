@@ -58,6 +58,12 @@ peaks to be attributed to RLM activity without logging model inputs or outputs.
 An interrupted RLM attempt removes only Docker containers bearing its unique
 label.
 
+RLM provider settings are explicit. SwissAI uses a 2,048-token response limit
+with server-side hidden thinking disabled. OpenRouter uses a 4,096-token total
+limit and `low` reasoning effort because its three selected closed models enable
+reasoning by default; a GPT-5-mini trial showed that the former 2,048-token cap
+could be consumed entirely by hidden reasoning, yielding an empty agent action.
+
 Docker RLM code execution has a 300-second per-block wall-time limit. The limit
 runs inside the container and terminates the generated program's process group,
 so multiprocessing children cannot survive a timeout while the RLM controller

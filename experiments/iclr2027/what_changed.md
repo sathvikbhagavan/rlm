@@ -199,11 +199,15 @@ could not stop the underlying computation, leaving a worker unable to finish.
 The shared factory applies this to all 34 CodeAct scripts, and agent cleanup
 stops every child even when the workflow itself fails or is interrupted.
 
-RLM now sends the same 2,048-token limit on every root and recursive request.
-Its prior OpenAI-compatible client had a 300-second deadline but no output-token
-bound; a live full-corpus Qwen turn exceeded two minutes while ordinary turns
-used 129--860 output tokens. The 30-iteration and two-level recursion limits are
-unchanged.
+RLM now sends an explicit limit on every root and recursive request. SwissAI
+uses 2,048 tokens with its hidden thinking channel disabled. The three
+OpenRouter models use a 4,096-token total ceiling and the provider's recorded
+`low` reasoning effort. This is necessary because a GPT-5-mini calibration spent
+five consecutive 2,048-token responses entirely on hidden reasoning and returned
+zero visible words or actions. OpenRouter's live model metadata reports
+reasoning as enabled by default at medium effort for GPT/Gemini and high effort
+for Claude. Low effort leaves most of the bounded response for visible RLM code.
+The 30-iteration and two-level recursion limits are unchanged.
 
 Docker-executed model code also has a 300-second wall-time limit per block. It
 terminates the complete in-container process group, including multiprocessing

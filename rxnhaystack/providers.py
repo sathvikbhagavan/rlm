@@ -14,6 +14,8 @@ CODEACT_MAX_OUTPUT_TOKENS_ENV = "RXNHAYSTACK_CODEACT_OUTPUT_LIMIT"
 CODEACT_MAX_OUTPUT_TOKENS = 2048
 RLM_MAX_OUTPUT_TOKENS_ENV = "RXNHAYSTACK_RLM_OUTPUT_LIMIT"
 RLM_MAX_OUTPUT_TOKENS = 2048
+RLM_REASONING_EFFORT_ENV = "RXNHAYSTACK_RLM_REASONING_EFFORT"
+OPENROUTER_REASONING_EFFORTS = {"none", "minimal", "low", "medium", "high", "xhigh", "max"}
 ANTHROPIC_CACHE_CONTROL = {"type": "ephemeral"}
 RUN_ID_ENV = "RXNHAYSTACK_RUN_ID"
 SWISSAI_API_KEY_ENV = "SWISSAI_RESEARCH_API_KEY"
@@ -173,6 +175,21 @@ def configure_rlm_for_provider(kwargs: dict[str, Any]) -> dict[str, Any]:
     model = os.environ.get("RXNHAYSTACK_MODEL")
     if model:
         backend_kwargs["model_name"] = model
+    reasoning_effort = os.environ.get(RLM_REASONING_EFFORT_ENV)
+    if reasoning_effort is not None:
+        reasoning_effort = reasoning_effort.strip().lower()
+        if reasoning_effort not in OPENROUTER_REASONING_EFFORTS:
+            choices = ", ".join(sorted(OPENROUTER_REASONING_EFFORTS))
+            raise ManifestError(
+                f"{RLM_REASONING_EFFORT_ENV} must be one of: {choices}"
+            )
+        if benchmark_provider() != "openrouter":
+            raise ManifestError(
+                f"{RLM_REASONING_EFFORT_ENV} is only supported by the OpenRouter transport"
+            )
+        extra_body = dict(backend_kwargs.get("chat_completion_extra_body", {}) or {})
+        extra_body["reasoning"] = {"effort": reasoning_effort}
+        backend_kwargs["chat_completion_extra_body"] = extra_body
     if (
         benchmark_provider() == "openrouter"
         and model is not None
