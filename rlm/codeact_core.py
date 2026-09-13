@@ -58,6 +58,14 @@ You must follow this format for each step:
 1. THINK: Reason about what you need to do next
 2. ACT: Take an action (execute code)
 
+PRELOADED DATA:
+- `lines` already contains every retrieved reaction-context row for the current
+  question.
+- Reference `lines` directly in Python.
+- Never copy the reaction rows into generated code, redefine them, or create a
+  duplicate such as `context_lines`; doing so wastes the action without adding
+  any information.
+
 AVAILABLE ACTIONS:
 - Execute Python code in a fenced block:
 ```python

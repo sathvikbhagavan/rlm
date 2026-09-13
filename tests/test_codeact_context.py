@@ -37,6 +37,8 @@ def test_codeact_does_not_treat_unfinished_reasoning_as_an_answer() -> None:
 def test_index_prompt_and_last_turn_instruction_do_not_assume_one_answer_shape() -> None:
     normalized_prompt = " ".join(INDEX_CODEACT_SYSTEM_PROMPT.split())
     assert "exact output format requested in the question" in normalized_prompt
+    assert "Reference `lines` directly" in normalized_prompt
+    assert "Never copy the reaction rows" in normalized_prompt
     assert "Do not write or request more code" in FINAL_ANSWER_REQUIRED
 
 
