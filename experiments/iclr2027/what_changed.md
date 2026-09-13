@@ -114,7 +114,7 @@ The three closed models use OpenRouter:
 
 ```text
 google/gemini-3.7-flash
-anthropic/claude-sonnet-5
+anthropic/claude-haiku-4.5
 openai/gpt-5-mini
 ```
 
@@ -346,9 +346,9 @@ current closed-model prices:
 | --- | ---: |
 | Three SwissAI models | CHF 0 |
 | Gemini-3.7-Flash | CHF 229.89 |
-| Claude-Sonnet-5 | CHF 835.00 |
+| Claude-Haiku-4.5 | CHF 417.50 |
 | GPT-5-mini | CHF 96.33 |
-| **Full benchmark** | **CHF 1,161.22** |
+| **Full benchmark** | **CHF 743.72** |
 
 Actual cost can differ because models may take different numbers of recursive
 turns. This is why the running guide requires small real-model trials before the
@@ -456,6 +456,24 @@ all worker processes. A provider-rejected request waits for `Retry-After` and is
 retried at most twice. This policy is used by the one-shot, CodeAct, and native
 RLM clients, is generated into the experiment files, and has deterministic
 tests. The v18 results remain diagnostics and are not mixed with v19.
+
+## 15. Final Claude choice and CodeAct response allowance
+
+The first v19 GLM LLM phase produced 214 complete jobs, but 63 later requests
+reached the five-minute provider deadline, three received provider 5xx errors,
+and four active jobs were interrupted when the launcher was stopped. These are
+diagnostic records; no v19 work is mixed into the final v20 result directory.
+
+Claude Sonnet 5 was replaced by the pinned `anthropic/claude-haiku-4.5` model.
+Haiku supports reasoning and tool use at half Sonnet's list-token prices, which
+reduces the full six-model estimate from CHF 1,161.22 to CHF 743.72. The combined
+full and matched-cardinality estimate is now CHF 814.70.
+
+The CodeAct response allowance increased from 2,048 to 8,192 tokens. In the
+hardest x500 calibration, 31/96 Sonnet turns and 30/57 GPT-5-mini turns ended at
+exactly 2,048 tokens. This showed a real truncation risk. The 8,192-token bound
+is materially safer without restoring the original 30,000-token exposure; it
+must be checked on Haiku and GPT-5-mini before broad CodeAct launch.
 
 ## What has not been hidden or simplified away
 

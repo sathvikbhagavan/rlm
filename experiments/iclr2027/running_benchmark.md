@@ -16,7 +16,7 @@ There are three experiment-description files, but only two contain new work:
 
 | Experiment file | Purpose | Separately tracked jobs | Estimated cost with safety margin |
 | --- | --- | ---: | ---: |
-| `full-campaign.toml` | Complete 100-question benchmark with six models | 6,300 | CHF 1,161.22 |
+| `full-campaign.toml` | Complete 100-question benchmark with six models | 6,300 | CHF 743.72 |
 | `matched-cardinality-campaign.toml` | Corpus-size/cardinality control on the 65 questions with ordinary reaction-row positives | 1,450 | CHF 70.98 |
 | `baseline-campaign.toml` | Optional independent GPT-5-mini reproduction | 1,050 | CHF 67.32 |
 
@@ -80,7 +80,7 @@ baseline reproduction. We should not run `baseline-campaign.toml` as well unless
 we explicitly want a second, independent GPT-5-mini reproduction.
 
 The provisional estimated total for the full and matched-cardinality experiments
-is CHF 1,232.20. The estimates include a 25% general safety margin, a further
+is CHF 814.70. The estimates include a 25% general safety margin, a further
 Claude CodeAct allowance based on a live Tier-4 trial, and a 50% margin for the
 matched-cardinality experiment. They are spending ceilings, not expected
 charges. Freeze the final figure only after the Docker-based RLM trial described
@@ -91,7 +91,7 @@ below.
 The full benchmark compares:
 
 - SwissAI: DeepSeek-V4-Flash-0731, GLM-5.2, and Qwen3.5-397B-A17B;
-- OpenRouter: Gemini-3.7-Flash, Claude-Sonnet-5, and GPT-5-mini.
+- OpenRouter: Gemini-3.7-Flash, Claude-Haiku-4.5, and GPT-5-mini.
 
 As calculated above, each full-benchmark model accounts for:
 
@@ -101,7 +101,7 @@ As calculated above, each full-benchmark model accounts for:
 ```
 
 The planned costs, including the safety margin, are CHF 0 for the three SwissAI
-models, CHF 229.89 for Gemini, CHF 835.00 for Claude, and CHF 96.33 for
+models, CHF 229.89 for Gemini, CHF 417.50 for Claude, and CHF 96.33 for
 GPT-5-mini. Each matched-cardinality model accounts for 725 jobs and 2,175
 question-level trajectories, as calculated above; only its GPT-5-mini half is
 expected to incur API charges.
@@ -334,7 +334,7 @@ Do not repeat those broad LLM, CodeAct, and full-corpus Task-16 diagnostics. The
 six-model v18 RLM check also completed successfully. The first attempted v18
 GLM LLM release then exposed SwissAI's shared 15-request-per-minute quota: 23
 jobs received HTTP 429 before producing a result. No v18 LLM result was used.
-The final v19 description spaces SwissAI request starts across worker processes
+The v19 description added spacing between SwissAI request starts across worker processes
 and retries at most two rejected-before-inference 429 requests using the delay
 specified by the provider.
 
@@ -362,13 +362,14 @@ thread-based timeout could report a timeout while an infinite loop continued in
 the background and prevented the worker from exiting. Both values are written
 into every CodeAct job in the experiment file.
 
-Each CodeAct model turn is capped at 2,048 output tokens. The older scripts
-requested as many as 30,000, which allowed a malformed action to occupy a
-provider for five minutes and could create an outsized paid bill. A 4,096-token
-trial still took over three minutes on Qwen, whereas the successful representative
-action used 390 tokens. The final cap is
-written into every CodeAct job in the experiment file and applied equally to
-SwissAI and OpenRouter models.
+Each CodeAct model turn is capped at 8,192 output tokens. A live Tier-4 x500
+audit found that 31/96 Claude Sonnet turns and 30/57 GPT-5-mini turns ended
+exactly at the former 2,048-token ceiling, making truncation a material concern.
+The original 30,000-token request remains too permissive across as many as eight
+tool turns. The 8,192-token compromise is written into every CodeAct job and
+applied equally to SwissAI and OpenRouter models. Its paid-model cost and
+truncation behavior must be checked on matched Task-16 cells before broad
+CodeAct execution.
 
 RLM requests use an explicit per-call bound. SwissAI models use 2,048 tokens and
 their hidden thinking channel is disabled. OpenRouter models use a 4,096-token
@@ -446,10 +447,11 @@ minutes per job, but the configured upper bound is about 35 minutes plus the
 answer-only model call. With two jobs at a time, the three-wave configured worst
 case is roughly 1.75 hours.
 
-The final v19 release check is the first selected GLM LLM phase itself. Its
-rate limiter has deterministic unit tests; the initial production results must
-be inspected for successful retries, complete metrics, and an absence of
-unhandled 429 errors before proceeding to another method or model.
+The v19 GLM LLM phase is diagnostic because excessive in-flight requests caused
+63 provider timeouts. Before broad v20 execution, run the 8,192-token Haiku and
+GPT-5-mini Task-16 x500 CodeAct checks and a lower-concurrency SwissAI LLM cell.
+Inspect successful retries, complete metrics, output-boundary frequency, and
+provider timeouts before proceeding to another method or model.
 
 For every trial job, inspect:
 
@@ -534,7 +536,7 @@ full-deepseek-v4-flash-*
 full-glm-5.2-*
 full-qwen3.5-397b-*
 full-gemini-3.7-flash-*
-full-claude-sonnet-5-*
+full-claude-haiku-4.5-*
 full-gpt-5-mini-*
 matched-qwen3.5-397b-*
 matched-gpt-5-mini-*
@@ -546,7 +548,7 @@ If a model must be divided further, job names follow this structure:
 full-{model}-{tier}-task{task}-{method}-x{context}-r{repetition}
 ```
 
-Thus `full-claude-sonnet-5-tier4-*` selects Claude Tier 4, while
+Thus `full-claude-haiku-4.5-tier4-*` selects Claude Tier 4, while
 `full-gpt-5-mini-*-rlm-*` selects GPT-5-mini RLM work across tiers. Multiple
 `--select` arguments are combined.
 

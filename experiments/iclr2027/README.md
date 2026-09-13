@@ -203,7 +203,7 @@ OpenRouter models, for 6,300 cells total. `RXNHAYSTACK_PROVIDER` selects the
 transport without changing task prompts. LLM and CodeAct use the shared
 LlamaIndex chat interface; RLM uses its native OpenAI-compatible client.
 
-The provisional CHF 1,161.22 planning estimate uses the submitted GPT-5-mini
+The provisional CHF 743.72 planning estimate uses the submitted GPT-5-mini
 token footprint, current per-token list prices for the three closed models,
 0.80 CHF/USD, and a 25% general margin. A live Claude CodeAct x500 trial showed
 longer conversations than GPT-5-mini, so Claude's CodeAct allowance has a
@@ -255,4 +255,4 @@ positives; no special cardinality definition is introduced.
 
 This is 1,450 worker cells and 4,350 question trajectories, with a CHF 70.98
 planning estimate including 50% contingency. Combined with the six-model
-matrix, the current estimate is CHF 1,232.20.
+matrix, the current estimate is CHF 814.70.

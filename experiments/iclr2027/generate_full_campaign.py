@@ -12,14 +12,12 @@ except ImportError:  # Direct script execution.
 USD_TO_CHF = 0.80
 COST_CONTINGENCY = 1.25
 
-# Claude used substantially more CodeAct turns/input than GPT-5-mini in a live
-# Tier-4 x500 calibration. OpenRouter prompt caching reduced the measured run
-# from CHF 12.13 to CHF 4.79, but provider cache reads were not perfectly
-# reliable. Apply a further model/method allowance to both CodeAct context sizes:
-# the resulting Task-16 x500 reservation is CHF 6.51, 36% above the cached run.
+# Claude Sonnet used substantially more CodeAct turns/input than GPT-5-mini in a
+# live Tier-4 x500 calibration. Retain that 1.75x model/method allowance for the
+# cheaper Haiku replacement until its own calibration can refine the estimate.
 COST_MULTIPLIERS = {
-    ("claude-sonnet-5", "codeact", 100): 1.75,
-    ("claude-sonnet-5", "codeact", 500): 1.75,
+    ("claude-haiku-4.5", "codeact", 100): 1.75,
+    ("claude-haiku-4.5", "codeact", 500): 1.75,
 }
 
 # Historical GPT-5-mini tokens for one repetition of each 100-question condition.
@@ -56,7 +54,13 @@ MODELS = (
         "swissai",
     ),
     Model("gemini-3.7-flash", "google/gemini-3.7-flash", "openrouter", 0.75, 3.75),
-    Model("claude-sonnet-5", "anthropic/claude-sonnet-5", "openrouter", 2.00, 10.00),
+    Model(
+        "claude-haiku-4.5",
+        "anthropic/claude-haiku-4.5",
+        "openrouter",
+        1.00,
+        5.00,
+    ),
     Model("gpt-5-mini", "openai/gpt-5-mini", "openrouter", 0.25, 2.00),
 )
 
@@ -83,9 +87,9 @@ def render() -> str:
         "schema_version = 1",
         "",
         "[campaign]",
-        'name = "iclr2027-six-model-full-v19"',
+        'name = "iclr2027-six-model-full-v20"',
         'project_root = "../.."',
-        'artifact_dir = "artifacts/iclr2027-six-model-full-v19"',
+        'artifact_dir = "artifacts/iclr2027-six-model-full-v20"',
         "budget_chf = 1500.0",
         f"usd_to_chf = {USD_TO_CHF:.2f}",
         "require_dataset = true",
@@ -119,7 +123,7 @@ def render() -> str:
                         env["RXNHAYSTACK_SWISSAI_REQUESTS_PER_MINUTE"] = "15"
                         env["RXNHAYSTACK_SWISSAI_RATE_LIMIT_RETRIES"] = "2"
                     if condition.method == "codeact":
-                        env["RXNHAYSTACK_CODEACT_OUTPUT_LIMIT"] = "2048"
+                        env["RXNHAYSTACK_CODEACT_OUTPUT_LIMIT"] = "8192"
                         env["RXNHAYSTACK_CODEACT_TOOL_TIMEOUT_SECONDS"] = "60"
                         env["RXNHAYSTACK_CODEACT_TOOL_MEMORY_LIMIT_MIB"] = "4096"
                     if condition.method == "rlm":

@@ -10,21 +10,24 @@ broader engineering history, read [`what_changed.md`](what_changed.md).
 
 ## Current status
 
-- The final experiment descriptions are full benchmark v19 and
+- The final experiment descriptions are full benchmark v20 and
   matched-cardinality v7.
 - The full benchmark contains 6,300 jobs and has a planned ceiling of
-  CHF 1,161.22.
+  CHF 743.72.
 - The matched-cardinality experiment contains 1,450 jobs and has a planned
   ceiling of CHF 70.98.
-- The combined planned amount is CHF 1,232.20. These are conservative planning
+- The combined planned amount is CHF 814.70. These are conservative planning
   figures, not predictions of the final invoice.
+- All locally recorded ICLR preparation and diagnostic metrics through v19 sum
+  to CHF 19.78. Adding that amount to the current planned ceiling gives
+  CHF 834.48 before the new v20 checks.
 - The exact USPTO raw and cleaned files, all six model identifiers, all three
   credentials, and the Docker image have been verified on Amin's machine.
 - After the final telemetry correction, the complete automated suite reports
   421 passed and 10 skipped tests.
 
-The v16, v17, and v18 directories contain calibration and diagnostic work. They
-are deliberately separate from v19 and will not be mistaken for final results.
+The v16 through v19 directories contain calibration and diagnostic work. They
+are deliberately separate from v20 and will not be mistaken for final results.
 
 ## Why the final testing took so long
 
@@ -129,7 +132,7 @@ full experiment. Qwen uses the SwissAI 2,048-token/no-hidden-thinking path.
 
 | Area | Effective limit | What happens at the boundary |
 | --- | --- | --- |
-| Full planned cost | CHF 1,500 declared; CHF 1,161.22 currently planned | Validation rejects an experiment description whose planned work exceeds the declaration. |
+| Full planned cost | CHF 1,500 declared; CHF 743.72 currently planned | Validation rejects an experiment description whose planned work exceeds the declaration. |
 | Matched planned cost | CHF 100 declared; CHF 70.98 currently planned | Same planning check; this is not live provider-account enforcement. |
 | Active-worker memory | 49,152 MiB total scheduling allowance | A worker waits until its declared reservation fits. |
 | LLM parallelism | 4 questions per worker | Further questions wait. |
@@ -140,7 +143,7 @@ full experiment. Qwen uses the SwissAI 2,048-token/no-hidden-thinking path.
 | LLM worker memory | 2–4 GiB reserved; 4–8 GiB hard limit | The launcher terminates a worker exceeding its combined hard limit. |
 | CodeAct worker memory | 4–6 GiB reserved; 8–12 GiB hard limit | Same combined-memory enforcement. |
 | RLM worker memory | 8/10/28 GiB reserved for 100/500/full context; 16/20/30 GiB hard limit | Same combined-memory enforcement. |
-| CodeAct response | 2,048 output tokens per model turn | The provider response is truncated at the recorded bound. |
+| CodeAct response | 8,192 output tokens per model turn | The provider response is truncated at the recorded bound. |
 | CodeAct reasoning loop | 8 tool/reasoning turns, then at most 2 answer-only attempts | Further code is not executed; the controller asks for the final answer. |
 | CodeAct generated tool | 60 seconds and 4,096 MiB | Its complete child process group is stopped and a clean namespace is restored. |
 | CodeAct provider request | 300 seconds; at most 2 timeout retries | A timed-out request is retried with recorded backoff; other errors are not silently retried. |
@@ -216,6 +219,20 @@ request starts sharing one SwissAI credential are spaced 4.25 seconds apart
 across worker processes. A rejected request is retried at most twice after the
 provider's stated delay. The rejected request has no model response and the
 retry therefore does not resample or replace a completed trajectory.
+
+The v19 GLM LLM phase subsequently established that request-start pacing alone
+does not bound the number of slow requests already in flight. It preserved 214
+complete jobs, while 63 jobs reached the 300-second provider deadline and three
+received provider 5xx errors; four more were interrupted when the launcher was
+stopped. These remain diagnostics. The v20 launch must use lower SwissAI
+in-flight concurrency and first demonstrate that the timeout rate is acceptable.
+
+Before v20, Claude Sonnet 5 was replaced by the pinned Claude Haiku 4.5 model at
+half the input and output list prices. CodeAct's former 2,048-token response
+allowance was also raised to 8,192 after the Task-16 x500 trace showed 31/96
+Sonnet turns and 30/57 GPT-5-mini turns exactly at the old ceiling. Haiku and
+GPT-5-mini must complete matched 8,192-token Task-16 checks before broad CodeAct
+execution.
 
 A second full-corpus Task-16 stress-test sweep is not necessary. Running Task 16
 once for Qwen, Gemini, Claude, and GPT would have a planned paid cost of

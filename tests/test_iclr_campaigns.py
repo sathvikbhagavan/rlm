@@ -28,7 +28,9 @@ def test_full_campaign_is_generated_and_covers_six_models() -> None:
 
     assert len(manifest.runs) == 6_300
     assert len({run.model for run in manifest.runs}) == 6
-    assert manifest.estimated_cost_chf == pytest.approx(1_161.22, abs=0.02)
+    assert manifest.estimated_cost_chf == pytest.approx(743.72, abs=0.02)
+    assert "anthropic/claude-haiku-4.5" in {run.model for run in manifest.runs}
+    assert "anthropic/claude-sonnet-5" not in {run.model for run in manifest.runs}
     assert manifest.campaign.required_secrets == REQUIRED_SECRETS
     assert Counter(run.env["RXNHAYSTACK_PROVIDER"] for run in manifest.runs) == {
         "swissai": 3_150,
@@ -36,6 +38,8 @@ def test_full_campaign_is_generated_and_covers_six_models() -> None:
     }
     rlm_runs = [run for run in manifest.runs if run.method == "rlm"]
     assert {run.env["RXNHAYSTACK_RLM_MAX_TIMEOUT_SECONDS"] for run in rlm_runs} == {"1800"}
+    codeact_runs = [run for run in manifest.runs if run.method == "codeact"]
+    assert {run.env["RXNHAYSTACK_CODEACT_OUTPUT_LIMIT"] for run in codeact_runs} == {"8192"}
 
     with pytest.raises(ManifestError, match="SWISSAI_RESEARCH_API_KEY"):
         resolve_required_secrets(
