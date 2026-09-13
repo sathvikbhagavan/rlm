@@ -464,11 +464,19 @@ four-question check returned 9/10 answers but lost one request at the 300-second
 deadline; the identical ten-question check completed in 36 seconds when run
 serially. GLM later showed the same pattern on Tier-2 Task 2, returning 5/6
 answers before one request timed out. This is recorded directly in full
-benchmark v27. It does not require a special launch flag: SwissAI LLM jobs say
+benchmark v28. It does not require a special launch flag: SwissAI LLM jobs say
 `question_parallelism = 1`, while OpenRouter LLM jobs retain four. The exact
 Qwen v26 x100/x500 launcher checks
 completed all 20 questions in 42.7/172.5 seconds with no timeout, 429, or provider
 error.
+
+SwissAI LLM jobs also cap each response at 4,096 tokens. The hardest observed
+GLM x500 request timed out after both five and ten minutes when it reserved
+30,000 output tokens; the identical prompt returned in 33 seconds with the
+4,096-token allowance and used 42 tokens. Even an answer containing all 500
+reaction indices fits inside this bound. This setting is recorded in v28 and is
+applied automatically; it does not change the separate 30,000-token CodeAct
+allowance.
 
 For every trial job, inspect:
 

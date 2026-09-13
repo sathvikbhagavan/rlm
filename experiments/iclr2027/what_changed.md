@@ -493,6 +493,12 @@ on three hard Task-2 jobs before one request in each batch timed out. Full
 benchmark v27 therefore uses one-question parallelism for every SwissAI LLM
 model. This changes throughput, not prompts, sampling, or inference limits.
 
+The first serialized GLM Task-2 x500 request still timed out at both five and
+ten minutes when its request reserved 30,000 output tokens. With an otherwise
+identical 4,096-token allowance it returned in 33 seconds and used 42 output
+tokens. Full benchmark v28 applies that bound to SwissAI LLM requests only;
+OpenRouter LLM, CodeAct, and RLM retain their separately recorded limits.
+
 ## What has not been hidden or simplified away
 
 - The three API/W&B credential values are currently required before any selected

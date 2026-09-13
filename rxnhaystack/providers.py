@@ -11,6 +11,7 @@ from rxnhaystack.rate_limit import call_swissai_async, call_swissai_sync
 
 PROVIDER_ENV = "RXNHAYSTACK_PROVIDER"
 METHOD_ENV = "RXNHAYSTACK_METHOD"
+LLM_MAX_OUTPUT_TOKENS_ENV = "RXNHAYSTACK_LLM_OUTPUT_LIMIT"
 CODEACT_MAX_OUTPUT_TOKENS_ENV = "RXNHAYSTACK_CODEACT_OUTPUT_LIMIT"
 CODEACT_MAX_OUTPUT_TOKENS = 2048
 RLM_MAX_OUTPUT_TOKENS_ENV = "RXNHAYSTACK_RLM_OUTPUT_LIMIT"
@@ -59,20 +60,24 @@ def provider_reports_cost(environ: dict[str, str] | None = None) -> bool:
 
 
 def _bounded_chat_kwargs(kwargs: dict[str, Any]) -> dict[str, Any]:
-    """Apply the recorded per-turn CodeAct output guardrail."""
+    """Apply the recorded per-turn output guardrail for the selected method."""
 
     configured = dict(kwargs)
-    if os.environ.get(METHOD_ENV) != "codeact":
+    method = os.environ.get(METHOD_ENV)
+    if method == "codeact":
+        limit_env = CODEACT_MAX_OUTPUT_TOKENS_ENV
+        raw_limit = os.environ.get(limit_env, str(CODEACT_MAX_OUTPUT_TOKENS))
+    elif method == "llm" and LLM_MAX_OUTPUT_TOKENS_ENV in os.environ:
+        limit_env = LLM_MAX_OUTPUT_TOKENS_ENV
+        raw_limit = os.environ[limit_env]
+    else:
         return configured
-    raw_limit = os.environ.get(CODEACT_MAX_OUTPUT_TOKENS_ENV, str(CODEACT_MAX_OUTPUT_TOKENS))
     try:
         limit = int(raw_limit)
     except ValueError as error:
-        raise ManifestError(
-            f"{CODEACT_MAX_OUTPUT_TOKENS_ENV} must be a positive integer"
-        ) from error
+        raise ManifestError(f"{limit_env} must be a positive integer") from error
     if limit <= 0:
-        raise ManifestError(f"{CODEACT_MAX_OUTPUT_TOKENS_ENV} must be a positive integer")
+        raise ManifestError(f"{limit_env} must be a positive integer")
 
     requested = int(configured.get("max_tokens", limit))
     configured["max_tokens"] = min(requested, limit)

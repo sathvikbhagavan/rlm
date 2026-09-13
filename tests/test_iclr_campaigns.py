@@ -45,6 +45,8 @@ def test_full_campaign_is_generated_and_covers_six_models() -> None:
     openrouter_llm_runs = [run for run in llm_runs if run not in swissai_llm_runs]
     assert {run.question_parallelism for run in swissai_llm_runs} == {1}
     assert {run.question_parallelism for run in openrouter_llm_runs} == {4}
+    assert {run.env["RXNHAYSTACK_LLM_OUTPUT_LIMIT"] for run in swissai_llm_runs} == {"4096"}
+    assert all("RXNHAYSTACK_LLM_OUTPUT_LIMIT" not in run.env for run in openrouter_llm_runs)
 
     with pytest.raises(ManifestError, match="SWISSAI_RESEARCH_API_KEY"):
         resolve_required_secrets(

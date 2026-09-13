@@ -7,6 +7,7 @@ from rxnhaystack.providers import (
     ANTHROPIC_CACHE_CONTROL,
     CODEACT_MAX_OUTPUT_TOKENS,
     CODEACT_MAX_OUTPUT_TOKENS_ENV,
+    LLM_MAX_OUTPUT_TOKENS_ENV,
     RLM_MAX_OUTPUT_TOKENS,
     RLM_MAX_OUTPUT_TOKENS_ENV,
     RLM_REASONING_EFFORT_ENV,
@@ -152,6 +153,26 @@ def test_codeact_caps_each_provider_completion(monkeypatch) -> None:
     )
 
     assert swiss_client.max_tokens == CODEACT_MAX_OUTPUT_TOKENS
+
+
+def test_llm_output_limit_is_explicit_and_does_not_affect_other_methods(monkeypatch) -> None:
+    monkeypatch.setenv("RXNHAYSTACK_PROVIDER", "openrouter")
+    monkeypatch.setenv("RXNHAYSTACK_METHOD", "llm")
+    monkeypatch.setenv(LLM_MAX_OUTPUT_TOKENS_ENV, "4096")
+
+    client = build_benchmark_llm(
+        model="model",
+        api_key="private",
+        max_tokens=30_000,
+        additional_kwargs={"max_completion_tokens": 30_000},
+    )
+
+    assert client.max_tokens == 4096
+    assert client.additional_kwargs["max_completion_tokens"] == 4096
+
+    monkeypatch.setenv("RXNHAYSTACK_METHOD", "rlm")
+    rlm_client = build_benchmark_llm(model="model", api_key="private", max_tokens=30_000)
+    assert rlm_client.max_tokens == 30_000
 
 
 def test_anthropic_codeact_enables_openrouter_prompt_cache(monkeypatch) -> None:

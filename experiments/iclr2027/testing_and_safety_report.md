@@ -10,7 +10,7 @@ broader engineering history, read [`what_changed.md`](what_changed.md).
 
 ## Current status
 
-- The final experiment descriptions are full benchmark v27 and
+- The final experiment descriptions are full benchmark v28 and
   matched-cardinality v7.
 - The full benchmark contains 6,300 jobs and has a planned ceiling of
   CHF 743.72.
@@ -25,11 +25,11 @@ broader engineering history, read [`what_changed.md`](what_changed.md).
 - The exact USPTO raw and cleaned files, all six model identifiers, all three
   credentials, and the Docker image have been verified on Amin's machine.
 - After the Claude compatibility correction, the complete automated suite
-  reports 430 passed and 10 skipped tests; the focused final checks report 14
+  reports 431 passed and 10 skipped tests; the focused final checks report 21
   passed.
 
-The v16 through v26 directories contain calibration and diagnostic work. They
-are deliberately separate from v27 and will not be mistaken for final results.
+The v16 through v27 directories contain calibration and diagnostic work. They
+are deliberately separate from v28 and will not be mistaken for final results.
 
 ## Why the final testing took so long
 
@@ -149,6 +149,7 @@ full experiment. Qwen uses the SwissAI 2,048-token/no-hidden-thinking path.
 | RLM worker memory | 8/10/28 GiB reserved for 100/500/full context; 16/20/30 GiB hard limit | Same combined-memory enforcement. |
 | CodeAct response | 30,000 output tokens per model turn | The provider response is truncated at the recorded bound; the valid Haiku Task-16 pilot hit it zero times. |
 | LLM/CodeAct reasoning | `low` in Tier 1; `high` in Tiers 2–4 | This preserves the collaborator's original task settings. SwissAI disables only its separate hidden-thinking channel. |
+| SwissAI LLM response | 4,096 output tokens per request | Keeps large-context requests schedulable; 500 reaction indices fit within the bound. OpenRouter LLM limits are unchanged. |
 | CodeAct reasoning loop | 8 tool/reasoning turns, then at most 2 answer-only attempts | Further code is not executed; the controller asks for the final answer. |
 | CodeAct generated tool | 60 seconds and 4,096 MiB | Its complete child process group is stopped and a clean namespace is restored. |
 | CodeAct provider request | 300 seconds; at most 2 timeout retries | A timed-out request is retried with recorded backoff; other errors are not silently retried. |
@@ -252,6 +253,12 @@ The subsequent broad GLM phase showed the same long-tail effect on the harder
 Tier-2 Task-2 prompts: three jobs returned 5/6 answers before the sixth request
 timed out. Full benchmark v27 therefore serializes LLM questions for all three
 SwissAI models. OpenRouter LLM jobs retain four-question concurrency.
+
+Serialization alone did not make GLM Task-2 x500 schedulable: the first request
+timed out at both five and ten minutes while reserving 30,000 output tokens. The
+identical prompt returned in 33 seconds when its allowance was 4,096 tokens and
+used only 42. Full benchmark v28 therefore records a 4,096-token SwissAI LLM
+allowance. CodeAct retains 30,000; RLM retains its separate 2,048 setting.
 
 Claude Sonnet 5 was replaced by the pinned Claude Haiku 4.5 model at half the
 input and output list prices. The first 8,192-token Haiku checks exposed two
