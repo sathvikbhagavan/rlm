@@ -47,6 +47,7 @@ RLM(
     max_iterations: int = 30,
     max_budget: float | None = None,
     max_timeout: float | None = None,
+    finalize_on_timeout: bool = False,
     max_tokens: int | None = None,
     max_errors: int | None = None,
     custom_system_prompt: str | None = None,
@@ -222,6 +223,10 @@ Maximum total USD cost for a completion. If exceeded, raises `BudgetExceededErro
 **Default:** `None`
 
 Maximum wall-clock seconds for a completion. If exceeded, raises `TimeoutExceededError`. The partial answer (if any) is available on the exception.
+
+Set `finalize_on_timeout=True` to request one answer-only response from the
+accumulated history and return a normal `RLMChatCompletion` instead. This final
+response and its usage are included in the completion metrics.
 
 ---
 

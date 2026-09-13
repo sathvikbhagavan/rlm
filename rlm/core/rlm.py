@@ -60,6 +60,7 @@ class RLM:
         max_iterations: int = 30,
         max_budget: float | None = None,
         max_timeout: float | None = None,
+        finalize_on_timeout: bool = False,
         max_tokens: int | None = None,
         max_errors: int | None = None,
         custom_system_prompt: str | None = None,
@@ -90,6 +91,7 @@ class RLM:
             max_iterations: The maximum number of iterations of the RLM.
             max_budget: Maximum budget in USD. Execution stops if exceeded. Requires cost-tracking backend (e.g., OpenRouter).
             max_timeout: Maximum execution time in seconds. Execution stops if exceeded, returning best answer if available.
+            finalize_on_timeout: If True, ask for one answer-only response when max_timeout is exceeded instead of raising TimeoutExceededError.
             max_tokens: Maximum total tokens (input + output). Execution stops if exceeded, returning best answer if available.
             max_errors: Maximum consecutive errors before stopping. Execution stops if exceeded, returning best answer if available.
             custom_system_prompt: The custom system prompt to use for the RLM.
@@ -145,6 +147,7 @@ class RLM:
         self.max_iterations = max_iterations
         self.max_budget = max_budget
         self.max_timeout = max_timeout
+        self.finalize_on_timeout = finalize_on_timeout
         self.max_tokens = max_tokens
         self.max_errors = max_errors
         self.system_prompt = custom_system_prompt if custom_system_prompt else RLM_SYSTEM_PROMPT
@@ -346,6 +349,7 @@ class RLM:
                     prev_total_output_tokens = 0
                     prev_total_calls = 0
                     prev_total_cost = 0.0
+                    stopped_by_timeout = False
 
                     compaction_count = 0
                     try:
@@ -468,24 +472,24 @@ class RLM:
                                         for block in iteration.code_blocks
                                     )
                                     iteration_metrics = {
-                                            "iteration": iteration_num,
-                                            "prompt_tokens": prompt_tokens,
-                                            "context_limit_tokens": context_limit_tokens,
-                                            "context_fill_pct": context_fill_pct,
-                                            "iteration_input_tokens": iteration_input_tokens,
-                                            "iteration_output_tokens": iteration_output_tokens,
-                                            "iteration_total_tokens": iteration_total_tokens,
-                                            "iteration_calls": iteration_calls,
-                                            "iteration_cost_usd": iteration_cost,
-                                            "total_input_tokens": total_input_tokens,
-                                            "total_output_tokens": total_output_tokens,
-                                            "total_tokens": total_tokens,
-                                            "iteration_time_s": iteration.iteration_time,
-                                            "model_time_s": iteration.model_time,
-                                            "tool_time_s": iteration.tool_time,
-                                            "code_block_count": len(iteration.code_blocks),
-                                            "had_error": int(iteration_had_error),
-                                        }
+                                        "iteration": iteration_num,
+                                        "prompt_tokens": prompt_tokens,
+                                        "context_limit_tokens": context_limit_tokens,
+                                        "context_fill_pct": context_fill_pct,
+                                        "iteration_input_tokens": iteration_input_tokens,
+                                        "iteration_output_tokens": iteration_output_tokens,
+                                        "iteration_total_tokens": iteration_total_tokens,
+                                        "iteration_calls": iteration_calls,
+                                        "iteration_cost_usd": iteration_cost,
+                                        "total_input_tokens": total_input_tokens,
+                                        "total_output_tokens": total_output_tokens,
+                                        "total_tokens": total_tokens,
+                                        "iteration_time_s": iteration.iteration_time,
+                                        "model_time_s": iteration.model_time,
+                                        "tool_time_s": iteration.tool_time,
+                                        "code_block_count": len(iteration.code_blocks),
+                                        "had_error": int(iteration_had_error),
+                                    }
                                     self._last_iteration_metrics.append(iteration_metrics)
                                     if self.on_iteration_metrics:
                                         try:
@@ -583,14 +587,23 @@ class RLM:
                             partial_answer=self._best_partial_answer,
                             message="Execution cancelled by user (Ctrl+C)",
                         ) from None
+                    except TimeoutExceededError:
+                        if not self.finalize_on_timeout:
+                            raise
+                        # A trajectory timeout is an expected experiment outcome, not
+                        # a worker failure.  Force one answer-only model call from the
+                        # accumulated history, just as iteration exhaustion does.
+                        stopped_by_timeout = True
+                        completion_span.set_attribute("rlm.timeout_exceeded", True)
 
                     # Default behavior: we run out of iterations, provide one final answer
                     final_answer = self._default_answer(message_history, lm_handler)
                     time_end = time.perf_counter()
                     usage = lm_handler.get_usage_summary()
+                    completed_iterations = len(self._last_iteration_metrics)
                     self.verbose.print_final_answer(final_answer)
                     self.verbose.print_summary(
-                        self.max_iterations,
+                        completed_iterations,
                         time_end - time_start,
                         usage.to_dict(),
                     )
@@ -600,12 +613,15 @@ class RLM:
                         environment.add_history(message_history)
 
                     completion_span.set_attribute("rlm.completed", True)
-                    completion_span.set_attribute("rlm.iterations", self.max_iterations)
+                    completion_span.set_attribute("rlm.iterations", completed_iterations)
+                    completion_span.set_attribute("rlm.forced_final_answer", True)
+                    completion_span.set_attribute("rlm.stopped_by_timeout", stopped_by_timeout)
                     completion_span.set_attribute("rlm.final_model", root_model_name)
                     completion_span.set_attribute("rlm.execution_time_s", time_end - time_start)
                     self._emit_completion_metrics(
                         usage,
                         execution_time=time_end - time_start,
+                        stopped_by_timeout=stopped_by_timeout,
                     )
                     return RLMChatCompletion(
                         root_model=root_model_name,
@@ -621,6 +637,7 @@ class RLM:
         usage: UsageSummary,
         *,
         execution_time: float,
+        stopped_by_timeout: bool = False,
     ) -> None:
         if self.on_completion_metrics is None:
             return
@@ -631,13 +648,12 @@ class RLM:
             "cost_usd": usage.total_cost or 0.0,
             "execution_time_seconds": execution_time,
             "model_time_seconds": sum(
-                float(metric.get("model_time_s") or 0.0)
-                for metric in self._last_iteration_metrics
+                float(metric.get("model_time_s") or 0.0) for metric in self._last_iteration_metrics
             ),
             "tool_time_seconds": sum(
-                float(metric.get("tool_time_s") or 0.0)
-                for metric in self._last_iteration_metrics
+                float(metric.get("tool_time_s") or 0.0) for metric in self._last_iteration_metrics
             ),
+            "stopped_by_timeout": stopped_by_timeout,
         }
         try:
             self.on_completion_metrics(metrics)
@@ -1024,6 +1040,7 @@ class RLM:
                 max_iterations=self.max_iterations,
                 max_budget=remaining_budget,
                 max_timeout=remaining_timeout,
+                finalize_on_timeout=self.finalize_on_timeout,
                 max_tokens=self.max_tokens,
                 max_errors=self.max_errors,
                 custom_system_prompt=self.system_prompt,

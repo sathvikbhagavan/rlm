@@ -207,7 +207,16 @@ five consecutive 2,048-token responses entirely on hidden reasoning and returned
 zero visible words or actions. OpenRouter's live model metadata reports
 reasoning as enabled by default at medium effort for GPT/Gemini and high effort
 for Claude. Low effort leaves most of the bounded response for visible RLM code.
-The 30-iteration and two-level recursion limits are unchanged.
+The 30-iteration and two-level recursion limits are unchanged. Each question
+also has a 30-minute total trajectory cutoff, checked between turns. At that
+boundary the RLM asks once for a final answer based on its accumulated work,
+records the cutoff with normal metrics, and advances instead of failing and
+rerunning the whole multi-question job. A block already in progress retains its
+separate five-minute limit, so finalization can occur up to roughly five minutes
+after the cutoff. A
+GPT-5-mini full-corpus Task-16 diagnostic motivated this limit: seven questions
+finished within 25 minutes each, while the next exceeded 40 minutes by repeating
+five-minute searches.
 
 Docker-executed model code also has a 300-second wall-time limit per block. It
 terminates the complete in-container process group, including multiprocessing

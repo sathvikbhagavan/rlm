@@ -9,6 +9,7 @@ from rxnhaystack.manifest import ManifestError
 from rxnhaystack.worker import (
     RLM_LOCAL_MEMORY_LIMIT_ENV,
     RLM_LOCAL_TOOL_MEMORY_LIMIT_ENV,
+    RLM_MAX_TIMEOUT_ENV,
     BenchmarkRuntime,
     instrument_rlm_from_environment,
     resolve_rlm_environment,
@@ -79,9 +80,7 @@ def test_benchmark_runtime_uses_typed_campaign_values(tmp_path: Path, monkeypatc
     }
 
 
-def test_local_rlm_sets_address_space_limit_and_records_it(
-    tmp_path: Path, monkeypatch
-) -> None:
+def test_local_rlm_sets_address_space_limit_and_records_it(tmp_path: Path, monkeypatch) -> None:
     trace_path = tmp_path / "resource-trace.jsonl"
     monkeypatch.setenv("RXNHAYSTACK_RESOURCE_TRACE_PATH", str(trace_path))
     monkeypatch.setenv("RXNHAYSTACK_PROVIDER", "openrouter")
@@ -104,32 +103,41 @@ def test_local_rlm_sets_address_space_limit_and_records_it(
 
 
 def test_local_rlm_rejects_invalid_memory_limit(tmp_path: Path, monkeypatch) -> None:
-    monkeypatch.setenv(
-        "RXNHAYSTACK_RESOURCE_TRACE_PATH", str(tmp_path / "resource-trace.jsonl")
-    )
+    monkeypatch.setenv("RXNHAYSTACK_RESOURCE_TRACE_PATH", str(tmp_path / "resource-trace.jsonl"))
     monkeypatch.setenv("RXNHAYSTACK_PROVIDER", "openrouter")
     monkeypatch.setenv(RLM_LOCAL_MEMORY_LIMIT_ENV, "0")
 
     with pytest.raises(ManifestError, match=RLM_LOCAL_MEMORY_LIMIT_ENV):
-        instrument_rlm_from_environment(
-            {"backend": "openrouter", "environment": "local"}
-        )
+        instrument_rlm_from_environment({"backend": "openrouter", "environment": "local"})
 
 
-def test_local_rlm_rejects_tool_limit_above_worker_limit(
-    tmp_path: Path, monkeypatch
-) -> None:
-    monkeypatch.setenv(
-        "RXNHAYSTACK_RESOURCE_TRACE_PATH", str(tmp_path / "resource-trace.jsonl")
-    )
+def test_local_rlm_rejects_tool_limit_above_worker_limit(tmp_path: Path, monkeypatch) -> None:
+    monkeypatch.setenv("RXNHAYSTACK_RESOURCE_TRACE_PATH", str(tmp_path / "resource-trace.jsonl"))
     monkeypatch.setenv("RXNHAYSTACK_PROVIDER", "openrouter")
     monkeypatch.setenv(RLM_LOCAL_MEMORY_LIMIT_ENV, "4096")
     monkeypatch.setenv(RLM_LOCAL_TOOL_MEMORY_LIMIT_ENV, "8192")
 
     with pytest.raises(ManifestError, match="must not exceed"):
-        instrument_rlm_from_environment(
-            {"backend": "openrouter", "environment": "local"}
-        )
+        instrument_rlm_from_environment({"backend": "openrouter", "environment": "local"})
+
+
+def test_rlm_total_timeout_is_read_from_environment(monkeypatch) -> None:
+    monkeypatch.setenv("RXNHAYSTACK_PROVIDER", "openrouter")
+    monkeypatch.setenv(RLM_MAX_TIMEOUT_ENV, "1800")
+
+    configured = instrument_rlm_from_environment({"backend": "openrouter"})
+
+    assert configured["max_timeout"] == 1800.0
+    assert configured["finalize_on_timeout"] is True
+
+
+@pytest.mark.parametrize("value", ["0", "-1", "not-a-number"])
+def test_rlm_total_timeout_must_be_positive(monkeypatch, value: str) -> None:
+    monkeypatch.setenv("RXNHAYSTACK_PROVIDER", "openrouter")
+    monkeypatch.setenv(RLM_MAX_TIMEOUT_ENV, value)
+
+    with pytest.raises(ManifestError, match=RLM_MAX_TIMEOUT_ENV):
+        instrument_rlm_from_environment({"backend": "openrouter"})
 
 
 def test_archival_docker_job_does_not_fall_back_to_local(monkeypatch) -> None:

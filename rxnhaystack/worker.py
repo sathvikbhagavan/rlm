@@ -18,6 +18,7 @@ RLM_LOCAL_MEMORY_LIMIT_ENV = "RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB"
 RLM_LOCAL_MEMORY_LIMIT_MIB = 8192
 RLM_LOCAL_TOOL_MEMORY_LIMIT_ENV = "RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB"
 RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = 4096
+RLM_MAX_TIMEOUT_ENV = "RXNHAYSTACK_RLM_MAX_TIMEOUT_SECONDS"
 
 
 def docker_is_available() -> bool:
@@ -195,6 +196,9 @@ def instrument_rlm_from_environment(
     """Add campaign model and resource callbacks while preserving standalone use."""
 
     configured = configure_rlm_for_provider(kwargs)
+    if raw_timeout := os.environ.get(RLM_MAX_TIMEOUT_ENV):
+        configured["max_timeout"] = _positive_float(RLM_MAX_TIMEOUT_ENV, raw_timeout)
+        configured["finalize_on_timeout"] = True
     trace_path = os.environ.get("RXNHAYSTACK_RESOURCE_TRACE_PATH")
     if configured.get("environment") == "local" and trace_path:
         _apply_local_rlm_address_space_limit(trace_path=Path(trace_path).resolve())
@@ -206,16 +210,13 @@ def instrument_rlm_from_environment(
 def _apply_local_rlm_address_space_limit(*, trace_path: Path) -> None:
     """Make runaway local REPL allocations raise MemoryError inside the tool."""
 
-    limit_mib = _positive_memory_limit(
-        RLM_LOCAL_MEMORY_LIMIT_ENV, RLM_LOCAL_MEMORY_LIMIT_MIB
-    )
+    limit_mib = _positive_memory_limit(RLM_LOCAL_MEMORY_LIMIT_ENV, RLM_LOCAL_MEMORY_LIMIT_MIB)
     tool_limit_mib = _positive_memory_limit(
         RLM_LOCAL_TOOL_MEMORY_LIMIT_ENV, RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB
     )
     if tool_limit_mib > limit_mib:
         raise ManifestError(
-            f"{RLM_LOCAL_TOOL_MEMORY_LIMIT_ENV} must not exceed "
-            f"{RLM_LOCAL_MEMORY_LIMIT_ENV}"
+            f"{RLM_LOCAL_TOOL_MEMORY_LIMIT_ENV} must not exceed {RLM_LOCAL_MEMORY_LIMIT_ENV}"
         )
 
     requested_bytes = limit_mib * 1024 * 1024
@@ -246,6 +247,16 @@ def _positive_memory_limit(name: str, default: int) -> int:
     if limit_mib <= 0:
         raise ManifestError(f"{name} must be a positive integer")
     return limit_mib
+
+
+def _positive_float(name: str, raw_value: str) -> float:
+    try:
+        value = float(raw_value)
+    except ValueError as error:
+        raise ManifestError(f"{name} must be a positive number") from error
+    if value <= 0:
+        raise ManifestError(f"{name} must be a positive number")
+    return value
 
 
 def codeact_callbacks_from_environment(*, sample_id: str | int) -> dict[str, Any]:

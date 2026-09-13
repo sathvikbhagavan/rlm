@@ -366,7 +366,14 @@ the former 2,048-token ceiling produced five consecutive calls with 2,048 billed
 output tokens but zero visible words or actions: mandatory hidden reasoning had
 consumed the whole allowance. The current setting retains bounded spend while
 leaving most tokens for visible RLM code. The RLM-level limits of 30 iterations
-and two recursion levels remain unchanged.
+and two recursion levels remain unchanged. Every RLM question additionally has
+a 1,800-second (30-minute) total trajectory cutoff, checked between turns. When
+that cutoff is reached, the controller makes one answer-only request from the
+work accumulated so far, records the cutoff with ordinary usage and timing
+metrics, and continues to the next question. It does not fail and restart the
+surrounding multi-question job. A model-written block already in progress may
+use its separate 300-second limit before the cutoff is observed, so shutdown can
+occur up to roughly five minutes after the 30-minute mark.
 
 Tier-4 Tasks 16, 17, and 17b require the Docker environment for recorded
 benchmark jobs. There is no automatic local fallback during these archival
@@ -395,6 +402,14 @@ the next turn. Live Qwen Task-16 diagnostics reached 23,963.6 MiB and then the
 before the host controller is endangered. Full-corpus RLM jobs reserve 28,672
 MiB; the 49,152-MiB machine allowance therefore permits only one at a time,
 regardless of a larger `--max-parallel` value.
+
+The 30-minute trajectory limit comes from the final GPT-5-mini stress test. The
+first seven full-corpus Task-16 questions finished in 14 seconds, 9.6 minutes,
+24.9 minutes, 19 seconds, 17 seconds, 4.1 minutes, and 5.8 minutes. The eighth
+question then exceeded 40 minutes while repeating failed five-minute searches.
+The selected ceiling preserves every observed successful trajectory while
+bounding that runaway pattern. A forced final answer is a valid recorded
+outcome, but repeated forced answers still require inspection before scaling.
 
 Start with one open model, one job at a time:
 
@@ -458,6 +473,8 @@ Before scaling up, all trial jobs should satisfy these checks:
   we stop and reassess;
 - isolated Docker code either finishes within 300 seconds or records a clean
   timeout and continues; repeated timeouts require inspection before scaling;
+- each RLM question finishes normally or records a forced final answer at the
+  30-minute trajectory ceiling; report how often the ceiling is reached;
 - there are no repeated authentication, rate-limit, or provider errors.
 
 Send this report for each trial group:

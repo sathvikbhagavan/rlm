@@ -110,6 +110,7 @@ def test_capture_uses_exact_recursive_trace_metrics(monkeypatch, tmp_path: Path)
                 "output_tokens": 10,
                 "cost_usd": 0.25,
                 "tool_time_seconds": 1.5,
+                "stopped_by_timeout": True,
             }
         )
         + "\n"
@@ -131,6 +132,7 @@ def test_capture_uses_exact_recursive_trace_metrics(monkeypatch, tmp_path: Path)
     metrics = json.loads(metrics_path.read_text())
     assert metrics["calls"] == 3
     assert metrics["tool_time_seconds"] == 1.5
+    assert metrics["results"]["rlm_timeout_finalizations"] == 1
 
 
 def test_capture_rejects_missing_provider_cost(monkeypatch, tmp_path: Path) -> None:

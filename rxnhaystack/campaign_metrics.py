@@ -189,6 +189,10 @@ class CampaignMetricsCapture:
                 "output_tokens": output_tokens - logged_output,
             }
             results = self._summary()
+            if rlm_events:
+                results["rlm_timeout_finalizations"] = sum(
+                    bool(event.get("stopped_by_timeout")) for event in rlm_events
+                )
             if rlm_events and any(usage_discrepancy.values()):
                 results["wandb_usage_discrepancy"] = usage_discrepancy
 

@@ -135,6 +135,7 @@ This will display:
 | `max_iterations` | `int` | `30` | Max REPL iterations per call |
 | `max_budget` | `float` | `None` | Max total USD cost (if provider reports cost) |
 | `max_timeout` | `float` | `None` | Max wall-clock seconds per completion |
+| `finalize_on_timeout` | `bool` | `False` | Request one final answer at timeout instead of raising |
 | `max_tokens` | `int` | `None` | Max total tokens (input + output) per completion |
 | `max_errors` | `int` | `None` | Max consecutive REPL errors before abort |
 | `custom_system_prompt` | `str` | `None` | Override default system prompt |

@@ -73,14 +73,7 @@ def estimated_cost_chf(
         input_tokens * model.input_usd_per_million + output_tokens * model.output_usd_per_million
     ) / 1_000_000
     multiplier = COST_MULTIPLIERS.get((model.alias, method, context_size), 1.0)
-    return (
-        cost_usd_per_100
-        * question_count
-        / 100
-        * USD_TO_CHF
-        * COST_CONTINGENCY
-        * multiplier
-    )
+    return cost_usd_per_100 * question_count / 100 * USD_TO_CHF * COST_CONTINGENCY * multiplier
 
 
 def render() -> str:
@@ -90,9 +83,9 @@ def render() -> str:
         "schema_version = 1",
         "",
         "[campaign]",
-        'name = "iclr2027-six-model-full-v17"',
+        'name = "iclr2027-six-model-full-v18"',
         'project_root = "../.."',
-        'artifact_dir = "artifacts/iclr2027-six-model-full-v17"',
+        'artifact_dir = "artifacts/iclr2027-six-model-full-v18"',
         "budget_chf = 1500.0",
         f"usd_to_chf = {USD_TO_CHF:.2f}",
         "require_dataset = true",
@@ -127,6 +120,7 @@ def render() -> str:
                         env["RXNHAYSTACK_CODEACT_TOOL_TIMEOUT_SECONDS"] = "60"
                         env["RXNHAYSTACK_CODEACT_TOOL_MEMORY_LIMIT_MIB"] = "4096"
                     if condition.method == "rlm":
+                        env["RXNHAYSTACK_RLM_MAX_TIMEOUT_SECONDS"] = "1800"
                         if model.provider == "openrouter":
                             env["RXNHAYSTACK_RLM_OUTPUT_LIMIT"] = "4096"
                             env["RXNHAYSTACK_RLM_REASONING_EFFORT"] = "low"

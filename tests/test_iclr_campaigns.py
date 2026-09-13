@@ -34,6 +34,8 @@ def test_full_campaign_is_generated_and_covers_six_models() -> None:
         "swissai": 3_150,
         "openrouter": 3_150,
     }
+    rlm_runs = [run for run in manifest.runs if run.method == "rlm"]
+    assert {run.env["RXNHAYSTACK_RLM_MAX_TIMEOUT_SECONDS"] for run in rlm_runs} == {"1800"}
 
     with pytest.raises(ManifestError, match="SWISSAI_RESEARCH_API_KEY"):
         resolve_required_secrets(
@@ -81,3 +83,9 @@ def test_matched_cardinality_campaign_has_two_factor_design() -> None:
             run.positive_cardinality
             <= generate_matched_cardinality_campaign.MIN_POSITIVES[tier][task]
         )
+        assert run.env["RXNHAYSTACK_RLM_MAX_TIMEOUT_SECONDS"] == "1800"
+        if run.env["RXNHAYSTACK_PROVIDER"] == "openrouter":
+            assert run.env["RXNHAYSTACK_RLM_OUTPUT_LIMIT"] == "4096"
+            assert run.env["RXNHAYSTACK_RLM_REASONING_EFFORT"] == "low"
+        else:
+            assert run.env["RXNHAYSTACK_RLM_OUTPUT_LIMIT"] == "2048"

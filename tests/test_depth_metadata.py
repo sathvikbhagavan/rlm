@@ -79,6 +79,55 @@ class TestDepth1CompletionLoop:
             result = rlm.completion("Compute 2*2")
             assert result.response == "4"
 
+    def test_timeout_forces_and_returns_a_final_answer(self):
+        """A total timeout should preserve the job and its usage metrics."""
+        completion_metrics = Mock()
+        with patch.object(rlm_module, "get_client") as mock_get_client:
+            mock_lm = create_mock_lm(
+                [
+                    "I am still working on it.",
+                    "Best answer from the work completed so far.",
+                ]
+            )
+            mock_get_client.return_value = mock_lm
+            rlm = RLM(
+                backend="openai",
+                backend_kwargs={"model_name": "test-model"},
+                max_depth=1,
+                max_iterations=30,
+                max_timeout=10.0,
+                finalize_on_timeout=True,
+                on_completion_metrics=completion_metrics,
+            )
+
+            timeout = TimeoutExceededError(elapsed=11.0, timeout=10.0)
+            with patch.object(rlm, "_check_timeout", side_effect=[None, timeout]):
+                result = rlm.completion("Find the answer")
+
+            assert result.response == "Best answer from the work completed so far."
+            assert mock_lm.completion.call_count == 2
+            completion_metrics.assert_called_once()
+            assert completion_metrics.call_args.args[0]["stopped_by_timeout"] is True
+
+    def test_timeout_still_raises_without_finalization_opt_in(self):
+        """The public default remains compatible with the existing API."""
+        with patch.object(rlm_module, "get_client") as mock_get_client:
+            mock_get_client.return_value = create_mock_lm(["unused"])
+            rlm = RLM(
+                backend="openai",
+                backend_kwargs={"model_name": "test-model"},
+                max_timeout=10.0,
+            )
+            timeout = TimeoutExceededError(elapsed=11.0, timeout=10.0)
+
+            with (
+                patch.object(rlm, "_check_timeout", side_effect=timeout),
+                pytest.raises(TimeoutExceededError),
+            ):
+                rlm.completion("Find the answer")
+
+            mock_get_client.return_value.completion.assert_not_called()
+
     def test_no_subcall_fn_at_depth_1(self):
         """depth=1 (max_depth=1) should NOT pass subcall_fn to environment."""
         with patch.object(rlm_module, "get_client") as mock_get_client:

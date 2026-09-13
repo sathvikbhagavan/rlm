@@ -123,9 +123,9 @@ def render() -> str:
         "schema_version = 1",
         "",
         "[campaign]",
-        'name = "iclr2027-matched-cardinality-v5"',
+        'name = "iclr2027-matched-cardinality-v6"',
         'project_root = "../.."',
-        'artifact_dir = "artifacts/iclr2027-matched-cardinality-v5"',
+        'artifact_dir = "artifacts/iclr2027-matched-cardinality-v6"',
         "budget_chf = 100.0",
         f"usd_to_chf = {USD_TO_CHF:.2f}",
         "require_dataset = true",
@@ -152,13 +152,19 @@ def render() -> str:
                         QUESTION_COUNTS[tier][task_id],
                     )
                     run_id = f"matched-{model.alias}-{tier}-task{task_id}-{label}"
-                    env = (
-                        f"RXNHAYSTACK_CONTEXT_SIZE = {quote(str(context_size))}, "
-                        f"RXNHAYSTACK_PROVIDER = {quote(model.provider)}, "
-                        'RXNHAYSTACK_RLM_OUTPUT_LIMIT = "2048", '
-                        'RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", '
-                        'RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "4096"'
-                    )
+                    env_values = {
+                        "RXNHAYSTACK_CONTEXT_SIZE": str(context_size),
+                        "RXNHAYSTACK_PROVIDER": model.provider,
+                        "RXNHAYSTACK_RLM_MAX_TIMEOUT_SECONDS": "1800",
+                        "RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB": "8192",
+                        "RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB": "4096",
+                    }
+                    if model.provider == "openrouter":
+                        env_values["RXNHAYSTACK_RLM_OUTPUT_LIMIT"] = "4096"
+                        env_values["RXNHAYSTACK_RLM_REASONING_EFFORT"] = "low"
+                    else:
+                        env_values["RXNHAYSTACK_RLM_OUTPUT_LIMIT"] = "2048"
+                    env = ", ".join(f"{key} = {quote(value)}" for key, value in env_values.items())
                     lines.extend(
                         [
                             "[[runs]]",
