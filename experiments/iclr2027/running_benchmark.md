@@ -330,9 +330,13 @@ The completed v16/v17 profiling already covered:
    memory;
 4. SwissAI plus all three paid models.
 
-Do not repeat those broad LLM, CodeAct, and full-corpus Task-16 diagnostics just
-because the final result directory is called v18. The remaining release check
-is the small six-model RLM set below.
+Do not repeat those broad LLM, CodeAct, and full-corpus Task-16 diagnostics. The
+six-model v18 RLM check also completed successfully. The first attempted v18
+GLM LLM release then exposed SwissAI's shared 15-request-per-minute quota: 23
+jobs received HTTP 429 before producing a result. No v18 LLM result was used.
+The final v19 description spaces SwissAI request starts across worker processes
+and retries at most two rejected-before-inference 429 requests using the delay
+specified by the provider.
 
 In CodeAct, the retrieved rows are preloaded in each isolated Python tool as a
 list named `lines`. During trial review, confirm the model uses `lines` rather
@@ -418,9 +422,8 @@ The selected ceiling preserves every observed successful trajectory while
 bounding that runaway pattern. A forced final answer is a valid recorded
 outcome, but repeated forced answers still require inspection before scaling.
 
-Run one single-question, 100-row Tier-3 Task-13 RLM job for each model. These are
-real v18 benchmark cells, so successful results remain part of the final data
-and are skipped during the later full launch:
+The following six v18 RLM checks have already finished and must not be repeated.
+They are retained as calibration evidence rather than v19 benchmark cells:
 
 ```bash
 uv run --frozen rxnhaystack run experiments/iclr2027/full-campaign.toml \
@@ -436,19 +439,17 @@ uv run --frozen rxnhaystack run experiments/iclr2027/full-campaign.toml \
   --secret-file WANDB_API_KEY=~/.wandb_api_key
 ```
 
-The three open-model jobs are free. The planned paid amounts are CHF 0.053619
+The three open-model jobs were free. The planned paid amounts were CHF 0.053619
 for Gemini, CHF 0.142984 for Claude, and CHF 0.022214 for GPT-5-mini: CHF
 0.218817 total. Each job contains one question. The likely duration is several
 minutes per job, but the configured upper bound is about 35 minutes plus the
 answer-only model call. With two jobs at a time, the three-wave configured worst
 case is roughly 1.75 hours.
 
-These release checks are recommended, not strictly necessary. Deterministic
-tests already verify the cutoff and telemetry paths. Their purpose is to catch
-model-specific formatting, provider, W&B, or artifact problems before thousands
-of jobs are released. Skipping them saves only CHF 0.22 and moves that risk into
-the large run. See the detailed necessity discussion in
-[`testing_and_safety_report.md`](testing_and_safety_report.md).
+The final v19 release check is the first selected GLM LLM phase itself. Its
+rate limiter has deterministic unit tests; the initial production results must
+be inspected for successful retries, complete metrics, and an absence of
+unhandled 429 errors before proceeding to another method or model.
 
 For every trial job, inspect:
 

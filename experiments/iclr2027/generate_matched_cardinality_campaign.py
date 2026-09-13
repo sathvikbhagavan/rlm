@@ -123,9 +123,9 @@ def render() -> str:
         "schema_version = 1",
         "",
         "[campaign]",
-        'name = "iclr2027-matched-cardinality-v6"',
+        'name = "iclr2027-matched-cardinality-v7"',
         'project_root = "../.."',
-        'artifact_dir = "artifacts/iclr2027-matched-cardinality-v6"',
+        'artifact_dir = "artifacts/iclr2027-matched-cardinality-v7"',
         "budget_chf = 100.0",
         f"usd_to_chf = {USD_TO_CHF:.2f}",
         "require_dataset = true",
@@ -159,6 +159,9 @@ def render() -> str:
                         "RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB": "8192",
                         "RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB": "4096",
                     }
+                    if model.provider == "swissai":
+                        env_values["RXNHAYSTACK_SWISSAI_REQUESTS_PER_MINUTE"] = "15"
+                        env_values["RXNHAYSTACK_SWISSAI_RATE_LIMIT_RETRIES"] = "2"
                     if model.provider == "openrouter":
                         env_values["RXNHAYSTACK_RLM_OUTPUT_LIMIT"] = "4096"
                         env_values["RXNHAYSTACK_RLM_REASONING_EFFORT"] = "low"

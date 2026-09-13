@@ -7,6 +7,7 @@ from dotenv import load_dotenv
 
 from rlm.clients.base_lm import BaseLM
 from rlm.core.types import ModelUsageSummary, UsageSummary
+from rxnhaystack.rate_limit import call_swissai_async, call_swissai_sync, is_swissai_url
 
 load_dotenv()
 
@@ -62,6 +63,8 @@ class OpenAIClient(BaseLM):
         self.async_client = openai.AsyncOpenAI(**client_kwargs)
         self.model_name = model_name
         self.base_url = base_url  # Track for cost extraction
+        self._api_key = api_key or ""
+        self._is_swissai = is_swissai_url(base_url)
 
         # Per-model usage tracking
         self.model_call_counts: dict[str, int] = defaultdict(int)
@@ -89,7 +92,13 @@ class OpenAIClient(BaseLM):
         request_kwargs = {"model": model, "messages": messages, "extra_body": extra_body}
         if self.max_output_tokens is not None:
             request_kwargs["max_tokens"] = self.max_output_tokens
-        response = self.client.chat.completions.create(**request_kwargs)
+
+        def request():
+            return self.client.chat.completions.create(**request_kwargs)
+
+        response = (
+            call_swissai_sync(request, api_key=self._api_key) if self._is_swissai else request()
+        )
         self._track_cost(response, model)
         return response.choices[0].message.content
 
@@ -114,7 +123,15 @@ class OpenAIClient(BaseLM):
         request_kwargs = {"model": model, "messages": messages, "extra_body": extra_body}
         if self.max_output_tokens is not None:
             request_kwargs["max_tokens"] = self.max_output_tokens
-        response = await self.async_client.chat.completions.create(**request_kwargs)
+
+        async def request():
+            return await self.async_client.chat.completions.create(**request_kwargs)
+
+        response = (
+            await call_swissai_async(request, api_key=self._api_key)
+            if self._is_swissai
+            else await request()
+        )
         self._track_cost(response, model)
         return response.choices[0].message.content
 

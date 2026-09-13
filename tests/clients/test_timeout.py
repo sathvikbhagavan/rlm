@@ -90,9 +90,7 @@ class TestOpenAIClientTimeout:
                 client = OpenAIClient(
                     api_key="test-key",
                     model_name="model",
-                    chat_completion_extra_body={
-                        "chat_template_kwargs": {"enable_thinking": False}
-                    },
+                    chat_completion_extra_body={"chat_template_kwargs": {"enable_thinking": False}},
                 )
                 assert client.completion("Hello") == "answer"
 
@@ -125,6 +123,34 @@ class TestOpenAIClientTimeout:
 
         assert "max_output_tokens" not in constructor.call_args.kwargs
         assert mock_client.chat.completions.create.call_args.kwargs["max_tokens"] == 2048
+
+    def test_swissai_rlm_completion_uses_shared_rate_limiter(self):
+        """The native RLM client must share the same SwissAI quota boundary."""
+        from rlm.clients.openai import OpenAIClient
+
+        mock_client = MagicMock()
+        response = mock_client.chat.completions.create.return_value
+        response.choices[0].message.content = "answer"
+        response.usage.prompt_tokens = 2
+        response.usage.completion_tokens = 1
+        response.usage.total_tokens = 3
+        response.usage.cost = None
+        response.usage.model_extra = None
+
+        with patch("rlm.clients.openai.openai.OpenAI", return_value=mock_client):
+            with patch("rlm.clients.openai.openai.AsyncOpenAI"):
+                with patch(
+                    "rlm.clients.openai.call_swissai_sync",
+                    side_effect=lambda call, **_kwargs: call(),
+                ) as rate_limited:
+                    client = OpenAIClient(
+                        api_key="test-key",
+                        model_name="model",
+                        base_url="https://api.swissai.svc.cscs.ch/v1",
+                    )
+                    assert client.completion("Hello") == "answer"
+
+        rate_limited.assert_called_once()
 
 
 class TestAnthropicClientTimeout:

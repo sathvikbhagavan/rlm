@@ -1,8 +1,8 @@
 # ICLR 2027 experiment operations
 
 Read [`testing_and_safety_report.md`](testing_and_safety_report.md) for the
-real-model findings, Docker corrections, effective limits, and minimal v18 pilot
-proposal. The step-by-step launch instructions are in
+real-model findings, Docker corrections, effective limits, and release checks.
+The step-by-step launch instructions are in
 [`running_benchmark.md`](running_benchmark.md).
 
 The campaign launcher treats an experiment matrix as immutable scientific input.

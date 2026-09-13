@@ -10,8 +10,8 @@ broader engineering history, read [`what_changed.md`](what_changed.md).
 
 ## Current status
 
-- The final experiment descriptions are full benchmark v18 and
-  matched-cardinality v6.
+- The final experiment descriptions are full benchmark v19 and
+  matched-cardinality v7.
 - The full benchmark contains 6,300 jobs and has a planned ceiling of
   CHF 1,161.22.
 - The matched-cardinality experiment contains 1,450 jobs and has a planned
@@ -23,8 +23,8 @@ broader engineering history, read [`what_changed.md`](what_changed.md).
 - After the final telemetry correction, the complete automated suite reports
   421 passed and 10 skipped tests.
 
-The v16 and v17 directories contain calibration and diagnostic work. They are
-deliberately separate from v18 and will not be mistaken for final results.
+The v16, v17, and v18 directories contain calibration and diagnostic work. They
+are deliberately separate from v19 and will not be mistaken for final results.
 
 ## Why the final testing took so long
 
@@ -135,6 +135,8 @@ full experiment. Qwen uses the SwissAI 2,048-token/no-hidden-thinking path.
 | LLM parallelism | 4 questions per worker | Further questions wait. |
 | CodeAct parallelism | 2 isolated questions per worker | Further questions wait. |
 | RLM parallelism | 1 question per worker | Questions run sequentially within the task job. |
+| SwissAI request starts | 15 requests/minute per credential, spaced by 4.25 seconds across local worker processes | Further request starts wait on a credential-specific local lock. Different co-authors use different credentials. |
+| SwissAI rejected request | At most 2 retries | An HTTP 429 that produced no model answer waits for the provider's `Retry-After` duration and is retried visibly. |
 | LLM worker memory | 2–4 GiB reserved; 4–8 GiB hard limit | The launcher terminates a worker exceeding its combined hard limit. |
 | CodeAct worker memory | 4–6 GiB reserved; 8–12 GiB hard limit | Same combined-memory enforcement. |
 | RLM worker memory | 8/10/28 GiB reserved for 100/500/full context; 16/20/30 GiB hard limit | Same combined-memory enforcement. |
@@ -170,12 +172,11 @@ procedure.
 
 These are calibration results, not a balanced scientific comparison.
 
-## Completed v18 pilots
+## Completed v18 diagnostics
 
-The broad v16 LLM and CodeAct trials do not need to be repeated: the subsequent
-changes affect RLM limits and telemetry, not their prompts or scoring. The
-smallest useful v18 release check is one single-question, 100-row RLM job for
-each of the six models using Tier-3 Task 13, repetition 1.
+The broad v16 LLM and CodeAct trials did not need to be repeated. One
+single-question, 100-row RLM job was run for each of the six models using
+Tier-3 Task 13, repetition 1.
 
 The pilots were run on 13 September 2026 from commit `8ecd2a6`, two at a time.
 All six succeeded on their first attempt and answered the question exactly.
@@ -190,11 +191,11 @@ All six succeeded on their first attempt and answered the question exactly.
 | GPT-5-mini Task-13 RLM x100 | 3 | 12.04 s | 0.002442 | 358.8 MiB |
 | **Total** | **18** | **under 2 min elapsed** | **0.046800** | **368.6 MiB maximum** |
 
-They verify that every exact model can complete the final RLM request path, that
-v18 records a normal result and usage, and that the two provider transports
-produce compatible artifacts. They are genuine v18 cells: successful jobs are
-kept and skipped during the later full launch, so their time and money are not
-wasted.
+They verify that every exact model can complete the RLM request path, that v18
+recorded normal results and usage, and that the two provider transports produce
+compatible artifacts. They remain calibration evidence; v19 uses a separate
+result directory because the provider quota policy changed before any complete
+benchmark phase.
 
 Every run recorded calls, tokens, cost, score, a W&B URL, resource usage, and an
 explicit zero for `results.rlm_timeout_finalizations`. No iteration error,
@@ -206,6 +207,15 @@ case. They do **not** prove that the time, turn, response-length, or memory
 limits are neutral on the hardest Tier-4 full-corpus questions. Those limits
 remain explicit computational budgets and their boundary events must be
 reported in the final results.
+
+The first attempted v18 GLM LLM phase then started requests faster than
+SwissAI's credential-wide quota of 15 per minute. Twenty-three jobs received
+HTTP 429 and no GLM LLM job completed. The launcher was stopped immediately.
+This was a transport-capacity failure, not a scored model result. In v19,
+request starts sharing one SwissAI credential are spaced 4.25 seconds apart
+across worker processes. A rejected request is retried at most twice after the
+provider's stated delay. The rejected request has no model response and the
+retry therefore does not resample or replace a completed trajectory.
 
 A second full-corpus Task-16 stress-test sweep is not necessary. Running Task 16
 once for Qwen, Gemini, Claude, and GPT would have a planned paid cost of

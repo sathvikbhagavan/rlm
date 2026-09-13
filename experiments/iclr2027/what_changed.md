@@ -442,6 +442,21 @@ review still needs assigned chemistry reviewers and its own recorded outputs.
 
 See [`human_eval/README.md`](../../human_eval/README.md).
 
+## 14. SwissAI quota enforcement
+
+The first broad GLM LLM launch showed that SwissAI applies a shared limit of 15
+request starts per minute to one research credential. Four launcher workers can
+contain up to sixteen simultaneous LLM questions, so memory-safe concurrency
+alone was not sufficient. Twenty-three v18 jobs received HTTP 429 before any
+answer was recorded, and the launcher was stopped.
+
+The final full experiment is consequently v19. SwissAI request starts using the
+same credential are now spaced 4.25 seconds apart through a local lock shared by
+all worker processes. A provider-rejected request waits for `Retry-After` and is
+retried at most twice. This policy is used by the one-shot, CodeAct, and native
+RLM clients, is generated into the experiment files, and has deterministic
+tests. The v18 results remain diagnostics and are not mixed with v19.
+
 ## What has not been hidden or simplified away
 
 - The three API/W&B credential values are currently required before any selected

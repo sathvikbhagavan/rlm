@@ -13,6 +13,7 @@ from rxnhaystack.providers import (
     SWISSAI_BASE_URL,
     SWISSAI_REQUEST_TIMEOUT_ENV,
     SWISSAI_REQUEST_TIMEOUT_SECONDS,
+    SwissAICompatibleLLM,
     benchmark_provider,
     build_benchmark_llm,
     configure_rlm_for_provider,
@@ -49,9 +50,7 @@ def test_swissai_rlm_uses_openai_compatible_transport(monkeypatch) -> None:
         "base_url": SWISSAI_BASE_URL,
         "timeout": SWISSAI_REQUEST_TIMEOUT_SECONDS,
         "max_retries": 0,
-        "chat_completion_extra_body": {
-            "chat_template_kwargs": {"enable_thinking": False}
-        },
+        "chat_completion_extra_body": {"chat_template_kwargs": {"enable_thinking": False}},
     }
 
 
@@ -66,6 +65,7 @@ def test_swissai_llamaindex_client_preserves_chat_interface(monkeypatch) -> None
         additional_kwargs={"max_completion_tokens": 100},
     )
     assert client.api_base == SWISSAI_BASE_URL
+    assert isinstance(client, SwissAICompatibleLLM)
     assert client.api_key == "private"
     assert client.metadata.is_chat_model
     assert client.timeout == SWISSAI_REQUEST_TIMEOUT_SECONDS

@@ -83,9 +83,9 @@ def render() -> str:
         "schema_version = 1",
         "",
         "[campaign]",
-        'name = "iclr2027-six-model-full-v18"',
+        'name = "iclr2027-six-model-full-v19"',
         'project_root = "../.."',
-        'artifact_dir = "artifacts/iclr2027-six-model-full-v18"',
+        'artifact_dir = "artifacts/iclr2027-six-model-full-v19"',
         "budget_chf = 1500.0",
         f"usd_to_chf = {USD_TO_CHF:.2f}",
         "require_dataset = true",
@@ -115,6 +115,9 @@ def render() -> str:
                         "RXNHAYSTACK_CONTEXT_SIZE": str(context_size),
                         "RXNHAYSTACK_PROVIDER": model.provider,
                     }
+                    if model.provider == "swissai":
+                        env["RXNHAYSTACK_SWISSAI_REQUESTS_PER_MINUTE"] = "15"
+                        env["RXNHAYSTACK_SWISSAI_RATE_LIMIT_RETRIES"] = "2"
                     if condition.method == "codeact":
                         env["RXNHAYSTACK_CODEACT_OUTPUT_LIMIT"] = "2048"
                         env["RXNHAYSTACK_CODEACT_TOOL_TIMEOUT_SECONDS"] = "60"

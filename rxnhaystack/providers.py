@@ -7,6 +7,7 @@ from llama_index.llms.openai_like import OpenAILike
 from llama_index.llms.openrouter import OpenRouter
 
 from rxnhaystack.manifest import ManifestError
+from rxnhaystack.rate_limit import call_swissai_async, call_swissai_sync
 
 PROVIDER_ENV = "RXNHAYSTACK_PROVIDER"
 METHOD_ENV = "RXNHAYSTACK_METHOD"
@@ -22,6 +23,25 @@ SWISSAI_API_KEY_ENV = "SWISSAI_RESEARCH_API_KEY"
 SWISSAI_BASE_URL = "https://api.swissai.svc.cscs.ch/v1"
 SWISSAI_REQUEST_TIMEOUT_ENV = "RXNHAYSTACK_SWISSAI_REQUEST_TIMEOUT_SECONDS"
 SWISSAI_REQUEST_TIMEOUT_SECONDS = 300.0
+
+
+class SwissAICompatibleLLM(OpenAILike):
+    """OpenAI-compatible client with the recorded SwissAI quota policy."""
+
+    def chat(self, messages: Any, **kwargs: Any) -> Any:
+        api_key = os.environ.get(SWISSAI_API_KEY_ENV, "")
+        return call_swissai_sync(
+            lambda: super(SwissAICompatibleLLM, self).chat(messages, **kwargs),
+            api_key=api_key,
+        )
+
+    async def achat(self, messages: Any, **kwargs: Any) -> Any:
+        api_key = os.environ.get(SWISSAI_API_KEY_ENV, "")
+
+        async def request() -> Any:
+            return await super(SwissAICompatibleLLM, self).achat(messages, **kwargs)
+
+        return await call_swissai_async(request, api_key=api_key)
 
 
 def benchmark_provider(environ: dict[str, str] | None = None) -> str:
@@ -44,9 +64,7 @@ def _bounded_chat_kwargs(kwargs: dict[str, Any]) -> dict[str, Any]:
     configured = dict(kwargs)
     if os.environ.get(METHOD_ENV) != "codeact":
         return configured
-    raw_limit = os.environ.get(
-        CODEACT_MAX_OUTPUT_TOKENS_ENV, str(CODEACT_MAX_OUTPUT_TOKENS)
-    )
+    raw_limit = os.environ.get(CODEACT_MAX_OUTPUT_TOKENS_ENV, str(CODEACT_MAX_OUTPUT_TOKENS))
     try:
         limit = int(raw_limit)
     except ValueError as error:
@@ -54,17 +72,13 @@ def _bounded_chat_kwargs(kwargs: dict[str, Any]) -> dict[str, Any]:
             f"{CODEACT_MAX_OUTPUT_TOKENS_ENV} must be a positive integer"
         ) from error
     if limit <= 0:
-        raise ManifestError(
-            f"{CODEACT_MAX_OUTPUT_TOKENS_ENV} must be a positive integer"
-        )
+        raise ManifestError(f"{CODEACT_MAX_OUTPUT_TOKENS_ENV} must be a positive integer")
 
     requested = int(configured.get("max_tokens", limit))
     configured["max_tokens"] = min(requested, limit)
     additional = dict(configured.get("additional_kwargs", {}) or {})
     if "max_completion_tokens" in additional:
-        additional["max_completion_tokens"] = min(
-            int(additional["max_completion_tokens"]), limit
-        )
+        additional["max_completion_tokens"] = min(int(additional["max_completion_tokens"]), limit)
     configured["additional_kwargs"] = additional
     return configured
 
@@ -127,9 +141,7 @@ def build_benchmark_llm(**kwargs: Any) -> OpenRouter | OpenAILike:
             f"{SWISSAI_REQUEST_TIMEOUT_ENV} must be a positive number of seconds"
         ) from error
     if request_timeout <= 0:
-        raise ManifestError(
-            f"{SWISSAI_REQUEST_TIMEOUT_ENV} must be a positive number of seconds"
-        )
+        raise ManifestError(f"{SWISSAI_REQUEST_TIMEOUT_ENV} must be a positive number of seconds")
     # The endpoint's large models can legitimately take longer than the
     # OpenAILike default of 60 seconds. Keep one explicit request deadline and
     # avoid nested SDK retries multiplying it invisibly; CodeAct and the job
@@ -152,7 +164,7 @@ def build_benchmark_llm(**kwargs: Any) -> OpenRouter | OpenAILike:
     extra_body["chat_template_kwargs"] = chat_template_kwargs
     additional["extra_body"] = extra_body
     configured["additional_kwargs"] = additional
-    return OpenAILike(**configured)
+    return SwissAICompatibleLLM(**configured)
 
 
 def configure_rlm_for_provider(kwargs: dict[str, Any]) -> dict[str, Any]:
@@ -160,15 +172,11 @@ def configure_rlm_for_provider(kwargs: dict[str, Any]) -> dict[str, Any]:
 
     configured = dict(kwargs)
     backend_kwargs = dict(configured.get("backend_kwargs", {}))
-    raw_output_limit = os.environ.get(
-        RLM_MAX_OUTPUT_TOKENS_ENV, str(RLM_MAX_OUTPUT_TOKENS)
-    )
+    raw_output_limit = os.environ.get(RLM_MAX_OUTPUT_TOKENS_ENV, str(RLM_MAX_OUTPUT_TOKENS))
     try:
         output_limit = int(raw_output_limit)
     except ValueError as error:
-        raise ManifestError(
-            f"{RLM_MAX_OUTPUT_TOKENS_ENV} must be a positive integer"
-        ) from error
+        raise ManifestError(f"{RLM_MAX_OUTPUT_TOKENS_ENV} must be a positive integer") from error
     if output_limit <= 0:
         raise ManifestError(f"{RLM_MAX_OUTPUT_TOKENS_ENV} must be a positive integer")
     backend_kwargs["max_output_tokens"] = output_limit
@@ -180,9 +188,7 @@ def configure_rlm_for_provider(kwargs: dict[str, Any]) -> dict[str, Any]:
         reasoning_effort = reasoning_effort.strip().lower()
         if reasoning_effort not in OPENROUTER_REASONING_EFFORTS:
             choices = ", ".join(sorted(OPENROUTER_REASONING_EFFORTS))
-            raise ManifestError(
-                f"{RLM_REASONING_EFFORT_ENV} must be one of: {choices}"
-            )
+            raise ManifestError(f"{RLM_REASONING_EFFORT_ENV} must be one of: {choices}")
         if benchmark_provider() != "openrouter":
             raise ManifestError(
                 f"{RLM_REASONING_EFFORT_ENV} is only supported by the OpenRouter transport"
@@ -216,9 +222,7 @@ def configure_rlm_for_provider(kwargs: dict[str, Any]) -> dict[str, Any]:
                 "base_url": SWISSAI_BASE_URL,
                 "timeout": SWISSAI_REQUEST_TIMEOUT_SECONDS,
                 "max_retries": 0,
-                "chat_completion_extra_body": {
-                    "chat_template_kwargs": {"enable_thinking": False}
-                },
+                "chat_completion_extra_body": {"chat_template_kwargs": {"enable_thinking": False}},
             }
         )
     configured["backend_kwargs"] = backend_kwargs
