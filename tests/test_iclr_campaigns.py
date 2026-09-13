@@ -39,7 +39,7 @@ def test_full_campaign_is_generated_and_covers_six_models() -> None:
     rlm_runs = [run for run in manifest.runs if run.method == "rlm"]
     assert {run.env["RXNHAYSTACK_RLM_MAX_TIMEOUT_SECONDS"] for run in rlm_runs} == {"1800"}
     codeact_runs = [run for run in manifest.runs if run.method == "codeact"]
-    assert {run.env["RXNHAYSTACK_CODEACT_OUTPUT_LIMIT"] for run in codeact_runs} == {"8192"}
+    assert {run.env["RXNHAYSTACK_CODEACT_OUTPUT_LIMIT"] for run in codeact_runs} == {"30000"}
 
     with pytest.raises(ManifestError, match="SWISSAI_RESEARCH_API_KEY"):
         resolve_required_secrets(
