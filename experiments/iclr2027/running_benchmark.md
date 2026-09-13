@@ -451,11 +451,12 @@ answer-only model call. With two jobs at a time, the three-wave configured worst
 case is roughly 1.75 hours.
 
 The v19 GLM LLM phase is diagnostic because excessive in-flight requests caused
-63 provider timeouts. The paid CodeAct calibration checks are now complete. The
-v25 Haiku record is the first final job; the v20 GPT-5-mini record validated the
-limit but predates the final prompt and must remain diagnostic. A
-lower-concurrency SwissAI LLM cell still needs to demonstrate an acceptable
-provider-timeout rate before broad SwissAI execution.
+63 provider timeouts. The paid CodeAct calibration checks are complete. The v25
+Haiku record is the first final job; the v20 GPT-5-mini record validated the
+limit but predates the final prompt and must remain diagnostic. The final v25
+GLM check also passed: two jobs and 20 questions completed without a 429,
+timeout, or provider error at `--max-parallel 1`. Broad SwissAI LLM work should
+therefore retain one launcher job at a time per credential.
 
 For every trial job, inspect:
 

@@ -232,6 +232,13 @@ received provider 5xx errors; four more were interrupted when the launcher was
 stopped. These remain diagnostics. The final launch must use lower SwissAI
 in-flight concurrency and first demonstrate that the timeout rate is acceptable.
 
+The final v25 GLM release check used `--max-parallel 1`: two Tier-1 jobs covering
+20 question trajectories completed in 43.5 and 44.6 seconds. All 20 responses
+were recorded with no 429, timeout, or provider error; peak memory was 328.4 MiB
+and the x100/x500 macro-F1 scores were 0.880/0.773. This supports one SwissAI LLM
+job at a time on each credential, while each job retains its four-question
+internal concurrency.
+
 Claude Sonnet 5 was replaced by the pinned Claude Haiku 4.5 model at half the
 input and output list prices. The first 8,192-token Haiku checks exposed two
 provider-format variants and showed that otherwise valid code was still being
