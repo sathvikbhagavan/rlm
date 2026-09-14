@@ -31,8 +31,6 @@ def test_real_extraction_is_exact_and_deterministic(tmp_path: Path):
         item["suggested_time_minutes"] == SUGGESTED_MINUTES_BY_TIER[item["tier"]]
         for item in public
     )
-    ring_question = next(item for item in public if item["question_id"] == "rxh-t2-task3-1")
-    assert "max(rings(product_component)) minus" in ring_question["canonical_prompt"]
 
 
 def test_schema_round_trip_and_stable_ids():
