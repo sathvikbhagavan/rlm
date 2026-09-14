@@ -46,3 +46,20 @@ def test_pause_resume_timing_accounting(tmp_path: Path, monkeypatch):
     store.timer(user, "baseline", "q1", "start")
     with store.connect() as db:
         assert db.execute("SELECT COUNT(*) FROM timing_sessions").fetchone()[0] == 2
+
+
+def test_latest_submitted_payload_only_uses_eligible_completed_items(tmp_path: Path):
+    store = Store(tmp_path / "state.sqlite3")
+    user = store.profile()["annotator_id"]
+    store.save_draft(user, "baseline", "q-draft", {"confidence": "1"})
+    store.save_draft(user, "baseline", "q-other", {"confidence": "2"}, submit=True)
+    store.save_draft(user, "baseline", "q-same", {"confidence": "4"}, submit=True)
+
+    latest = store.latest_submitted_payload(
+        user,
+        "baseline",
+        ["q-draft", "q-same", "q-current"],
+        exclude_item_id="q-current",
+    )
+    assert latest and latest["item_id"] == "q-same"
+    assert latest["payload"]["confidence"] == "4"

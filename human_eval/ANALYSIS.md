@@ -3,7 +3,7 @@
 ```bash
 uv run --frozen --with-requirements human_eval/requirements.txt \
   python -m human_eval.cli analyze collaborator-*.zip \
-  --bundle human_eval/generated/canonical-v2 --output analysis/human-v2
+  --bundle human_eval/generated/canonical-v3 --output analysis/human-v3
 ```
 
 Outputs are `summary.json`, `item_metrics.csv`, and `disagreements.csv`. They report

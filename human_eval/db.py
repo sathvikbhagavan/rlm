@@ -173,6 +173,34 @@ class Store:
             "annotation_context": json.loads(row["annotation_context_json"]),
         }
 
+    def latest_submitted_payload(
+        self,
+        annotator_id: str,
+        mode: str,
+        item_ids: list[str],
+        *,
+        exclude_item_id: str,
+    ) -> dict[str, Any] | None:
+        eligible = [item_id for item_id in item_ids if item_id != exclude_item_id]
+        if not eligible:
+            return None
+        placeholders = ",".join("?" for _ in eligible)
+        with self.connect() as db:
+            row = db.execute(
+                f"""SELECT item_id,payload_json,submitted_at FROM drafts
+                WHERE annotator_id=? AND mode=? AND submitted_at IS NOT NULL
+                  AND item_id IN ({placeholders})
+                ORDER BY submitted_at DESC, item_id DESC LIMIT 1""",
+                (annotator_id, mode, *eligible),
+            ).fetchone()
+        if row is None:
+            return None
+        return {
+            "item_id": str(row["item_id"]),
+            "payload": json.loads(row["payload_json"]),
+            "submitted_at": str(row["submitted_at"]),
+        }
+
     def progress(self, annotator_id: str, mode: str) -> dict[str, int]:
         with self.connect() as db:
             row = db.execute(

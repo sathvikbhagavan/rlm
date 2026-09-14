@@ -32,6 +32,8 @@ remain valid with an empty context and should be reported as version-unresolved.
 Annotation payloads contain mode-specific judgments, confidence, rationale,
 abstention, issue tags, tool categories, verification, and offline minutes. Timestamps
 are timezone-aware ISO 8601 UTC. ZIP checksums cover each member.
+When editable metadata is prefilled from a completed question of the same
+tier/category/subcategory, `prefill_source_question_id` records its provenance.
 
 Restore accepts only manifest-declared members with safe relative names, verifies
 each size and SHA-256 checksum, enforces compressed/uncompressed limits, and merges
