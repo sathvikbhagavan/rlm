@@ -238,13 +238,80 @@ def create_app(
         )
 
     @app.get("/question/{question_id}", response_class=HTMLResponse)
-    def question_detail(request: Request, question_id: str, mode: str = "baseline"):
+    def question_detail(
+        request: Request,
+        question_id: str,
+        mode: str = "baseline",
+        study_id: str = "",
+    ):
         if mode not in {"baseline", "audit"}:
             raise HTTPException(400, "Invalid question mode")
         q = questions.get(question_id)
         if q is None:
             raise HTTPException(404, "Question not found")
         draft = store.draft(profile["annotator_id"], mode, question_id)
+        prefill = None
+        if mode == "baseline" and not draft["updated_at"]:
+            same_type_ids = [
+                candidate["question_id"]
+                for candidate in questions_list
+                if (
+                    candidate["tier"],
+                    candidate["category"],
+                    candidate["subcategory"],
+                )
+                == (q["tier"], q["category"], q["subcategory"])
+            ]
+            source = store.latest_submitted_payload(
+                profile["annotator_id"],
+                mode,
+                same_type_ids,
+                exclude_item_id=question_id,
+            )
+            if source:
+                labels = {
+                    "confidence": "confidence",
+                    "offline_minutes": "offline/tool-use minutes",
+                    "tools": "tools used",
+                }
+                carried = {
+                    key: source["payload"][key]
+                    for key in labels
+                    if source["payload"].get(key) not in (None, "", [])
+                }
+                if carried:
+                    draft["payload"] = {
+                        **draft["payload"],
+                        **carried,
+                        "prefill_source_question_id": source["item_id"],
+                    }
+                    prefill = {
+                        "source_question_id": source["item_id"],
+                        "fields": [labels[key] for key in carried],
+                    }
+
+        if study_id:
+            ordered_ids = store.assigned_items(profile["annotator_id"], study_id, mode)
+        else:
+            ordered_ids = [candidate["question_id"] for candidate in questions_list]
+        navigation = {
+            "previous": None,
+            "next": None,
+            "position": None,
+            "total": len(ordered_ids),
+            "study_id": study_id,
+        }
+        if question_id in ordered_ids:
+            position = ordered_ids.index(question_id)
+            navigation.update(
+                {
+                    "previous": ordered_ids[position - 1] if position else None,
+                    "next": ordered_ids[position + 1]
+                    if position + 1 < len(ordered_ids)
+                    else None,
+                    "position": position + 1,
+                }
+            )
         audit_truth = None
         if mode == "audit":
             gt = ground_truth[question_id]
@@ -266,7 +333,16 @@ def create_app(
         return templates.TemplateResponse(
             request,
             "question.html",
-            context(request, question=q, mode=mode, draft=draft, audit_truth=audit_truth),
+            context(
+                request,
+                question=q,
+                mode=mode,
+                draft=draft,
+                audit_truth=audit_truth,
+                prefill=prefill,
+                navigation=navigation,
+                study_id=study_id,
+            ),
         )
 
     @app.get("/api/question/{question_id}")

@@ -20,7 +20,7 @@
 <p>{{ rows|length }} questions shown.</p>
 <div class="panel">
 {% for q in rows %}
-<div class="question-row"><span>Tier {{ q.tier }}<br><span class="badge">{{ q.status }}</span></span><span><strong>{{ q.question_id }}</strong><br>{{ q.category }} / {{ q.subcategory }}<br>{{ q.canonical_prompt[:170] }}…</span><span><a class="button" href="/question/{{ q.question_id }}?mode={{ mode }}">Open</a></span></div>
+<div class="question-row"><span>Tier {{ q.tier }}<br><span class="badge">{{ q.status }}</span></span><span><strong>{{ q.question_id }}</strong><br>{{ q.category }} / {{ q.subcategory }}<br>{{ q.canonical_prompt[:170] }}…</span><span><a class="button" href="/question/{{ q.question_id }}?mode={{ mode }}{% if study_id %}&amp;study_id={{ study_id|urlencode }}{% endif %}">Open</a></span></div>
 {% else %}<p>No questions match.</p>{% endfor %}
 </div>
 {% endblock %}
