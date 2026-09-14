@@ -38,8 +38,6 @@ EXPECTED = {
     },
 }
 
-SUGGESTED_MINUTES_BY_TIER = {1: 5, 2: 10, 3: 10, 4: 15}
-
 
 def literal_constants(path: Path) -> dict[str, Any]:
     tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
@@ -122,7 +120,7 @@ class BundleBuilder:
         sources: list[str],
         evaluator: dict[str, Any] | None = None,
         metadata: dict[str, Any] | None = None,
-        minutes: int | None = None,
+        minutes: int = 30,
     ) -> None:
         slug = re.sub(r"[^a-z0-9]+", "-", key.lower()).strip("-")
         question_id = f"rxh-t{tier}-{slug}"
@@ -142,9 +140,7 @@ class BundleBuilder:
             source_files=tuple(sources),
             dataset_sha256=self.dataset_sha256,
             ground_truth_ref=gt_ref,
-            suggested_time_minutes=(
-                minutes if minutes is not None else SUGGESTED_MINUTES_BY_TIER[tier]
-            ),
+            suggested_time_minutes=minutes,
             scoring=scoring,
             metadata=metadata or {},
         )
@@ -183,6 +179,7 @@ class BundleBuilder:
                 answer_type="index_set",
                 answer=answer,
                 sources=["tier1/llm_task1.py", "tier1/task1_hardcoded_cases.py"],
+                minutes=20,
                 metadata={"target_product": product},
             )
 
@@ -216,6 +213,7 @@ class BundleBuilder:
                     answer_type="index_set",
                     answer=values[gt_name][threshold],
                     sources=[f"tier2/llm_task{task}.py", f"tier2/{gt_file.name}"],
+                    minutes=35,
                 )
         values = literal_constants(self.root / "tier2/task5_hardcoded_ground_truth.py")
         fn = source_function(self.root / "tier2/llm_task5.py", "build_question")
@@ -231,6 +229,7 @@ class BundleBuilder:
                     answer_type="index_set",
                     answer=answer,
                     sources=["tier2/llm_task5.py", "tier2/task5_hardcoded_ground_truth.py"],
+                    minutes=45,
                 )
 
     def tier3(self) -> None:
@@ -268,6 +267,7 @@ class BundleBuilder:
                         f"tier3/llm_task{task}.py",
                         f"tier3/task{task}_hardcoded_ground_truth.py",
                     ],
+                    minutes=45,
                     metadata=metadata,
                 )
         for task_name in ("10", "10b"):
@@ -292,6 +292,7 @@ class BundleBuilder:
                         f"tier3/task{task_name}_prompt_config.py",
                         f"tier3/task{task_name}_hardcoded_ground_truth.py",
                     ],
+                    minutes=60,
                 )
         singleton_groups = {
             11: "bond-level",
@@ -319,6 +320,7 @@ class BundleBuilder:
                 answer_type="index_set",
                 answer=answer,
                 sources=[f"tier3/llm_task{task}.py", f"tier3/{gt_file.name}"],
+                minutes=45,
             )
 
     def tier4(self) -> None:
@@ -337,6 +339,7 @@ class BundleBuilder:
                     answer_type="reaction_chains",
                     answer=answer,
                     sources=["tier4/rlm_task11.py", "tier4/task11_synthetic_chain_ground_truth.py"],
+                    minutes=60,
                 )
             t12 = imported("tier4", "task12_longest_chain_ground_truth", self.root)
             prompt12 = source_function(self.root / "tier4/rlm_task12.py", "build_question")
@@ -350,6 +353,7 @@ class BundleBuilder:
                     answer_type="single_chain",
                     answer=list(t12.HARDCODED_GT_LONGEST_CHAIN[product]),
                     sources=["tier4/rlm_task12.py", "tier4/task12_longest_chain_ground_truth.py"],
+                    minutes=60,
                 )
             t12b = imported("tier4", "task12b_hub_molecule_ground_truth", self.root)
             prompt12b = source_function(
@@ -366,6 +370,7 @@ class BundleBuilder:
                 answer_type="smiles_set",
                 answer=list(t12b.HARDCODED_GT_HUB_MOLECULES),
                 sources=["tier4/rlm_task12b.py", "tier4/task12b_hub_molecule_ground_truth.py"],
+                minutes=60,
             )
 
             t13g = imported("tier4", "task13_fg_chain_graph", self.root)
@@ -388,6 +393,7 @@ class BundleBuilder:
                         "tier4/task13_fg_chain_ground_truth.py",
                         "tier4/task13_fg_hardcoded_chains.json",
                     ],
+                    minutes=90,
                 )
             t14g = imported("tier4", "task14_protecting_group_graph", self.root)
             t14 = imported("tier4", "task14_protecting_group_ground_truth", self.root)
@@ -407,6 +413,7 @@ class BundleBuilder:
                         "tier4/task14_protecting_group_ground_truth.py",
                         "tier4/task14_pg_hardcoded_pairs.json",
                     ],
+                    minutes=90,
                 )
             t15g = imported("tier4", "task15_ring_chain_graph", self.root)
             t15 = imported("tier4", "task15_ring_chain_ground_truth", self.root)
@@ -431,6 +438,7 @@ class BundleBuilder:
                         "tier4/task15_ring_chain_ground_truth.py",
                         "tier4/task15_ring_hardcoded_chains.json",
                     ],
+                    minutes=90,
                 )
             self.add_prospective()
 
@@ -452,6 +460,7 @@ class BundleBuilder:
                     "tier4/task16_truncated_synthesis_ground_truth.py",
                     "tier4/task16_truncated_hardcoded_chains.json",
                 ],
+                minutes=120,
             )
         for suffix in ("17", "17b"):
             graph = imported("tier4", f"task{suffix}_smirks_sequential_graph", self.root)
@@ -472,6 +481,7 @@ class BundleBuilder:
                         f"tier4/task{suffix}_ground_truth.py",
                         f"tier4/task{suffix}_hardcoded_chains.json",
                     ],
+                    minutes=90,
                 )
 
 

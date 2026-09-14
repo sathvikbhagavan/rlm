@@ -10,7 +10,7 @@ elif [[ -f "$bundled_dataset" ]]; then
 else
   dataset_path="$legacy_dataset"
 fi
-if [[ ! -f human_eval/generated/canonical-v3/manifest.json ]]; then
+if [[ ! -f human_eval/generated/canonical-v2/manifest.json ]]; then
   uv run --frozen --with-requirements human_eval/requirements.txt python -m human_eval.cli build-bundle --dataset "$dataset_path"
 fi
 if [[ ! -f human_eval/local_state/dataset_index.sqlite3 ]]; then

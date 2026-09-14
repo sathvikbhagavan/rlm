@@ -86,16 +86,8 @@ button, .button { background: var(--primary); color: #fff; border: 1px solid tra
 button:hover, .button:hover { background: var(--primary-hover); }
 button.secondary { color: var(--text); background: var(--surface-muted); border-color: var(--border); }
 button.secondary:hover { border-color: var(--input-border); }
-.button.secondary-link { color: var(--text); background: var(--surface-muted); border-color: var(--border); }
-.button.secondary-link:hover { color: var(--text); background: var(--badge); border-color: var(--input-border); }
 button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
 .action-row { display: flex; flex-wrap: wrap; align-items: center; gap: .75rem; margin-top: 1rem; }
-.question-navigation { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: .75rem 1rem; margin: 0 0 1rem; padding: .7rem 0; }
-.question-navigation-bottom { margin: 1rem 0 0; border-top: 1px solid var(--border); }
-.question-navigation-actions { display: flex; flex-wrap: wrap; gap: .75rem; }
-.prefill-note { margin: 1rem 0; padding: .8rem 1rem; background: var(--surface-muted); border: 1px solid var(--border); border-left: 4px solid var(--primary); border-radius: 4px; }
-.text-button { margin-left: .35rem; padding: .15rem .3rem; color: var(--link); background: transparent; border: 0; text-decoration: underline; }
-.text-button:hover { color: var(--text); background: transparent; }
 .disagreement-callout { margin: 1rem 0; padding: 1rem; background: var(--danger-bg); border: 2px solid var(--danger-border); border-radius: 6px; }
 .disagreement-callout h3 { margin-top: 0; }
 .disagreement-callout label { font-weight: 600; }

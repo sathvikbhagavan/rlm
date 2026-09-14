@@ -53,8 +53,6 @@ def build_question(threshold: int) -> str:
     - For each reaction, compute ALL pairwise deltas:
       rings(product_component) - rings(reactant_component)
       and use the maximum of those deltas.
-      Equivalently, this is max(rings(product_component)) minus
-      min(rings(reactant_component)); either computation gives the same result.
     - Ignore reagents (middle field).
     - For each side (reactants/products), ignore invalid or empty dot-separated molecules.
     - Skip a reaction only if reactant side or product side has no valid molecules left after filtering.

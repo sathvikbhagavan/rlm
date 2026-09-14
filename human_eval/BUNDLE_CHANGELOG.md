@@ -1,13 +1,5 @@
 # Canonical bundle changelog
 
-## rxnhaystack-human-1.2.0 — September 14, 2026
-
-Updated the empirically informed suggested stopping limits to 5 minutes for Tier 1,
-10 minutes for Tiers 2–3, and 15 minutes for Tier 4. Clarified, without changing
-the predicate or answer, that the Tier-2 ring-count maximum over all component
-pairs is equivalently the maximum product ring count minus the minimum reactant
-ring count. Stable question IDs, ground truths, and the dataset are unchanged.
-
 ## rxnhaystack-human-1.1.0 — September 12, 2026
 
 Rebuilt from Sathvik Bhagavan's source commit `8987a3c` (“fix: last 10 questions

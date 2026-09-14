@@ -47,13 +47,6 @@ stopping limit; if you reach it without an answer, report “Suggested time exce
 The first submitted answer remains the independent human-baseline answer. Later
 revisions never overwrite it invisibly.
 
-For a new question, the interface may reuse confidence, selected tools, and
-offline/tool-use minutes from your most recent completed question of the same type.
-Review and edit these values—especially the time, which is per question. Answers,
-rationales, outcomes, and the verification checkbox are never reused. Use
-**Previous** and **Next** to move directly between questions; navigation saves any
-current draft and pauses its timer.
-
 ## Reusing code across questions
 
 Related questions are intentionally amenable to shared tooling. Reuse is allowed

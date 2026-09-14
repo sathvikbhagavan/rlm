@@ -22,9 +22,6 @@ non-loopback `--host` is rejected unless `--allow-network` is explicit.
 Drafts autosave every 10 seconds and on normal tab/background transitions. The
 question screen's **Save and pause** button performs a confirmed save and closes the
 timing session. Keep `human_eval/local_state/` to resume after restarting the app.
-Previous/next controls save before navigating. On a new question, confidence, tool
-selections, and offline-time minutes are prefilled from the latest completed question
-of the same subtype; the annotator must review them and confirm the logic anew.
 
 Dependencies are supplied from `human_eval/requirements.txt` with `uv --frozen`;
 the main lockfile is not changed. Override the corpus with
@@ -102,14 +99,14 @@ different suite versions remains distinguishable.
 
 Before changing a live study, archive the old canonical bundle—including its
 protected `admin/` component—and build the update to a new directory such as
-`human_eval/generated/canonical-v4`. Do not overwrite the old bundle needed to
+`human_eval/generated/canonical-v2`. Do not overwrite the old bundle needed to
 score its submissions. Restart the application with both the new bundle and the
 unchanged state directory:
 
 ```bash
 uv run --frozen --with-requirements human_eval/requirements.txt \
   python -m human_eval.cli serve \
-  --bundle human_eval/generated/canonical-v4 \
+  --bundle human_eval/generated/canonical-v2 \
   --state human_eval/local_state
 ```
 
