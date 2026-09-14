@@ -10,7 +10,7 @@ broader engineering history, read [`what_changed.md`](what_changed.md).
 
 ## Current status
 
-- The final experiment descriptions are full benchmark v33 and
+- The current release-check experiment descriptions are full benchmark v34 and
   matched-cardinality v7.
 - The full benchmark contains 6,300 jobs and has a planned ceiling of
   CHF 743.72.
@@ -31,9 +31,10 @@ v28 directory contains the authoritative completed GLM LLM phase plus the
 failed 30,000-token concurrent, 8,192-token concurrent, and 4,096-token serial
 CodeAct release checks. A broader v32 run then found 93 output-limit finishes in
 1,106 returned GLM CodeAct turns (8.4%), affecting 16 of 66 completed jobs. Full
-benchmark v33 retains serial GLM CodeAct scheduling, restores the common
-30,000-token allowance, and keeps the aligned workflow and request-retry
-deadlines.
+benchmark v33 retained serial GLM CodeAct scheduling and restored the common
+30,000-token allowance, but its first release request timed out on all three
+300-second attempts. Full benchmark v34 tests a 16,384-token midpoint and keeps
+the aligned workflow and request-retry deadlines.
 
 ## Why the final testing took so long
 
@@ -151,7 +152,7 @@ full experiment. Qwen uses the SwissAI 2,048-token/no-hidden-thinking path.
 | LLM worker memory | 2–4 GiB reserved; 4–8 GiB hard limit | The launcher terminates a worker exceeding its combined hard limit. |
 | CodeAct worker memory | 4–6 GiB reserved; 8–12 GiB hard limit | Same combined-memory enforcement. |
 | RLM worker memory | 8/10/28 GiB reserved for 100/500/full context; 16/20/30 GiB hard limit | Same combined-memory enforcement. |
-| CodeAct response | 30,000 output tokens per model turn | The provider response is truncated at the recorded bound. GLM remains serialized: its v32 8,192-token run reached that ceiling on 93/1,106 returned turns, so v33 restores 30,000 without restoring question concurrency. |
+| CodeAct response | 30,000 output tokens per model turn; v34 tests 16,384 for GLM | The provider response is truncated at the recorded bound. GLM remains serialized: v32 reached 8,192 on 93/1,106 returned turns, while v33's first serial 30,000-token request timed out on all three attempts. |
 | LLM/CodeAct reasoning | `low` in Tier 1; `high` in Tiers 2–4 | This preserves the collaborator's original task settings. SwissAI disables only its separate hidden-thinking channel. |
 | SwissAI LLM response | 4,096 output tokens per request | Keeps large-context requests schedulable; 500 reaction indices fit within the bound. OpenRouter LLM limits are unchanged. |
 | CodeAct reasoning loop | 8 tool/reasoning turns, then at most 2 answer-only attempts | Further code is not executed; the controller asks for the final answer. |

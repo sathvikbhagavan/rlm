@@ -538,6 +538,17 @@ CodeAct model while keeping GLM questions serialized. The 300-second request,
 1,800-second question-workflow, eight-turn reasoning, two-answer-attempt,
 60-second generated-tool, and 4,096-MiB generated-tool limits remain in place.
 
+## 20. GLM CodeAct midpoint release check
+
+The v33 Task-16 x500 serial release cell did not return its first model answer:
+all three 300-second attempts timed out with a 30,000-token reservation. This
+was an API timeout, not an HTTP 429 rate-limit response. Full benchmark v34
+records a practical 16,384-token GLM CodeAct midpoint, doubling the truncating
+8,192 setting while remaining well below the unschedulable 30,000 setting. It
+retains serial questions and every existing workflow, retry, tool, turn, and
+memory boundary. V34 is a release check until that demanding cell completes; it
+is not authorization to launch the broad GLM phase.
+
 ## What has not been hidden or simplified away
 
 - The three API/W&B credential values are currently required before any selected

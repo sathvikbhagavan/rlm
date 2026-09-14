@@ -39,9 +39,16 @@ def test_full_campaign_is_generated_and_covers_six_models() -> None:
     rlm_runs = [run for run in manifest.runs if run.method == "rlm"]
     assert {run.env["RXNHAYSTACK_RLM_MAX_TIMEOUT_SECONDS"] for run in rlm_runs} == {"1800"}
     codeact_runs = [run for run in manifest.runs if run.method == "codeact"]
-    assert {run.env["RXNHAYSTACK_CODEACT_OUTPUT_LIMIT"] for run in codeact_runs} == {
-        "30000"
-    }
+    assert {
+        run.env["RXNHAYSTACK_CODEACT_OUTPUT_LIMIT"]
+        for run in codeact_runs
+        if run.model == "CSCS-Inference/zai-org/GLM-5.2"
+    } == {"16384"}
+    assert {
+        run.env["RXNHAYSTACK_CODEACT_OUTPUT_LIMIT"]
+        for run in codeact_runs
+        if run.model != "CSCS-Inference/zai-org/GLM-5.2"
+    } == {"30000"}
     assert {
         run.env["RXNHAYSTACK_CODEACT_WORKFLOW_TIMEOUT_SECONDS"] for run in codeact_runs
     } == {"1800"}

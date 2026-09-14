@@ -21,10 +21,12 @@ COST_MULTIPLIERS = {
 }
 
 # GLM CodeAct is serialized because concurrent 500-row turns did not schedule
-# reliably. The v32 broad run then showed that an 8,192-token ceiling still
-# truncated 93 of 1,106 returned turns, so v33 restores the common 30,000-token
-# ceiling while retaining one question at a time.
-CODEACT_OUTPUT_LIMITS: dict[str, int] = {}
+# reliably. V32's 8,192-token ceiling truncated 93 of 1,106 returned turns,
+# while the v33 serial 30,000-token release request timed out on all three
+# attempts. V34 tests a recorded midpoint that doubles the schedulable bound.
+CODEACT_OUTPUT_LIMITS = {
+    "glm-5.2": 16384,
+}
 
 # Historical GPT-5-mini tokens for one repetition of each 100-question condition.
 TOKEN_FOOTPRINT = {
@@ -93,9 +95,9 @@ def render() -> str:
         "schema_version = 1",
         "",
         "[campaign]",
-        'name = "iclr2027-six-model-full-v33"',
+        'name = "iclr2027-six-model-full-v34"',
         'project_root = "../.."',
-        'artifact_dir = "artifacts/iclr2027-six-model-full-v33"',
+        'artifact_dir = "artifacts/iclr2027-six-model-full-v34"',
         "budget_chf = 1250.0",
         f"usd_to_chf = {USD_TO_CHF:.2f}",
         "require_dataset = true",
