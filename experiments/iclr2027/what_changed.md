@@ -527,6 +527,17 @@ job. All 34 CodeAct scripts read and report this value; their historical
 standalone defaults remain unchanged. Per-request, tool, turn, and memory limits
 are unchanged.
 
+## 19. GLM CodeAct output allowance after the broad run
+
+The first 66 completed jobs in the v32 serialized GLM CodeAct run returned
+1,106 model turns. Of those, 93 turns (8.4%) ended at the 8,192-token output
+limit, spread across 16 jobs. That is frequent enough to alter the scientific
+result rather than merely prevent pathological output. Full benchmark v33
+therefore gives GLM the same 30,000-token per-turn allowance as every other
+CodeAct model while keeping GLM questions serialized. The 300-second request,
+1,800-second question-workflow, eight-turn reasoning, two-answer-attempt,
+60-second generated-tool, and 4,096-MiB generated-tool limits remain in place.
+
 ## What has not been hidden or simplified away
 
 - The three API/W&B credential values are currently required before any selected

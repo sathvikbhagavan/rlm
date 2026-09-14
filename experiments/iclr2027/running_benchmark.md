@@ -372,17 +372,18 @@ the action could close. After the provider-neutral prompt/parser correction,
 the final Haiku Task-16 x500 pilot made 44 calls and 34 tool executions with
 zero 30,000-token hits. It used 139,497 output tokens in total—not 30,000 on
 every call—and cost CHF 1.239, below that cell's CHF 3.255 allowance. The
-30,000-token ceiling is written into every model's CodeAct job except GLM.
+30,000-token ceiling is written into every model's CodeAct job.
 GLM's Tier-4 Task-16 x500 release check completed a nine-turn trajectory but
 then suffered repeated 300-second provider timeouts with that reservation. The
 completed trajectory used 5,272 output tokens across all nine turns. Full
 benchmark v29 tested 8,192 output tokens, but neither of two concurrent initial
 requests returned before the five-minute deadline. A subsequent 4,096-token
 serial check scheduled successfully, but consecutive legitimate CodeAct turns
-hit that output ceiling. Full benchmark v31 therefore records 8,192 output
-tokens per GLM CodeAct turn and serializes GLM CodeAct questions, isolating the
-concurrency problem without truncating ordinary turns. The other models remain
-at 30,000 and two questions per worker.
+hit that output ceiling. A broader v32 run serialized GLM at 8,192 tokens, but
+93 of 1,106 returned turns (8.4%) still ended because they reached that limit,
+across 16 of 66 completed jobs. Full benchmark v33 therefore restores 30,000
+tokens for GLM while retaining one GLM CodeAct question at a time. The other
+models also remain at 30,000 and may run two questions per worker.
 
 The final experiment gives each CodeAct question 1,800 seconds in total. This
 is intentionally longer than the previous 600/900-second script defaults:
