@@ -62,7 +62,7 @@ def test_memory_watchdog_records_host_docker_and_combined_peaks(
         lambda _path: docker_bytes,
     )
     process = subprocess.Popen(
-        [sys.executable, "-c", "import time; time.sleep(0.25)"],
+        [sys.executable, "-c", "import time; time.sleep(1.0)"],
         text=True,
         start_new_session=True,
     )

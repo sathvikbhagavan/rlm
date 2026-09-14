@@ -34,6 +34,7 @@ def write_worker(
     write_metrics: bool = True,
     exit_code: int = 0,
     cost_chf: float = 0.08,
+    hold_seconds: float = 0.0,
 ) -> None:
     metrics_statement = (
         f"""
@@ -55,10 +56,12 @@ write_run_metrics(RunMetrics(
     )
     path.write_text(
         "import os\n"
+        "import time\n"
         "from pathlib import Path\n"
         f"{metrics_statement}\n"
         "print('run=' + os.environ['RXNHAYSTACK_RUN_ID'])\n"
         "print('secret-present=' + str(bool(os.environ.get('TEST_API_KEY'))))\n"
+        f"time.sleep({hold_seconds!r})\n"
         f"raise SystemExit({exit_code})\n"
     )
 
@@ -110,7 +113,11 @@ def test_launcher_executes_parallel_runs_records_artifacts_and_resumes(tmp_path:
     project_root.mkdir()
     initialize_git_repository(project_root)
     worker = project_root / "worker.py"
-    write_worker(worker)
+    # Keep this synthetic worker alive long enough for the polling watchdog to
+    # observe it even on a heavily loaded shared login node. Real benchmark
+    # workers live for minutes or hours; a process that exits between spawn and
+    # the first /proc sample cannot have its RSS reconstructed after the fact.
+    write_worker(worker, hold_seconds=0.5)
     manifest = load_manifest(write_campaign(tmp_path, project_root, worker))
     preflight = perform_preflight(manifest)
 
