@@ -13,7 +13,7 @@ from rlm.codeact_helpers import build_context_pipeline, precision_recall_f1
 from rlm.tracing import init_tracing, using_tracing_attributes
 from rxnhaystack.metrics import RunMetrics, cost_chf_from_usd, write_run_metrics
 from rxnhaystack.providers import provider_reports_cost
-from rxnhaystack.worker import BenchmarkRuntime
+from rxnhaystack.worker import BenchmarkRuntime, instrument_rlm_from_environment
 
 # os.environ["WANDB_MODE"] = "disabled"
 
@@ -149,7 +149,7 @@ def main() -> None:
     total_tool_time = 0.0
 
     for i, question in enumerate(questions):
-        rlm = RLM(**runtime.instrument_rlm_kwargs(RLM_INIT_KWARGS, sample_id=i))
+        rlm = RLM(**instrument_rlm_from_environment(RLM_INIT_KWARGS, sample_id=i))
         print(f"Question {i + 1}/{len(questions)}")
         target_product = selected_products[i]
         ground_truth_index_set = set(selected_ground_truth[i])
