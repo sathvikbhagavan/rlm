@@ -103,6 +103,8 @@ def test_browser_smoke_leakage_autosave_and_export(
     assert "Does your answer reveal a possible benchmark error?" in application_js
     baseline = client.get("/question/rxh-t1-fixture?mode=baseline")
     assert baseline.status_code == 200 and "987654321" not in baseline.text
+    assert "Less repetition on similar questions" in baseline.text
+    assert "verification remains question-specific" in baseline.text
     api = client.get("/api/question/rxh-t1-fixture?mode=baseline")
     assert "ground_truth" not in api.text and "987654321" not in api.text
     assert client.get("/question/rxh-t1-fixture?mode=audit").text.count("987654321") >= 1

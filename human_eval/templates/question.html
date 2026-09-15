@@ -54,6 +54,10 @@
     <button type="button" class="text-button" data-clear-prefill>Clear reused details</button>
   </aside>
   <input type="hidden" name="prefill_source_question_id" value="{{ prefill.source_question_id }}">
+  {% else %}
+  <aside class="prefill-note">
+    <strong>Less repetition on similar questions:</strong> after you complete one question of this type, later questions will prefill your confidence, selected tools, and offline time. Review these editable values for each question; verification remains question-specific.
+  </aside>
   {% endif %}
 
   <label>Self-reported offline/tool-use time (minutes) <small>(for this question; adjust any reused value)</small>
