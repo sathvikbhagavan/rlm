@@ -11,6 +11,15 @@ from rlm.clients.openai import OpenAIClient
 from rxnhaystack.accounting import RESPONSE_EVENTS_ENV
 
 
+class FakeStatusError(Exception):
+    def __init__(self, status_code: int, message: str, *, request_id: str = "req-error"):
+        super().__init__(message)
+        self.status_code = status_code
+        self.message = message
+        self.request_id = request_id
+        self.headers = {}
+
+
 def response(
     *,
     generation_id: str = "gen-test",
@@ -84,6 +93,24 @@ def read_events(path) -> list[dict]:
     return [json.loads(line) for line in path.read_text().splitlines()]
 
 
+def test_openrouter_sdk_retries_are_disabled_for_audited_retry_control() -> None:
+    sync_factory = MagicMock(return_value=MagicMock())
+    async_factory = MagicMock(return_value=MagicMock())
+    with (
+        patch("rlm.clients.openai.openai.OpenAI", sync_factory),
+        patch("rlm.clients.openai.openai.AsyncOpenAI", async_factory),
+    ):
+        OpenAIClient(
+            api_key="not-a-real-key",
+            model_name="openai/gpt-5-mini",
+            base_url="https://openrouter.ai/api/v1",
+            max_retries=9,
+        )
+
+    assert sync_factory.call_args.kwargs["max_retries"] == 0
+    assert async_factory.call_args.kwargs["max_retries"] == 0
+
+
 def test_normal_usage_is_available_and_response_is_saved_first(monkeypatch, tmp_path) -> None:
     path = tmp_path / "responses.jsonl"
     monkeypatch.setenv(RESPONSE_EVENTS_ENV, str(path))
@@ -155,6 +182,167 @@ def test_malformed_response_is_saved_then_rejected(monkeypatch, tmp_path) -> Non
 
     assert read_events(path)[0]["event"] == "provider_response_saved"
     assert transport.chat.completions.create.call_count == 1
+
+
+def test_policy_403_empty_response_is_preserved_without_retry_sync(monkeypatch, tmp_path) -> None:
+    path = tmp_path / "responses.jsonl"
+    monkeypatch.setenv(RESPONSE_EVENTS_ENV, str(path))
+    client, transport = client_with_responses(
+        response(
+            generation_id="gen-policy",
+            choices=False,
+            model_extra={
+                "error": {
+                    "code": 403,
+                    "message": "Policy Violation: private prompt blocked",
+                    "metadata": {
+                        "error_type": "refusal",
+                        "provider_code": "invalid_request",
+                    },
+                }
+            },
+        )
+    )
+
+    with (
+        patch("rlm.clients.openai.time.sleep") as sleep,
+        pytest.raises(ValueError, match="non-retryable HTTP 403"),
+    ):
+        client.completion("private prompt")
+
+    assert transport.chat.completions.create.call_count == 1
+    sleep.assert_not_called()
+    events = read_events(path)
+    assert [event["event"] for event in events] == [
+        "provider_response_saved",
+        "usage_unavailable",
+        "provider_error_non_retryable",
+    ]
+    assert events[-1]["status_code"] == 403
+    assert "private prompt" not in path.read_text()
+    assert client.get_last_usage().total_calls == 1
+    assert client.get_last_usage().total_cost is None
+
+
+def test_policy_403_empty_response_is_preserved_without_retry_async(monkeypatch, tmp_path) -> None:
+    path = tmp_path / "responses.jsonl"
+    monkeypatch.setenv(RESPONSE_EVENTS_ENV, str(path))
+    client, transport = async_client_with_responses(
+        response(
+            generation_id="gen-policy",
+            choices=False,
+            model_extra={"error": {"code": 403, "message": "permission denied"}},
+        )
+    )
+
+    with (
+        patch("rlm.clients.openai.asyncio.sleep", new=AsyncMock()) as sleep,
+        pytest.raises(ValueError, match="non-retryable HTTP 403"),
+    ):
+        asyncio.run(client.acompletion("private prompt"))
+
+    assert transport.chat.completions.create.await_count == 1
+    sleep.assert_not_awaited()
+    assert read_events(path)[-1]["event"] == "provider_error_non_retryable"
+
+
+def test_raised_403_is_audited_and_not_retried(monkeypatch, tmp_path) -> None:
+    path = tmp_path / "responses.jsonl"
+    monkeypatch.setenv(RESPONSE_EVENTS_ENV, str(path))
+    error = FakeStatusError(403, "permission denied for private prompt")
+    client, transport = client_with_responses(error)
+
+    with pytest.raises(FakeStatusError):
+        client.completion("private prompt")
+
+    assert transport.chat.completions.create.call_count == 1
+    events = read_events(path)
+    assert [event["event"] for event in events] == [
+        "provider_error_saved",
+        "usage_unavailable",
+        "provider_error_non_retryable",
+    ]
+    assert events[0]["status_code"] == 403
+    assert events[0]["error_message"] == "permission denied for [REDACTED]"
+    assert client.get_last_usage().total_cost is None
+
+
+def test_429_empty_response_respects_retry_after(monkeypatch, tmp_path) -> None:
+    path = tmp_path / "responses.jsonl"
+    monkeypatch.setenv(RESPONSE_EVENTS_ENV, str(path))
+    client, transport = client_with_responses(
+        response(
+            generation_id="gen-rate-limited",
+            choices=False,
+            model_extra={
+                "error": {
+                    "code": 429,
+                    "message": "rate limited",
+                    "metadata": {"retry-after": "7"},
+                }
+            },
+        ),
+        response(generation_id="gen-success", usage=usage()),
+    )
+
+    with patch("rlm.clients.openai.time.sleep") as sleep:
+        assert client.completion("private prompt") == "valid answer"
+
+    assert transport.chat.completions.create.call_count == 2
+    sleep.assert_called_once_with(7.0)
+    retry = next(
+        event for event in read_events(path) if event["event"] == "empty_choices_retry_scheduled"
+    )
+    assert retry["backoff_seconds"] == 7.0
+
+
+def test_503_empty_response_remains_retryable(monkeypatch, tmp_path) -> None:
+    path = tmp_path / "responses.jsonl"
+    monkeypatch.setenv(RESPONSE_EVENTS_ENV, str(path))
+    client, transport = client_with_responses(
+        response(
+            generation_id="gen-unavailable",
+            choices=False,
+            model_extra={"error": {"code": 503, "message": "temporarily unavailable"}},
+        ),
+        response(generation_id="gen-success", usage=usage()),
+    )
+
+    with patch("rlm.clients.openai.time.sleep") as sleep:
+        assert client.completion("private prompt") == "valid answer"
+
+    assert transport.chat.completions.create.call_count == 2
+    sleep.assert_called_once_with(1.0)
+
+
+def test_openrouter_routing_metadata_is_requested_and_sanitized(monkeypatch, tmp_path) -> None:
+    path = tmp_path / "responses.jsonl"
+    monkeypatch.setenv(RESPONSE_EVENTS_ENV, str(path))
+    client, transport = client_with_responses(
+        response(
+            usage=usage(),
+            model_extra={
+                "openrouter_metadata": {
+                    "router": "openrouter/auto",
+                    "provider_name": "OpenAI",
+                    "pipeline": [{"stage": "upstream", "status": "completed"}],
+                    "request_body": "private prompt",
+                    "authorization": "Bearer not-a-real-key",
+                }
+            },
+        )
+    )
+
+    client.completion("private prompt")
+
+    request = transport.chat.completions.create.call_args.kwargs
+    assert request["extra_headers"] == {"X-OpenRouter-Metadata": "enabled"}
+    metadata = read_events(path)[0]["response"]["model_extra"]["openrouter_metadata"]
+    assert metadata["router"] == "openrouter/auto"
+    assert metadata["provider_name"] == "OpenAI"
+    assert metadata["pipeline"] == [{"stage": "upstream", "status": "completed"}]
+    assert metadata["request_body"] == "[REDACTED]"
+    assert metadata["authorization"] == "[REDACTED]"
 
 
 def test_empty_choices_retry_then_succeed_sync(monkeypatch, tmp_path) -> None:

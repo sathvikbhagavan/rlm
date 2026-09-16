@@ -5,6 +5,8 @@ import threading
 import time
 from collections import defaultdict
 from collections.abc import Mapping, Sequence
+from datetime import UTC, datetime
+from email.utils import parsedate_to_datetime
 from typing import Any
 
 import openai
@@ -25,6 +27,8 @@ DEFAULT_PRIME_API_KEY = os.getenv("PRIME_API_KEY")
 DEFAULT_PRIME_INTELLECT_BASE_URL = "https://api.pinference.ai/api/v1/"
 EMPTY_CHOICE_MAX_RETRIES = 2
 EMPTY_CHOICE_BACKOFF_SECONDS = (1.0, 2.0)
+MAX_RETRY_AFTER_SECONDS = 60.0
+RETRYABLE_HTTP_STATUS_CODES = frozenset({408, 409, 429, 500, 502, 503, 504, 524, 529})
 _REDACTED = "[REDACTED]"
 _SENSITIVE_RESPONSE_KEYS = frozenset(
     {
@@ -85,6 +89,10 @@ class OpenAIClient(BaseLM):
             "timeout": self.timeout,
             **{k: v for k, v in self.kwargs.items() if k != "model_name"},
         }
+        self._is_openrouter = str(base_url or "").rstrip("/") == "https://openrouter.ai/api/v1"
+        # Bound OpenRouter retries here so every transport attempt is audited.
+        if self._is_openrouter:
+            client_kwargs["max_retries"] = 0
         self.client = openai.OpenAI(**client_kwargs)
         self.async_client = openai.AsyncOpenAI(**client_kwargs)
         self.model_name = model_name
@@ -124,6 +132,8 @@ class OpenAIClient(BaseLM):
             extra_body["usage"] = {"include": True}
 
         request_kwargs = {"model": model, "messages": messages, "extra_body": extra_body}
+        if self._is_openrouter:
+            request_kwargs["extra_headers"] = {"X-OpenRouter-Metadata": "enabled"}
         if self.max_output_tokens is not None:
             request_kwargs["max_tokens"] = self.max_output_tokens
 
@@ -132,9 +142,26 @@ class OpenAIClient(BaseLM):
 
         self._begin_request_sequence()
         for transport_attempt in range(1, EMPTY_CHOICE_MAX_RETRIES + 2):
-            response = (
-                call_swissai_sync(request, api_key=self._api_key) if self._is_swissai else request()
-            )
+            try:
+                response = (
+                    call_swissai_sync(request, api_key=self._api_key)
+                    if self._is_swissai
+                    else request()
+                )
+            except Exception as error:
+                if not self._handle_transport_error(
+                    error,
+                    model=model,
+                    prompt=prompt,
+                    transport_attempt=transport_attempt,
+                ):
+                    raise
+                if transport_attempt > EMPTY_CHOICE_MAX_RETRIES:
+                    raise
+                delay = self._retry_delay(error, transport_attempt)
+                self._audit_retry(error, model, transport_attempt, delay)
+                time.sleep(delay)
+                continue
             self._save_response(
                 response,
                 model,
@@ -145,6 +172,14 @@ class OpenAIClient(BaseLM):
             self._track_cost(response, model, scientifically_usable=has_choices)
             if has_choices:
                 return self._response_text(response)
+            status = self._status_code(response)
+            if status is not None and status not in RETRYABLE_HTTP_STATUS_CODES:
+                self._raise_non_retryable_response(
+                    response,
+                    model=model,
+                    prompt=prompt,
+                    transport_attempt=transport_attempt,
+                )
             if transport_attempt > EMPTY_CHOICE_MAX_RETRIES:
                 self._audit(
                     "empty_choices_exhausted",
@@ -158,7 +193,7 @@ class OpenAIClient(BaseLM):
                 raise ValueError(
                     f"Provider response has no completion choices after {transport_attempt} attempts"
                 )
-            backoff = EMPTY_CHOICE_BACKOFF_SECONDS[transport_attempt - 1]
+            backoff = self._retry_delay(response, transport_attempt)
             self._audit(
                 "empty_choices_retry_scheduled",
                 model=model,
@@ -190,6 +225,8 @@ class OpenAIClient(BaseLM):
             extra_body["usage"] = {"include": True}
 
         request_kwargs = {"model": model, "messages": messages, "extra_body": extra_body}
+        if self._is_openrouter:
+            request_kwargs["extra_headers"] = {"X-OpenRouter-Metadata": "enabled"}
         if self.max_output_tokens is not None:
             request_kwargs["max_tokens"] = self.max_output_tokens
 
@@ -198,11 +235,26 @@ class OpenAIClient(BaseLM):
 
         self._begin_request_sequence()
         for transport_attempt in range(1, EMPTY_CHOICE_MAX_RETRIES + 2):
-            response = (
-                await call_swissai_async(request, api_key=self._api_key)
-                if self._is_swissai
-                else await request()
-            )
+            try:
+                response = (
+                    await call_swissai_async(request, api_key=self._api_key)
+                    if self._is_swissai
+                    else await request()
+                )
+            except Exception as error:
+                if not self._handle_transport_error(
+                    error,
+                    model=model,
+                    prompt=prompt,
+                    transport_attempt=transport_attempt,
+                ):
+                    raise
+                if transport_attempt > EMPTY_CHOICE_MAX_RETRIES:
+                    raise
+                delay = self._retry_delay(error, transport_attempt)
+                self._audit_retry(error, model, transport_attempt, delay)
+                await asyncio.sleep(delay)
+                continue
             self._save_response(
                 response,
                 model,
@@ -213,6 +265,14 @@ class OpenAIClient(BaseLM):
             self._track_cost(response, model, scientifically_usable=has_choices)
             if has_choices:
                 return self._response_text(response)
+            status = self._status_code(response)
+            if status is not None and status not in RETRYABLE_HTTP_STATUS_CODES:
+                self._raise_non_retryable_response(
+                    response,
+                    model=model,
+                    prompt=prompt,
+                    transport_attempt=transport_attempt,
+                )
             if transport_attempt > EMPTY_CHOICE_MAX_RETRIES:
                 self._audit(
                     "empty_choices_exhausted",
@@ -226,7 +286,7 @@ class OpenAIClient(BaseLM):
                 raise ValueError(
                     f"Provider response has no completion choices after {transport_attempt} attempts"
                 )
-            backoff = EMPTY_CHOICE_BACKOFF_SECONDS[transport_attempt - 1]
+            backoff = self._retry_delay(response, transport_attempt)
             self._audit(
                 "empty_choices_retry_scheduled",
                 model=model,
@@ -280,6 +340,198 @@ class OpenAIClient(BaseLM):
                 if isinstance(value, str) and value:
                     return value
         return None
+
+    @classmethod
+    def _error_details(cls, value: Any) -> Mapping[str, Any]:
+        payload = cls._response_payload(value)
+        if not isinstance(payload, Mapping):
+            return {}
+        error = payload.get("error")
+        if not isinstance(error, Mapping):
+            model_extra = payload.get("model_extra")
+            if isinstance(model_extra, Mapping):
+                error = model_extra.get("error")
+        return error if isinstance(error, Mapping) else {}
+
+    @classmethod
+    def _status_code(cls, value: Any) -> int | None:
+        direct = getattr(value, "status_code", None)
+        if isinstance(direct, int):
+            return direct
+        code = cls._error_details(value).get("code")
+        try:
+            return int(code) if code is not None else None
+        except (TypeError, ValueError):
+            return None
+
+    @classmethod
+    def _error_message(cls, value: Any) -> str | None:
+        message = cls._error_details(value).get("message")
+        if isinstance(message, str) and message:
+            return message
+        direct = getattr(value, "message", None)
+        return direct if isinstance(direct, str) and direct else None
+
+    @classmethod
+    def _response_headers(cls, value: Any) -> Mapping[str, Any]:
+        headers: dict[str, Any] = {}
+        for candidate in (
+            getattr(value, "headers", None),
+            getattr(getattr(value, "response", None), "headers", None),
+            cls._error_details(value).get("headers"),
+            cls._error_details(value).get("metadata"),
+        ):
+            if isinstance(candidate, Mapping):
+                headers.update({str(key): item for key, item in candidate.items()})
+        return headers
+
+    @classmethod
+    def _retry_after_seconds(cls, value: Any) -> float | None:
+        raw = None
+        for key, item in cls._response_headers(value).items():
+            if str(key).casefold().replace("_", "-") == "retry-after":
+                raw = item
+                break
+        if raw is None:
+            return None
+        try:
+            seconds = float(raw)
+        except (TypeError, ValueError):
+            try:
+                retry_at = parsedate_to_datetime(str(raw))
+            except (TypeError, ValueError, OverflowError):
+                return None
+            if retry_at.tzinfo is None:
+                retry_at = retry_at.replace(tzinfo=UTC)
+            seconds = (retry_at - datetime.now(UTC)).total_seconds()
+        return min(max(seconds, 0.0), MAX_RETRY_AFTER_SECONDS)
+
+    @classmethod
+    def _retry_delay(cls, value: Any, transport_attempt: int) -> float:
+        retry_after = cls._retry_after_seconds(value)
+        if retry_after is not None:
+            return retry_after
+        return EMPTY_CHOICE_BACKOFF_SECONDS[transport_attempt - 1]
+
+    def _audit_retry(
+        self,
+        value: Any,
+        model: str,
+        transport_attempt: int,
+        delay: float,
+    ) -> None:
+        self._audit(
+            "provider_retry_scheduled",
+            model=model,
+            launcher_attempt=self._launcher_attempt(),
+            transport_attempt=transport_attempt,
+            request_id=self._request_id(value),
+            status_code=self._status_code(value),
+            backoff_seconds=delay,
+            retry_after_seconds=self._retry_after_seconds(value),
+        )
+
+    def _save_transport_error(
+        self,
+        error: Exception,
+        model: str,
+        *,
+        transport_attempt: int,
+        prompt: str | list[dict[str, Any]],
+    ) -> None:
+        secrets = (self._api_key, *self._prompt_values(prompt))
+        message = self._error_message(error) or str(error)
+        self._audit(
+            "provider_error_saved",
+            model=model,
+            launcher_attempt=self._launcher_attempt(),
+            transport_attempt=transport_attempt,
+            request_id=self._request_id(error),
+            status_code=self._status_code(error),
+            error_message=self._sanitize_response(message, secrets=secrets),
+            error=self._sanitize_response(
+                self._response_payload(error),
+                secrets=secrets,
+            ),
+        )
+
+    def _handle_transport_error(
+        self,
+        error: Exception,
+        *,
+        model: str,
+        prompt: str | list[dict[str, Any]],
+        transport_attempt: int,
+    ) -> bool:
+        status = self._status_code(error)
+        is_connection_error = isinstance(
+            error,
+            (openai.APIConnectionError, openai.APITimeoutError),
+        )
+        if status is None and not is_connection_error:
+            return False
+        self._save_transport_error(
+            error,
+            model,
+            transport_attempt=transport_attempt,
+            prompt=prompt,
+        )
+        self._mark_usage_unavailable(
+            model,
+            None,
+            reason=(
+                f"provider transport returned HTTP {status}"
+                if status is not None
+                else "provider connection failed before returning usage metadata"
+            ),
+        )
+        retryable = status in RETRYABLE_HTTP_STATUS_CODES if status is not None else True
+        if not retryable:
+            self._audit(
+                "provider_error_non_retryable",
+                model=model,
+                launcher_attempt=self._launcher_attempt(),
+                transport_attempt=transport_attempt,
+                request_id=self._request_id(error),
+                status_code=status,
+                accounting_status="unavailable",
+            )
+        elif transport_attempt > EMPTY_CHOICE_MAX_RETRIES:
+            self._audit(
+                "provider_retries_exhausted",
+                model=model,
+                launcher_attempt=self._launcher_attempt(),
+                transport_attempt=transport_attempt,
+                request_id=self._request_id(error),
+                status_code=status,
+                accounting_status="unavailable",
+            )
+        return retryable
+
+    def _raise_non_retryable_response(
+        self,
+        response: openai.ChatCompletion,
+        *,
+        model: str,
+        prompt: str | list[dict[str, Any]],
+        transport_attempt: int,
+    ) -> None:
+        status = self._status_code(response)
+        secrets = (self._api_key, *self._prompt_values(prompt))
+        message = self._sanitize_response(self._error_message(response), secrets=secrets)
+        self._audit(
+            "provider_error_non_retryable",
+            model=model,
+            launcher_attempt=self._launcher_attempt(),
+            transport_attempt=transport_attempt,
+            generation_id=self._generation_id(response),
+            request_id=self._request_id(response),
+            status_code=status,
+            error_message=message,
+            accounting_status="unavailable",
+        )
+        suffix = f": {message}" if message else ""
+        raise ValueError(f"Provider response failed with non-retryable HTTP {status}{suffix}")
 
     @staticmethod
     def _prompt_values(prompt: str | list[dict[str, Any]]) -> tuple[str, ...]:
