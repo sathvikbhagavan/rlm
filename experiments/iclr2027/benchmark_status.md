@@ -4,7 +4,7 @@ This is the shared coordination record for the final benchmark. It says who
 owns each part, where it is running, what is complete, and what must happen
 next. Update this file whenever a phase starts, stops, or materially changes.
 
-Last consolidated: **2026-09-17 01:05 Europe/Zurich**
+Last consolidated: **2026-09-17 01:12 Europe/Zurich**
 
 Repository commit at consolidation: `70c885ed1c900622dead52ef4ef0ecd629882fbc`
 
@@ -42,7 +42,7 @@ changing this table and checking both ledgers for overlap.
 
 | Model | Owner / machine | LLM | CodeAct | RLM | Confidence |
 | --- | --- | ---: | ---: | ---: | --- |
-| DeepSeek V4 Flash | Amin / `liacpc14` | 300 succeeded | Finished: 243 succeeded, 57 failed | 9 succeeded, 1 running, 440 pending | Verified locally at consolidation time |
+| DeepSeek V4 Flash | Amin / `liacpc14` | 300 succeeded | Finished: 243 succeeded, 57 failed | 10 succeeded, 1 running, 439 pending | Verified locally at consolidation time |
 | GLM 5.2 | shared / Jed | 300 succeeded in reusable v28 results on `liacpc14` | Release pilot failed; remaining 299 held | 22 succeeded, 6 failed, 1 running, 376 pending among 405 non-Docker jobs; 45 Docker jobs held | GLM LLM verified locally; RLM from Jed report |
 | Qwen 3.5 | Sathvik / `liacpc15` | Reported complete, nominally 300 | Reported complete, nominally 300 | Reported near completion; exact success/failure/running/pending split missing | Reported by Sathvik through Amin |
 | Gemini Flash | Sathvik / `liacpc15` | Reported complete; exact ledger count missing | Reported complete; exact ledger count missing | Reported launched; progress and outcome counts unknown | Unverified collaborator report |
@@ -57,8 +57,8 @@ changing this table and checking both ledgers for overlap.
   `full-deepseek-v4-flash-tier1-task1-rlm-x500-r05`.
 - The CodeAct failures are retained for a later failed-only review/retry. Do
   not retry them while they would compete with the active RLM phase.
-- RLM started automatically at `2026-09-16T21:13:47Z`. Nine jobs succeeded,
-  one was active, 440 were pending, and none had failed at consolidation.
+- RLM started automatically at `2026-09-16T21:13:47Z`. Ten jobs succeeded,
+  one was active, 439 were pending, and none had failed at consolidation.
 
 ### GLM details on Jed
 
@@ -94,12 +94,27 @@ changing this table and checking both ledgers for overlap.
 - The first staged GPT Task-14 pilot made three requests. All returned empty
   choices with HTTP 403 policy-refusal errors, so the script stopped before
   Task 15 and both memory pilots, as intended.
+- Kuma's read-only diagnosis found high-confidence upstream OpenAI policy
+  refusal rather than an OpenRouter balance or key failure. The preserved
+  errors identify `error_type=refusal` and `provider_code=invalid_request` and
+  link to OpenAI policy guidance. OpenRouter's key endpoint remained healthy
+  with USD 217.29 of its USD 500 limit available.
+- All three generation-metadata and content lookups returned HTTP 404, so cost,
+  tokens, request IDs, and the retrospective router pipeline remain unknown.
+  Future calls on the review branch request and sanitize OpenRouter routing
+  metadata.
 - GPT repair branches are held and unmerged:
   `fix/gpt-missing-usage-recovery` at `655f835` and the combined
-  `review/gpt-retry-definitions` at `62f113a`.
-- Do not submit the 19-job or 505-job retries until the source of the 403 is
-  identified. Querying the three preserved generation IDs is read-only and is
-  the next diagnostic step.
+  `review/gpt-retry-definitions` at `012be90`.
+- The updated review branch stops explicit 403 and other non-transient 4xx
+  responses after one request, disables hidden SDK retries, retains bounded
+  retries for transient failures, and passes 471 tests with 10 skipped. It is
+  not yet merged.
+- Do not submit the 19-job or 505-job retries through the same upstream OpenAI
+  route. OpenRouter currently lists Azure as another provider for the same
+  `openai/gpt-5-mini` model slug. One provenance-recorded Azure-only pilot is a
+  reasonable next test; changing provider routing must be explicit in the
+  retry definition and final methods.
 
 ## Matched-cardinality status
 
@@ -126,6 +141,34 @@ ordinary 405-job RLM phases are reconciled. Do not launch all held jobs merely
 because `liacpc14` supports Docker; first import or preserve the other
 machines' ledgers and confirm which run IDs remain.
 
+## Paper blockers, not merely missing leaderboard cells
+
+1. **The central causal claim is still confounded.** The oracle-predicate
+   control has not been implemented, and matched cardinality is incomplete.
+   Without them, corpus size, answer cardinality, chemical diversity, and
+   abstraction difficulty remain entangled.
+2. **The obvious competing systems are absent.** There is no completed
+   retrieval-augmented or non-recursive map-reduce baseline. A six-model
+   replication does not answer whether RLM recursion is necessary.
+3. **Prospective validity is unresolved.** Target-name, target-structure, and
+   target-structure-plus-class conditions have not been run, and the available
+   chemist-review application has not yet produced annotations.
+4. **The final benchmark matrix is incomplete.** Several RLM phases are active,
+   GLM CodeAct is blocked, GPT retries are policy-blocked, transient failures
+   remain, and Docker coverage is unresolved. The paper can tolerate disclosed
+   failures, but not ambiguous denominators or silent missing cells.
+5. **Statistics and efficiency evidence are not yet consolidated.** Final
+   analysis must include uncertainty across questions/tasks and calls, tokens,
+   latency, tool time, cost, memory, and failure rates.
+6. **Claims and figures need tightening even if no more experiments finish.**
+   Context size has different operational meanings across methods; prospective
+   ground truth is non-exhaustive; and broad “chemical reasoning” language must
+   be narrowed to what the tasks establish.
+
+The first three items are acceptance-critical experimental blockers. Items four
+through six can be addressed partly through transparent reporting and narrower
+claims, but they cannot be ignored.
+
 ## Priority through the full-paper deadline
 
 The abstract deadline is September 18 and the full-paper deadline is September
@@ -143,8 +186,10 @@ continue while the acceptance-critical controls below are implemented.
 3. Confirm whether Sathvik's SwissAI credential differs from Amin's. If it is
    the same credential, include `liacpc15` in the shared 15-RPM allocation
    before making any further SwissAI launch.
-4. Diagnose the GPT HTTP 403 using preserved generation metadata. Do not spend
-   on the 19 full or 505 matched retries until routing/policy is understood.
+4. Treat the GPT HTTP 403 as an upstream OpenAI policy block. Test at most one
+   explicitly routed Azure GPT-5-mini pilot before deciding whether the same
+   model can be completed without changing prompts. Do not send the 19 full or
+   505 matched retries through the already-refusing OpenAI route.
 
 ### P0-B: acceptance-critical controls not yet implemented
 
@@ -206,20 +251,59 @@ chemist/ML red-team read, prepare the reproducibility release, and post the
 matching paper/code version to arXiv. Paper writing should proceed now, but
 cosmetic plot work must not consume the time reserved for P0 controls.
 
+## Ways to shorten the remaining runtime
+
+These are ordered by expected benefit without weakening the experiment.
+
+1. **Use two workers within one adequately sized node.** GLM has averaged about
+   1,452 calls in 9.15 hours, or 2.6 calls per minute, well below its six-RPM
+   Jed share. A resumed Jed allocation with about 8--10 CPUs, 60--64 GiB, and
+   `--max-parallel 2` could overlap one RLM trajectory's model wait or tool
+   execution with another. The manifest's 48-GiB parallel-memory budget will
+   still serialize incompatible pairs. Test five to ten jobs before retaining
+   this setting.
+2. **Pilot a second local DeepSeek worker only on low-memory, non-Docker jobs.**
+   `liacpc14` has enough memory for carefully selected 16-GiB plus 30-GiB
+   reservations, and both workers would share the same six-RPM node limiter.
+   Do not start this until selectors and combined memory have been mechanically
+   checked. Earlier unconstrained CodeAct accelerators increased timeouts, so
+   this must be a measured RLM pilot rather than an assumption.
+3. **Keep one allocation per SwissAI host.** Multiple Slurm nodes do not share
+   `/tmp`; each could independently consume the full host share. More nodes are
+   unsafe unless quota is statically divided again or a proven distributed
+   limiter is introduced.
+4. **Retry only transient failures.** The six early GLM failures are candidates
+   after pending work finishes. HTTP 403 policy failures and malformed
+   scientific outputs are not. Failed-only selection prevents hundreds of
+   completed jobs from being repeated.
+5. **Use narrow causal subsets.** Oracle predicates, retrieval/map-reduce, and
+   prospective decomposition should first cover representative hard/easy tasks
+   with one open and one closed model. This can answer the paper's causal
+   questions much faster than another complete six-model sweep.
+6. **Separate coding from inference.** Existing cluster jobs can run unattended
+   while independent clean branches implement the oracle, retrieval, and
+   prospective controls and prepare human-review candidates. Do not modify
+   active execution clones.
+7. **Stop low-information work.** If a release pilot repeatedly demonstrates a
+   stable provider or model limitation, report the limitation and redirect time
+   to acceptance-critical controls instead of forcing hundreds of identical
+   failures.
+
 ## Active blockers and decisions
 
-1. **GPT policy rejection:** determine whether HTTP 403 came from an OpenRouter
-   workspace guardrail, upstream OpenAI policy, an allowlist, or a spending/key
-   restriction. Deterministic 403 responses should not receive transport
-   retries.
+1. **GPT upstream policy rejection:** the current OpenAI route refuses the RLM
+   request before producing a choice. The key and spending balance are healthy.
+   One Azure-only GPT-5-mini pilot may test the same model through another
+   declared provider; otherwise GPT refusals must be reported rather than
+   hidden by prompt changes or model substitution.
 2. **GLM CodeAct release:** the demanding Task-16 x500 cell must succeed on Jed
    before broad GLM CodeAct is released. GLM non-Docker RLM is independently
    eligible to run.
 3. **SwissAI shared quota:** `liacpc14` and the single Jed allocation each own
    six requests per minute. Separate Jed allocations or nodes must not each
    claim another six.
-4. **Remote counts:** Qwen, Gemini, Claude RLM, Jed GLM, and matched Qwen require
-   fresh ledger summaries.
+4. **Remote counts:** Qwen, Gemini, Claude RLM, and matched Qwen require fresh
+   ledger summaries. Jed GLM is now tracked from Slurm job `66534424`.
 5. **Failures are not erased:** DeepSeek failures, GPT policy failures, memory
    failures, and all interrupted attempts remain in their respective ledgers.
 
@@ -241,15 +325,20 @@ available and whether Tasks 16, 17, and 17b were included in the RLM count.
 
 ### From Jed Codex
 
-Report whether commit `781c0f6` was pulled, the combined Slurm job ID, GLM RLM
-counts, the GLM CodeAct release-cell result, and whether broad CodeAct opened.
+Keep Slurm job `66534424` running. Send periodic GLM RLM ledger counts, observed
+jobs/hour, projected completion time, and the exact GLM CodeAct release-pilot
+error. Before changing resources, prepare a resume-safe two-worker Slurm draft
+and estimate speedup from the current trace; do not interrupt the active job
+solely because more CPUs exist.
 
 ### From Kuma Codex
 
 Send fresh Claude LLM/CodeAct/RLM ledger counts and the status of its Slurm
-allocation. For GPT, report the read-only generation-metadata diagnosis for
-the three Task-14 policy-refusal IDs. Do not submit held retries merely to
-produce a fresher count.
+allocation. For GPT, prepare one provenance-clean Azure-only GPT-5-mini pilot
+using the unchanged Task-14 request and the reviewed non-transient-error
+handling. Report its exact provider-routing configuration, estimated cost, and
+tests before submission. Do not submit the 19-job or 505-job groups merely to
+produce fresher counts.
 
 ### From `liacpc14`
 
