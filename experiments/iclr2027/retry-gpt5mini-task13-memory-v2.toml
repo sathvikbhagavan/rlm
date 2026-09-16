@@ -1,0 +1,32 @@
+# Second provenance-clean execution after v1 received an OpenRouter response
+# with no completion choices before r02 was admitted by the campaign budget.
+schema_version = 1
+
+[campaign]
+name = "iclr2027-gpt5mini-task13-memory-retry-v2"
+project_root = "../.."
+artifact_dir = "artifacts/iclr2027-gpt5mini-task13-memory-retry-v2"
+budget_chf = 0.40
+usd_to_chf = 0.80
+require_dataset = true
+require_clean_git = true
+require_metrics = true
+max_parallel_memory_mib = 28672
+required_secrets = ["OPENROUTER_API_KEY", "WANDB_API_KEY"]
+
+[[runs]]
+id = "retry2-gpt5mini-task13-memory8192-xfull"
+source_run_id = "full-gpt-5-mini-tier4-task13-rlm-xfull-r{repetition:02d}"
+task = "tier4/task13"
+condition = "full-xfull"
+method = "rlm"
+model = "openai/gpt-5-mini"
+corpus_size = "full"
+seed = 42
+repetitions = 2
+estimated_cost_chf = 0.077412
+memory_reservation_mib = 28672
+memory_limit_mib = 30720
+question_parallelism = 1
+env = { RXNHAYSTACK_CONTEXT_SIZE = "-1", RXNHAYSTACK_PROVIDER = "openrouter", RXNHAYSTACK_RLM_MAX_TIMEOUT_SECONDS = "1800", RXNHAYSTACK_RLM_OUTPUT_LIMIT = "4096", RXNHAYSTACK_RLM_REASONING_EFFORT = "low", RXNHAYSTACK_RLM_LOCAL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB = "8192", RXNHAYSTACK_PRIOR_RETRY_CAMPAIGN = "iclr2027-gpt5mini-task13-memory-retry-v1" }
+command = ["uv", "run", "--frozen", "python", "tier4/rlm_task13.py"]
