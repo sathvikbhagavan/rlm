@@ -405,6 +405,8 @@ def build_run_environment(
         environment[DOCKER_RUN_TOKEN_ENV] = docker_run_token
     if run.positive_cardinality is not None:
         environment["RXNHAYSTACK_POSITIVE_CARDINALITY"] = str(run.positive_cardinality)
+    if run.source_run_id is not None:
+        environment["RXNHAYSTACK_SOURCE_RUN_ID"] = run.source_run_id
     if preflight.dataset is not None:
         environment[RAW_DATASET_ENV] = preflight.dataset.raw_path
         environment[CLEANED_DATASET_ENV] = preflight.dataset.cleaned_path

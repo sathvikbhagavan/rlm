@@ -51,6 +51,7 @@ class PlannedRun:
     memory_reservation_mib: int | None = None
     memory_limit_mib: int | None = None
     question_parallelism: int = 1
+    source_run_id: str | None = None
 
     @property
     def spec_json(self) -> str:
@@ -213,6 +214,17 @@ def parse_run(
             )
 
     repetitions = require_integer(raw, "repetitions", location, minimum=1, default=1)
+    repetition_start = require_integer(raw, "repetition_start", location, minimum=1, default=1)
+    source_run_id_template = raw.get("source_run_id")
+    if source_run_id_template is not None:
+        if not isinstance(source_run_id_template, str) or not source_run_id_template:
+            raise ManifestError(f"{location}.source_run_id must be a non-empty string")
+        try:
+            source_run_id_template.format(repetition=repetition_start)
+        except (KeyError, IndexError, ValueError) as error:
+            raise ManifestError(
+                f"{location}.source_run_id has an invalid repetition template: {error}"
+            ) from error
     estimated_cost = require_number(raw, "estimated_cost_chf", location, minimum=0)
     memory_reservation_mib = optional_positive_integer(raw, "memory_reservation_mib", location)
     memory_limit_mib = optional_positive_integer(raw, "memory_limit_mib", location)
@@ -246,6 +258,7 @@ def parse_run(
     model = require_string(raw, "model", location)
     seed = require_integer(raw, "seed", location)
     normalized_env = {key: str(value) for key, value in sorted(env.items())}
+    repetition_values = range(repetition_start, repetition_start + repetitions)
     return [
         PlannedRun(
             run_id=base_id if repetitions == 1 else f"{base_id}-r{repetition:02d}",
@@ -265,8 +278,13 @@ def parse_run(
             memory_reservation_mib=memory_reservation_mib,
             memory_limit_mib=memory_limit_mib,
             question_parallelism=question_parallelism,
+            source_run_id=(
+                source_run_id_template.format(repetition=repetition)
+                if source_run_id_template is not None
+                else None
+            ),
         )
-        for repetition in range(1, repetitions + 1)
+        for repetition in repetition_values
     ]
 
 

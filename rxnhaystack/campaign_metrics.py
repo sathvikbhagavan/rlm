@@ -129,6 +129,8 @@ class CampaignMetricsCapture:
             config["rxnhaystack_positive_cardinality"] = int(
                 os.environ["RXNHAYSTACK_POSITIVE_CARDINALITY"]
             )
+        if "RXNHAYSTACK_SOURCE_RUN_ID" in os.environ:
+            config["rxnhaystack_source_run_id"] = os.environ["RXNHAYSTACK_SOURCE_RUN_ID"]
         kwargs["config"] = config
         run = self.original_init(*args, **kwargs)
         # W&B replaces its pre-init module functions when a run starts. Capture the

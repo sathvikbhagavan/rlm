@@ -67,6 +67,26 @@ def test_manifest_expands_repetitions_and_resolves_paths(tmp_path: Path) -> None
     assert manifest.runs[0].spec_hash == manifest.runs[0].spec_hash
 
 
+def test_manifest_expands_provenance_links_from_nondefault_repetition(tmp_path: Path) -> None:
+    manifest = load_manifest(
+        write_manifest(
+            tmp_path,
+            valid_run(
+                repetitions="2",
+                repetition_start="4",
+                source_run_id='"original-run-r{repetition:02d}"',
+            ),
+        )
+    )
+
+    assert [run.run_id for run in manifest.runs] == ["oracle-task10-r04", "oracle-task10-r05"]
+    assert [run.repetition for run in manifest.runs] == [4, 5]
+    assert [run.source_run_id for run in manifest.runs] == [
+        "original-run-r04",
+        "original-run-r05",
+    ]
+
+
 def test_manifest_parses_memory_admission_and_watchdog_limits(tmp_path: Path) -> None:
     run = valid_run(
         memory_reservation_mib="1024",
@@ -180,6 +200,13 @@ def test_manifest_rejects_secret_like_environment_keys(tmp_path: Path, key: str)
 def test_manifest_rejects_zero_repetitions(tmp_path: Path) -> None:
     with pytest.raises(ManifestError, match="repetitions must be >= 1"):
         load_manifest(write_manifest(tmp_path, valid_run(repetitions="0")))
+
+
+def test_manifest_rejects_invalid_source_run_template(tmp_path: Path) -> None:
+    with pytest.raises(ManifestError, match="invalid repetition template"):
+        load_manifest(
+            write_manifest(tmp_path, valid_run(source_run_id='"source-{unknown}"'))
+        )
 
 
 def test_manifest_rejects_zero_question_parallelism(tmp_path: Path) -> None:

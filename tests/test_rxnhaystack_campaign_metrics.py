@@ -14,8 +14,10 @@ class FakeWandb:
     def __init__(self) -> None:
         self.run = SimpleNamespace(summary={}, url="https://wandb.invalid/run")
         self.finished = False
+        self.init_kwargs = {}
 
     def init(self, *args, **kwargs):
+        self.init_kwargs = kwargs
         return self.run
 
     def log(self, data, *args, **kwargs):
@@ -115,6 +117,17 @@ def test_capture_writes_complete_llm_metrics(monkeypatch, tmp_path: Path) -> Non
     assert metrics["cost_chf"] == pytest.approx(0.24)
     assert metrics["results"]["macro_f1"] == 0.75
     assert wandb.finished
+
+
+def test_capture_links_retry_to_source_run_in_wandb(monkeypatch, tmp_path: Path) -> None:
+    configure_campaign(monkeypatch, tmp_path, method="rlm")
+    monkeypatch.setenv("RXNHAYSTACK_SOURCE_RUN_ID", "original-run-r02")
+    wandb = FakeWandb()
+    install_campaign_metrics(wandb)
+
+    wandb.init(project="test")
+
+    assert wandb.init_kwargs["config"]["rxnhaystack_source_run_id"] == "original-run-r02"
 
 
 def test_capture_reads_current_wandb_summary_object(monkeypatch, tmp_path: Path) -> None:
