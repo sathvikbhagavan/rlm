@@ -4,9 +4,9 @@ This is the shared coordination record for the final benchmark. It says who
 owns each part, where it is running, what is complete, and what must happen
 next. Update this file whenever a phase starts, stops, or materially changes.
 
-Last consolidated: **2026-09-17 01:12 Europe/Zurich**
+Last consolidated: **2026-09-17 01:41 Europe/Zurich**
 
-Repository commit at consolidation: `70c885ed1c900622dead52ef4ef0ecd629882fbc`
+Repository commit at consolidation: `fdf792c026dcdc8067c56febd3eb631a1a7e022c`
 
 ## How to read the counts
 
@@ -42,7 +42,7 @@ changing this table and checking both ledgers for overlap.
 
 | Model | Owner / machine | LLM | CodeAct | RLM | Confidence |
 | --- | --- | ---: | ---: | ---: | --- |
-| DeepSeek V4 Flash | Amin / `liacpc14` | 300 succeeded | Finished: 243 succeeded, 57 failed | 10 succeeded, 1 running, 439 pending | Verified locally at consolidation time |
+| DeepSeek V4 Flash | Amin / `liacpc14` | 300 succeeded | Finished: 243 succeeded, 57 failed | 12 succeeded, 1 running, 437 pending | Verified locally at consolidation time |
 | GLM 5.2 | shared / Jed | 300 succeeded in reusable v28 results on `liacpc14` | Release pilot failed; remaining 299 held | 22 succeeded, 6 failed, 1 running, 376 pending among 405 non-Docker jobs; 45 Docker jobs held | GLM LLM verified locally; RLM from Jed report |
 | Qwen 3.5 | Sathvik / `liacpc15` | Reported complete, nominally 300 | Reported complete, nominally 300 | Reported near completion; exact success/failure/running/pending split missing | Reported by Sathvik through Amin |
 | Gemini Flash | Sathvik / `liacpc15` | Reported complete; exact ledger count missing | Reported complete; exact ledger count missing | Reported launched; progress and outcome counts unknown | Unverified collaborator report |
@@ -54,11 +54,11 @@ changing this table and checking both ledgers for overlap.
 - CodeAct finished with 243 successful and 57 failed jobs.
 - Active phase: RLM, one worker, six SwissAI request starts per minute at most.
 - Active run at consolidation:
-  `full-deepseek-v4-flash-tier1-task1-rlm-x500-r05`.
+  `full-deepseek-v4-flash-tier1-task1-rlm-xfull-r03`.
 - The CodeAct failures are retained for a later failed-only review/retry. Do
   not retry them while they would compete with the active RLM phase.
-- RLM started automatically at `2026-09-16T21:13:47Z`. Ten jobs succeeded,
-  one was active, 439 were pending, and none had failed at consolidation.
+- RLM started automatically at `2026-09-16T21:13:47Z`. Twelve jobs succeeded,
+  one was active, 437 were pending, and none had failed at consolidation.
 
 ### GLM details on Jed
 
@@ -229,12 +229,14 @@ their implementation in parallel with the unattended full runs:
 1. **Oracle-predicate control:** a small, representative Tier-3/Tier-4 subset
    comparing normal RLM with validated executable chemistry predicates and a
    deterministic executor ceiling.
-2. **Retrieval and map-reduce baselines:** retrieval followed by LLM/CodeAct,
-   plus a non-recursive chunk-and-merge baseline on the same representative
-   tasks.
+2. **Retrieval and map-reduce baselines:** explain why generic top-k retrieval
+   is not a neutral comparator for exhaustive-set queries, and validate a
+   non-recursive chunk-and-union baseline on representative row-separable
+   Tier-1--3 questions.
 3. **Prospective-task decomposition:** target name only versus target structure
-   versus target structure plus final transformation class for Tasks 16, 17,
-   and 17b.
+   versus target structure plus final transformation class for Task 16 only.
+   Treat Tasks 17 and 17b as constrained chain retrieval, not prospective
+   synthesis.
 4. **Matched cardinality:** finish or launch Qwen matched-cardinality and unblock
    GPT matched-cardinality. This is already specified and should not be
    redesigned.
@@ -254,9 +256,17 @@ and leakage audits pass:
 
 | Branch | Work | Launch tonight? |
 | --- | --- | --- |
-| `feature/oracle-predicate-control` | Five-task oracle prompts, deterministic ceiling, generated experiment and parity/leakage tests | Implementation/tests only |
-| `feature/task16-prospective-decomposition` | Correct Task-16 name/structure/class conditions, remove exact-target leakage, fix taxonomy and prepare human-review export | Implementation/tests only |
-| `feature/flat-map-reduce-baseline` | Resumable Tier-1--3 flat mapper/union reducer, artifacts and mocked experiment definition | No real calls; pilot requires review |
+| `feature/oracle-predicate-control` | Five-task oracle prompts, deterministic ceiling, generated experiment and parity/leakage tests | Implementation and final validation in progress; no model calls |
+| `feature/task16-prospective-decomposition` at `6cc7719` | Correct Task-16 name/structure/class conditions, remove exact-target leakage, fix taxonomy and prepare human-review export | Pushed; 449 tests passed, 10 skipped; class arm held for chemist approval |
+| `feature/flat-map-reduce-baseline` at `475d018` | Resumable Tier-1--3 flat mapper/union reducer, artifacts and mocked experiment definition | Pushed; 456 tests passed, 10 skipped; no real calls; staged pilot required |
+
+The prospective definition contains 30 jobs and 90 trajectories, with an
+estimated API cost of CHF 2.73 and a CHF 15 ceiling. The map-and-union
+definition contains 30 jobs but expands to 7,350 mapper calls because each job
+must cover 245 chunks. Real-corpus calibration estimates about 12.5 million
+input tokens per job; its Qwen/Gemini paid ceiling is CHF 180 within a CHF 200
+budget. Do not launch that full baseline without first passing the documented
+one-request and one-Qwen-job gates.
 
 Separately, Sathvik should queue matched Qwen behind the current full-Qwen RLM
 only after reporting his SwissAI key fingerprint and exact current ledger. Kuma
