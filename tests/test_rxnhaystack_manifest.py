@@ -204,9 +204,7 @@ def test_manifest_rejects_zero_repetitions(tmp_path: Path) -> None:
 
 def test_manifest_rejects_invalid_source_run_template(tmp_path: Path) -> None:
     with pytest.raises(ManifestError, match="invalid repetition template"):
-        load_manifest(
-            write_manifest(tmp_path, valid_run(source_run_id='"source-{unknown}"'))
-        )
+        load_manifest(write_manifest(tmp_path, valid_run(source_run_id='"source-{unknown}"')))
 
 
 def test_manifest_rejects_zero_question_parallelism(tmp_path: Path) -> None:

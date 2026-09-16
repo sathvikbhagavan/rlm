@@ -56,7 +56,9 @@ def quote(value: str) -> str:
 def source_run(manifest: ExperimentManifest, group: FailureGroup) -> PlannedRun:
     matches = [run for run in manifest.runs if run.base_id == group.base_id]
     if len(matches) != 5:
-        raise ValueError(f"Expected five source repetitions for {group.base_id}; found {len(matches)}")
+        raise ValueError(
+            f"Expected five source repetitions for {group.base_id}; found {len(matches)}"
+        )
     expected = set(range(group.repetition_start, group.repetition_start + group.repetitions))
     available = {run.repetition for run in matches}
     if not expected <= available:
@@ -95,7 +97,9 @@ def render(
         retry_base_id = f"retry-usagefix-{group.base_id}"
         env = ", ".join(f"{key} = {quote(value)}" for key, value in run.env.items())
         command = ", ".join(quote(value) for value in run.command)
-        corpus_size = quote(run.corpus_size) if isinstance(run.corpus_size, str) else str(run.corpus_size)
+        corpus_size = (
+            quote(run.corpus_size) if isinstance(run.corpus_size, str) else str(run.corpus_size)
+        )
         lines.extend(
             [
                 "[[runs]]",
