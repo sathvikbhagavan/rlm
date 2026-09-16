@@ -137,7 +137,7 @@ def outputs() -> tuple[tuple[Path, str], ...]:
                 full,
                 FULL_FAILURES,
                 campaign_name="iclr2027-gpt5mini-full-missing-usage-retry-v1",
-                budget_chf=2.00,
+                budget_chf=5.00,
             ),
         ),
         (
@@ -146,7 +146,7 @@ def outputs() -> tuple[tuple[Path, str], ...]:
                 matched,
                 MATCHED_FAILURES,
                 campaign_name="iclr2027-gpt5mini-matched-missing-usage-retry-v1",
-                budget_chf=33.00,
+                budget_chf=97.00,
             ),
         ),
     )

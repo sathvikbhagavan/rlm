@@ -121,3 +121,55 @@ def test_matched_cardinality_campaign_has_two_factor_design() -> None:
             assert run.env["RXNHAYSTACK_RLM_REASONING_EFFORT"] == "low"
         else:
             assert run.env["RXNHAYSTACK_RLM_OUTPUT_LIMIT"] == "2048"
+
+
+def test_gpt_staged_pilots_preserve_source_science_and_cover_retry_budgets() -> None:
+    full = load_manifest(CAMPAIGN_DIR / "full-campaign.toml")
+    source = {run.run_id: run for run in full.runs}
+    scoring = load_manifest(CAMPAIGN_DIR / "retry-gpt5mini-scoring-pilots.toml")
+    memory = load_manifest(CAMPAIGN_DIR / "retry-gpt5mini-task13-memory-pilot.toml")
+
+    assert [run.source_run_id for run in scoring.runs] == [
+        "full-gpt-5-mini-tier4-task14-rlm-xfull-r02",
+        "full-gpt-5-mini-tier4-task15-rlm-x100-r01",
+    ]
+    assert [run.source_run_id for run in memory.runs] == [
+        "full-gpt-5-mini-tier4-task13-rlm-xfull-r01",
+        "full-gpt-5-mini-tier4-task13-rlm-xfull-r02",
+    ]
+    assert scoring.campaign.budget_chf >= 3 * scoring.estimated_cost_chf
+    assert memory.campaign.budget_chf >= 3 * memory.estimated_cost_chf
+
+    for pilot in (*scoring.runs, *memory.runs):
+        original = source[pilot.source_run_id]
+        assert (
+            pilot.task,
+            pilot.condition,
+            pilot.method,
+            pilot.model,
+            pilot.corpus_size,
+            pilot.positive_cardinality,
+            pilot.seed,
+            pilot.repetition,
+            pilot.command,
+            pilot.memory_reservation_mib,
+            pilot.memory_limit_mib,
+            pilot.question_parallelism,
+        ) == (
+            original.task,
+            original.condition,
+            original.method,
+            original.model,
+            original.corpus_size,
+            original.positive_cardinality,
+            original.seed,
+            original.repetition,
+            original.command,
+            original.memory_reservation_mib,
+            original.memory_limit_mib,
+            original.question_parallelism,
+        )
+        expected_env = dict(original.env)
+        if pilot.task == "tier4/task13":
+            expected_env["RXNHAYSTACK_RLM_LOCAL_TOOL_MEMORY_LIMIT_MIB"] = "8192"
+        assert pilot.env == expected_env

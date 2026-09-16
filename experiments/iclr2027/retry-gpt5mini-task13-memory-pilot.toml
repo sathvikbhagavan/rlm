@@ -1,11 +1,10 @@
-# Provenance-clean retries for the two full-corpus GPT-5-mini task-13 jobs
-# aborted under commit 590856e. The source_run_id link is expanded per repetition.
+# Provenance-clean validation of the two v34 task-13 memory aborts.
 schema_version = 1
 
 [campaign]
-name = "iclr2027-gpt5mini-task13-memory-retry-v1"
+name = "iclr2027-gpt5mini-task13-memory-pilot-v1"
 project_root = "../.."
-artifact_dir = "artifacts/iclr2027-gpt5mini-task13-memory-retry-v1"
+artifact_dir = "artifacts/iclr2027-gpt5mini-task13-memory-pilot-v1"
 budget_chf = 0.50
 usd_to_chf = 0.80
 require_dataset = true
@@ -15,7 +14,7 @@ max_parallel_memory_mib = 28672
 required_secrets = ["OPENROUTER_API_KEY", "WANDB_API_KEY"]
 
 [[runs]]
-id = "retry-gpt5mini-task13-memory8192-xfull"
+id = "pilot-gpt5mini-task13-memory8192-xfull"
 source_run_id = "full-gpt-5-mini-tier4-task13-rlm-xfull-r{repetition:02d}"
 task = "tier4/task13"
 condition = "full-xfull"
