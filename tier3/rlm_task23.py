@@ -1,15 +1,14 @@
 import argparse
+import os
 import random
 import uuid
 
 import wandb
-
-from rxnhaystack.campaign_metrics import install_campaign_metrics
-
-from rlm import RLM
-from rxnhaystack.worker import instrument_rlm_from_environment
-from rlm.codeact_helpers import build_context_pipeline, load_lines, parse_indices, precision_recall_f1
-from rlm.tracing import init_tracing, using_tracing_attributes
+from oracle_predicates import (
+    ORACLE_PREDICATE_SHA256,
+    ORACLE_PREDICATE_VERSION,
+    task23_oracle_guidance,
+)
 from task23_hardcoded_ground_truth import (
     TASK23_GROUND_TRUTH_DEFINITION,
     TASK23_HARDCODED_GROUND_TRUTH_INDICES,
@@ -19,9 +18,25 @@ from task23_hardcoded_ground_truth import (
     TASK23_VALID_REACTIONS,
 )
 
+from rlm import RLM
+from rlm.codeact_helpers import (
+    build_context_pipeline,
+    load_lines,
+    parse_indices,
+    precision_recall_f1,
+)
+from rlm.tracing import init_tracing, using_tracing_attributes
+from rxnhaystack.campaign_metrics import install_campaign_metrics
+from rxnhaystack.worker import instrument_rlm_from_environment
+
 install_campaign_metrics(wandb)
 
-DATASET_PATH = __import__("os").environ.get("RXNHAYSTACK_CLEANED_DATASET", __import__("os").path.expanduser("~/datasets/rxnhaystack/reactionSmilesFigShareUSPTO2023_cleaned.txt"))
+DATASET_PATH = __import__("os").environ.get(
+    "RXNHAYSTACK_CLEANED_DATASET",
+    __import__("os").path.expanduser(
+        "~/datasets/rxnhaystack/reactionSmilesFigShareUSPTO2023_cleaned.txt"
+    ),
+)
 BACKEND = "openrouter"
 MODEL_NAME = __import__("os").environ.get("RXNHAYSTACK_MODEL", "openai/gpt-5-mini")
 ENABLE_TRACING = True
@@ -29,6 +44,7 @@ SEED = int(__import__("os").environ.get("RXNHAYSTACK_SEED", "42"))
 CONTEXT_SIZE = int(__import__("os").environ.get("RXNHAYSTACK_CONTEXT_SIZE", "100"))
 CONTEXT_PIPELINE_NAME = "random"
 MIN_SELECTED_GROUND_TRUTH = 5
+ORACLE_PREDICATE = os.environ.get("RXNHAYSTACK_ORACLE_PREDICATE") == "1"
 
 RLM_INIT_KWARGS = {
     "backend": BACKEND,
@@ -93,7 +109,7 @@ def parse_args() -> argparse.Namespace:
 
 
 def build_question() -> str:
-    return f"""
+    question = f"""
     Context: You are given a large string of chemical reactions in SMILES format, separated by newlines.
     Each reaction is in one of these forms:
     - "index reactants>reagents>products"
@@ -122,6 +138,9 @@ def build_question() -> str:
     - Do not include additional text, quotes, punctuation, or formatting.
     - If no matching reaction exists, return -1.
     """
+    if not ORACLE_PREDICATE:
+        return question
+    return f"{question}\n{task23_oracle_guidance()}"
 
 
 def main(model_name: str, context_size: int) -> None:
@@ -169,6 +188,9 @@ def main(model_name: str, context_size: int) -> None:
             "ground_truth_valid_reactions": TASK23_VALID_REACTIONS,
             "ground_truth_skipped_reactions": TASK23_SKIPPED_REACTIONS,
             "ground_truth_definition": TASK23_GROUND_TRUTH_DEFINITION,
+            "oracle_predicate": ORACLE_PREDICATE,
+            "oracle_predicate_version": ORACLE_PREDICATE_VERSION if ORACLE_PREDICATE else None,
+            "oracle_predicate_sha256": ORACLE_PREDICATE_SHA256 if ORACLE_PREDICATE else None,
         },
     )
     wandb.define_metric("sample_iteration")
@@ -200,6 +222,8 @@ def main(model_name: str, context_size: int) -> None:
             "sample_count": 1,
             "task": REACTION_KEY,
             "ground_truth_definition": TASK23_GROUND_TRUTH_DEFINITION,
+            "oracle_predicate": ORACLE_PREDICATE,
+            "oracle_predicate_sha256": ORACLE_PREDICATE_SHA256 if ORACLE_PREDICATE else None,
         },
         tags=["run_rlms", "sample", "task23_stereocenter_from_achiral_reactants"],
     ):

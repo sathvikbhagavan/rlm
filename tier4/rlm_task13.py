@@ -1,8 +1,14 @@
 import argparse
-import random
 import os
+import random
 import uuid
 
+import wandb
+from oracle_predicates import (
+    ORACLE_PREDICATE_SHA256,
+    ORACLE_PREDICATE_VERSION,
+    task13_oracle_guidance,
+)
 from task13_fg_chain_graph import (
     MAX_HEAVY_ATOMS,
     MAX_MOLECULE_FREQ_REFERENCE,
@@ -30,26 +36,29 @@ from task13_fg_chain_ground_truth import (
     update_task13_run_summary,
 )
 
-import wandb
-
-from rxnhaystack.campaign_metrics import install_campaign_metrics
-
 from rlm import RLM
-from rxnhaystack.worker import instrument_rlm_from_environment
 from rlm.codeact_helpers import build_context_pipeline, load_lines
 from rlm.tracing import init_tracing, using_tracing_attributes
+from rxnhaystack.campaign_metrics import install_campaign_metrics
+from rxnhaystack.worker import instrument_rlm_from_environment
 
 install_campaign_metrics(wandb)
 
 # os.environ["WANDB_MODE"] = "disabled"
 
-DATASET_PATH = __import__("os").environ.get("RXNHAYSTACK_CLEANED_DATASET", __import__("os").path.expanduser("~/datasets/rxnhaystack/reactionSmilesFigShareUSPTO2023_cleaned.txt"))
+DATASET_PATH = __import__("os").environ.get(
+    "RXNHAYSTACK_CLEANED_DATASET",
+    __import__("os").path.expanduser(
+        "~/datasets/rxnhaystack/reactionSmilesFigShareUSPTO2023_cleaned.txt"
+    ),
+)
 BACKEND = "openrouter"
 MODEL_NAME = __import__("os").environ.get("RXNHAYSTACK_MODEL", "openai/gpt-5-mini")
 ENABLE_TRACING = True
 SEED = int(__import__("os").environ.get("RXNHAYSTACK_SEED", "42"))
 CONTEXT_SIZE = int(__import__("os").environ.get("RXNHAYSTACK_CONTEXT_SIZE", "-1"))
 CONTEXT_PIPELINE_NAME = "random"
+ORACLE_PREDICATE = os.environ.get("RXNHAYSTACK_ORACLE_PREDICATE") == "1"
 
 RLM_INIT_KWARGS = {
     "backend": BACKEND,
@@ -128,6 +137,9 @@ def main(model_name: str, context_size: int) -> None:
             "task_description": "Functional-group transformation chains via RDKit SMARTS.",
             "ground_truth_definition": TASK13_GROUND_TRUTH_DEFINITION,
             "ground_truth_total_reactions": TASK13_TOTAL_REACTIONS,
+            "oracle_predicate": ORACLE_PREDICATE,
+            "oracle_predicate_version": ORACLE_PREDICATE_VERSION if ORACLE_PREDICATE else None,
+            "oracle_predicate_sha256": ORACLE_PREDICATE_SHA256 if ORACLE_PREDICATE else None,
         },
     )
     wandb.define_metric("sample_iteration")
@@ -188,6 +200,7 @@ def main(model_name: str, context_size: int) -> None:
             target_fg=question.target_fg,
             context_reaction_count=filters.context_reaction_count,
             molecule_freq_cap=filters.molecule_freq_cap,
+            oracle_guidance=task13_oracle_guidance() if ORACLE_PREDICATE else None,
         )
 
         print_task13_sample_context(
@@ -216,6 +229,8 @@ def main(model_name: str, context_size: int) -> None:
                 "gt_chain_count": len(gt_chains),
                 "molecule_freq_cap": filters.molecule_freq_cap,
                 "frequent_molecule_count": len(filters.frequent_molecules),
+                "oracle_predicate": ORACLE_PREDICATE,
+                "oracle_predicate_sha256": ORACLE_PREDICATE_SHA256 if ORACLE_PREDICATE else None,
             },
             tags=["run_rlms", "sample", "task13_FUNCTIONAL_GROUP_CHAIN"],
         ):

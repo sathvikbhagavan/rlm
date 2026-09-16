@@ -4,18 +4,11 @@ import random
 import uuid
 
 import wandb
-
-from rxnhaystack.campaign_metrics import install_campaign_metrics
-
-from rlm import RLM
-from rxnhaystack.worker import instrument_rlm_from_environment
-from rlm.codeact_helpers import (
-    build_context_pipeline,
-    load_lines,
-    parse_indices,
-    precision_recall_f1,
+from oracle_predicates import (
+    ORACLE_PREDICATE_SHA256,
+    ORACLE_PREDICATE_VERSION,
+    task6_oracle_guidance,
 )
-from rlm.tracing import init_tracing, using_tracing_attributes
 from task6_hardcoded_ground_truth import (
     TASK6_AMIDE_COUPLING_SMIRKS,
     TASK6_GROUND_TRUTH_DEFINITION,
@@ -26,11 +19,27 @@ from task6_hardcoded_ground_truth import (
     TASK6_VALID_REACTIONS,
 )
 
+from rlm import RLM
+from rlm.codeact_helpers import (
+    build_context_pipeline,
+    load_lines,
+    parse_indices,
+    precision_recall_f1,
+)
+from rlm.tracing import init_tracing, using_tracing_attributes
+from rxnhaystack.campaign_metrics import install_campaign_metrics
+from rxnhaystack.worker import instrument_rlm_from_environment
+
 install_campaign_metrics(wandb)
 
 # os.environ["WANDB_MODE"] = "disabled"
 
-DATASET_PATH = __import__("os").environ.get("RXNHAYSTACK_CLEANED_DATASET", __import__("os").path.expanduser("~/datasets/rxnhaystack/reactionSmilesFigShareUSPTO2023_cleaned.txt"))
+DATASET_PATH = __import__("os").environ.get(
+    "RXNHAYSTACK_CLEANED_DATASET",
+    __import__("os").path.expanduser(
+        "~/datasets/rxnhaystack/reactionSmilesFigShareUSPTO2023_cleaned.txt"
+    ),
+)
 BACKEND = "openrouter"
 MODEL_NAME = __import__("os").environ.get("RXNHAYSTACK_MODEL", "openai/gpt-5-mini")
 ENABLE_TRACING = True
@@ -38,6 +47,7 @@ SEED = int(__import__("os").environ.get("RXNHAYSTACK_SEED", "42"))
 CONTEXT_SIZE = int(__import__("os").environ.get("RXNHAYSTACK_CONTEXT_SIZE", "100"))
 CONTEXT_PIPELINE_NAME = "random"
 MIN_SELECTED_GROUND_TRUTH = 5
+ORACLE_PREDICATE = os.environ.get("RXNHAYSTACK_ORACLE_PREDICATE") == "1"
 
 RLM_INIT_KWARGS = {
     "backend": BACKEND,
@@ -95,6 +105,13 @@ def build_question(reaction_label: str, reaction_description: str) -> str:
     """
 
 
+def build_run_question(reaction_key: str, reaction_label: str, reaction_description: str) -> str:
+    question = build_question(reaction_label, reaction_description)
+    if not ORACLE_PREDICATE:
+        return question
+    return f"{question}\n{task6_oracle_guidance(reaction_key)}"
+
+
 def maybe_init_tracing() -> None:
     if not ENABLE_TRACING:
         return
@@ -111,9 +128,7 @@ def maybe_init_tracing() -> None:
 
 
 def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(
-        description="Run RLM task 6 amide acylation index evaluation."
-    )
+    parser = argparse.ArgumentParser(description="Run RLM task 6 amide acylation index evaluation.")
     parser.add_argument(
         "--model-name",
         type=str,
@@ -175,6 +190,9 @@ def main(model_name: str, context_size: int) -> None:
             "rlm_init_kwargs": rlm_init_kwargs,
             "task_description": "Return reaction indices for amide-acylation subtypes.",
             "ground_truth_definition": TASK6_GROUND_TRUTH_DEFINITION,
+            "oracle_predicate": ORACLE_PREDICATE,
+            "oracle_predicate_version": ORACLE_PREDICATE_VERSION if ORACLE_PREDICATE else None,
+            "oracle_predicate_sha256": ORACLE_PREDICATE_SHA256 if ORACLE_PREDICATE else None,
             "amide_coupling_smirks": TASK6_AMIDE_COUPLING_SMIRKS,
             "ground_truth_positive_reactions_by_key": TASK6_POSITIVE_REACTIONS_BY_KEY,
             "ground_truth_total_reactions": TASK6_TOTAL_REACTIONS,
@@ -201,7 +219,8 @@ def main(model_name: str, context_size: int) -> None:
         reaction_label = AMIDE_COUPLING_LABELS[reaction_key]
         reaction_description = AMIDE_COUPLING_DESCRIPTIONS[reaction_key]
         reaction_smirks = TASK6_AMIDE_COUPLING_SMIRKS[reaction_key]
-        question = build_question(
+        question = build_run_question(
+            reaction_key=reaction_key,
             reaction_label=reaction_label,
             reaction_description=reaction_description,
         )
@@ -239,6 +258,8 @@ def main(model_name: str, context_size: int) -> None:
                 "task": "amide_acylation",
                 "reaction_key": reaction_key,
                 "ground_truth_definition": TASK6_GROUND_TRUTH_DEFINITION,
+                "oracle_predicate": ORACLE_PREDICATE,
+                "oracle_predicate_sha256": ORACLE_PREDICATE_SHA256 if ORACLE_PREDICATE else None,
             },
             tags=["run_rlms", "sample", "task6_amide_acylation"],
         ):
@@ -345,9 +366,9 @@ def main(model_name: str, context_size: int) -> None:
     print(f"Macro F1: {macro_f1:.4f}")
 
     for reaction_key in reaction_keys:
-        run.summary[f"full_ground_truth/{reaction_key}/count"] = (
-            TASK6_POSITIVE_REACTIONS_BY_KEY[reaction_key]
-        )
+        run.summary[f"full_ground_truth/{reaction_key}/count"] = TASK6_POSITIVE_REACTIONS_BY_KEY[
+            reaction_key
+        ]
 
     run.summary["exact_match_correct"] = exact_match_count
     run.summary["total"] = total
@@ -358,9 +379,7 @@ def main(model_name: str, context_size: int) -> None:
     run.summary["ground_truth/total_reactions"] = TASK6_TOTAL_REACTIONS
     run.summary["ground_truth/valid_reactions"] = TASK6_VALID_REACTIONS
     run.summary["ground_truth/skipped_reactions"] = TASK6_SKIPPED_REACTIONS
-    run.summary["avg_total_input_tokens_per_sample"] = (
-        total_input_tokens / total if total else 0.0
-    )
+    run.summary["avg_total_input_tokens_per_sample"] = total_input_tokens / total if total else 0.0
     run.summary["avg_total_output_tokens_per_sample"] = (
         total_output_tokens / total if total else 0.0
     )

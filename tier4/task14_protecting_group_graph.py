@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import json
 import re
 from collections import defaultdict
 from dataclasses import dataclass
@@ -461,5 +460,13 @@ RLM_CODE_GUIDANCE = """
 """.strip()
 
 
-def build_rlm_question(spec: ProtectingGroupSpec, max_pairs: int) -> str:
-    return f"{build_question(spec, max_pairs)}\n\nGuidance:\n{RLM_CODE_GUIDANCE}"
+def build_rlm_question(
+    spec: ProtectingGroupSpec,
+    max_pairs: int,
+    *,
+    oracle_guidance: str | None = None,
+) -> str:
+    question = f"{build_question(spec, max_pairs)}\n\nGuidance:\n{RLM_CODE_GUIDANCE}"
+    if oracle_guidance is None:
+        return question
+    return f"{question}\n\n{oracle_guidance}"
