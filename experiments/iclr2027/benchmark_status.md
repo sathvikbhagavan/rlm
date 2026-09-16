@@ -4,8 +4,9 @@ This is the shared coordination record for the final benchmark. It says who
 owns each part, where it is running, what is complete, and what must happen
 next. Update this file whenever a phase starts, stops, or materially changes.
 
-Last consolidated: **2026-09-16 21:55 Europe/Zurich**  
-Repository commit at consolidation: `781c0f61f0021001a004638a5722c701b564f93d`
+Last consolidated: **2026-09-17 01:05 Europe/Zurich**
+
+Repository commit at consolidation: `70c885ed1c900622dead52ef4ef0ecd629882fbc`
 
 ## How to read the counts
 
@@ -41,24 +42,23 @@ changing this table and checking both ledgers for overlap.
 
 | Model | Owner / machine | LLM | CodeAct | RLM | Confidence |
 | --- | --- | ---: | ---: | ---: | --- |
-| DeepSeek V4 Flash | Amin / `liacpc14` | 300 succeeded | 240 succeeded, 57 failed, 1 running, 2 pending | 450 pending; starts after CodeAct | Verified locally at consolidation time |
-| GLM 5.2 | shared / Jed | 300 succeeded in reusable v28 results on `liacpc14` | 1 failed release attempt; 299 otherwise pending | 405 assigned to Jed; 45 Docker jobs held | GLM LLM verified locally; Jed execution not yet reported |
-| Qwen 3.5 | Sathvik / `liacpc15` | Reported complete, nominally 300 | Reported complete, nominally 300 | Reported at 323/450 processed; exact success/failure/running split missing | Reported by Sathvik through Amin |
-| Gemini Flash | Sathvik / `liacpc15` | Reported probably complete; exact ledger count missing | Reported complete; exact ledger count missing | Pending/running status and counts unknown | Unverified collaborator report |
+| DeepSeek V4 Flash | Amin / `liacpc14` | 300 succeeded | Finished: 243 succeeded, 57 failed | 9 succeeded, 1 running, 440 pending | Verified locally at consolidation time |
+| GLM 5.2 | shared / Jed | 300 succeeded in reusable v28 results on `liacpc14` | Release pilot failed; remaining 299 held | 22 succeeded, 6 failed, 1 running, 376 pending among 405 non-Docker jobs; 45 Docker jobs held | GLM LLM verified locally; RLM from Jed report |
+| Qwen 3.5 | Sathvik / `liacpc15` | Reported complete, nominally 300 | Reported complete, nominally 300 | Reported near completion; exact success/failure/running/pending split missing | Reported by Sathvik through Amin |
+| Gemini Flash | Sathvik / `liacpc15` | Reported complete; exact ledger count missing | Reported complete; exact ledger count missing | Reported launched; progress and outcome counts unknown | Unverified collaborator report |
 | Claude Haiku | Amin / Kuma | 300 succeeded | Effectively 300 succeeded: 299 assigned cells plus one compatible prior cell | Last confirmed: 163/405 succeeded, 1 running, 241 pending; 45 Docker jobs held | Kuma ledger report, but RLM count is stale and needs refresh |
 | GPT-5-mini | Amin / Kuma | 300 succeeded | 300 succeeded | 384/405 succeeded; 19 missing-usage/empty-response failures and 2 memory failures; 45 Docker jobs held | Verified by Kuma ledger audit |
 
 ### DeepSeek details on `liacpc14`
 
-- Active phase: CodeAct, one worker, six SwissAI request starts per minute at
-  most.
+- CodeAct finished with 243 successful and 57 failed jobs.
+- Active phase: RLM, one worker, six SwissAI request starts per minute at most.
 - Active run at consolidation:
-  `full-deepseek-v4-flash-tier4-task17b-codeact-x500-r03`.
+  `full-deepseek-v4-flash-tier1-task1-rlm-x500-r05`.
 - The CodeAct failures are retained for a later failed-only review/retry. Do
-  not mix that retry with the currently pending cells.
-- The existing chain starts all 450 DeepSeek RLM jobs automatically after
-  CodeAct reaches a terminal state. It inherits the six-request-per-minute
-  host cap.
+  not retry them while they would compete with the active RLM phase.
+- RLM started automatically at `2026-09-16T21:13:47Z`. Nine jobs succeeded,
+  one was active, 440 were pending, and none had failed at consolidation.
 
 ### GLM details on Jed
 
@@ -70,9 +70,18 @@ changing this table and checking both ledgers for overlap.
   execution-only host cap. `liacpc14` is capped at six requests per minute and
   Jed must also be capped at six, leaving three requests per minute of
   headroom below the shared limit of 15.
-- The GLM RLM arm may begin in the combined Jed allocation. Broad CodeAct may
-  begin only if `full-glm-5.2-tier4-task16-codeact-x500-r01` passes its release
-  check. The latest launch outcome from Jed has not yet been reported.
+- Slurm job `66534424` is running on `jst043` with the six-request-per-minute
+  host cap. After about nine hours it had processed 28/405 jobs: 22 succeeded,
+  six failed, one was active, and 376 had not started.
+- The active run in that report was
+  `full-glm-5.2-tier2-task2-rlm-xfull-r04`, question 3/6.
+- Successful runs recorded 23.35 million tokens, 1,452 calls, and W&B records.
+  There were no HTTP 429 errors and no RLM trajectory-timeout finalizations.
+  Four jobs failed on HTTP 500 and two on API request timeout; retain them for
+  failed-only retry after the pending set finishes.
+- `full-glm-5.2-tier4-task16-codeact-x500-r01` failed its release check, so the
+  remaining 299 CodeAct jobs correctly stayed held. Its exact error still
+  needs to be recorded before deciding whether to revise or retry the pilot.
 
 ### GPT and Claude details on Kuma
 
@@ -116,6 +125,86 @@ Docker catch-up must receive an explicit non-overlapping assignment after the
 ordinary 405-job RLM phases are reconciled. Do not launch all held jobs merely
 because `liacpc14` supports Docker; first import or preserve the other
 machines' ledgers and confirm which run IDs remain.
+
+## Priority through the full-paper deadline
+
+The abstract deadline is September 18 and the full-paper deadline is September
+25. The abstract should use claims already supported by completed evidence; it
+must not wait for every leaderboard cell. Work that can run unattended should
+continue while the acceptance-critical controls below are implemented.
+
+### P0-A: protect and finish work already running
+
+1. Keep DeepSeek RLM on `liacpc14`, GLM RLM on Jed, and the active Qwen,
+   Gemini, and Claude RLM phases running. Do not restart whole phases or create
+   duplicate ledgers.
+2. Obtain exact Qwen, Gemini, Claude, and matched-Qwen ledger counts immediately.
+   We cannot plan remaining capacity from “near the end.”
+3. Confirm whether Sathvik's SwissAI credential differs from Amin's. If it is
+   the same credential, include `liacpc15` in the shared 15-RPM allocation
+   before making any further SwissAI launch.
+4. Diagnose the GPT HTTP 403 using preserved generation metadata. Do not spend
+   on the 19 full or 505 matched retries until routing/policy is understood.
+
+### P0-B: acceptance-critical controls not yet implemented
+
+The external review ranks these above polishing a six-model leaderboard. Begin
+their implementation in parallel with the unattended full runs:
+
+1. **Oracle-predicate control:** a small, representative Tier-3/Tier-4 subset
+   comparing normal RLM with validated executable chemistry predicates and a
+   deterministic executor ceiling.
+2. **Retrieval and map-reduce baselines:** retrieval followed by LLM/CodeAct,
+   plus a non-recursive chunk-and-merge baseline on the same representative
+   tasks.
+3. **Prospective-task decomposition:** target name only versus target structure
+   versus target structure plus final transformation class for Tasks 16, 17,
+   and 17b.
+4. **Matched cardinality:** finish or launch Qwen matched-cardinality and unblock
+   GPT matched-cardinality. This is already specified and should not be
+   redesigned.
+5. **Human validation:** the tested `human_eval/` application exists, but the
+   study is not complete. Export prospective false positives, assign available
+   chemistry reviewers, and start review as soon as stable candidate outputs
+   exist.
+
+Use representative subsets and two contrasting models first. Do not expand a
+control to all six models until its small version works and its result changes
+the paper's conclusion.
+
+### P1: complete the comparison without blocking P0 controls
+
+1. Resolve the GLM CodeAct release failure. If it is an infrastructure failure,
+   retry one pilot; if it is a stable model/provider limitation, record it and
+   avoid spending days forcing all 299 jobs.
+2. Run the two provenance-linked GPT memory pilots after the 403 diagnosis.
+3. Run failed-only retries for transient HTTP 500/timeouts after each phase's
+   pending jobs finish. Do not automatically retry policy failures, malformed
+   scientific responses, or all 57 DeepSeek CodeAct failures as one group.
+4. Reconcile and run the Docker-required Tier-4 RLM cells on a tested Docker
+   machine. Prioritize a scientifically representative subset before attempting
+   every held model/cell.
+
+### P2: analysis required before manuscript claims are frozen
+
+1. Consolidate ledgers without overwriting attempts and verify that every
+   plotted cell has the expected number of questions and repetitions.
+2. Report tokens, calls, end-to-end time, tool time, cost, peak memory, failure
+   rate, and timeout-finalization rate—not only task score.
+3. Compute uncertainty across questions/tasks as well as repetitions, and use
+   paired comparisons where conditions share questions.
+4. Build a failure taxonomy separating provider failures, resource limits,
+   malformed responses, retrieval/execution mistakes, abstraction mistakes,
+   and prospective alternatives.
+5. Add negative cases or narrow the calibration claims if a defensible negative
+   subset cannot be completed in time.
+
+### P3: only after the result matrix is frozen
+
+Regenerate plots and tables from scripts, complete the manuscript, run a
+chemist/ML red-team read, prepare the reproducibility release, and post the
+matching paper/code version to arXiv. Paper writing should proceed now, but
+cosmetic plot work must not consume the time reserved for P0 controls.
 
 ## Active blockers and decisions
 
