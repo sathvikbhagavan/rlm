@@ -4,7 +4,16 @@ from datetime import UTC, datetime
 from io import TextIOWrapper
 from pathlib import Path
 
+import wandb
 from rich.console import Console
+from task16_prospective import (
+    PromptCondition,
+    build_prospective_question,
+    exact_target_product_indices,
+    parse_prompt_condition,
+    selected_question_ids,
+    write_prediction_artifact,
+)
 from task16_truncated_synthesis_graph import (
     FULL_CHAIN_LENGTH,
     MAX_HEAVY_ATOMS,
@@ -33,7 +42,6 @@ from task16_truncated_synthesis_ground_truth import (
     update_task16_run_summary,
 )
 
-import wandb
 from rlm import RLM
 from rlm.codeact_helpers import load_lines
 from rlm.tracing import init_tracing, using_tracing_attributes
@@ -44,13 +52,24 @@ install_campaign_metrics(wandb)
 
 # os.environ["WANDB_MODE"] = "disabled"
 
-DATASET_PATH = __import__("os").environ.get("RXNHAYSTACK_CLEANED_DATASET", __import__("os").path.expanduser("~/datasets/rxnhaystack/reactionSmilesFigShareUSPTO2023_cleaned.txt"))
+DATASET_PATH = __import__("os").environ.get(
+    "RXNHAYSTACK_CLEANED_DATASET",
+    __import__("os").path.expanduser(
+        "~/datasets/rxnhaystack/reactionSmilesFigShareUSPTO2023_cleaned.txt"
+    ),
+)
 BACKEND = "openrouter"
 MODEL_NAME = __import__("os").environ.get("RXNHAYSTACK_MODEL", "openai/gpt-5-mini")
 ENABLE_TRACING = True
 SEED = int(__import__("os").environ.get("RXNHAYSTACK_SEED", "42"))
 CONTEXT_SIZE = int(__import__("os").environ.get("RXNHAYSTACK_CONTEXT_SIZE", "100"))
 CONTEXT_PIPELINE_NAME = "random"
+PROMPT_CONDITION = parse_prompt_condition(
+    __import__("os").environ.get("RXNHAYSTACK_TASK16_PROMPT_CONDITION", "legacy")
+)
+EXCLUDE_ALL_TARGET_PRODUCTS = (
+    __import__("os").environ.get("RXNHAYSTACK_TASK16_EXCLUDE_ALL_TARGET_PRODUCTS", "0") == "1"
+)
 
 ENVIRONMENT = "docker"
 DOCKER_IMAGE = "rlm-sandbox"
@@ -186,6 +205,30 @@ def main(
     print(f"Parsed {len(full_records)} reactions.")
     print_task16_startup_banner()
 
+    requested_question_ids = selected_question_ids()
+    questions = (
+        [question for question in FIXED_QUESTIONS if question.question_id in requested_question_ids]
+        if requested_question_ids
+        else list(FIXED_QUESTIONS)
+    )
+    missing_question_ids = set(requested_question_ids) - {
+        question.question_id for question in questions
+    }
+    if missing_question_ids:
+        raise ValueError(f"Unknown Task-16 question IDs: {sorted(missing_question_ids)}")
+    if PROMPT_CONDITION != PromptCondition.LEGACY and not EXCLUDE_ALL_TARGET_PRODUCTS:
+        raise ValueError(
+            "Controlled Task-16 prompts require RXNHAYSTACK_TASK16_EXCLUDE_ALL_TARGET_PRODUCTS=1"
+        )
+    if (
+        PROMPT_CONDITION == PromptCondition.STRUCTURE_PLUS_CLASS
+        and __import__("os").environ.get("RXNHAYSTACK_TASK16_CLASS_LABELS_AUTHOR_APPROVED") != "1"
+    ):
+        raise ValueError(
+            "The structure_plus_class condition is held until an author chemist confirms "
+            "the frozen final-transformation labels"
+        )
+
     rlm_init_kwargs = build_rlm_init_kwargs(
         model_name=model_name,
         environment=environment,
@@ -215,8 +258,10 @@ def main(
             "seed": SEED,
             "context_size": context_size,
             "context_pipeline_name": CONTEXT_PIPELINE_NAME,
-            "num_questions": len(FIXED_QUESTIONS),
-            "target_questions": [q.question_id for q in FIXED_QUESTIONS],
+            "num_questions": len(questions),
+            "target_questions": [q.question_id for q in questions],
+            "task16_prompt_condition": PROMPT_CONDITION.value,
+            "task16_exclude_all_target_products": EXCLUDE_ALL_TARGET_PRODUCTS,
             "prefix_length": PREFIX_LENGTH,
             "full_chain_length": FULL_CHAIN_LENGTH,
             "forced_prefix_count": TASK16_FORCED_PREFIX_COUNT,
@@ -246,6 +291,7 @@ def main(
             run_session_id=run_session_id,
             lines=lines,
             full_records=full_records,
+            questions=questions,
             context_size=context_size,
             environment=environment,
             verbose_log=verbose_log,
@@ -265,6 +311,7 @@ def _run_task16_samples(
     run_session_id: str,
     lines: list[str],
     full_records,
+    questions,
     context_size: int,
     environment: str,
     verbose_log: VerboseLogFile | None,
@@ -278,11 +325,17 @@ def _run_task16_samples(
     total_input_tokens = 0
     total_output_tokens = 0
     samples_run = 0
+    prediction_rows: list[dict[str, object]] = []
 
-    for i, question in enumerate(FIXED_QUESTIONS):
+    for i, question in enumerate(questions):
         spec = target_spec_for_question(question)
         full_chains = hardcoded_full_chains_for_question(question.question_id)
         full_support_indices = full_support_indices_for_question(question)
+        target_product_indices = (
+            exact_target_product_indices(full_records, question.target_smiles)
+            if EXCLUDE_ALL_TARGET_PRODUCTS
+            else frozenset()
+        )
         built = build_task16_eval_context(
             question=question,
             lines=lines,
@@ -291,6 +344,7 @@ def _run_task16_samples(
             seed=SEED,
             pipeline_name=CONTEXT_PIPELINE_NAME,
             full_records=full_records,
+            additional_excluded_indices=target_product_indices,
         )
         sampling = built.sampling
         support_indices = set(sampling.support_indices)
@@ -304,10 +358,17 @@ def _run_task16_samples(
 
         records = built.records
 
-        prompt_question = build_rlm_question(
-            spec=spec,
-            docker_memory_limit=DOCKER_MEMORY_LIMIT if environment == "docker" else None,
-        )
+        if PROMPT_CONDITION == PromptCondition.LEGACY:
+            prompt_question = build_rlm_question(
+                spec=spec,
+                docker_memory_limit=DOCKER_MEMORY_LIMIT if environment == "docker" else None,
+            )
+        else:
+            prompt_question = build_prospective_question(
+                spec,
+                PROMPT_CONDITION,
+                docker_memory_limit=DOCKER_MEMORY_LIMIT if environment == "docker" else None,
+            )
 
         print_task16_sample_context(
             sample_index=i,
@@ -326,7 +387,7 @@ def _run_task16_samples(
         if verbose_log is not None:
             verbose_log.write_section(
                 f"\n{'=' * 80}\n"
-                f"Sample {i + 1}/{len(FIXED_QUESTIONS)}: {question.question_id}\n"
+                f"Sample {i + 1}/{len(questions)}: {question.question_id}\n"
                 f"{'=' * 80}\n"
             )
 
@@ -334,7 +395,7 @@ def _run_task16_samples(
             session_id=run_session_id,
             metadata={
                 "sample_index": i,
-                "sample_count": len(FIXED_QUESTIONS),
+                "sample_count": len(questions),
                 "task": "truncated_synthesis",
                 "question_id": question.question_id,
                 "prefix_length": PREFIX_LENGTH,
@@ -358,6 +419,27 @@ def _run_task16_samples(
             filters=filters,
         )
         is_exact_match = bool(scores["is_exact_match"])
+        gt_set = set(gt_chains)
+        prediction_rows.append(
+            {
+                "sample_index": i,
+                "question_id": question.question_id,
+                "canonical_question_id": f"rxh-t4-task16-{question.question_id.replace('_', '-')}",
+                "parsed_chains": [list(chain) for chain in parsed_chains],
+                "ground_truth_chains": [list(chain) for chain in gt_chains],
+                "false_positive_chains": [
+                    list(chain) for chain in parsed_chains if chain not in gt_set
+                ],
+                "scores": dict(scores),
+                "context_line_count": len(context_lines),
+                "excluded_target_product_indices": sorted(target_product_indices),
+            }
+        )
+        write_prediction_artifact(
+            prediction_rows,
+            prompt_condition=PROMPT_CONDITION.value,
+            excluded_all_target_products=EXCLUDE_ALL_TARGET_PRODUCTS,
+        )
         sample_cost_usd = completion.usage_summary.total_cost
         if sample_cost_usd is not None:
             total_cost_usd += sample_cost_usd

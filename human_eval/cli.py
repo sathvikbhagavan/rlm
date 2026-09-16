@@ -10,6 +10,7 @@ from rxnhaystack.dataset import verify_cleaned
 from .analysis import analyze
 from .app import create_app
 from .assignments import assign_questions
+from .candidate_export import build_candidate_pack, write_candidate_pack
 from .candidates import import_candidate_pack
 from .canonical import build_bundle, validate_taxonomy
 from .dataset_browser import DatasetIndex
@@ -44,6 +45,15 @@ def parser() -> argparse.ArgumentParser:
     serve.add_argument("--allow-network", action="store_true")
     candidates = commands.add_parser("import-candidates")
     candidates.add_argument("pack", type=Path)
+
+    export_candidates = commands.add_parser("export-task16-candidates")
+    export_candidates.add_argument("output", type=Path)
+    export_candidates.add_argument("predictions", nargs="+", type=Path)
+    export_candidates.add_argument("--pack-id", required=True)
+    export_candidates.add_argument("--version", default="1.0.0")
+    export_candidates.add_argument("--seed", type=int, default=20270910)
+    export_candidates.add_argument("--max-false-positives", type=int)
+    export_candidates.add_argument("--positive-controls-per-question", type=int, default=1)
     candidates.add_argument("--state", type=Path, default=DEFAULT_STATE)
     study = commands.add_parser("install-study")
     study.add_argument("manifest", type=Path)
@@ -138,6 +148,22 @@ def main(argv: list[str] | None = None) -> int:
             args.unblinding,
         )
         print(json.dumps(summary, indent=2))
+        return 0
+    if args.command == "export-task16-candidates":
+        payload = build_candidate_pack(
+            args.predictions,
+            pack_id=args.pack_id,
+            version=args.version,
+            seed=args.seed,
+            max_false_positives=args.max_false_positives,
+            positive_controls_per_question=args.positive_controls_per_question,
+        )
+        output = write_candidate_pack(payload, args.output)
+        print(
+            json.dumps(
+                {"output": str(output), "candidate_count": len(payload["candidates"])}, indent=2
+            )
+        )
         return 0
     store = Store(args.state / "annotations.sqlite3")
     if args.command == "import-candidates":

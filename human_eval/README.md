@@ -67,6 +67,14 @@ uv run --frozen --with-requirements human_eval/requirements.txt \
   python -m human_eval.cli import-candidates human_eval/examples/candidate_pack.json
 ```
 
+Task-16 experiment attempts can be converted to a deterministic candidate pack
+with `export-task16-candidates`; see
+[`prospective_decomposition.md`](../experiments/iclr2027/prospective_decomposition.md).
+The historical internal category `prospective-multiconstraint` contains Task 16
+and Tasks 17/17b for bundle compatibility. Conceptually only Task 16 is
+prospective; future bundles mark Tasks 17/17b as multi-constraint sequential
+template searches and show them a different review rubric.
+
 Original IDs and source/evaluator metadata are written separately with mode 0600
 under `local_state/admin/`. Browser records use opaque derived IDs.
 

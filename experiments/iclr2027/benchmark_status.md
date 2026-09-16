@@ -150,8 +150,8 @@ machines' ledgers and confirm which run IDs remain.
 2. **The obvious competing systems are absent.** There is no completed
    retrieval-augmented or non-recursive map-reduce baseline. A six-model
    replication does not answer whether RLM recursion is necessary.
-3. **Prospective validity is unresolved.** Target-name, target-structure, and
-   target-structure-plus-class conditions have not been run, and the available
+3. **Prospective validity is unresolved.** Task 16 target-name, target-structure,
+   and target-structure-plus-class conditions have not been run, and the available
    chemist-review application has not yet produced annotations.
 4. **The final benchmark matrix is incomplete.** Several RLM phases are active,
    GLM CodeAct is blocked, GPT retries are policy-blocked, transient failures
@@ -202,9 +202,10 @@ their implementation in parallel with the unattended full runs:
 2. **Retrieval and map-reduce baselines:** retrieval followed by LLM/CodeAct,
    plus a non-recursive chunk-and-merge baseline on the same representative
    tasks.
-3. **Prospective-task decomposition:** target name only versus target structure
-   versus target structure plus final transformation class for Tasks 16, 17,
-   and 17b.
+3. **Prospective-task decomposition:** for Task 16 only, compare target name only,
+   target structure only, and target structure plus final transformation class.
+   Tasks 17 and 17b are multi-constraint sequential-template searches, not
+   target-conditioned prospective synthesis tasks.
 4. **Matched cardinality:** finish or launch Qwen matched-cardinality and unblock
    GPT matched-cardinality. This is already specified and should not be
    redesigned.

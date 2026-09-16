@@ -15,6 +15,9 @@ completing any assigned independent attempt on that question.
 ## Candidate-route plausibility review
 
 Judge connectivity and referenced records, transformations and intermediates,
-prefix completability, overall label, confidence 1–5, and a concise rationale.
+overall label, confidence 1–5, and a concise rationale. For Task 16, also judge
+whether the prefix is plausibly completable toward the target. For Tasks 17/17b,
+judge whether the complete chain satisfies the stated sequential constraints;
+those questions are not prospective target completion.
 “Uncertain / insufficient evidence” is distinct from “implausible.” Source model,
 run, prompting method, evaluator outcome, controls, and duplicates remain blinded.
