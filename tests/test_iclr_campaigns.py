@@ -50,9 +50,9 @@ def test_full_campaign_is_generated_and_covers_six_models() -> None:
         for run in codeact_runs
         if run.model != "CSCS-Inference/zai-org/GLM-5.2"
     } == {"30000"}
-    assert {
-        run.env["RXNHAYSTACK_CODEACT_WORKFLOW_TIMEOUT_SECONDS"] for run in codeact_runs
-    } == {"1800"}
+    assert {run.env["RXNHAYSTACK_CODEACT_WORKFLOW_TIMEOUT_SECONDS"] for run in codeact_runs} == {
+        "1800"
+    }
     assert {
         run.question_parallelism
         for run in codeact_runs

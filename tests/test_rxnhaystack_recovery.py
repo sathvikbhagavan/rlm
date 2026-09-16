@@ -74,6 +74,4 @@ def test_dry_run_ignores_non_metadata_failure(tmp_path) -> None:
     (attempt_dir / "stderr.log").write_text("cannot allocate memory for thread-local data: ABORT\n")
     (attempt_dir / "stdout.log").write_text("")
 
-    assert audit_missing_usage(
-        ledger.path, artifact_root=tmp_path / "artifacts"
-    ) == []
+    assert audit_missing_usage(ledger.path, artifact_root=tmp_path / "artifacts") == []

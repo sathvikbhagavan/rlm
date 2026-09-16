@@ -79,14 +79,10 @@ def audit_missing_usage(
         run_id = str(row["run_id"])
         attempt = int(row["attempts"])
         attempt_dir = artifact_root / "runs" / run_id / f"attempt-{attempt:03d}"
-        stderr = (attempt_dir / "stderr.log").read_text(
-            encoding="utf-8", errors="replace"
-        )
+        stderr = (attempt_dir / "stderr.log").read_text(encoding="utf-8", errors="replace")
         if MISSING_USAGE_ERROR not in stderr:
             continue
-        stdout = (attempt_dir / "stdout.log").read_text(
-            encoding="utf-8", errors="replace"
-        )
+        stdout = (attempt_dir / "stdout.log").read_text(encoding="utf-8", errors="replace")
         config = _wandb_config(stderr, wandb_root)
         expected = config.get("num_questions")
         # Some legacy task configs counted explicitly skipped query keys.  The
@@ -119,9 +115,7 @@ def audit_missing_usage(
                 match = re.match(r"^sample/([^/]+)/final_total_tokens$", str(key))
                 if match:
                     final_samples.add(match.group(1))
-                if re.match(
-                    r"^sample/([^/]+)/(?:f1|is_exact_match|accuracy|score)$", str(key)
-                ):
+                if re.match(r"^sample/([^/]+)/(?:f1|is_exact_match|accuracy|score)$", str(key)):
                     scored_samples.add(str(key).split("/")[1])
 
         legacy_scores = len(re.findall(r"^Metrics \[", stdout, re.MULTILINE))
@@ -150,8 +144,7 @@ def audit_missing_usage(
             else None
         )
         fully_recoverable = (
-            expected > 0
-            and min(complete_responses, parsed, scored, trace_artifacts) >= expected
+            expected > 0 and min(complete_responses, parsed, scored, trace_artifacts) >= expected
         )
         has_partial = any((complete_responses, parsed, scored, trace_artifacts))
         recoverability = (
@@ -183,9 +176,7 @@ def render_dry_run(audits: list[RecoveryAudit], *, details: bool = False) -> str
     for audit in audits:
         trajectories[audit.recoverability] += audit.expected_trajectories
     known_costs = [
-        audit.recovered_cost_usd
-        for audit in audits
-        if audit.recovered_cost_usd is not None
+        audit.recovered_cost_usd for audit in audits if audit.recovered_cost_usd is not None
     ]
     payload: dict[str, Any] = {
         "mode": "dry-run",

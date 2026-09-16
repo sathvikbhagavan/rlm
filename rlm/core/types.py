@@ -110,8 +110,7 @@ class UsageSummary:
     @property
     def usage_unavailable_calls(self) -> int:
         return sum(
-            summary.usage_unavailable_calls
-            for summary in self.model_usage_summaries.values()
+            summary.usage_unavailable_calls for summary in self.model_usage_summaries.values()
         )
 
     @property

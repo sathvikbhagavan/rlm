@@ -300,9 +300,7 @@ def test_sync_audit_serialization_redacts_prompts_and_credentials(monkeypatch, t
     assert extra["echo"].count("[REDACTED]") == 3
 
 
-def test_async_audit_serialization_redacts_prompts_and_credentials(
-    monkeypatch, tmp_path
-) -> None:
+def test_async_audit_serialization_redacts_prompts_and_credentials(monkeypatch, tmp_path) -> None:
     path = tmp_path / "responses.jsonl"
     monkeypatch.setenv(RESPONSE_EVENTS_ENV, str(path))
     client, _ = async_client_with_responses(

@@ -133,9 +133,7 @@ class OpenAIClient(BaseLM):
         self._begin_request_sequence()
         for transport_attempt in range(1, EMPTY_CHOICE_MAX_RETRIES + 2):
             response = (
-                call_swissai_sync(request, api_key=self._api_key)
-                if self._is_swissai
-                else request()
+                call_swissai_sync(request, api_key=self._api_key) if self._is_swissai else request()
             )
             self._save_response(
                 response,
@@ -333,9 +331,7 @@ class OpenAIClient(BaseLM):
             except TypeError:
                 payload = model_dump()
             if isinstance(payload, Mapping):
-                serialized = {
-                    str(key): serialize(value) for key, value in payload.items()
-                }
+                serialized = {str(key): serialize(value) for key, value in payload.items()}
                 extra = getattr(response, "model_extra", None)
                 if extra is not None and "model_extra" not in serialized:
                     serialized["model_extra"] = serialize(extra)
@@ -401,9 +397,7 @@ class OpenAIClient(BaseLM):
             total_output_tokens=previous.total_output_tokens + current.total_output_tokens,
             total_cost=total_cost,
             accounting_status=accounting_status,
-            usage_available_calls=(
-                previous.usage_available_calls + current.usage_available_calls
-            ),
+            usage_available_calls=(previous.usage_available_calls + current.usage_available_calls),
             usage_unavailable_calls=(
                 previous.usage_unavailable_calls + current.usage_unavailable_calls
             ),

@@ -156,9 +156,7 @@ def test_launcher_executes_parallel_runs_records_artifacts_and_resumes(
         assert any(event["event"] == "resource_sample" for event in resource_events)
         assert metadata["execution"]["secret_names"] == ["TEST_API_KEY"]
         assert (
-            metadata["execution"]["environment"][
-                "RXNHAYSTACK_SWISSAI_HOST_REQUESTS_PER_MINUTE_CAP"
-            ]
+            metadata["execution"]["environment"]["RXNHAYSTACK_SWISSAI_HOST_REQUESTS_PER_MINUTE_CAP"]
             == "6"
         )
         assert "never-record-this" not in json.dumps(metadata)
@@ -447,6 +445,8 @@ def test_keyboard_interrupt_terminates_worker_and_records_failure(
     assert record.status == "failed"
     assert record.error == "Run interrupted by launcher shutdown"
     metadata = json.loads(
-        (manifest.campaign.artifact_dir / "runs/integration-cell/attempt-001/metadata.json").read_text()
+        (
+            manifest.campaign.artifact_dir / "runs/integration-cell/attempt-001/metadata.json"
+        ).read_text()
     )
     assert metadata["result"]["error"] == "Run interrupted by launcher shutdown"

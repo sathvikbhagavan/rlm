@@ -201,9 +201,7 @@ def test_artifact_recovery_preserves_failed_attempt_and_resumes_as_success(
     assert ledger.claim(planned_run.run_id, retry_failed=True) is None
 
 
-def test_repeated_artifact_recovery_is_idempotent(
-    tmp_path: Path, planned_run: PlannedRun
-) -> None:
+def test_repeated_artifact_recovery_is_idempotent(tmp_path: Path, planned_run: PlannedRun) -> None:
     ledger = RunLedger(tmp_path / "ledger.sqlite3")
     ledger.sync_runs([planned_run], manifest_sha256="a" * 64)
     ledger.claim(planned_run.run_id)

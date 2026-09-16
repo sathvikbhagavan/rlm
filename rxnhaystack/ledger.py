@@ -357,9 +357,7 @@ class RunLedger:
             if run is None:
                 raise LedgerError(f"Unknown run ID: {run_id}")
             if run["status"] != "failed":
-                raise LedgerError(
-                    f"Cannot recover run {run_id!r} from status {run['status']!r}"
-                )
+                raise LedgerError(f"Cannot recover run {run_id!r} from status {run['status']!r}")
             source_row = connection.execute(
                 "SELECT status FROM attempts WHERE run_id = ? AND attempt = ?",
                 (run_id, source_attempt),

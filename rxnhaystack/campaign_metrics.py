@@ -307,9 +307,7 @@ class CampaignMetricsCapture:
                     cost_usd=cost_usd,
                     cost_chf=(cost_chf_from_usd(cost_usd) if cost_usd is not None else None),
                     accounting_status=accounting_status,
-                    estimated_cost_chf=float(
-                        os.environ.get("RXNHAYSTACK_ESTIMATED_COST_CHF", "0")
-                    ),
+                    estimated_cost_chf=float(os.environ.get("RXNHAYSTACK_ESTIMATED_COST_CHF", "0")),
                     wandb_url=getattr(self.run, "url", None),
                     results=results,
                 )
