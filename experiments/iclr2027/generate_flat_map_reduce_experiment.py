@@ -39,8 +39,8 @@ MODELS = (
         map_parallelism=1,
     ),
     Model(
-        alias="claude-haiku-4.5",
-        model_id="anthropic/claude-haiku-4.5",
+        alias="gemini-3.7-flash",
+        model_id="google/gemini-3.7-flash",
         provider="openrouter",
         estimated_cost_chf_per_run=12.0,
         map_parallelism=4,

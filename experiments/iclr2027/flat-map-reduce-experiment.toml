@@ -63,11 +63,11 @@ env = { RXNHAYSTACK_MAP_REDUCE_CHUNK_SIZE = "500", RXNHAYSTACK_MAP_REDUCE_MAX_PA
 command = ["uv", "run", "--frozen", "python", "experiments/iclr2027/run_flat_map_reduce.py"]
 
 [[runs]]
-id = "flat-map-reduce-claude-haiku-4.5-tier1-task1-q01-xfull-c500"
+id = "flat-map-reduce-gemini-3.7-flash-tier1-task1-q01-xfull-c500"
 task = "tier1/task1"
 condition = "full-corpus-fixed-chunks-500"
 method = "map-reduce"
-model = "anthropic/claude-haiku-4.5"
+model = "google/gemini-3.7-flash"
 corpus_size = "full"
 seed = 42
 repetitions = 5
@@ -79,11 +79,11 @@ env = { RXNHAYSTACK_MAP_REDUCE_CHUNK_SIZE = "500", RXNHAYSTACK_MAP_REDUCE_MAX_PA
 command = ["uv", "run", "--frozen", "python", "experiments/iclr2027/run_flat_map_reduce.py"]
 
 [[runs]]
-id = "flat-map-reduce-claude-haiku-4.5-tier2-task5-weight100-ring1-xfull-c500"
+id = "flat-map-reduce-gemini-3.7-flash-tier2-task5-weight100-ring1-xfull-c500"
 task = "tier2/task5"
 condition = "full-corpus-fixed-chunks-500"
 method = "map-reduce"
-model = "anthropic/claude-haiku-4.5"
+model = "google/gemini-3.7-flash"
 corpus_size = "full"
 seed = 42
 repetitions = 5
@@ -95,11 +95,11 @@ env = { RXNHAYSTACK_MAP_REDUCE_CHUNK_SIZE = "500", RXNHAYSTACK_MAP_REDUCE_MAX_PA
 command = ["uv", "run", "--frozen", "python", "experiments/iclr2027/run_flat_map_reduce.py"]
 
 [[runs]]
-id = "flat-map-reduce-claude-haiku-4.5-tier3-task10-wittig-xfull-c500"
+id = "flat-map-reduce-gemini-3.7-flash-tier3-task10-wittig-xfull-c500"
 task = "tier3/task10"
 condition = "full-corpus-fixed-chunks-500"
 method = "map-reduce"
-model = "anthropic/claude-haiku-4.5"
+model = "google/gemini-3.7-flash"
 corpus_size = "full"
 seed = 42
 repetitions = 5

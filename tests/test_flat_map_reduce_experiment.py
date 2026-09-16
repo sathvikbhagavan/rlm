@@ -18,7 +18,10 @@ def test_flat_map_reduce_experiment_is_generated_and_small() -> None:
     manifest = load_manifest(path)
 
     assert len(manifest.runs) == 30
-    assert len({run.model for run in manifest.runs}) == 2
+    assert {run.model for run in manifest.runs} == {
+        "RCP-AIaaS/Qwen/Qwen3.5-397B-A17B",
+        "google/gemini-3.7-flash",
+    }
     assert {run.task for run in manifest.runs} == {
         "tier1/task1",
         "tier2/task5",

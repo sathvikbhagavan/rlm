@@ -62,7 +62,10 @@ The small design selects one question at each row-separable difficulty level:
 - Tier 2 Task 5, weight >100 Da and ring delta 1: conjunctive descriptors; and
 - Tier 3 Task 10, Wittig olefination: chemistry-dependent classification.
 
-It uses Qwen3.5-397B-A17B and Claude Haiku 4.5 with five repetitions:
+It uses Qwen3.5-397B-A17B and Gemini 3.7 Flash with five repetitions. Both are
+already part of the main paper comparison. Gemini is the closed-model default
+because this exhaustive baseline repeats unusually large inputs and Gemini's
+recorded input price is lower than Claude Haiku's:
 
 ```text
 3 questions × 2 models × 5 repetitions = 30 tracked jobs
@@ -71,7 +74,7 @@ It uses Qwen3.5-397B-A17B and Claude Haiku 4.5 with five repetitions:
 
 For either model, the minimum work is 3,675 calls. At a six-request-per-minute
 host cap, the SwissAI half requires at least 10.2 hours of request starts,
-before inference time and retries. The generated Claude allowance is CHF 180
+before inference time and retries. The generated Gemini allowance is CHF 180
 within a CHF 200 experiment ceiling; it is deliberately conservative and must
 be replaced by a measured one-job estimate before broad paid launch.
 
