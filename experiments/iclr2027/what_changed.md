@@ -549,6 +549,27 @@ retains serial questions and every existing workflow, retry, tool, turn, and
 memory boundary. V34 is a release check until that demanding cell completes; it
 is not authorization to launch the broad GLM phase.
 
+## 21. Safe SwissAI quota division across clusters
+
+The SwissAI limiter originally coordinated worker processes through a locked
+timestamp file in node-local `/tmp`. That remains the correct mechanism for
+one node, but two clusters using the same credential cannot see each other's
+lock and could each attempt the full 15-request-per-minute account allowance.
+
+The execution environment now accepts
+`RXNHAYSTACK_SWISSAI_HOST_REQUESTS_PER_MINUTE_CAP`. The effective request rate
+is the lower of this machine-level cap and the rate recorded in the experiment
+description, so the override can only make execution more conservative. The
+launcher records the cap in `metadata.json`; it is deliberately not part of the
+scientific run identity because it changes waiting time rather than prompts,
+model settings, or answers. Invalid and non-positive caps stop before a model
+request. Two hosts can, for example, be assigned six requests per minute each,
+leaving three requests per minute of headroom under the shared limit of 15.
+
+This mechanism divides quota; it is not a distributed lock. Separate nodes on
+the same cluster must also receive explicit shares unless their workers run in
+one allocation and share the same local limiter state.
+
 ## What has not been hidden or simplified away
 
 - The three API/W&B credential values are currently required before any selected

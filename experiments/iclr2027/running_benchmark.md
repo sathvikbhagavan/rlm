@@ -341,6 +341,23 @@ The v19 description added spacing between SwissAI request starts across worker p
 and retries at most two rejected-before-inference 429 requests using the delay
 specified by the provider.
 
+That coordination uses a locked file in the compute node's local `/tmp`. It
+therefore coordinates processes on one node, but not different nodes or
+clusters. When one SwissAI credential is used on several hosts, give each host
+a conservative share of the provider quota before starting its runner:
+
+```bash
+export RXNHAYSTACK_SWISSAI_HOST_REQUESTS_PER_MINUTE_CAP=6
+```
+
+The effective rate is the lower of this host cap and the rate recorded in the
+experiment file. A host cap can reduce the launch rate but cannot raise the
+recorded rate. It is written to each attempt's `metadata.json`, and it does not
+change prompts, model parameters, run names, or scientific identities. Static
+shares must sum to less than the account limit; for example, two clusters at
+six requests per minute use at most 12 of a shared 15-request-per-minute
+allowance. This is conservative quota division, not cross-cluster locking.
+
 In CodeAct, the retrieved rows are preloaded in each isolated Python tool as a
 list named `lines`. During trial review, confirm the model uses `lines` rather
 than copying the full `<context>` block into generated Python code. The prompt
@@ -643,6 +660,10 @@ Use the parallelism recommended after the trial jobs, not necessarily `4`.
 `--max-parallel` controls the number of separate worker processes. Inside each
 worker, LLM can have up to four questions in flight, CodeAct up to two isolated
 agents, and RLM one question at a time.
+
+If the same SwissAI key is active on another host, set that host's assigned
+`RXNHAYSTACK_SWISSAI_HOST_REQUESTS_PER_MINUTE_CAP` in the batch script before
+this command. Do not launch two hosts at the default 15 requests per minute.
 
 The runner also limits the sum of estimated RAM for active workers to 48 GiB.
 Typical allowances are 2--4 GiB for LLM, 4--6 GiB for CodeAct, and 8--16 GiB for

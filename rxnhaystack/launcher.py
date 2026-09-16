@@ -19,6 +19,7 @@ from rxnhaystack.dataset import CLEANED_DATASET_ENV, RAW_DATASET_ENV
 from rxnhaystack.ledger import RunLedger, validate_metrics
 from rxnhaystack.manifest import ExperimentManifest, ManifestError, PlannedRun
 from rxnhaystack.metrics import METRICS_PATH_ENV, USD_TO_CHF_ENV
+from rxnhaystack.rate_limit import SWISSAI_HOST_REQUESTS_PER_MINUTE_CAP_ENV
 from rxnhaystack.resources import (
     DOCKER_MEMORY_CGROUP_ENV,
     MemoryBudget,
@@ -162,11 +163,16 @@ def execute_run(
     environment.update(secrets)
     started_at = datetime.now(UTC).isoformat()
     started = time.monotonic()
+    recorded_environment = {**run.env, **generated_env}
+    if SWISSAI_HOST_REQUESTS_PER_MINUTE_CAP_ENV in environment:
+        recorded_environment[SWISSAI_HOST_REQUESTS_PER_MINUTE_CAP_ENV] = environment[
+            SWISSAI_HOST_REQUESTS_PER_MINUTE_CAP_ENV
+        ]
     execution_metadata: dict[str, Any] = {
         "attempt": attempt,
         "command": list(run.command),
         "cwd": str(manifest.campaign.project_root),
-        "environment": {**run.env, **generated_env},
+        "environment": recorded_environment,
         "secret_names": sorted(secrets),
         "started_at": started_at,
     }

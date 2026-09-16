@@ -15,6 +15,9 @@ from rxnhaystack.manifest import ManifestError
 
 SWISSAI_REQUESTS_PER_MINUTE_ENV = "RXNHAYSTACK_SWISSAI_REQUESTS_PER_MINUTE"
 SWISSAI_REQUESTS_PER_MINUTE = 15.0
+SWISSAI_HOST_REQUESTS_PER_MINUTE_CAP_ENV = (
+    "RXNHAYSTACK_SWISSAI_HOST_REQUESTS_PER_MINUTE_CAP"
+)
 SWISSAI_RATE_LIMIT_RETRIES_ENV = "RXNHAYSTACK_SWISSAI_RATE_LIMIT_RETRIES"
 SWISSAI_RATE_LIMIT_RETRIES = 2
 SWISSAI_RATE_LIMIT_MARGIN_SECONDS = 0.25
@@ -93,6 +96,12 @@ def _swissai_limiter(api_key: str) -> CrossProcessRateLimiter:
         SWISSAI_REQUESTS_PER_MINUTE_ENV,
         SWISSAI_REQUESTS_PER_MINUTE,
     )
+    if SWISSAI_HOST_REQUESTS_PER_MINUTE_CAP_ENV in os.environ:
+        host_cap = _positive_float_from_environment(
+            SWISSAI_HOST_REQUESTS_PER_MINUTE_CAP_ENV,
+            requests_per_minute,
+        )
+        requests_per_minute = min(requests_per_minute, host_cap)
     return CrossProcessRateLimiter(
         api_key=api_key,
         requests_per_minute=requests_per_minute,

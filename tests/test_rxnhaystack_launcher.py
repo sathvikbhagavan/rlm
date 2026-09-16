@@ -108,7 +108,9 @@ command = [{json.dumps(sys.executable)}, {json.dumps(str(worker))}]
     return manifest
 
 
-def test_launcher_executes_parallel_runs_records_artifacts_and_resumes(tmp_path: Path) -> None:
+def test_launcher_executes_parallel_runs_records_artifacts_and_resumes(
+    tmp_path: Path, monkeypatch
+) -> None:
     project_root = tmp_path / "project"
     project_root.mkdir()
     initialize_git_repository(project_root)
@@ -120,6 +122,7 @@ def test_launcher_executes_parallel_runs_records_artifacts_and_resumes(tmp_path:
     write_worker(worker, hold_seconds=0.5)
     manifest = load_manifest(write_campaign(tmp_path, project_root, worker))
     preflight = perform_preflight(manifest)
+    monkeypatch.setenv("RXNHAYSTACK_SWISSAI_HOST_REQUESTS_PER_MINUTE_CAP", "6")
 
     results = run_selected(
         manifest,
@@ -152,6 +155,12 @@ def test_launcher_executes_parallel_runs_records_artifacts_and_resumes(tmp_path:
         assert resource_events[-1]["event"] == "process_finished"
         assert any(event["event"] == "resource_sample" for event in resource_events)
         assert metadata["execution"]["secret_names"] == ["TEST_API_KEY"]
+        assert (
+            metadata["execution"]["environment"][
+                "RXNHAYSTACK_SWISSAI_HOST_REQUESTS_PER_MINUTE_CAP"
+            ]
+            == "6"
+        )
         assert "never-record-this" not in json.dumps(metadata)
         assert "secret-present=True" in stdout
 
