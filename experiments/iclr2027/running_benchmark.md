@@ -3,6 +3,10 @@
 This is a walkthrough for launching RxnHaystack. It explains what we
 need to run, the order, how different we can divide the work, what to check after each stage, and what to send back to the coding assistant before continuing.
 
+The live ownership, machine assignments, completed counts, blockers, and next
+actions are maintained in [`benchmark_status.md`](benchmark_status.md). Read
+and update that file before launching any additional jobs.
+
 We first run a few small tests with real models, check their cost, memory use, outputs,
 and logs, and only then choose how much parallelism each machine can safely use.
 
