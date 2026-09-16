@@ -119,7 +119,7 @@ def test_launcher_executes_parallel_runs_records_artifacts_and_resumes(
     # observe it even on a heavily loaded shared login node. Real benchmark
     # workers live for minutes or hours; a process that exits between spawn and
     # the first /proc sample cannot have its RSS reconstructed after the fact.
-    write_worker(worker, hold_seconds=0.5)
+    write_worker(worker, hold_seconds=2.0)
     manifest = load_manifest(write_campaign(tmp_path, project_root, worker))
     preflight = perform_preflight(manifest)
     monkeypatch.setenv("RXNHAYSTACK_SWISSAI_HOST_REQUESTS_PER_MINUTE_CAP", "6")

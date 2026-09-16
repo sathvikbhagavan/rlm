@@ -2,6 +2,8 @@ from dataclasses import dataclass
 from types import ModuleType
 from typing import Any, Literal
 
+from rxnhaystack.accounting import AccountingStatus, merged_accounting_status
+
 ClientBackend = Literal[
     "openai",
     "portkey",
@@ -46,13 +48,22 @@ class ModelUsageSummary:
     total_input_tokens: int
     total_output_tokens: int
     total_cost: float | None = None  # Cost in USD, if available from provider
+    accounting_status: AccountingStatus = "available"
+    usage_available_calls: int = 0
+    usage_unavailable_calls: int = 0
+    generation_ids: tuple[str, ...] = ()
 
     def to_dict(self):
         result = {
             "total_calls": self.total_calls,
             "total_input_tokens": self.total_input_tokens,
             "total_output_tokens": self.total_output_tokens,
+            "accounting_status": self.accounting_status,
+            "usage_available_calls": self.usage_available_calls,
+            "usage_unavailable_calls": self.usage_unavailable_calls,
         }
+        if self.generation_ids:
+            result["generation_ids"] = list(self.generation_ids)
         if self.total_cost is not None:
             result["total_cost"] = self.total_cost
         return result
@@ -64,6 +75,10 @@ class ModelUsageSummary:
             total_input_tokens=data.get("total_input_tokens"),
             total_output_tokens=data.get("total_output_tokens"),
             total_cost=data.get("total_cost"),
+            accounting_status=data.get("accounting_status", "available"),
+            usage_available_calls=data.get("usage_available_calls", 0),
+            usage_unavailable_calls=data.get("usage_unavailable_calls", 0),
+            generation_ids=tuple(data.get("generation_ids", ())),
         )
 
 
@@ -78,13 +93,34 @@ class UsageSummary:
 
     @property
     def total_cost(self) -> float | None:
-        """Aggregate cost across all models. Returns None if no cost data available."""
-        costs = [
-            summary.total_cost
-            for summary in self.model_usage_summaries.values()
-            if summary.total_cost is not None
+        """Aggregate cost only when every used model has complete cost data."""
+        used = [
+            summary for summary in self.model_usage_summaries.values() if summary.total_calls > 0
         ]
-        return sum(costs) if costs else None
+        if not used or any(summary.total_cost is None for summary in used):
+            return None
+        return sum(summary.total_cost for summary in used if summary.total_cost is not None)
+
+    @property
+    def accounting_status(self) -> AccountingStatus:
+        return merged_accounting_status(
+            [summary.accounting_status for summary in self.model_usage_summaries.values()]
+        )
+
+    @property
+    def usage_unavailable_calls(self) -> int:
+        return sum(
+            summary.usage_unavailable_calls
+            for summary in self.model_usage_summaries.values()
+        )
+
+    @property
+    def generation_ids(self) -> tuple[str, ...]:
+        return tuple(
+            generation_id
+            for summary in self.model_usage_summaries.values()
+            for generation_id in summary.generation_ids
+        )
 
     @property
     def total_input_tokens(self) -> int:
@@ -102,7 +138,11 @@ class UsageSummary:
                 model: usage_summary.to_dict()
                 for model, usage_summary in self.model_usage_summaries.items()
             },
+            "accounting_status": self.accounting_status,
+            "usage_unavailable_calls": self.usage_unavailable_calls,
         }
+        if self.generation_ids:
+            result["generation_ids"] = list(self.generation_ids)
         if self.total_cost is not None:
             result["total_cost"] = self.total_cost
         return result

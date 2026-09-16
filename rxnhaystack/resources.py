@@ -342,6 +342,7 @@ def rlm_trace_callbacks(
         )
 
     def on_iteration_metrics(depth: int, iteration: int, metrics: dict[str, Any]) -> None:
+        cost_usd = metrics.get("iteration_cost_usd")
         append_trace_event(
             trace_path,
             "rlm_iteration_metrics",
@@ -351,7 +352,7 @@ def rlm_trace_callbacks(
             calls=int(metrics.get("iteration_calls", 0)),
             input_tokens=int(metrics.get("iteration_input_tokens", 0)),
             output_tokens=int(metrics.get("iteration_output_tokens", 0)),
-            cost_usd=float(metrics.get("iteration_cost_usd", 0.0)),
+            cost_usd=float(cost_usd) if cost_usd is not None else None,
             model_time_seconds=float(metrics.get("model_time_s") or 0.0),
             tool_time_seconds=float(metrics.get("tool_time_s") or 0.0),
             code_block_count=int(metrics.get("code_block_count", 0)),
@@ -359,6 +360,7 @@ def rlm_trace_callbacks(
         )
 
     def on_completion_metrics(metrics: dict[str, Any]) -> None:
+        cost_usd = metrics.get("cost_usd")
         append_trace_event(
             trace_path,
             "rlm_completion_metrics",
@@ -366,7 +368,10 @@ def rlm_trace_callbacks(
             calls=int(metrics.get("calls", 0)),
             input_tokens=int(metrics.get("input_tokens", 0)),
             output_tokens=int(metrics.get("output_tokens", 0)),
-            cost_usd=float(metrics.get("cost_usd", 0.0)),
+            cost_usd=float(cost_usd) if cost_usd is not None else None,
+            accounting_status=metrics.get("accounting_status", "available"),
+            usage_unavailable_calls=int(metrics.get("usage_unavailable_calls", 0)),
+            generation_ids=list(metrics.get("generation_ids", ())),
             execution_time_seconds=float(metrics.get("execution_time_seconds", 0.0)),
             model_time_seconds=float(metrics.get("model_time_seconds", 0.0)),
             tool_time_seconds=float(metrics.get("tool_time_seconds", 0.0)),

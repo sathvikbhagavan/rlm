@@ -45,6 +45,9 @@ def configure_campaign(monkeypatch, tmp_path: Path, *, method: str) -> Path:
     monkeypatch.setenv("RXNHAYSTACK_METRICS_PATH", str(metrics))
     monkeypatch.setenv("RXNHAYSTACK_USD_TO_CHF", "0.8")
     monkeypatch.setenv("RXNHAYSTACK_RESOURCE_TRACE_PATH", str(tmp_path / "trace.jsonl"))
+    monkeypatch.setenv(
+        "RXNHAYSTACK_TRAJECTORY_EVENTS_PATH", str(tmp_path / "trajectory-events.jsonl")
+    )
     return metrics
 
 
@@ -96,7 +99,8 @@ def test_capture_reads_current_wandb_summary_object(monkeypatch, tmp_path: Path)
     wandb.finish()
 
     metrics = json.loads(metrics_path.read_text())
-    assert metrics["results"] == {"macro_f1": 0.625}
+    assert metrics["results"]["macro_f1"] == 0.625
+    assert metrics["results"]["accounting"]["status"] == "available"
 
 
 @pytest.mark.parametrize(
@@ -144,20 +148,46 @@ def test_capture_uses_exact_recursive_trace_metrics(
     assert metrics["results"]["rlm_timeout_finalizations"] == expected_finalizations
 
 
-def test_capture_rejects_missing_provider_cost(monkeypatch, tmp_path: Path) -> None:
-    configure_campaign(monkeypatch, tmp_path, method="llm")
+def test_capture_preserves_score_with_unknown_provider_cost(monkeypatch, tmp_path: Path) -> None:
+    metrics_path = configure_campaign(monkeypatch, tmp_path, method="llm")
     wandb = FakeWandb()
     install_campaign_metrics(wandb)
-    wandb.init(project="test")
+    wandb.init(project="test", config={"num_questions": 1})
     wandb.log(
         {
             "sample/0/iteration_total_tokens": 30,
             "sample/0/final_total_input_tokens": 20,
             "sample/0/final_total_output_tokens": 10,
             "sample/0/final_total_tokens": 30,
+            "sample/0/f1": 0.5,
         }
     )
 
-    with pytest.raises(RuntimeError, match="Incomplete per-sample usage"):
-        wandb.finish()
+    wandb.finish()
+
+    metrics = json.loads(metrics_path.read_text())
+    assert metrics["cost_usd"] is None
+    assert metrics["cost_chf"] is None
+    assert metrics["accounting_status"] == "unavailable"
+    assert metrics["estimated_cost_chf"] == 0
+    trajectory = (tmp_path / "trajectory-events.jsonl").read_text()
+    assert '"sample/0/f1":0.5' in trajectory
     assert wandb.finished
+
+
+def test_capture_rejects_partial_multi_trajectory_job(monkeypatch, tmp_path: Path) -> None:
+    configure_campaign(monkeypatch, tmp_path, method="rlm")
+    wandb = FakeWandb()
+    install_campaign_metrics(wandb)
+    wandb.init(project="test", config={"num_questions": 2})
+    wandb.log(
+        {
+            "sample/0/final_total_input_tokens": 20,
+            "sample/0/final_total_output_tokens": 10,
+            "sample/0/final_total_tokens": 30,
+            "sample/0/f1": 0.5,
+        }
+    )
+
+    with pytest.raises(RuntimeError, match="Incomplete trajectory set: 1/2"):
+        wandb.finish()

@@ -154,3 +154,84 @@ def test_validate_metrics_allows_required_efficiency_fields() -> None:
 def test_validate_metrics_can_require_complete_efficiency_record() -> None:
     with pytest.raises(ManifestError, match="missing required fields"):
         validate_metrics({"calls": 1}, require_complete=True)
+
+
+def test_artifact_recovery_preserves_failed_attempt_and_resumes_as_success(
+    tmp_path: Path, planned_run: PlannedRun
+) -> None:
+    ledger = RunLedger(tmp_path / "ledger.sqlite3")
+    ledger.sync_runs([planned_run], manifest_sha256="a" * 64)
+    assert ledger.claim(planned_run.run_id) == 1
+    failed_dir = tmp_path / "attempt-001"
+    ledger.finish(
+        planned_run.run_id,
+        return_code=1,
+        artifact_dir=failed_dir,
+        error="usage unavailable",
+    )
+    metrics = {
+        "calls": 2,
+        "input_tokens": 10,
+        "output_tokens": 5,
+        "total_tokens": 15,
+        "latency_seconds": 1.0,
+        "tool_time_seconds": 0.2,
+        "cost_chf": None,
+        "cost_usd": None,
+        "accounting_status": "unavailable",
+        "estimated_cost_chf": 1.5,
+        "results": {"f1": 0.5},
+    }
+    evidence = {"scientific_status": "scored", "trajectory_count": 1}
+
+    assert ledger.recover_failed_attempt(
+        planned_run.run_id,
+        source_attempt=1,
+        recovery_id="recovery-one",
+        source="provider-response-artifact",
+        artifact_dir=tmp_path / "recovery-002",
+        metrics=metrics,
+        evidence=evidence,
+    )
+
+    record = ledger.get(planned_run.run_id)
+    assert record.status == "succeeded"
+    assert record.attempts == 2
+    assert [attempt.status for attempt in ledger.list_attempts()] == ["failed", "succeeded"]
+    assert ledger.claim(planned_run.run_id, retry_failed=True) is None
+
+
+def test_repeated_artifact_recovery_is_idempotent(
+    tmp_path: Path, planned_run: PlannedRun
+) -> None:
+    ledger = RunLedger(tmp_path / "ledger.sqlite3")
+    ledger.sync_runs([planned_run], manifest_sha256="a" * 64)
+    ledger.claim(planned_run.run_id)
+    ledger.finish(
+        planned_run.run_id,
+        return_code=1,
+        artifact_dir=tmp_path / "failed",
+        error="usage unavailable",
+    )
+    metrics = {
+        "calls": 1,
+        "input_tokens": 2,
+        "output_tokens": 1,
+        "total_tokens": 3,
+        "latency_seconds": 1.0,
+        "tool_time_seconds": 0.0,
+        "cost_chf": None,
+        "accounting_status": "unavailable",
+    }
+    kwargs = {
+        "source_attempt": 1,
+        "recovery_id": "same-recovery",
+        "source": "test",
+        "artifact_dir": tmp_path / "recovered",
+        "metrics": metrics,
+        "evidence": {"scientific_status": "scored"},
+    }
+
+    assert ledger.recover_failed_attempt(planned_run.run_id, **kwargs)
+    assert not ledger.recover_failed_attempt(planned_run.run_id, **kwargs)
+    assert len(ledger.list_attempts()) == 2

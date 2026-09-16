@@ -1,4 +1,5 @@
 import os
+import threading
 from collections import defaultdict
 from typing import Any
 
@@ -7,6 +8,7 @@ from dotenv import load_dotenv
 
 from rlm.clients.base_lm import BaseLM
 from rlm.core.types import ModelUsageSummary, UsageSummary
+from rxnhaystack.accounting import RESPONSE_EVENTS_ENV, append_audit_event
 from rxnhaystack.rate_limit import call_swissai_async, call_swissai_sync, is_swissai_url
 
 load_dotenv()
@@ -65,6 +67,7 @@ class OpenAIClient(BaseLM):
         self.base_url = base_url  # Track for cost extraction
         self._api_key = api_key or ""
         self._is_swissai = is_swissai_url(base_url)
+        self._accounting_lock = threading.Lock()
 
         # Per-model usage tracking
         self.model_call_counts: dict[str, int] = defaultdict(int)
@@ -72,6 +75,13 @@ class OpenAIClient(BaseLM):
         self.model_output_tokens: dict[str, int] = defaultdict(int)
         self.model_total_tokens: dict[str, int] = defaultdict(int)
         self.model_costs: dict[str, float] = defaultdict(float)  # Cost in USD
+        self.model_usage_available_calls: dict[str, int] = defaultdict(int)
+        self.model_usage_unavailable_calls: dict[str, int] = defaultdict(int)
+        self.model_recovered_calls: dict[str, int] = defaultdict(int)
+        self.model_generation_ids: dict[str, list[str]] = defaultdict(list)
+        self._unavailable_generations: dict[str, tuple[str, int | None, int | None]] = {}
+        self._recovered_generations: set[str] = set()
+        self._last_usage = ModelUsageSummary(0, 0, 0)
 
     def completion(self, prompt: str | list[dict[str, Any]], model: str | None = None) -> str:
         if isinstance(prompt, str):
@@ -99,8 +109,9 @@ class OpenAIClient(BaseLM):
         response = (
             call_swissai_sync(request, api_key=self._api_key) if self._is_swissai else request()
         )
+        self._save_response(response, model)
         self._track_cost(response, model)
-        return response.choices[0].message.content
+        return self._response_text(response)
 
     async def acompletion(
         self, prompt: str | list[dict[str, Any]], model: str | None = None
@@ -132,62 +143,225 @@ class OpenAIClient(BaseLM):
             if self._is_swissai
             else await request()
         )
+        self._save_response(response, model)
         self._track_cost(response, model)
-        return response.choices[0].message.content
+        return self._response_text(response)
+
+    @staticmethod
+    def _response_text(response: openai.ChatCompletion) -> str:
+        choices = getattr(response, "choices", None)
+        if not choices:
+            raise ValueError("Provider response has no completion choices")
+        message = getattr(choices[0], "message", None)
+        content = getattr(message, "content", None)
+        if not isinstance(content, str) or not content.strip():
+            raise ValueError("Provider response has no non-empty completion text")
+        return content
+
+    @staticmethod
+    def _generation_id(response: openai.ChatCompletion) -> str | None:
+        value = getattr(response, "id", None)
+        return value if isinstance(value, str) and value else None
+
+    def _audit(self, event: str, **fields: Any) -> None:
+        path = os.environ.get(RESPONSE_EVENTS_ENV)
+        if path:
+            append_audit_event(path, event, **fields)
+
+    def _save_response(self, response: openai.ChatCompletion, model: str) -> None:
+        """Persist provider output before any accounting or shape validation."""
+
+        choices = getattr(response, "choices", None) or []
+        choice = choices[0] if choices else None
+        message = getattr(choice, "message", None)
+        usage = getattr(response, "usage", None)
+        usage_payload = None
+        if usage is not None:
+            usage_payload = {
+                "prompt_tokens": getattr(usage, "prompt_tokens", None),
+                "completion_tokens": getattr(usage, "completion_tokens", None),
+                "total_tokens": getattr(usage, "total_tokens", None),
+                "cost_usd": self._extract_cost(usage),
+            }
+        self._audit(
+            "provider_response_saved",
+            model=model,
+            generation_id=self._generation_id(response),
+            content=getattr(message, "content", None),
+            refusal=getattr(message, "refusal", None),
+            finish_reason=getattr(choice, "finish_reason", None),
+            usage=usage_payload,
+        )
 
     def _track_cost(self, response: openai.ChatCompletion, model: str):
-        self.model_call_counts[model] += 1
-
         usage = getattr(response, "usage", None)
+        generation_id = self._generation_id(response)
+        with self._accounting_lock:
+            self.model_call_counts[model] += 1
+            if generation_id:
+                self.model_generation_ids[model].append(generation_id)
         if usage is None:
-            raise ValueError("No usage data received. Tracking tokens not possible.")
+            self._mark_usage_unavailable(
+                model, generation_id, reason="provider response omitted usage metadata"
+            )
+            return
 
-        self.model_input_tokens[model] += usage.prompt_tokens
-        self.model_output_tokens[model] += usage.completion_tokens
-        self.model_total_tokens[model] += usage.total_tokens
+        try:
+            prompt_tokens = int(usage.prompt_tokens)
+            completion_tokens = int(usage.completion_tokens)
+            total_tokens = int(usage.total_tokens)
+            if min(prompt_tokens, completion_tokens, total_tokens) < 0:
+                raise ValueError
+        except (AttributeError, TypeError, ValueError):
+            self._mark_usage_unavailable(
+                model, generation_id, reason="provider response contained incomplete usage metadata"
+            )
+            return
+        cost = self._extract_cost(usage)
+        cost_missing = cost is None
 
-        # Track last call for handler to read
-        self.last_prompt_tokens = usage.prompt_tokens
-        self.last_completion_tokens = usage.completion_tokens
+        with self._accounting_lock:
+            self.model_input_tokens[model] += prompt_tokens
+            self.model_output_tokens[model] += completion_tokens
+            self.model_total_tokens[model] += total_tokens
+            if cost_missing:
+                self.model_usage_unavailable_calls[model] += 1
+                if generation_id:
+                    self._unavailable_generations[generation_id] = (
+                        model,
+                        prompt_tokens,
+                        completion_tokens,
+                    )
+            else:
+                self.model_usage_available_calls[model] += 1
+            if cost is not None:
+                self.model_costs[model] += cost
+            self._last_usage = ModelUsageSummary(
+                total_calls=1,
+                total_input_tokens=prompt_tokens,
+                total_output_tokens=completion_tokens,
+                total_cost=cost,
+                accounting_status="unavailable" if cost_missing else "available",
+                usage_available_calls=int(not cost_missing),
+                usage_unavailable_calls=int(cost_missing),
+                generation_ids=(generation_id,) if generation_id else (),
+            )
+        self._audit(
+            "usage_unavailable" if cost_missing else "usage_available",
+            model=model,
+            generation_id=generation_id,
+            prompt_tokens=prompt_tokens,
+            completion_tokens=completion_tokens,
+            total_tokens=total_tokens,
+            cost_usd=cost,
+            reason="provider response omitted cost metadata" if cost_missing else None,
+        )
 
-        # Extract cost from OpenRouter responses (cost is in USD)
-        # OpenRouter returns cost in usage.model_extra for pydantic models
-        self.last_cost: float | None = None
+    def _mark_usage_unavailable(
+        self, model: str, generation_id: str | None, *, reason: str
+    ) -> None:
+        with self._accounting_lock:
+            self.model_usage_unavailable_calls[model] += 1
+            if generation_id:
+                self._unavailable_generations[generation_id] = (model, None, None)
+            self._last_usage = ModelUsageSummary(
+                total_calls=1,
+                total_input_tokens=0,
+                total_output_tokens=0,
+                total_cost=None,
+                accounting_status="unavailable",
+                usage_unavailable_calls=1,
+                generation_ids=(generation_id,) if generation_id else (),
+            )
+        self._audit(
+            "usage_unavailable",
+            model=model,
+            generation_id=generation_id,
+            reason=reason,
+        )
+
+    @staticmethod
+    def _extract_cost(usage: Any) -> float | None:
         cost = None
-
-        # Try direct attribute first
-        if hasattr(usage, "cost") and usage.cost:
-            cost = usage.cost
-        # Then try model_extra (OpenRouter uses this)
-        elif hasattr(usage, "model_extra") and usage.model_extra:
-            extra = usage.model_extra
-            # Primary cost field (may be 0 for BYOK)
-            if extra.get("cost"):
+        direct_cost = getattr(usage, "cost", None)
+        if direct_cost is not None:
+            cost = direct_cost
+        else:
+            extra = getattr(usage, "model_extra", None)
+        if cost is None and isinstance(extra, dict):
+            if extra.get("cost") is not None:
                 cost = extra["cost"]
-            # Fallback to upstream cost details
-            elif extra.get("cost_details", {}).get("upstream_inference_cost"):
+            elif extra.get("cost_details", {}).get("upstream_inference_cost") is not None:
                 cost = extra["cost_details"]["upstream_inference_cost"]
+        try:
+            return float(cost) if cost is not None else None
+        except (TypeError, ValueError):
+            return None
 
-        if cost is not None and cost > 0:
-            self.last_cost = float(cost)
-            self.model_costs[model] += self.last_cost
+    def recover_usage(
+        self,
+        *,
+        generation_id: str,
+        prompt_tokens: int,
+        completion_tokens: int,
+        cost_usd: float,
+    ) -> bool:
+        """Idempotently apply delayed provider metadata to an unavailable call."""
+
+        with self._accounting_lock:
+            if generation_id in self._recovered_generations:
+                return False
+            unavailable = self._unavailable_generations.get(generation_id)
+            if unavailable is None:
+                raise ValueError(f"No unavailable usage event for generation {generation_id!r}")
+            model, known_prompt_tokens, known_completion_tokens = unavailable
+            if min(prompt_tokens, completion_tokens, cost_usd) < 0:
+                raise ValueError("Recovered usage and cost must be non-negative")
+            if known_prompt_tokens is None or known_completion_tokens is None:
+                self.model_input_tokens[model] += prompt_tokens
+                self.model_output_tokens[model] += completion_tokens
+                self.model_total_tokens[model] += prompt_tokens + completion_tokens
+            elif (known_prompt_tokens, known_completion_tokens) != (
+                prompt_tokens,
+                completion_tokens,
+            ):
+                raise ValueError("Recovered token counts conflict with recorded provider usage")
+            self.model_costs[model] += cost_usd
+            self.model_usage_available_calls[model] += 1
+            self.model_usage_unavailable_calls[model] -= 1
+            self.model_recovered_calls[model] += 1
+            self._recovered_generations.add(generation_id)
+            del self._unavailable_generations[generation_id]
+        self._audit(
+            "usage_recovered",
+            model=model,
+            generation_id=generation_id,
+            prompt_tokens=prompt_tokens,
+            completion_tokens=completion_tokens,
+            total_tokens=prompt_tokens + completion_tokens,
+            cost_usd=cost_usd,
+        )
+        return True
 
     def get_usage_summary(self) -> UsageSummary:
         model_summaries = {}
         for model in self.model_call_counts:
             cost = self.model_costs.get(model)
+            unavailable = self.model_usage_unavailable_calls[model]
+            recovered = self.model_recovered_calls[model]
             model_summaries[model] = ModelUsageSummary(
                 total_calls=self.model_call_counts[model],
                 total_input_tokens=self.model_input_tokens[model],
                 total_output_tokens=self.model_output_tokens[model],
-                total_cost=cost if cost else None,
+                total_cost=None if unavailable else float(cost or 0.0),
+                accounting_status=(
+                    "unavailable" if unavailable else ("recovered" if recovered else "available")
+                ),
+                usage_available_calls=self.model_usage_available_calls[model],
+                usage_unavailable_calls=unavailable,
+                generation_ids=tuple(self.model_generation_ids[model]),
             )
         return UsageSummary(model_usage_summaries=model_summaries)
 
     def get_last_usage(self) -> ModelUsageSummary:
-        return ModelUsageSummary(
-            total_calls=1,
-            total_input_tokens=self.last_prompt_tokens,
-            total_output_tokens=self.last_completion_tokens,
-            total_cost=getattr(self, "last_cost", None),
-        )
+        return self._last_usage

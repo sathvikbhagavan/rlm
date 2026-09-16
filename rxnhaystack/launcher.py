@@ -92,6 +92,9 @@ def enforce_remaining_budget(manifest: ExperimentManifest, ledger: RunLedger) ->
     }
     committed = 0.0
     for attempt in ledger.list_attempts(campaign=manifest.campaign.name):
+        recovery = attempt.metrics.get("recovery") if attempt.metrics is not None else None
+        if isinstance(recovery, dict) and recovery.get("inference_requests") == 0:
+            continue
         if attempt.metrics is not None and isinstance(
             attempt.metrics.get("cost_chf"), (int, float)
         ):
@@ -378,6 +381,9 @@ def build_run_environment(
     environment = {
         "RXNHAYSTACK_RUN_ID": run.run_id,
         "RXNHAYSTACK_RUN_DIR": str(attempt_dir),
+        "RXNHAYSTACK_RESPONSE_EVENTS_PATH": str(attempt_dir / "provider-responses.jsonl"),
+        "RXNHAYSTACK_TRAJECTORY_EVENTS_PATH": str(attempt_dir / "trajectory-events.jsonl"),
+        "RXNHAYSTACK_ESTIMATED_COST_CHF": str(run.estimated_cost_chf),
         METRICS_PATH_ENV: str(metrics_path),
         USD_TO_CHF_ENV: str(manifest.campaign.usd_to_chf),
         "RXNHAYSTACK_TASK": run.task,

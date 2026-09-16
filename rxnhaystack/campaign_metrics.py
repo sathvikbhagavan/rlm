@@ -10,6 +10,11 @@ from pathlib import Path
 from types import ModuleType
 from typing import Any
 
+from rxnhaystack.accounting import (
+    TRAJECTORY_EVENTS_ENV,
+    append_audit_event,
+    merged_accounting_status,
+)
 from rxnhaystack.metrics import RunMetrics, cost_chf_from_usd, write_run_metrics
 from rxnhaystack.providers import benchmark_provider
 
@@ -17,6 +22,9 @@ _FINAL_METRIC = re.compile(
     r"^sample/(?P<sample>[^/]+)/final_total_(?P<kind>input_tokens|output_tokens|tokens|cost_usd)$"
 )
 _ITERATION_TOTAL = re.compile(r"^sample/[^/]+/iteration_total_tokens$")
+_SCIENTIFIC_SCORE = re.compile(
+    r"^sample/(?P<sample>[^/]+)/(?:f1|is_exact_match|accuracy|score|precision|recall)$"
+)
 
 
 def _json_value(value: Any) -> Any:
@@ -60,6 +68,7 @@ class CampaignMetricsCapture:
         self.iteration_calls = 0
         self.lock = threading.Lock()
         self.written = False
+        self.expected_samples: int | None = None
 
     def init(self, *args: Any, **kwargs: Any) -> Any:
         config = dict(kwargs.get("config") or {})
@@ -74,6 +83,9 @@ class CampaignMetricsCapture:
                 ),
             }
         )
+        expected_samples = config.get("num_questions")
+        if isinstance(expected_samples, int) and expected_samples > 0:
+            self.expected_samples = expected_samples
         if "RXNHAYSTACK_CONTEXT_SIZE" in os.environ:
             config["rxnhaystack_context_size"] = int(os.environ["RXNHAYSTACK_CONTEXT_SIZE"])
         if "RXNHAYSTACK_POSITIVE_CARDINALITY" in os.environ:
@@ -100,6 +112,13 @@ class CampaignMetricsCapture:
 
     def log(self, data: Any, *args: Any, **kwargs: Any) -> Any:
         if isinstance(data, Mapping):
+            trajectory_path = os.environ.get(TRAJECTORY_EVENTS_ENV)
+            if trajectory_path and any(str(key).startswith("sample/") for key in data):
+                append_audit_event(
+                    trajectory_path,
+                    "scientific_telemetry_saved",
+                    data=_json_value(data),
+                )
             with self.lock:
                 self.latest.update({str(key): value for key, value in data.items()})
                 self.iteration_calls += sum(
@@ -145,12 +164,28 @@ class CampaignMetricsCapture:
             samples = self._sample_metrics()
             if not samples:
                 raise RuntimeError("No per-sample final token metrics were logged")
+            results = self._summary()
+            reported_total = results.get("total")
+            expected_samples = (
+                int(reported_total)
+                if isinstance(reported_total, (int, float)) and reported_total > 0
+                else self.expected_samples
+            )
+            if expected_samples is not None and len(samples) != expected_samples:
+                raise RuntimeError(
+                    f"Incomplete trajectory set: {len(samples)}/{expected_samples} samples"
+                )
+            if expected_samples is not None:
+                scored = {
+                    match.group("sample")
+                    for key in self.latest
+                    for match in [_SCIENTIFIC_SCORE.fullmatch(key)]
+                    if match is not None
+                }
+                unscored = sorted(set(samples) - scored)
+                if unscored:
+                    raise RuntimeError(f"Unscored model responses: {unscored}")
             required = {"input_tokens", "output_tokens", "tokens"}
-            if benchmark_provider() == "swissai":
-                for values in samples.values():
-                    values.setdefault("cost_usd", 0.0)
-            else:
-                required.add("cost_usd")
             incomplete = {
                 sample: sorted(required - values.keys())
                 for sample, values in samples.items()
@@ -167,13 +202,37 @@ class CampaignMetricsCapture:
                 calls = sum(int(event.get("calls", 0)) for event in rlm_events)
                 input_tokens = sum(int(event.get("input_tokens", 0)) for event in rlm_events)
                 output_tokens = sum(int(event.get("output_tokens", 0)) for event in rlm_events)
-                cost_usd = sum(float(event.get("cost_usd", 0.0)) for event in rlm_events)
+                event_costs = [event.get("cost_usd") for event in rlm_events]
+                cost_usd = (
+                    sum(float(value) for value in event_costs if value is not None)
+                    if all(value is not None for value in event_costs)
+                    else None
+                )
+                accounting_status = merged_accounting_status(
+                    [str(event.get("accounting_status", "available")) for event in rlm_events]
+                )
+                usage_unavailable_calls = sum(
+                    int(event.get("usage_unavailable_calls", 0)) for event in rlm_events
+                )
+                generation_ids = [
+                    generation_id
+                    for event in rlm_events
+                    for generation_id in event.get("generation_ids", ())
+                ]
                 tool_time = sum(float(event.get("tool_time_seconds", 0.0)) for event in rlm_events)
             else:
                 calls = self.iteration_calls
                 input_tokens = sum(int(values["input_tokens"]) for values in samples.values())
                 output_tokens = sum(int(values["output_tokens"]) for values in samples.values())
-                cost_usd = sum(values["cost_usd"] for values in samples.values())
+                sample_costs = [values.get("cost_usd") for values in samples.values()]
+                cost_usd = (
+                    sum(float(value) for value in sample_costs if value is not None)
+                    if all(value is not None for value in sample_costs)
+                    else None
+                )
+                accounting_status = "available" if cost_usd is not None else "unavailable"
+                usage_unavailable_calls = int(cost_usd is None)
+                generation_ids = []
                 tool_time = sum(
                     float(event.get("duration_seconds", 0.0))
                     for event in trace
@@ -188,7 +247,11 @@ class CampaignMetricsCapture:
                 "input_tokens": input_tokens - logged_input,
                 "output_tokens": output_tokens - logged_output,
             }
-            results = self._summary()
+            results["accounting"] = {
+                "status": accounting_status,
+                "usage_unavailable_calls": usage_unavailable_calls,
+                "generation_ids": generation_ids,
+            }
             if rlm_events:
                 results["rlm_timeout_finalizations"] = sum(
                     bool(event.get("stopped_by_timeout")) for event in rlm_events
@@ -205,7 +268,11 @@ class CampaignMetricsCapture:
                     latency_seconds=time.monotonic() - self.started,
                     tool_time_seconds=tool_time,
                     cost_usd=cost_usd,
-                    cost_chf=cost_chf_from_usd(cost_usd),
+                    cost_chf=(cost_chf_from_usd(cost_usd) if cost_usd is not None else None),
+                    accounting_status=accounting_status,
+                    estimated_cost_chf=float(
+                        os.environ.get("RXNHAYSTACK_ESTIMATED_COST_CHF", "0")
+                    ),
                     wandb_url=getattr(self.run, "url", None),
                     results=results,
                 )

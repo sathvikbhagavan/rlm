@@ -348,7 +348,7 @@ class RLM:
                     prev_total_input_tokens = 0
                     prev_total_output_tokens = 0
                     prev_total_calls = 0
-                    prev_total_cost = 0.0
+                    prev_total_cost: float | None = 0.0
                     stopped_by_timeout = False
 
                     compaction_count = 0
@@ -449,7 +449,7 @@ class RLM:
                                     total_output_tokens = current_usage.total_output_tokens
                                     total_tokens = total_input_tokens + total_output_tokens
                                     total_calls = current_usage.total_calls
-                                    total_cost = current_usage.total_cost or 0.0
+                                    total_cost = current_usage.total_cost
                                     iteration_input_tokens = max(
                                         0,
                                         total_input_tokens - prev_total_input_tokens,
@@ -464,7 +464,11 @@ class RLM:
                                     prev_total_input_tokens = total_input_tokens
                                     prev_total_output_tokens = total_output_tokens
                                     iteration_calls = max(0, total_calls - prev_total_calls)
-                                    iteration_cost = max(0.0, total_cost - prev_total_cost)
+                                    iteration_cost = (
+                                        max(0.0, total_cost - prev_total_cost)
+                                        if total_cost is not None and prev_total_cost is not None
+                                        else None
+                                    )
                                     prev_total_calls = total_calls
                                     prev_total_cost = total_cost
                                     iteration_had_error = any(
@@ -645,7 +649,10 @@ class RLM:
             "calls": usage.total_calls,
             "input_tokens": usage.total_input_tokens,
             "output_tokens": usage.total_output_tokens,
-            "cost_usd": usage.total_cost or 0.0,
+            "cost_usd": usage.total_cost,
+            "accounting_status": usage.accounting_status,
+            "usage_unavailable_calls": usage.usage_unavailable_calls,
+            "generation_ids": list(usage.generation_ids),
             "execution_time_seconds": execution_time,
             "model_time_seconds": sum(
                 float(metric.get("model_time_s") or 0.0) for metric in self._last_iteration_metrics

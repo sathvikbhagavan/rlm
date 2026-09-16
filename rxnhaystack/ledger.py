@@ -92,6 +92,21 @@ class RunLedger:
             )
             connection.execute(
                 """
+                CREATE TABLE IF NOT EXISTS recovery_events (
+                    recovery_id TEXT PRIMARY KEY,
+                    run_id TEXT NOT NULL REFERENCES runs(run_id),
+                    source_attempt INTEGER NOT NULL,
+                    recovery_attempt INTEGER NOT NULL,
+                    recovered_at TEXT NOT NULL,
+                    source TEXT NOT NULL,
+                    evidence_json TEXT NOT NULL,
+                    metrics_json TEXT NOT NULL,
+                    UNIQUE (run_id, recovery_attempt)
+                )
+                """
+            )
+            connection.execute(
+                """
                 CREATE TABLE IF NOT EXISTS attempts (
                     run_id TEXT NOT NULL REFERENCES runs(run_id),
                     attempt INTEGER NOT NULL,
@@ -292,6 +307,120 @@ class RunLedger:
             rows = connection.execute(query, arguments).fetchall()
         return [attempt_row_to_record(row) for row in rows]
 
+    def recover_failed_attempt(
+        self,
+        run_id: str,
+        *,
+        source_attempt: int,
+        recovery_id: str,
+        source: str,
+        artifact_dir: Path,
+        metrics: dict[str, Any],
+        evidence: dict[str, Any],
+    ) -> bool:
+        """Record artifact-only recovery as a new attempt, preserving the failure."""
+
+        metrics = {
+            **metrics,
+            "recovery": {
+                "recovery_id": recovery_id,
+                "source_attempt": source_attempt,
+                "inference_requests": 0,
+            },
+        }
+        validate_metrics(metrics, require_complete=True)
+        if evidence.get("scientific_status") != "scored":
+            raise LedgerError("Recovery evidence must prove a complete, scored response")
+        if not recovery_id or not source:
+            raise LedgerError("Recovery ID and source must be non-empty")
+        metrics_json = json.dumps(metrics, sort_keys=True)
+        evidence_json = json.dumps(evidence, sort_keys=True)
+        with self.connect() as connection:
+            connection.execute("BEGIN IMMEDIATE")
+            previous = connection.execute(
+                "SELECT * FROM recovery_events WHERE recovery_id = ?", (recovery_id,)
+            ).fetchone()
+            if previous is not None:
+                same = (
+                    previous["run_id"] == run_id
+                    and previous["source_attempt"] == source_attempt
+                    and previous["source"] == source
+                    and previous["evidence_json"] == evidence_json
+                    and previous["metrics_json"] == metrics_json
+                )
+                if not same:
+                    raise LedgerError(f"Recovery ID {recovery_id!r} has conflicting contents")
+                return False
+            run = connection.execute(
+                "SELECT status, attempts FROM runs WHERE run_id = ?", (run_id,)
+            ).fetchone()
+            if run is None:
+                raise LedgerError(f"Unknown run ID: {run_id}")
+            if run["status"] != "failed":
+                raise LedgerError(
+                    f"Cannot recover run {run_id!r} from status {run['status']!r}"
+                )
+            source_row = connection.execute(
+                "SELECT status FROM attempts WHERE run_id = ? AND attempt = ?",
+                (run_id, source_attempt),
+            ).fetchone()
+            if source_row is None or source_row["status"] != "failed":
+                raise LedgerError("Recovery source must be an existing failed attempt")
+            recovery_attempt = int(run["attempts"]) + 1
+            recovered_at = utc_now()
+            resolved_artifact = str(artifact_dir.resolve())
+            connection.execute(
+                """
+                INSERT INTO attempts (
+                    run_id, attempt, status, started_at, finished_at, return_code,
+                    artifact_dir, metrics_json, error
+                ) VALUES (?, ?, 'succeeded', ?, ?, 0, ?, ?, NULL)
+                """,
+                (
+                    run_id,
+                    recovery_attempt,
+                    recovered_at,
+                    recovered_at,
+                    resolved_artifact,
+                    metrics_json,
+                ),
+            )
+            connection.execute(
+                """
+                UPDATE runs
+                SET status = 'succeeded', attempts = ?, started_at = ?, finished_at = ?,
+                    return_code = 0, artifact_dir = ?, metrics_json = ?, error = NULL
+                WHERE run_id = ?
+                """,
+                (
+                    recovery_attempt,
+                    recovered_at,
+                    recovered_at,
+                    resolved_artifact,
+                    metrics_json,
+                    run_id,
+                ),
+            )
+            connection.execute(
+                """
+                INSERT INTO recovery_events (
+                    recovery_id, run_id, source_attempt, recovery_attempt, recovered_at,
+                    source, evidence_json, metrics_json
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                """,
+                (
+                    recovery_id,
+                    run_id,
+                    source_attempt,
+                    recovery_attempt,
+                    recovered_at,
+                    source,
+                    evidence_json,
+                    metrics_json,
+                ),
+            )
+        return True
+
 
 def row_to_record(row: sqlite3.Row) -> RunRecord:
     metrics = json.loads(row["metrics_json"]) if row["metrics_json"] is not None else None
@@ -358,4 +487,9 @@ def validate_metrics(metrics: Any, *, require_complete: bool = False) -> dict[st
     wandb_url = metrics.get("wandb_url")
     if wandb_url is not None and (not isinstance(wandb_url, str) or not wandb_url):
         raise ManifestError("Metric 'wandb_url' must be a non-empty string")
+    accounting_status = metrics.get("accounting_status", "available")
+    if accounting_status not in {"available", "recovered", "unavailable"}:
+        raise ManifestError(
+            "Metric 'accounting_status' must be available, recovered, or unavailable"
+        )
     return metrics

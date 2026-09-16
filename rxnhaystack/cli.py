@@ -9,6 +9,7 @@ from rxnhaystack.dataset import DatasetError
 from rxnhaystack.launcher import run_selected, select_runs
 from rxnhaystack.ledger import LedgerError, RunLedger
 from rxnhaystack.manifest import ManifestError, load_manifest
+from rxnhaystack.recovery import audit_missing_usage, render_dry_run
 from rxnhaystack.runtime import load_secret_specs, perform_preflight, resolve_required_secrets
 
 
@@ -45,6 +46,15 @@ def build_parser() -> argparse.ArgumentParser:
 
     status = subparsers.add_parser("status", help="Summarize a campaign ledger.")
     status.add_argument("manifest", type=Path)
+
+    recover = subparsers.add_parser(
+        "recover-usage", help="Audit artifact-only recovery of missing provider usage."
+    )
+    recover.add_argument("--ledger", required=True, type=Path)
+    recover.add_argument("--artifact-root", required=True, type=Path)
+    recover.add_argument("--wandb-root", type=Path)
+    recover.add_argument("--dry-run", action="store_true", required=True)
+    recover.add_argument("--details", action="store_true")
     return parser
 
 
@@ -147,6 +157,16 @@ def command_status(args: argparse.Namespace) -> int:
     return 0
 
 
+def command_recover_usage(args: argparse.Namespace) -> int:
+    audits = audit_missing_usage(
+        args.ledger,
+        artifact_root=args.artifact_root,
+        wandb_root=args.wandb_root,
+    )
+    print(render_dry_run(audits, details=args.details))
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
     commands = {
@@ -154,6 +174,7 @@ def main(argv: list[str] | None = None) -> int:
         "plan": command_plan,
         "run": command_run,
         "status": command_status,
+        "recover-usage": command_recover_usage,
     }
     try:
         return commands[args.command](args)

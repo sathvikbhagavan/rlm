@@ -21,8 +21,10 @@ class RunMetrics:
     total_tokens: int
     latency_seconds: float
     tool_time_seconds: float
-    cost_chf: float
+    cost_chf: float | None
     cost_usd: float | None = None
+    accounting_status: str = "available"
+    estimated_cost_chf: float | None = None
     wandb_url: str | None = None
     results: dict[str, Any] = field(default_factory=dict)
 
