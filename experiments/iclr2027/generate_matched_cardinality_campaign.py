@@ -126,7 +126,9 @@ def render() -> str:
         'name = "iclr2027-matched-cardinality-v7"',
         'project_root = "../.."',
         'artifact_dir = "artifacts/iclr2027-matched-cardinality-v7"',
-        "budget_chf = 100.0",
+        # Three times the paid matrix estimate covers two bounded empty-choice
+        # transport retries without weakening the launcher cap.
+        "budget_chf = 225.0",
         f"usd_to_chf = {USD_TO_CHF:.2f}",
         "require_dataset = true",
         "require_clean_git = true",

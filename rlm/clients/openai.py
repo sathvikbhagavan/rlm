@@ -1,6 +1,10 @@
+import asyncio
 import os
+import re
 import threading
+import time
 from collections import defaultdict
+from collections.abc import Mapping, Sequence
 from typing import Any
 
 import openai
@@ -19,6 +23,26 @@ DEFAULT_OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
 DEFAULT_VERCEL_API_KEY = os.getenv("AI_GATEWAY_API_KEY")
 DEFAULT_PRIME_API_KEY = os.getenv("PRIME_API_KEY")
 DEFAULT_PRIME_INTELLECT_BASE_URL = "https://api.pinference.ai/api/v1/"
+EMPTY_CHOICE_MAX_RETRIES = 2
+EMPTY_CHOICE_BACKOFF_SECONDS = (1.0, 2.0)
+_REDACTED = "[REDACTED]"
+_SENSITIVE_RESPONSE_KEYS = frozenset(
+    {
+        "api_key",
+        "apikey",
+        "authorization",
+        "headers",
+        "input",
+        "messages",
+        "password",
+        "prompt",
+        "proxy_authorization",
+        "request",
+        "request_body",
+        "secret",
+    }
+)
+_BEARER_CREDENTIAL = re.compile(r"(?i)\bbearer\s+[a-z0-9._~+/=-]+")
 
 
 class OpenAIClient(BaseLM):
@@ -106,12 +130,48 @@ class OpenAIClient(BaseLM):
         def request():
             return self.client.chat.completions.create(**request_kwargs)
 
-        response = (
-            call_swissai_sync(request, api_key=self._api_key) if self._is_swissai else request()
-        )
-        self._save_response(response, model)
-        self._track_cost(response, model)
-        return self._response_text(response)
+        self._begin_request_sequence()
+        for transport_attempt in range(1, EMPTY_CHOICE_MAX_RETRIES + 2):
+            response = (
+                call_swissai_sync(request, api_key=self._api_key)
+                if self._is_swissai
+                else request()
+            )
+            self._save_response(
+                response,
+                model,
+                transport_attempt=transport_attempt,
+                prompt=prompt,
+            )
+            has_choices = self._has_choices(response)
+            self._track_cost(response, model, scientifically_usable=has_choices)
+            if has_choices:
+                return self._response_text(response)
+            if transport_attempt > EMPTY_CHOICE_MAX_RETRIES:
+                self._audit(
+                    "empty_choices_exhausted",
+                    model=model,
+                    launcher_attempt=self._launcher_attempt(),
+                    transport_attempt=transport_attempt,
+                    generation_id=self._generation_id(response),
+                    request_id=self._request_id(response),
+                    accounting_status="unavailable",
+                )
+                raise ValueError(
+                    f"Provider response has no completion choices after {transport_attempt} attempts"
+                )
+            backoff = EMPTY_CHOICE_BACKOFF_SECONDS[transport_attempt - 1]
+            self._audit(
+                "empty_choices_retry_scheduled",
+                model=model,
+                launcher_attempt=self._launcher_attempt(),
+                transport_attempt=transport_attempt,
+                generation_id=self._generation_id(response),
+                request_id=self._request_id(response),
+                backoff_seconds=backoff,
+            )
+            time.sleep(backoff)
+        raise AssertionError("unreachable")
 
     async def acompletion(
         self, prompt: str | list[dict[str, Any]], model: str | None = None
@@ -138,14 +198,52 @@ class OpenAIClient(BaseLM):
         async def request():
             return await self.async_client.chat.completions.create(**request_kwargs)
 
-        response = (
-            await call_swissai_async(request, api_key=self._api_key)
-            if self._is_swissai
-            else await request()
-        )
-        self._save_response(response, model)
-        self._track_cost(response, model)
-        return self._response_text(response)
+        self._begin_request_sequence()
+        for transport_attempt in range(1, EMPTY_CHOICE_MAX_RETRIES + 2):
+            response = (
+                await call_swissai_async(request, api_key=self._api_key)
+                if self._is_swissai
+                else await request()
+            )
+            self._save_response(
+                response,
+                model,
+                transport_attempt=transport_attempt,
+                prompt=prompt,
+            )
+            has_choices = self._has_choices(response)
+            self._track_cost(response, model, scientifically_usable=has_choices)
+            if has_choices:
+                return self._response_text(response)
+            if transport_attempt > EMPTY_CHOICE_MAX_RETRIES:
+                self._audit(
+                    "empty_choices_exhausted",
+                    model=model,
+                    launcher_attempt=self._launcher_attempt(),
+                    transport_attempt=transport_attempt,
+                    generation_id=self._generation_id(response),
+                    request_id=self._request_id(response),
+                    accounting_status="unavailable",
+                )
+                raise ValueError(
+                    f"Provider response has no completion choices after {transport_attempt} attempts"
+                )
+            backoff = EMPTY_CHOICE_BACKOFF_SECONDS[transport_attempt - 1]
+            self._audit(
+                "empty_choices_retry_scheduled",
+                model=model,
+                launcher_attempt=self._launcher_attempt(),
+                transport_attempt=transport_attempt,
+                generation_id=self._generation_id(response),
+                request_id=self._request_id(response),
+                backoff_seconds=backoff,
+            )
+            await asyncio.sleep(backoff)
+        raise AssertionError("unreachable")
+
+    @staticmethod
+    def _has_choices(response: openai.ChatCompletion) -> bool:
+        return bool(getattr(response, "choices", None))
 
     @staticmethod
     def _response_text(response: openai.ChatCompletion) -> str:
@@ -163,13 +261,167 @@ class OpenAIClient(BaseLM):
         value = getattr(response, "id", None)
         return value if isinstance(value, str) and value else None
 
+    @staticmethod
+    def _launcher_attempt() -> int | None:
+        raw = os.environ.get("RXNHAYSTACK_ATTEMPT")
+        try:
+            return int(raw) if raw is not None else None
+        except ValueError:
+            return None
+
+    @staticmethod
+    def _request_id(response: openai.ChatCompletion) -> str | None:
+        for name in ("request_id", "_request_id"):
+            value = getattr(response, name, None)
+            if isinstance(value, str) and value:
+                return value
+        extra = getattr(response, "model_extra", None)
+        if isinstance(extra, Mapping):
+            for name in ("request_id", "request-id", "x-request-id"):
+                value = extra.get(name)
+                if isinstance(value, str) and value:
+                    return value
+        return None
+
+    @staticmethod
+    def _prompt_values(prompt: str | list[dict[str, Any]]) -> tuple[str, ...]:
+        values: list[str] = []
+
+        def visit(value: Any) -> None:
+            if isinstance(value, str):
+                if value:
+                    values.append(value)
+            elif isinstance(value, Mapping):
+                for item in value.values():
+                    visit(item)
+            elif isinstance(value, Sequence) and not isinstance(value, (bytes, bytearray)):
+                for item in value:
+                    visit(item)
+
+        visit(prompt)
+        return tuple(values)
+
+    @classmethod
+    def _response_payload(
+        cls,
+        response: Any,
+        *,
+        seen: set[int] | None = None,
+        depth: int = 0,
+    ) -> Any:
+        if response is None or isinstance(response, (bool, int, float, str)):
+            return response
+        if depth >= 32:
+            return "<maximum serialization depth>"
+        seen = set() if seen is None else seen
+        identity = id(response)
+        if identity in seen:
+            return "<recursive reference>"
+        seen.add(identity)
+
+        def serialize(value: Any) -> Any:
+            return cls._response_payload(value, seen=seen, depth=depth + 1)
+
+        if isinstance(response, Mapping):
+            return {str(key): serialize(value) for key, value in response.items()}
+        if isinstance(response, (list, tuple)):
+            return [serialize(value) for value in response]
+        model_dump = getattr(response, "model_dump", None)
+        if callable(model_dump):
+            try:
+                payload = model_dump(mode="json", warnings=False)
+            except TypeError:
+                payload = model_dump()
+            if isinstance(payload, Mapping):
+                serialized = {
+                    str(key): serialize(value) for key, value in payload.items()
+                }
+                extra = getattr(response, "model_extra", None)
+                if extra is not None and "model_extra" not in serialized:
+                    serialized["model_extra"] = serialize(extra)
+                return serialized
+        values = getattr(response, "__dict__", None)
+        if isinstance(values, dict):
+            return {str(key): serialize(value) for key, value in values.items()}
+        return str(response)
+
+    @classmethod
+    def _sanitize_response(cls, value: Any, *, secrets: tuple[str, ...]) -> Any:
+        if isinstance(value, Mapping):
+            sanitized: dict[str, Any] = {}
+            for key, item in value.items():
+                normalized = str(key).casefold().replace("-", "_")
+                if normalized in _SENSITIVE_RESPONSE_KEYS or normalized.endswith("_api_key"):
+                    sanitized[str(key)] = _REDACTED
+                else:
+                    sanitized[str(key)] = cls._sanitize_response(item, secrets=secrets)
+            return sanitized
+        if isinstance(value, list):
+            return [cls._sanitize_response(item, secrets=secrets) for item in value]
+        if isinstance(value, str):
+            sanitized_text = _BEARER_CREDENTIAL.sub(_REDACTED, value)
+            for secret in secrets:
+                if secret:
+                    sanitized_text = sanitized_text.replace(secret, _REDACTED)
+            return sanitized_text
+        return value
+
     def _audit(self, event: str, **fields: Any) -> None:
         path = os.environ.get(RESPONSE_EVENTS_ENV)
         if path:
             append_audit_event(path, event, **fields)
 
-    def _save_response(self, response: openai.ChatCompletion, model: str) -> None:
+    def _begin_request_sequence(self) -> None:
+        with self._accounting_lock:
+            self._last_usage = ModelUsageSummary(0, 0, 0)
+
+    def _accumulate_last_usage(self, current: ModelUsageSummary) -> None:
+        previous = self._last_usage
+        if previous.total_calls == 0:
+            total_cost = current.total_cost
+            accounting_status = current.accounting_status
+        else:
+            total_cost = (
+                previous.total_cost + current.total_cost
+                if previous.total_cost is not None and current.total_cost is not None
+                else None
+            )
+            accounting_status = (
+                "unavailable"
+                if "unavailable" in {previous.accounting_status, current.accounting_status}
+                else (
+                    "recovered"
+                    if "recovered" in {previous.accounting_status, current.accounting_status}
+                    else "available"
+                )
+            )
+        self._last_usage = ModelUsageSummary(
+            total_calls=previous.total_calls + current.total_calls,
+            total_input_tokens=previous.total_input_tokens + current.total_input_tokens,
+            total_output_tokens=previous.total_output_tokens + current.total_output_tokens,
+            total_cost=total_cost,
+            accounting_status=accounting_status,
+            usage_available_calls=(
+                previous.usage_available_calls + current.usage_available_calls
+            ),
+            usage_unavailable_calls=(
+                previous.usage_unavailable_calls + current.usage_unavailable_calls
+            ),
+            generation_ids=previous.generation_ids + current.generation_ids,
+        )
+
+    def _save_response(
+        self,
+        response: openai.ChatCompletion,
+        model: str,
+        *,
+        transport_attempt: int,
+        prompt: str | list[dict[str, Any]],
+    ) -> None:
         """Persist provider output before any accounting or shape validation."""
+
+        if not os.environ.get(RESPONSE_EVENTS_ENV):
+            return
 
         choices = getattr(response, "choices", None) or []
         choice = choices[0] if choices else None
@@ -183,17 +435,31 @@ class OpenAIClient(BaseLM):
                 "total_tokens": getattr(usage, "total_tokens", None),
                 "cost_usd": self._extract_cost(usage),
             }
+        secrets = (self._api_key, *self._prompt_values(prompt))
         self._audit(
             "provider_response_saved",
             model=model,
+            launcher_attempt=self._launcher_attempt(),
+            transport_attempt=transport_attempt,
             generation_id=self._generation_id(response),
-            content=getattr(message, "content", None),
-            refusal=getattr(message, "refusal", None),
+            request_id=self._request_id(response),
+            content=self._sanitize_response(getattr(message, "content", None), secrets=secrets),
+            refusal=self._sanitize_response(getattr(message, "refusal", None), secrets=secrets),
             finish_reason=getattr(choice, "finish_reason", None),
             usage=usage_payload,
+            response=self._sanitize_response(
+                self._response_payload(response),
+                secrets=secrets,
+            ),
         )
 
-    def _track_cost(self, response: openai.ChatCompletion, model: str):
+    def _track_cost(
+        self,
+        response: openai.ChatCompletion,
+        model: str,
+        *,
+        scientifically_usable: bool,
+    ) -> None:
         usage = getattr(response, "usage", None)
         generation_id = self._generation_id(response)
         with self._accounting_lock:
@@ -217,8 +483,9 @@ class OpenAIClient(BaseLM):
                 model, generation_id, reason="provider response contained incomplete usage metadata"
             )
             return
-        cost = self._extract_cost(usage)
-        cost_missing = cost is None
+        reported_cost = self._extract_cost(usage)
+        cost_missing = reported_cost is None or not scientifically_usable
+        cost = None if cost_missing else reported_cost
 
         with self._accounting_lock:
             self.model_input_tokens[model] += prompt_tokens
@@ -236,15 +503,17 @@ class OpenAIClient(BaseLM):
                 self.model_usage_available_calls[model] += 1
             if cost is not None:
                 self.model_costs[model] += cost
-            self._last_usage = ModelUsageSummary(
-                total_calls=1,
-                total_input_tokens=prompt_tokens,
-                total_output_tokens=completion_tokens,
-                total_cost=cost,
-                accounting_status="unavailable" if cost_missing else "available",
-                usage_available_calls=int(not cost_missing),
-                usage_unavailable_calls=int(cost_missing),
-                generation_ids=(generation_id,) if generation_id else (),
+            self._accumulate_last_usage(
+                ModelUsageSummary(
+                    total_calls=1,
+                    total_input_tokens=prompt_tokens,
+                    total_output_tokens=completion_tokens,
+                    total_cost=cost,
+                    accounting_status="unavailable" if cost_missing else "available",
+                    usage_available_calls=int(not cost_missing),
+                    usage_unavailable_calls=int(cost_missing),
+                    generation_ids=(generation_id,) if generation_id else (),
+                )
             )
         self._audit(
             "usage_unavailable" if cost_missing else "usage_available",
@@ -254,7 +523,11 @@ class OpenAIClient(BaseLM):
             completion_tokens=completion_tokens,
             total_tokens=total_tokens,
             cost_usd=cost,
-            reason="provider response omitted cost metadata" if cost_missing else None,
+            reason=(
+                "provider response had no completion choices"
+                if not scientifically_usable
+                else ("provider response omitted cost metadata" if cost_missing else None)
+            ),
         )
 
     def _mark_usage_unavailable(
@@ -264,14 +537,16 @@ class OpenAIClient(BaseLM):
             self.model_usage_unavailable_calls[model] += 1
             if generation_id:
                 self._unavailable_generations[generation_id] = (model, None, None)
-            self._last_usage = ModelUsageSummary(
-                total_calls=1,
-                total_input_tokens=0,
-                total_output_tokens=0,
-                total_cost=None,
-                accounting_status="unavailable",
-                usage_unavailable_calls=1,
-                generation_ids=(generation_id,) if generation_id else (),
+            self._accumulate_last_usage(
+                ModelUsageSummary(
+                    total_calls=1,
+                    total_input_tokens=0,
+                    total_output_tokens=0,
+                    total_cost=None,
+                    accounting_status="unavailable",
+                    usage_unavailable_calls=1,
+                    generation_ids=(generation_id,) if generation_id else (),
+                )
             )
         self._audit(
             "usage_unavailable",

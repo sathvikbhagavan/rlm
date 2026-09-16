@@ -6,7 +6,7 @@ from types import SimpleNamespace
 
 import pytest
 
-from rxnhaystack.campaign_metrics import install_campaign_metrics
+from rxnhaystack.campaign_metrics import SCIENTIFIC_SCORE_FIELDS, install_campaign_metrics
 from rxnhaystack.resources import rlm_trace_callbacks
 
 
@@ -49,6 +49,43 @@ def configure_campaign(monkeypatch, tmp_path: Path, *, method: str) -> Path:
         "RXNHAYSTACK_TRAJECTORY_EVENTS_PATH", str(tmp_path / "trajectory-events.jsonl")
     )
     return metrics
+
+
+def final_usage(sample: int = 0) -> dict[str, float]:
+    return {
+        f"sample/{sample}/iteration_total_tokens": 30,
+        f"sample/{sample}/final_total_input_tokens": 20,
+        f"sample/{sample}/final_total_output_tokens": 10,
+        f"sample/{sample}/final_total_tokens": 30,
+        f"sample/{sample}/final_total_cost_usd": 0.01,
+    }
+
+
+def test_full_and_matched_scoring_field_audit_is_registered() -> None:
+    # Inventory from every sample/* score emitted by the full-campaign runners,
+    # including the same Tier 1--3 runners reused by matched cardinality.
+    audited_fields = {
+        "count_exact",
+        "exact_set_match",
+        "f1",
+        "index_match",
+        "is_correct",
+        "is_exact_match",
+        "lcs_ratio",
+        "normalized_edit_distance",
+        "normalized_lcs",
+        "objective_length_match",
+        "position_accuracy",
+        "precision",
+        "prefix_match_ratio",
+        "reaction_f1",
+        "reaction_precision",
+        "reaction_recall",
+        "recall",
+        "valid_path",
+    }
+
+    assert audited_fields <= SCIENTIFIC_SCORE_FIELDS
 
 
 def test_capture_writes_complete_llm_metrics(monkeypatch, tmp_path: Path) -> None:
@@ -173,6 +210,109 @@ def test_capture_preserves_score_with_unknown_provider_cost(monkeypatch, tmp_pat
     trajectory = (tmp_path / "trajectory-events.jsonl").read_text()
     assert '"sample/0/f1":0.5' in trajectory
     assert wandb.finished
+
+
+def test_capture_accepts_actual_task14_metric_shape(monkeypatch, tmp_path: Path) -> None:
+    metrics_path = configure_campaign(monkeypatch, tmp_path, method="rlm")
+    monkeypatch.setenv("RXNHAYSTACK_TASK", "tier4/task14")
+    wandb = FakeWandb()
+    install_campaign_metrics(wandb)
+    wandb.init(project="test", config={"num_questions": 1})
+    payload = {
+        "sample_idx": 0,
+        "sample/0/pg_label": "Boc_N",
+        "sample/0/functional_group": "Boc-protected nitrogen",
+        "sample/0/ground_truth_count": 2,
+        "sample/0/pred_pair_count": 1,
+        "sample/0/precision": 1.0,
+        "sample/0/recall": 0.5,
+        "sample/0/f1": 2 / 3,
+        "sample/0/exact_set_match": 0.0,
+        **final_usage(),
+    }
+    wandb.log(payload)
+
+    wandb.finish()
+
+    assert json.loads(metrics_path.read_text())["results"]["accounting"]["status"] == "available"
+
+
+def test_capture_accepts_actual_task15_metric_shape(monkeypatch, tmp_path: Path) -> None:
+    metrics_path = configure_campaign(monkeypatch, tmp_path, method="rlm")
+    monkeypatch.setenv("RXNHAYSTACK_TASK", "tier4/task15")
+    wandb = FakeWandb()
+    install_campaign_metrics(wandb)
+    wandb.init(project="test", config={"num_questions": 1})
+    payload = {
+        "sample_idx": 0,
+        "sample/0/ring_system": "quinoline",
+        "sample/0/ground_truth_count": 1,
+        "sample/0/pred_reaction_indices": "1015,1016,1017",
+        "sample/0/validity_reason": "ok",
+        "sample/0/is_correct": 1.0,
+        "sample/0/valid_path": 1.0,
+        "sample/0/index_match": 1.0,
+        "sample/0/objective_length_match": 1.0,
+        "sample/0/reaction_precision": 1.0,
+        "sample/0/reaction_recall": 1.0,
+        "sample/0/reaction_f1": 1.0,
+        "sample/0/normalized_lcs": 1.0,
+        **final_usage(),
+    }
+    wandb.log(payload)
+
+    wandb.finish()
+
+    metrics = json.loads(metrics_path.read_text())
+    assert metrics["calls"] == 1
+    assert metrics["results"]["accounting"]["status"] == "available"
+    assert {"reaction_f1", "is_correct"} <= SCIENTIFIC_SCORE_FIELDS
+
+
+@pytest.mark.parametrize(
+    ("task", "score_fields"),
+    [
+        ("tier2/task3", {"precision": 0.5, "recall": 1.0, "f1": 2 / 3}),
+        ("tier3/task10b", {"precision": 1.0, "recall": 1.0, "f1": 1.0}),
+    ],
+)
+def test_capture_accepts_representative_matched_metric_shapes(
+    monkeypatch, tmp_path: Path, task: str, score_fields: dict[str, float]
+) -> None:
+    configure_campaign(monkeypatch, tmp_path, method="rlm")
+    monkeypatch.setenv("RXNHAYSTACK_TASK", task)
+    wandb = FakeWandb()
+    install_campaign_metrics(wandb)
+    wandb.init(project="test", config={"num_questions": 1})
+    wandb.log(
+        {
+            **{f"sample/0/{key}": value for key, value in score_fields.items()},
+            "sample/0/ground_truth_count": 5,
+            "sample/0/predicted_count": 5,
+            **final_usage(),
+        }
+    )
+
+    wandb.finish()
+
+    assert wandb.finished
+
+
+def test_capture_rejects_nonfinite_or_diagnostic_only_score(monkeypatch, tmp_path: Path) -> None:
+    configure_campaign(monkeypatch, tmp_path, method="rlm")
+    wandb = FakeWandb()
+    install_campaign_metrics(wandb)
+    wandb.init(project="test", config={"num_questions": 1})
+    wandb.log(
+        {
+            "sample/0/f1": float("nan"),
+            "sample/0/validity_reason": "not a scientific score",
+            **final_usage(),
+        }
+    )
+
+    with pytest.raises(RuntimeError, match="Unscored model responses"):
+        wandb.finish()
 
 
 def test_capture_rejects_partial_multi_trajectory_job(monkeypatch, tmp_path: Path) -> None:

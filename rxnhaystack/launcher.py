@@ -150,6 +150,7 @@ def execute_run(
     docker_run_token = f"rxnhaystack-{uuid.uuid4().hex}" if run.method == "rlm" else None
     generated_env = build_run_environment(
         run,
+        attempt=attempt,
         manifest=manifest,
         preflight=preflight,
         attempt_dir=attempt_dir,
@@ -370,6 +371,7 @@ def execute_run_safely(
 def build_run_environment(
     run: PlannedRun,
     *,
+    attempt: int,
     manifest: ExperimentManifest,
     preflight: Preflight,
     attempt_dir: Path,
@@ -380,6 +382,7 @@ def build_run_environment(
 ) -> dict[str, str]:
     environment = {
         "RXNHAYSTACK_RUN_ID": run.run_id,
+        "RXNHAYSTACK_ATTEMPT": str(attempt),
         "RXNHAYSTACK_RUN_DIR": str(attempt_dir),
         "RXNHAYSTACK_RESPONSE_EVENTS_PATH": str(attempt_dir / "provider-responses.jsonl"),
         "RXNHAYSTACK_TRAJECTORY_EVENTS_PATH": str(attempt_dir / "trajectory-events.jsonl"),

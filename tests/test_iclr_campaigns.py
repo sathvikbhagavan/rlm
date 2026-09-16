@@ -29,6 +29,7 @@ def test_full_campaign_is_generated_and_covers_six_models() -> None:
     assert len(manifest.runs) == 6_300
     assert len({run.model for run in manifest.runs}) == 6
     assert manifest.estimated_cost_chf == pytest.approx(743.72, abs=0.02)
+    assert manifest.campaign.budget_chf >= 3 * manifest.estimated_cost_chf
     assert "anthropic/claude-haiku-4.5" in {run.model for run in manifest.runs}
     assert "anthropic/claude-sonnet-5" not in {run.model for run in manifest.runs}
     assert manifest.campaign.required_secrets == REQUIRED_SECRETS
@@ -94,6 +95,7 @@ def test_matched_cardinality_campaign_has_two_factor_design() -> None:
     assert len(expected_tasks) == 21
     assert not any(task.startswith("tier4/") for task in expected_tasks)
     assert manifest.estimated_cost_chf == pytest.approx(70.98, abs=0.02)
+    assert manifest.campaign.budget_chf >= 3 * manifest.estimated_cost_chf
     assert manifest.campaign.required_secrets == REQUIRED_SECRETS
 
     scale = [run for run in manifest.runs if run.condition.startswith("scale-")]

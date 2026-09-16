@@ -1,11 +1,13 @@
 from __future__ import annotations
 
 import json
+import math
 import os
 import re
 import threading
 import time
 from collections.abc import Mapping
+from numbers import Real
 from pathlib import Path
 from types import ModuleType
 from typing import Any
@@ -22,9 +24,44 @@ _FINAL_METRIC = re.compile(
     r"^sample/(?P<sample>[^/]+)/final_total_(?P<kind>input_tokens|output_tokens|tokens|cost_usd)$"
 )
 _ITERATION_TOTAL = re.compile(r"^sample/[^/]+/iteration_total_tokens$")
-_SCIENTIFIC_SCORE = re.compile(
-    r"^sample/(?P<sample>[^/]+)/(?:f1|is_exact_match|accuracy|score|precision|recall)$"
+_SAMPLE_FIELD = re.compile(r"^sample/(?P<sample>[^/]+)/(?P<field>[^/]+)$")
+
+# Audited against every sample/* field emitted by the full and matched runners.
+# Most tasks report precision/recall/F1. Tier-4 tasks additionally expose exact
+# matches, chain-position/LCS scores, and Task 15's reaction-level/correctness scores.
+SCIENTIFIC_SCORE_FIELDS = frozenset(
+    {
+        "accuracy",
+        "count_exact",
+        "exact_set_match",
+        "f1",
+        "index_match",
+        "is_correct",
+        "is_exact_match",
+        "lcs_ratio",
+        "normalized_edit_distance",
+        "normalized_lcs",
+        "objective_length_match",
+        "position_accuracy",
+        "precision",
+        "prefix_match_ratio",
+        "reaction_f1",
+        "reaction_precision",
+        "reaction_recall",
+        "recall",
+        "score",
+        "valid_path",
+    }
 )
+
+
+def _is_scientific_score(key: str, value: Any) -> re.Match[str] | None:
+    match = _SAMPLE_FIELD.fullmatch(key)
+    if match is None or match.group("field") not in SCIENTIFIC_SCORE_FIELDS:
+        return None
+    if not isinstance(value, Real) or not math.isfinite(float(value)):
+        return None
+    return match
 
 
 def _json_value(value: Any) -> Any:
@@ -178,8 +215,8 @@ class CampaignMetricsCapture:
             if expected_samples is not None:
                 scored = {
                     match.group("sample")
-                    for key in self.latest
-                    for match in [_SCIENTIFIC_SCORE.fullmatch(key)]
+                    for key, value in self.latest.items()
+                    for match in [_is_scientific_score(key, value)]
                     if match is not None
                 }
                 unscored = sorted(set(samples) - scored)
