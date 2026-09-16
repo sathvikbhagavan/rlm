@@ -169,6 +169,36 @@ The first three items are acceptance-critical experimental blockers. Items four
 through six can be addressed partly through transparent reporting and narrower
 claims, but they cannot be ignored.
 
+### Control audit findings on September 17
+
+- A five-configuration oracle-predicate control is feasible using existing
+  answer-free chemistry evaluators: Tier-3 Tasks 6, 10, and 23 and Tier-4 Tasks
+  13 and 14. The initial design covers 16 questions with Qwen and Claude at
+  x100, x500, and full scale. Only oracle cells need new inference because the
+  normal cells already exist.
+- A universal retrieval baseline is not well-defined for this benchmark.
+  Tiers 1--3 ask for exhaustive sets, many queries have no natural query
+  reaction, and Tier-4 chains can connect individually dissimilar reactions.
+  Task-specific SMARTS retrieval would encode the oracle predicate. The paper
+  should explain this precisely rather than merely saying RAG is future work.
+- Flat non-recursive map-and-union is a relevant baseline for row-separable
+  Tiers 1--3, but it is expensive: three questions, two models, five repetitions,
+  and 500-row chunks require 7,350 model calls. Implement and mock-test it now,
+  then run only one 245-call pilot before deciding whether the publication set
+  is worth the deadline time and cost.
+- At least one completed full-context DeepSeek RLM trajectory used direct
+  Python scanning and no `llm_query`/recursive subcall. The paper must report
+  observed root/subcall counts and must not describe every successful RLM run
+  as recursive decomposition without trajectory evidence.
+- Prospective decomposition applies only to Tier-4 Task 16. Tasks 17 and 17b
+  are explicit multi-constraint chain retrieval, not prospective synthesis.
+- Current Task 16 is not actually name-only: it supplies descriptions that
+  disclose route/final-transformation information, two descriptions contradict
+  the withheld reactions, and exact target products remain elsewhere in the
+  full corpus for four of ten targets. New name/structure/class controls must
+  remove every exact-target-product reaction first. Existing Task-16 results
+  remain a separately labelled legacy condition.
+
 ## Priority through the full-paper deadline
 
 The abstract deadline is September 18 and the full-paper deadline is September
@@ -216,6 +246,22 @@ their implementation in parallel with the unattended full runs:
 Use representative subsets and two contrasting models first. Do not expand a
 control to all six models until its small version works and its result changes
 the paper's conclusion.
+
+### Overnight implementation assignments: September 17
+
+The following work uses isolated branches and makes no model calls until tests
+and leakage audits pass:
+
+| Branch | Work | Launch tonight? |
+| --- | --- | --- |
+| `feature/oracle-predicate-control` | Five-task oracle prompts, deterministic ceiling, generated experiment and parity/leakage tests | Implementation/tests only |
+| `feature/task16-prospective-decomposition` | Correct Task-16 name/structure/class conditions, remove exact-target leakage, fix taxonomy and prepare human-review export | Implementation/tests only |
+| `feature/flat-map-reduce-baseline` | Resumable Tier-1--3 flat mapper/union reducer, artifacts and mocked experiment definition | No real calls; pilot requires review |
+
+Separately, Sathvik should queue matched Qwen behind the current full-Qwen RLM
+only after reporting his SwissAI key fingerprint and exact current ledger. Kuma
+may prepare a staged Azure-only GPT diagnostic using unchanged prompts; one
+pilot may run, but the 524-job release remains held.
 
 ### P1: complete the comparison without blocking P0 controls
 
