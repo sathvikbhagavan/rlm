@@ -50,6 +50,12 @@ def test_dry_run_reports_partial_trajectory_job_without_writing_ledger(tmp_path)
     (attempt_dir / "resource-trace.jsonl").write_text(
         json.dumps({"event": "rlm_completion_metrics", "cost_usd": None}) + "\n"
     )
+    # Stabilize the on-disk snapshot before checking that the read-only audit
+    # leaves it byte-for-byte unchanged. Otherwise SQLite may checkpoint an
+    # already-committed WAL page after this snapshot and make the assertion
+    # flaky even though the audit itself performs no writes.
+    with ledger.connect() as connection:
+        connection.execute("PRAGMA wal_checkpoint(TRUNCATE)")
     before = ledger.path.read_bytes()
 
     audits = audit_missing_usage(
