@@ -72,7 +72,9 @@ def build_parser() -> argparse.ArgumentParser:
     status.add_argument("manifest", type=Path)
 
     control_room = subparsers.add_parser(
-        "control-room", help="Publish and view shared, sanitized experiment status."
+        "dashboard",
+        aliases=["control-room"],
+        help="Publish and view the shared RxnHaystack Dashboard.",
     )
     control_commands = control_room.add_subparsers(dest="control_command", required=True)
     update = control_commands.add_parser(
@@ -279,7 +281,7 @@ def command_control_room_update(args: argparse.Namespace) -> int:
         try:
             time.sleep(args.watch_seconds)
         except KeyboardInterrupt:
-            print("\nControl-room updater stopped; the experiment was not touched")
+            print("\nDashboard updater stopped; the experiment was not touched")
             return 0
 
 
@@ -388,7 +390,7 @@ def resolve_wandb_key(specifications: list[str]) -> str:
     unexpected = sorted(set(supplied) - {"WANDB_API_KEY"})
     if unexpected:
         raise ManifestError(
-            "Control-room commands accept only WANDB_API_KEY; unexpected secret name(s): "
+            "Dashboard commands accept only WANDB_API_KEY; unexpected secret name(s): "
             + ", ".join(unexpected)
         )
     key = supplied.get("WANDB_API_KEY") or os.environ.get("WANDB_API_KEY")
@@ -406,6 +408,11 @@ def main(argv: list[str] | None = None) -> int:
         "plan": command_plan,
         "run": command_run,
         "status": command_status,
+        "dashboard": lambda parsed: (
+            command_control_room_update(parsed)
+            if parsed.control_command == "update"
+            else command_control_room_view(parsed)
+        ),
         "control-room": lambda parsed: (
             command_control_room_update(parsed)
             if parsed.control_command == "update"

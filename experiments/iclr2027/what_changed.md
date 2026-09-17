@@ -575,7 +575,7 @@ one allocation and share the same local limiter state.
 - The three API/W&B credential values are currently required before any selected
   part of the full experiment starts, even when only one provider is selected.
 - Separate machines keep separate local SQLite completion records. W&B and the
-  shared control room provide the common view; local database files must not
+  shared dashboard provide the common view; local database files must not
   overwrite one another.
 - Cost estimates depend on historical GPT-5-mini token use. Model-specific
   trajectory lengths must be checked with the small trials.
@@ -640,10 +640,10 @@ largest jobs contain ten questions at a 30-minute per-question ceiling, leaving
 one additional hour for finalization and cleanup. Focused tests exercise both
 the watchdog termination and the persisted failed-attempt record.
 
-## 23. All machines now share a read-only experiment control room
+## 23. All machines now share the read-only RxnHaystack Dashboard
 
 Manually copied status counts became unreliable once work was divided among
-`liacpc14`, `liacpc15`, Jed, and Kuma. The control room reads each machine's
+`liacpc14`, `liacpc15`, Jed, and Kuma. The dashboard reads each machine's
 SQLite ledger and publishes a sanitized, compressed snapshot to one W&B team
 project. It merges by immutable run and attempt identity, so copied ledgers are
 not double-counted and independent duplicate execution is highlighted.

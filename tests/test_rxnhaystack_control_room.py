@@ -10,7 +10,7 @@ from typing import Any
 
 import pytest
 
-from rxnhaystack import control_room
+from rxnhaystack import cli, control_room
 from rxnhaystack.control_room import (
     ControlRoomError,
     build_snapshot,
@@ -368,12 +368,25 @@ def test_dashboard_and_markdown_are_generated(
 
     dashboard = html_path.read_text(encoding="utf-8")
     markdown = markdown_path.read_text(encoding="utf-8")
+    assert "RxnHaystack Dashboard" in dashboard
+    assert "Keep reporting sources up to date" in dashboard
+    assert "refreshSafely" in dashboard
+    assert 'http-equiv="refresh"' not in dashboard
     assert "Run explorer" in dashboard
     assert '<details class="panel run-explorer">' in dashboard
     assert '<details class="panel run-explorer" open>' not in dashboard
     assert "GPT-5 mini" in dashboard
     assert "Model and method matrix" in dashboard
     assert "| GPT-5 mini | llm | 2 | 1 |" in markdown
+
+
+def test_dashboard_command_and_legacy_alias_are_both_available() -> None:
+    parser = cli.build_parser()
+    current = parser.parse_args(["dashboard", "view", "--no-sync", "--no-serve"])
+    legacy = parser.parse_args(["control-room", "view", "--no-sync", "--no-serve"])
+
+    assert current.command == "dashboard"
+    assert legacy.command == "control-room"
 
 
 def test_fresh_running_source_remains_running(

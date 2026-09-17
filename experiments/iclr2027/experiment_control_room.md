@@ -1,4 +1,4 @@
-# Shared experiment control room
+# RxnHaystack Dashboard
 
 This is the common live view for experiments running on `liacpc14`,
 `liacpc15`, Jed, and Kuma. It replaces status numbers copied by hand between
@@ -57,7 +57,7 @@ If several phases truly share one ledger, publish it once under one source ID.
 Pull the current repository version on the machine, then run from its clone:
 
 ```bash
-uv run --frozen rxnhaystack control-room update \
+uv run --frozen rxnhaystack dashboard update \
   experiments/iclr2027/full-campaign.toml \
   --source-id jed-glm-rlm-v34 \
   --machine jed \
@@ -72,11 +72,11 @@ be private (`chmod 600 ~/.wandb_api_key`). Its value and path are not included
 in the status record.
 
 Do not pull new code into a checkout that is actively launching model
-subprocesses. Instead, use a separate current checkout for the control room and
+subprocesses. Instead, use a separate current checkout for the dashboard and
 point it read-only at the active ledger:
 
 ```bash
-uv run --frozen rxnhaystack control-room update \
+uv run --frozen rxnhaystack dashboard update \
   experiments/iclr2027/full-campaign.toml \
   --ledger-path /path/to/active/clone/artifacts/iclr2027-six-model-full-v34/ledger.sqlite3 \
   --source-id kuma-gpt-rlm-v34 \
@@ -92,7 +92,7 @@ specifications as the experiment file. Any mismatch stops publication.
 For a tmux-run phase, use a session label instead:
 
 ```bash
-uv run --frozen rxnhaystack control-room update \
+uv run --frozen rxnhaystack dashboard update \
   experiments/iclr2027/full-campaign.toml \
   --source-id liacpc14-v34 \
   --machine liacpc14 \
@@ -109,7 +109,7 @@ For matched cardinality, use
 An updater can remain in its own tmux session:
 
 ```bash
-uv run --frozen rxnhaystack control-room update \
+uv run --frozen rxnhaystack dashboard update \
   experiments/iclr2027/full-campaign.toml \
   --source-id liacpc14-v34 \
   --machine liacpc14 \
@@ -125,12 +125,17 @@ changes or when the 30-minute heartbeat is due. `Ctrl-C` stops only the status
 updater; it does not touch the experiment. Use `--local-only` to test record
 generation without contacting W&B.
 
+This is a one-time setup for each physical ledger. Restart that updater only
+after a machine reboot, if its tmux session stops, or if the experiment moves
+to a new ledger. Finished ledgers do not need an updater forever: publish one
+final snapshot, verify it appears as complete, then the updater can stop.
+
 ## Open the combined dashboard
 
 On `liacpc14`, or any machine with the repository and a W&B key:
 
 ```bash
-uv run --frozen rxnhaystack control-room view \
+uv run --frozen rxnhaystack dashboard view \
   --secret-file WANDB_API_KEY=~/.wandb_api_key
 ```
 
@@ -142,22 +147,29 @@ This downloads the latest record from every source, writes:
 
 and serves the dashboard at `http://127.0.0.1:8765/index.html`. Press `Ctrl-C`
 to stop the web server. While it is open, it downloads fresh source records and
-regenerates the page every five minutes; the browser reloads the page once per
-minute. Override the server interval with `--refresh-seconds` if needed.
+regenerates the page every five minutes. The browser checks safely once per
+minute: if the SSH tunnel is unavailable, the current page stays visible and
+shows a connection warning. Override the server interval with
+`--refresh-seconds` if needed.
 
 When viewing a remote machine from a laptop, forward the local-only port:
 
 ```bash
-ssh -L 8765:127.0.0.1:8765 amin@liacpc14
+ssh -fN -o ExitOnForwardFailure=yes \
+  -o ServerAliveInterval=30 -o ServerAliveCountMax=3 \
+  -L 8876:127.0.0.1:8765 amin@128.178.38.26
 ```
 
-Then open `http://127.0.0.1:8765/index.html` on the laptop. Keeping the server
-bound to `127.0.0.1` avoids exposing it to the network.
+Then open `http://127.0.0.1:8876/index.html` on the laptop. This command puts
+the tunnel in the background, so its terminal does not need to remain open.
+Laptop sleep, a VPN change, or a network interruption can still close it; rerun
+the same command if the dashboard reports that its connection was lost.
+Keeping the server bound to `127.0.0.1` avoids exposing it to the network.
 
 To generate the files without starting a web server:
 
 ```bash
-uv run --frozen rxnhaystack control-room view \
+uv run --frozen rxnhaystack dashboard view \
   --no-serve \
   --secret-file WANDB_API_KEY=~/.wandb_api_key
 ```

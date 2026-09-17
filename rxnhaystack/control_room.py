@@ -128,12 +128,12 @@ def build_snapshot(
 def validate_source_identity(source_id: str, *, machine: str, owner: str) -> None:
     if not SOURCE_ID_PATTERN.fullmatch(source_id):
         raise ManifestError(
-            "Control-room source IDs must contain 1-64 lowercase letters, digits, '_' or '-', "
+            "Dashboard source IDs must contain 1-64 lowercase letters, digits, '_' or '-', "
             "and must start with a letter or digit"
         )
     for name, value in (("machine", machine), ("owner", owner)):
         if not value.strip() or len(value.strip()) > 80 or any(char in value for char in "\r\n"):
-            raise ManifestError(f"Control-room {name} must be a non-empty single-line label")
+            raise ManifestError(f"Dashboard {name} must be a non-empty single-line label")
 
 
 def optional_label(value: str | None) -> str | None:
@@ -334,26 +334,26 @@ def load_snapshot(path: Path) -> dict[str, Any]:
 
 def validate_snapshot(payload: Any) -> None:
     if not isinstance(payload, dict) or payload.get("schema_version") != SNAPSHOT_SCHEMA_VERSION:
-        raise ControlRoomError("Unsupported control-room snapshot schema")
+        raise ControlRoomError("Unsupported dashboard snapshot schema")
     if payload.get("snapshot_id") != snapshot_digest(payload):
-        raise ControlRoomError("Control-room snapshot hash does not match its contents")
+        raise ControlRoomError("Dashboard snapshot hash does not match its contents")
     source = payload.get("source")
     experiment = payload.get("experiment")
     observations = payload.get("observations")
     if not isinstance(source, dict) or not SOURCE_ID_PATTERN.fullmatch(str(source.get("id", ""))):
-        raise ControlRoomError("Control-room snapshot has an invalid source")
+        raise ControlRoomError("Dashboard snapshot has an invalid source")
     if not isinstance(experiment, dict) or not isinstance(experiment.get("expected_runs"), list):
-        raise ControlRoomError("Control-room snapshot has an invalid experiment definition")
+        raise ControlRoomError("Dashboard snapshot has an invalid experiment definition")
     if not isinstance(observations, list):
-        raise ControlRoomError("Control-room snapshot observations must be an array")
+        raise ControlRoomError("Dashboard snapshot observations must be an array")
     expected_ids = {
         item.get("run_id") for item in experiment["expected_runs"] if isinstance(item, dict)
     }
     if len(expected_ids) != len(experiment["expected_runs"]) or None in expected_ids:
-        raise ControlRoomError("Control-room expected run IDs are invalid or duplicated")
+        raise ControlRoomError("Dashboard expected run IDs are invalid or duplicated")
     for observation in observations:
         if not isinstance(observation, dict) or observation.get("run_id") not in expected_ids:
-            raise ControlRoomError("Control-room observation references an unexpected run")
+            raise ControlRoomError("Dashboard observation references an unexpected run")
 
 
 def artifact_name(snapshot: Mapping[str, Any]) -> str:
@@ -875,7 +875,7 @@ def atomic_write_text(path: Path, content: str) -> None:
 
 def dashboard_title(merged: Mapping[str, Any]) -> str:
     campaigns = merged.get("campaigns", [])
-    return "RxnHaystack control room" if len(campaigns) != 1 else str(campaigns[0]["name"])
+    return "RxnHaystack Dashboard" if len(campaigns) != 1 else str(campaigns[0]["name"])
 
 
 DASHBOARD_TEMPLATE = r"""<!doctype html>
@@ -883,16 +883,23 @@ DASHBOARD_TEMPLATE = r"""<!doctype html>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<meta http-equiv="refresh" content="60">
-<title>RxnHaystack control room</title>
+<title>RxnHaystack Dashboard</title>
 <style>
 :root{color-scheme:dark;--bg:#0d1117;--panel:#161b22;--line:#30363d;--text:#e6edf3;--muted:#8b949e;--green:#3fb950;--blue:#58a6ff;--red:#f85149;--yellow:#d29922;--purple:#bc8cff}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:14px/1.45 ui-sans-serif,system-ui,-apple-system,sans-serif}header{padding:22px 28px;border-bottom:1px solid var(--line);position:sticky;top:0;background:rgba(13,17,23,.96);z-index:3}h1{font-size:21px;margin:0 0 5px}.sub{color:var(--muted)}main{padding:22px 28px;max-width:1700px;margin:auto}.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:16px 0}.card,.panel{background:var(--panel);border:1px solid var(--line);border-radius:8px}.card{padding:14px}.label{color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.06em}.value{font-size:23px;font-weight:700;margin-top:4px}.panel{margin:14px 0;padding:16px;overflow:auto}h2{font-size:16px;margin:0 0 12px}.run-explorer{padding:0;overflow:hidden}.run-explorer summary{cursor:pointer;padding:16px;list-style-position:inside;font-size:16px}.run-explorer summary:hover{background:#1c2128}.run-explorer[open] summary{border-bottom:1px solid var(--line)}.run-explorer-content{padding:16px;overflow:auto}.summary-note{color:var(--muted);font-size:13px;margin-left:8px}.filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}input,select{background:var(--bg);border:1px solid var(--line);border-radius:6px;color:var(--text);padding:7px 9px}input{min-width:280px;flex:1}table{width:100%;border-collapse:collapse;white-space:nowrap}th,td{text-align:left;padding:8px 9px;border-bottom:1px solid var(--line)}th{color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.05em;position:sticky;top:0;background:var(--panel)}.ok{color:var(--green)}.running{color:var(--blue)}.failed{color:var(--red)}.stale{color:var(--yellow)}.pending{color:var(--muted)}.pill{display:inline-block;border:1px solid var(--line);border-radius:999px;padding:2px 7px;font-size:12px}.bar{height:7px;background:#21262d;border-radius:9px;overflow:hidden;min-width:130px}.bar>span{height:100%;display:block;background:var(--green)}.warn{color:var(--yellow)}.mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px}.hidden{display:none}a{color:var(--blue)}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:14px/1.45 ui-sans-serif,system-ui,-apple-system,sans-serif}header{padding:22px 28px;border-bottom:1px solid var(--line);position:sticky;top:0;background:rgba(13,17,23,.96);z-index:3}h1{font-size:21px;margin:0 0 5px}.sub{color:var(--muted)}main{padding:22px 28px;max-width:1700px;margin:auto}.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:16px 0}.card,.panel{background:var(--panel);border:1px solid var(--line);border-radius:8px}.card{padding:14px}.label{color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.06em}.value{font-size:23px;font-weight:700;margin-top:4px}.panel{margin:14px 0;padding:16px;overflow:auto}h2{font-size:16px;margin:0 0 12px}.run-explorer{padding:0;overflow:hidden}.run-explorer summary{cursor:pointer;padding:16px;list-style-position:inside;font-size:16px}.run-explorer summary:hover{background:#1c2128}.run-explorer[open] summary{border-bottom:1px solid var(--line)}.run-explorer-content{padding:16px;overflow:auto}.summary-note{color:var(--muted);font-size:13px;margin-left:8px}.filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}input,select{background:var(--bg);border:1px solid var(--line);border-radius:6px;color:var(--text);padding:7px 9px}input{min-width:280px;flex:1}table{width:100%;border-collapse:collapse;white-space:nowrap}th,td{text-align:left;padding:8px 9px;border-bottom:1px solid var(--line)}th{color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.05em;position:sticky;top:0;background:var(--panel)}.ok{color:var(--green)}.running{color:var(--blue)}.failed{color:var(--red)}.stale{color:var(--yellow)}.pending{color:var(--muted)}.pill{display:inline-block;border:1px solid var(--line);border-radius:999px;padding:2px 7px;font-size:12px}.bar{height:7px;background:#21262d;border-radius:9px;overflow:hidden;min-width:130px}.bar>span{height:100%;display:block;background:var(--green)}.warn{color:var(--yellow)}.mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px}.hidden{display:none}a{color:var(--blue)}.reporting-help{padding:0;overflow:hidden}.reporting-help summary{cursor:pointer;padding:16px;list-style-position:inside}.reporting-help summary:hover{background:#1c2128}.reporting-help[open] summary{border-bottom:1px solid var(--line)}.reporting-help-content{padding:16px;max-width:1050px}.reporting-help li{margin:8px 0}.reporting-help code{display:block;margin:10px 0;padding:12px;background:var(--bg);border:1px solid var(--line);border-radius:6px;white-space:pre-wrap;overflow-wrap:anywhere}.connection-lost{color:var(--red)}
 </style>
 </head>
 <body>
-<header><h1>RxnHaystack experiment control room</h1><div class="sub" id="updated"></div></header>
-<main id="app"></main>
+<header><h1>RxnHaystack Dashboard</h1><div class="sub"><span id="updated"></span><span id="connection"></span></div></header>
+<main><details class="panel reporting-help"><summary><strong>Keep reporting sources up to date</strong><span class="summary-note">one updater per physical ledger</span></summary><div class="reporting-help-content">
+<ol><li>Use a separate, current repository checkout for reporting; do not update the checkout that is running an experiment.</li><li>Run an updater for every distinct experiment ledger. If several models share one ledger, publish it once; if they use separate ledgers, run one updater for each.</li><li>Give every updater a stable, unique source ID and identify its machine and owner. Each collaborator uses their own W&amp;B key; keys and prompts are never published.</li><li>Keep the updater running in tmux. It publishes a sanitized snapshot every five minutes and a heartbeat every 30 minutes. A stale source is highlighted on this page.</li></ol>
+<code>uv run --frozen rxnhaystack dashboard update EXPERIMENT_FILE \
+  --ledger-path /ABSOLUTE/PATH/TO/ledger.sqlite3 \
+  --source-id UNIQUE-SOURCE-ID --machine MACHINE --owner OWNER \
+  --watch-seconds 300 --heartbeat-seconds 1800 \
+  --secret-file WANDB_API_KEY=~/.wandb_api_key</code>
+<p>Set this up once per physical ledger. Restart its updater only after a machine reboot, if the tmux session stops, or if work moves to a new ledger. This page is read-only. Only one viewer server is needed. Keep its viewer process running on the host and keep your laptop's SSH tunnel open. If the tunnel drops, the existing page remains visible and shows a connection warning; reconnect the tunnel for fresh data.</p>
+</div></details><div id="app"></div></main>
 <script>const DATA=__CONTROL_ROOM_DATA__;
 const fmt=n=>new Intl.NumberFormat().format(n||0); const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const duration=s=>s==null?'—':s<120?Math.round(s)+'s':s<7200?Math.round(s/60)+'m':(s/3600).toFixed(1)+'h';
@@ -905,4 +912,6 @@ return `<section data-campaign="${idx}"><h2>${esc(c.name)} <span class="pill mon
 <details class="panel run-explorer"><summary><strong>Run explorer</strong><span class="summary-note">${fmt(c.runs.length)} jobs · open to search and filter</span></summary><div class="run-explorer-content"><div class="filters"><input class="search" placeholder="Filter run ID, model, task, source…"><select class="method"><option value="">all methods</option>${[...new Set(c.runs.map(r=>r.method))].map(v=>`<option>${esc(v)}</option>`).join('')}</select><select class="status"><option value="">all states</option>${['succeeded','running','stale','failed','pending'].map(v=>`<option>${v}</option>`).join('')}</select></div><table><thead><tr><th>Run</th><th>Model</th><th>Task</th><th>Method</th><th>Condition</th><th>Status</th><th>Attempts</th><th>Source</th><th>Failure class</th></tr></thead><tbody class="runs">${c.runs.map(r=>`<tr data-search="${esc((r.run_id+' '+r.model+' '+r.task+' '+r.sources.join(' ')).toLowerCase())}" data-method="${esc(r.method)}" data-status="${esc(r.status)}"><td class="mono">${esc(r.run_id)}</td><td>${esc(r.model)}</td><td>${esc(r.task)}</td><td>${esc(r.method)}</td><td>${esc(r.condition)}</td><td class="${statusClass(r.status)}">${esc(r.status)}</td><td>${r.attempt_count}</td><td>${esc(r.sources.join(', ')||'—')}</td><td>${esc(Object.keys(r.failure_categories).join(', ')||'—')}</td></tr>`).join('')}</tbody></table></div></details></section>`}
 document.getElementById('app').innerHTML=DATA.campaigns.map(renderCampaign).join('');
 document.querySelectorAll('section').forEach(section=>{const q=section.querySelector('.search'),m=section.querySelector('.method'),s=section.querySelector('.status'),rows=[...section.querySelectorAll('.runs tr')];const apply=()=>{const needle=q.value.toLowerCase();rows.forEach(r=>r.classList.toggle('hidden',!!((needle&&!r.dataset.search.includes(needle))||(m.value&&r.dataset.method!==m.value)||(s.value&&r.dataset.status!==s.value))))};q.oninput=apply;m.onchange=apply;s.onchange=apply});
+async function refreshSafely(){const connection=document.getElementById('connection');try{const response=await fetch(location.href,{cache:'no-store'});if(!response.ok)throw new Error('HTTP '+response.status);const page=await response.text();connection.textContent='';connection.className='';if(!page.includes('"generated_at":"'+DATA.generated_at+'"')){document.open();document.write(page);document.close()}}catch(error){connection.textContent=' · connection lost—reopen the SSH tunnel for updates';connection.className='connection-lost'}}
+setInterval(refreshSafely,60000);
 </script></body></html>"""
