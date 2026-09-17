@@ -123,7 +123,9 @@ This downloads the latest record from every source, writes:
 - `artifacts/control-room/shared/*.json` — verified local cache;
 
 and serves the dashboard at `http://127.0.0.1:8765/index.html`. Press `Ctrl-C`
-to stop the web server.
+to stop the web server. While it is open, it downloads fresh source records and
+regenerates the page every five minutes; the browser reloads the page once per
+minute. Override the server interval with `--refresh-seconds` if needed.
 
 When viewing a remote machine from a laptop, forward the local-only port:
 

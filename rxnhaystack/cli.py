@@ -3,6 +3,7 @@ from __future__ import annotations
 import argparse
 import os
 import sys
+import threading
 import time
 from collections import Counter
 from functools import partial
@@ -108,6 +109,7 @@ def build_parser() -> argparse.ArgumentParser:
     view.add_argument("--stale-after-hours", type=float, default=2)
     view.add_argument("--host", default="127.0.0.1")
     view.add_argument("--port", type=int, default=8765)
+    view.add_argument("--refresh-seconds", type=float, default=300)
     view.add_argument("--no-sync", action="store_true")
     view.add_argument("--no-serve", action="store_true")
     view.add_argument(
@@ -281,20 +283,18 @@ def command_control_room_view(args: argparse.Namespace) -> int:
         raise ManifestError("--stale-after-hours must be greater than zero")
     if not 1 <= args.port <= 65535:
         raise ManifestError("--port must be between 1 and 65535")
-    if not args.no_sync:
-        paths = sync_snapshots(
-            api_key=resolve_wandb_key(args.secret_file),
-            entity=args.entity,
-            project=args.project,
-            output_dir=cache_dir,
-        )
-        print(f"Downloaded {len(paths)} current machine snapshots")
-    snapshots = load_snapshot_directory(cache_dir)
-    merged = merge_snapshots(snapshots, stale_after_seconds=args.stale_after_hours * 3600)
+    if args.refresh_seconds <= 0:
+        raise ManifestError("--refresh-seconds must be greater than zero")
+    api_key = None if args.no_sync else resolve_wandb_key(args.secret_file)
     html_path = args.html.expanduser().resolve()
     markdown_path = args.markdown.expanduser().resolve()
-    write_dashboard(html_path, merged)
-    write_markdown(markdown_path, merged)
+    refresh_control_room(
+        args,
+        api_key=api_key,
+        cache_dir=cache_dir,
+        html_path=html_path,
+        markdown_path=markdown_path,
+    )
     print(f"Dashboard: {html_path}")
     print(f"Markdown: {markdown_path}")
     if args.no_serve:
@@ -303,14 +303,78 @@ def command_control_room_view(args: argparse.Namespace) -> int:
         print("warning: the dashboard is being exposed beyond this machine", file=sys.stderr)
     handler = partial(SimpleHTTPRequestHandler, directory=str(html_path.parent))
     server = ThreadingHTTPServer((args.host, args.port), handler)
+    stop_refresh = threading.Event()
+    refresh_thread = None
+    if not args.no_sync:
+        refresh_thread = threading.Thread(
+            target=refresh_control_room_until_stopped,
+            kwargs={
+                "args": args,
+                "api_key": api_key or "",
+                "cache_dir": cache_dir,
+                "html_path": html_path,
+                "markdown_path": markdown_path,
+                "stop": stop_refresh,
+            },
+            name="rxnhaystack-control-room-refresh",
+            daemon=True,
+        )
+        refresh_thread.start()
     print(f"Open http://{args.host}:{args.port}/{html_path.name} (Ctrl-C stops the server)")
     try:
         server.serve_forever()
     except KeyboardInterrupt:
         print("\nDashboard server stopped")
     finally:
+        stop_refresh.set()
+        if refresh_thread is not None:
+            refresh_thread.join(timeout=2)
         server.server_close()
     return 0
+
+
+def refresh_control_room(
+    args: argparse.Namespace,
+    *,
+    api_key: str | None,
+    cache_dir: Path,
+    html_path: Path,
+    markdown_path: Path,
+) -> None:
+    if not args.no_sync:
+        paths = sync_snapshots(
+            api_key=api_key or "",
+            entity=args.entity,
+            project=args.project,
+            output_dir=cache_dir,
+        )
+        print(f"Downloaded {len(paths)} current machine snapshots")
+    snapshots = load_snapshot_directory(cache_dir)
+    merged = merge_snapshots(snapshots, stale_after_seconds=args.stale_after_hours * 3600)
+    write_dashboard(html_path, merged)
+    write_markdown(markdown_path, merged)
+
+
+def refresh_control_room_until_stopped(
+    *,
+    args: argparse.Namespace,
+    api_key: str,
+    cache_dir: Path,
+    html_path: Path,
+    markdown_path: Path,
+    stop: threading.Event,
+) -> None:
+    while not stop.wait(args.refresh_seconds):
+        try:
+            refresh_control_room(
+                args,
+                api_key=api_key,
+                cache_dir=cache_dir,
+                html_path=html_path,
+                markdown_path=markdown_path,
+            )
+        except Exception as error:
+            print(f"warning: dashboard refresh failed: {error}", file=sys.stderr)
 
 
 def resolve_wandb_key(specifications: list[str]) -> str:

@@ -843,15 +843,29 @@ def write_markdown(path: Path, merged: Mapping[str, Any]) -> None:
                 ]
             )
         lines.append("")
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text("\n".join(lines).rstrip() + "\n", encoding="utf-8")
+    atomic_write_text(path, "\n".join(lines).rstrip() + "\n")
 
 
 def write_dashboard(path: Path, merged: Mapping[str, Any]) -> None:
     serialized = json.dumps(merged, sort_keys=True, separators=(",", ":")).replace("<", "\\u003c")
     document = DASHBOARD_TEMPLATE.replace("__CONTROL_ROOM_DATA__", serialized)
+    atomic_write_text(path, document)
+
+
+def atomic_write_text(path: Path, content: str) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(document, encoding="utf-8")
+    descriptor, temporary_name = tempfile.mkstemp(
+        dir=path.parent, prefix=f".{path.name}.", suffix=".tmp"
+    )
+    temporary_path = Path(temporary_name)
+    try:
+        with os.fdopen(descriptor, "w", encoding="utf-8") as handle:
+            handle.write(content)
+            handle.flush()
+            os.fsync(handle.fileno())
+        os.replace(temporary_path, path)
+    finally:
+        temporary_path.unlink(missing_ok=True)
 
 
 def dashboard_title(merged: Mapping[str, Any]) -> str:
@@ -864,6 +878,7 @@ DASHBOARD_TEMPLATE = r"""<!doctype html>
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
+<meta http-equiv="refresh" content="60">
 <title>RxnHaystack control room</title>
 <style>
 :root{color-scheme:dark;--bg:#0d1117;--panel:#161b22;--line:#30363d;--text:#e6edf3;--muted:#8b949e;--green:#3fb950;--blue:#58a6ff;--red:#f85149;--yellow:#d29922;--purple:#bc8cff}
