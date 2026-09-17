@@ -87,6 +87,11 @@ def build_parser() -> argparse.ArgumentParser:
     update.add_argument("--entity", default="liac")
     update.add_argument("--project", default="rxnhaystack-control-room")
     update.add_argument("--output-dir", type=Path)
+    update.add_argument(
+        "--ledger-path",
+        type=Path,
+        help="Read a ledger in another checkout without modifying that active checkout.",
+    )
     update.add_argument("--local-only", action="store_true")
     update.add_argument("--watch-seconds", type=float)
     update.add_argument("--heartbeat-seconds", type=float, default=1800)
@@ -246,6 +251,7 @@ def command_control_room_update(args: argparse.Namespace) -> int:
             owner=args.owner,
             scheduler_job_id=args.scheduler_job_id or os.environ.get("SLURM_JOB_ID"),
             session_name=args.session_name,
+            ledger_path=args.ledger_path,
         )
         write_snapshot(output_path, snapshot)
         state = snapshot_state_digest(snapshot)

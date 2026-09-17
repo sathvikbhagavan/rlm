@@ -58,6 +58,7 @@ def build_snapshot(
     owner: str,
     scheduler_job_id: str | None = None,
     session_name: str | None = None,
+    ledger_path: Path | None = None,
     generated_at: str | None = None,
 ) -> dict[str, Any]:
     """Create a path-free, prompt-free status snapshot from one local ledger."""
@@ -65,12 +66,16 @@ def build_snapshot(
     validate_source_identity(source_id, machine=machine, owner=owner)
     expected = [safe_run_spec(run) for run in manifest.runs]
     expected_by_id = {item["run_id"]: item for item in expected}
-    ledger_path = manifest.campaign.artifact_dir / "ledger.sqlite3"
+    selected_ledger_path = (
+        ledger_path.expanduser().resolve()
+        if ledger_path is not None
+        else manifest.campaign.artifact_dir / "ledger.sqlite3"
+    )
     observations: list[dict[str, Any]] = []
     ledger_manifest_hashes: set[str] = set()
 
-    if ledger_path.is_file():
-        runs, attempts = read_ledger(ledger_path, campaign=manifest.campaign.name)
+    if selected_ledger_path.is_file():
+        runs, attempts = read_ledger(selected_ledger_path, campaign=manifest.campaign.name)
         attempts_by_run: dict[str, list[sqlite3.Row]] = defaultdict(list)
         for attempt in attempts:
             attempts_by_run[str(attempt["run_id"])].append(attempt)

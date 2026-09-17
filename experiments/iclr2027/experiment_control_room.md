@@ -71,6 +71,24 @@ ledger being reported. Every person uses their own W&B key. The key file must
 be private (`chmod 600 ~/.wandb_api_key`). Its value and path are not included
 in the status record.
 
+Do not pull new code into a checkout that is actively launching model
+subprocesses. Instead, use a separate current checkout for the control room and
+point it read-only at the active ledger:
+
+```bash
+uv run --frozen rxnhaystack control-room update \
+  experiments/iclr2027/full-campaign.toml \
+  --ledger-path /path/to/active/clone/artifacts/iclr2027-six-model-full-v34/ledger.sqlite3 \
+  --source-id kuma-gpt-rlm-v34 \
+  --machine kuma \
+  --owner Amin \
+  --scheduler-job-id 4250000 \
+  --secret-file WANDB_API_KEY=~/.wandb_api_key
+```
+
+The external ledger must contain the same campaign and immutable run
+specifications as the experiment file. Any mismatch stops publication.
+
 For a tmux-run phase, use a session label instead:
 
 ```bash

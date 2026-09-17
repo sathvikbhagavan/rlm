@@ -104,6 +104,7 @@ def populated_snapshot(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> dict[
         machine="liacpc14",
         owner="Amin",
         session_name="test-session",
+        ledger_path=manifest.campaign.artifact_dir / "ledger.sqlite3",
         generated_at="2026-09-17T12:00:00+00:00",
     )
 
