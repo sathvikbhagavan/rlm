@@ -4,7 +4,7 @@ This is the shared coordination record for the final benchmark. It says who
 owns each part, where it is running, what is complete, and what must happen
 next. Update this file whenever a phase starts, stops, or materially changes.
 
-Last consolidated: **2026-09-17 18:47 Europe/Zurich**
+Last consolidated: **2026-09-17 23:40 Europe/Zurich**
 
 Repository commit at consolidation: `b8f6120c0a3764579b0ca46cb6ec90943d39e949`
 
@@ -329,6 +329,29 @@ abstraction supplied. The other 148 runs remain pending. The Qwen pilot shared
 the existing machine-wide six-request-per-minute SwissAI limiter with the
 DeepSeek worker, so it did not increase `liacpc14` beyond its assigned quota.
 Do not duplicate either r01 selector on another machine.
+
+Jed then received the 74 non-duplicating Claude oracle runs. Its required r02
+pilot passed with three of four exact answers, nine calls, 49,806 tokens, CHF
+0.0665 cost and a synchronized W&B run. The guarded continuation completed 50
+of the 74 assigned jobs successfully; five stopped while starting W&B and 19
+were not launched because the CHF 30 experiment budget gate refused further
+admission. Across the 50 successes Jed recorded 920 calls, 21,024,131 tokens,
+CHF 25.2577, and 87 of 167 exact answers. All successes synchronized to W&B;
+none hit a workflow, launcher-wall-time or memory limit. Command time was 3
+hours 55 minutes and peak traced memory was 930.30 MiB. Including the separate
+local r01 result, Claude oracle coverage is therefore 51 succeeded, five
+failed before scientific completion, and 19 pending. The reported Jed ledger
+SHA-256 is
+`6aad4f1180204422ae25cc6d22c6db1e93f157ed50d575d440584e1ae565f834`;
+the final report SHA-256 is
+`76f1d39ccb8e08d2b37c9b9cfd04ffdc45aec2f42fb42e70f5dccc6f4c3047d1`.
+
+The CHF 17.61 estimate for these 74 jobs was not reliable: completed oracle
+trajectories were materially longer than the historical trajectories used for
+planning. Do not restart the phase or simply raise the budget. First audit the
+exact five W&B failures and 19 budget-stopped run IDs, obtain a task/scale-aware
+remaining-cost estimate, and confirm failed-only/pending-only resumption will
+skip all 50 successes and the excluded local r01.
 
 The project lead confirms that the reused original ground-truth predicates were
 previously reviewed by a chemist. Preserve the reviewer/date/version record for
