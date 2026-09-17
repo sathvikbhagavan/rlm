@@ -298,7 +298,7 @@ timeout or memory boundary was reached. The other 29 prospective jobs remain
 pending until their revised cost and machine schedule are approved; the CHF
 0.18 estimate materially understated this pilot.
 
-At 00:51 Europe/Zurich on September 18, the local Docker catch-up plan assigns
+At 00:55 Europe/Zurich on September 18, the local Docker catch-up plan launched
 the 45 held Claude Tier-4 RLM cells (Tasks 16, 17, and 17b) to `liacpc14`. They
 run serially, low-context first, with a live OpenRouter balance check before
 every cell and a protected USD 50 reserve. The balance before launch was USD
@@ -308,7 +308,12 @@ only DeepSeek's 45 Docker cells; SQLite claims prevent overlap with the existing
 all-DeepSeek RLM worker, and both DeepSeek workers share the same six-RPM local
 limiter. Do not start GPT Docker cells: its correct 403/missing-usage handling
 remains on an unmerged review branch, so current `main` is not an archival-safe
-launcher for those cells.
+launcher for those cells. The Claude queue started with Task-17 x100 r01. The
+DeepSeek Docker-only worker simultaneously claimed Task-16 x100 r01 while the
+original DeepSeek worker continued its non-Docker phase. Two labelled sandbox
+containers were healthy and total machine memory remained at 8.7 GiB used with
+52 GiB available during the initial check. The tmux sessions are
+`rxn-claude-docker-catchup-v34` and `rxn-deepseek-docker-catchup-v34`.
 
 The oracle definition contains 150 model jobs and 480 question trajectories,
 estimated at CHF 17.90 with a CHF 30 ceiling, plus 15 deterministic jobs and
