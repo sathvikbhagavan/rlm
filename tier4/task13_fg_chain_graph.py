@@ -294,7 +294,8 @@ def longest_fg_path(
         raise ValueError(f"Unknown target functional group: {target_fg}")
 
     starts = sorted(
-        smiles for smiles, groups in group_cache.items()
+        smiles
+        for smiles, groups in group_cache.items()
         if source_fg in groups and target_fg not in groups
     )
     paths: list[tuple[str, tuple[int, ...], tuple[str, ...]]] = [
@@ -516,9 +517,7 @@ def lcs_length(pred: tuple[int, ...], gt: tuple[int, ...]) -> int:
     return dp[n][m]
 
 
-def precision_recall_f1(
-    predicted: set[int], ground_truth: set[int]
-) -> tuple[float, float, float]:
+def precision_recall_f1(predicted: set[int], ground_truth: set[int]) -> tuple[float, float, float]:
     tp = len(predicted & ground_truth)
     precision = tp / len(predicted) if predicted else 0.0
     recall = tp / len(ground_truth) if ground_truth else 0.0
@@ -697,8 +696,12 @@ def build_rlm_question(
     context_reaction_count: int,
     path_length: int = PATH_LENGTH,
     molecule_freq_cap: int | None = None,
+    oracle_guidance: str | None = None,
 ) -> str:
-    return (
+    question = (
         f"{build_question(source_fg, target_fg, context_reaction_count=context_reaction_count, path_length=path_length, molecule_freq_cap=molecule_freq_cap)}\n\n"
         f"Guidance:\n{RLM_CODE_GUIDANCE}"
     )
+    if oracle_guidance is None:
+        return question
+    return f"{question}\n\n{oracle_guidance}"
