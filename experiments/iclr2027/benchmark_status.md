@@ -265,15 +265,15 @@ and leakage audits pass:
 | --- | --- | --- |
 | `feature/oracle-predicate-control` at `7649255` | Five-task oracle prompts, deterministic ceiling, generated experiment and parity/leakage tests | Pushed; 444 tests passed, 11 skipped; Task-10 full-corpus parity remains a pre-launch gate |
 | `feature/task16-prospective-decomposition` at `6cc7719` | Correct Task-16 name/structure/class conditions, remove exact-target leakage, fix taxonomy and prepare human-review export | Pushed; 449 tests passed, 10 skipped; class arm held for chemist approval |
-| `feature/flat-map-reduce-baseline` at `475d018` | Resumable Tier-1--3 flat mapper/union reducer, artifacts and mocked experiment definition | Pushed; 456 tests passed, 10 skipped; no real calls; staged pilot required |
+| `feature/flat-map-reduce-baseline` at `475d018` | Resumable Tier-1--3 flat mapper/union reducer, artifacts and mocked experiment definition | Shelved on its remote branch by author decision; do not merge or launch before post-submission review |
 
 The prospective definition contains 30 jobs and 90 trajectories, with an
 estimated API cost of CHF 2.73 and a CHF 15 ceiling. The map-and-union
 definition contains 30 jobs but expands to 7,350 mapper calls because each job
 must cover 245 chunks. Real-corpus calibration estimates about 12.5 million
 input tokens per job; its Qwen/Gemini paid ceiling is CHF 180 within a CHF 200
-budget. Do not launch that full baseline without first passing the documented
-one-request and one-Qwen-job gates.
+budget. This work is now explicitly post-submission: do not launch even the
+pilot unless the author reopens it after the ICLR deadline.
 
 The oracle definition contains 150 model jobs and 480 question trajectories,
 estimated at CHF 17.90 with a CHF 30 ceiling, plus 15 deterministic jobs and

@@ -4,6 +4,7 @@ import json
 import subprocess
 import sys
 import threading
+import time
 from pathlib import Path
 
 from rxnhaystack.resources import (
@@ -77,6 +78,33 @@ def test_memory_watchdog_records_host_docker_and_combined_peaks(
     assert usage.peak_host_rss_mib > 0
     assert usage.peak_docker_memory_mib == 20
     assert usage.peak_combined_memory_mib >= usage.peak_host_rss_mib + 20
+
+
+def test_watchdog_terminates_process_group_at_wall_time_limit(tmp_path: Path) -> None:
+    trace = tmp_path / "resource-trace.jsonl"
+    process = subprocess.Popen(
+        [sys.executable, "-c", "import time; time.sleep(60)"],
+        text=True,
+        start_new_session=True,
+    )
+    started = time.monotonic()
+    usage = wait_with_memory_watchdog(
+        process,
+        memory_limit_mib=None,
+        poll_interval_seconds=0.01,
+        termination_grace_seconds=0.1,
+        trace_path=trace,
+        run_id="hung-worker",
+        wall_time_limit_seconds=0.1,
+    )
+
+    assert time.monotonic() - started < 2
+    assert usage.return_code != 0
+    assert usage.wall_time_limit_exceeded is True
+    events = [json.loads(line) for line in trace.read_text().splitlines()]
+    assert any(event["event"] == "wall_time_limit_exceeded" for event in events)
+    assert events[-1]["event"] == "process_finished"
+    assert events[-1]["wall_time_limit_exceeded"] is True
 
 
 def test_memory_budget_blocks_until_a_reservation_is_released() -> None:

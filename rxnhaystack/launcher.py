@@ -120,6 +120,7 @@ def execute_run(
     retry_failed: bool,
     recover_running: bool,
     cancellation_event: threading.Event | None = None,
+    max_run_seconds: float | None = None,
 ) -> ExecutionResult:
     attempt = ledger.claim(
         run.run_id,
@@ -194,6 +195,7 @@ def execute_run(
     peak_host_rss_mib = 0.0
     peak_docker_memory_mib = 0.0
     memory_limit_exceeded = False
+    wall_time_limit_exceeded = False
     docker_cleanup_error: str | None = None
     try:
         with (
@@ -219,6 +221,7 @@ def execute_run(
                     docker_memory_registry_path=(
                         docker_cgroup_registry_path if docker_run_token is not None else None
                     ),
+                    wall_time_limit_seconds=max_run_seconds,
                 )
             finally:
                 if docker_run_token is not None and docker_cgroup_registry_path.exists():
@@ -228,6 +231,7 @@ def execute_run(
         peak_host_rss_mib = usage.peak_host_rss_mib
         peak_docker_memory_mib = usage.peak_docker_memory_mib
         memory_limit_exceeded = usage.memory_limit_exceeded
+        wall_time_limit_exceeded = usage.wall_time_limit_exceeded
         if metrics_path.exists():
             try:
                 metrics = validate_metrics(
@@ -249,6 +253,8 @@ def execute_run(
             )
         elif usage.cancelled:
             error = "Run interrupted by launcher shutdown"
+        elif wall_time_limit_exceeded:
+            error = f"Process wall time exceeded the {max_run_seconds:g}-second launcher limit"
         elif return_code != 0:
             error = f"Command exited with status {return_code}" + (
                 f"; {error}" if error is not None else ""
@@ -269,6 +275,8 @@ def execute_run(
         "memory_reservation_mib": run.memory_reservation_mib,
         "memory_limit_mib": run.memory_limit_mib,
         "memory_limit_exceeded": memory_limit_exceeded,
+        "wall_time_limit_seconds": max_run_seconds,
+        "wall_time_limit_exceeded": wall_time_limit_exceeded,
         "trace_path": str(resource_trace_path),
     }
     execution_metadata.update(
@@ -317,6 +325,7 @@ def execute_run_safely(
     retry_failed: bool,
     recover_running: bool,
     cancellation_event: threading.Event | None = None,
+    max_run_seconds: float | None = None,
 ) -> ExecutionResult:
     try:
         return execute_run(
@@ -328,6 +337,7 @@ def execute_run_safely(
             retry_failed=retry_failed,
             recover_running=recover_running,
             cancellation_event=cancellation_event,
+            max_run_seconds=max_run_seconds,
         )
     except Exception as unexpected_error:
         record = ledger.get(run.run_id)
@@ -411,9 +421,12 @@ def run_selected(
     max_parallel: int,
     retry_failed: bool,
     recover_running: bool,
+    max_run_seconds: float | None = None,
 ) -> list[ExecutionResult]:
     if max_parallel < 1:
         raise ManifestError("max_parallel must be at least 1")
+    if max_run_seconds is not None and max_run_seconds <= 0:
+        raise ManifestError("max_run_seconds must be greater than zero")
     ledger = RunLedger(manifest.campaign.artifact_dir / "ledger.sqlite3")
     ledger.sync_runs(manifest.runs, manifest_sha256=manifest.sha256)
     enforce_remaining_budget(manifest, ledger)
@@ -472,6 +485,7 @@ def run_selected(
                 retry_failed=retry_failed,
                 recover_running=recover_running,
                 cancellation_event=cancellation_event,
+                max_run_seconds=max_run_seconds,
             )
 
     executor = ThreadPoolExecutor(max_workers=max_parallel)

@@ -164,6 +164,7 @@ full experiment. Qwen uses the SwissAI 2,048-token/no-hidden-thinking path.
 | RLM response, OpenRouter | 4,096 total output tokens; `low` reasoning | Hidden and visible output share this bound. |
 | RLM reasoning loop | 30 iterations and 2 recursion levels | Iteration exhaustion triggers one answer-only response. |
 | RLM question trajectory | 1,800 seconds, checked between turns | One answer-only response is requested and the cutoff is counted in `metrics.json`. |
+| Selected-job process wall time | Six hours when launched with `--max-run-seconds 21600` | The launcher terminates the complete process group, records a wall-time failure and its resource trace, and continues. This catches client/SDK calls that never return to the per-question timeout check. |
 | Docker RLM generated block | 300 seconds | The in-container process group is terminated and the RLM receives the error. |
 | Task-16 Docker memory | 24 GiB | Docker OOM-kills the generated process while retaining host-controller headroom. |
 | Local RLM process/tool memory | 8,192/4,096 MiB address space | Runaway local allocations raise inside the isolated tool boundary. |

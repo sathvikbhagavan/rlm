@@ -25,6 +25,7 @@ class ProcessUsage:
     peak_docker_memory_mib: float
     memory_limit_exceeded: bool
     cancelled: bool = False
+    wall_time_limit_exceeded: bool = False
 
 
 class MemoryBudget:
@@ -153,17 +154,22 @@ def wait_with_memory_watchdog(
     run_id: str | None = None,
     cancellation_event: threading.Event | None = None,
     docker_memory_registry_path: Path | None = None,
+    wall_time_limit_seconds: float | None = None,
 ) -> ProcessUsage:
-    """Measure host descendants plus any launcher-managed Docker cgroup."""
+    """Measure resources and enforce launcher-owned process limits."""
 
     if memory_limit_mib is not None and not Path("/proc/self/status").is_file():
         raise RuntimeError("Per-run memory limits require a Linux /proc filesystem")
+    if wall_time_limit_seconds is not None and wall_time_limit_seconds <= 0:
+        raise ValueError("wall_time_limit_seconds must be positive")
+    started = time.monotonic()
     peak_rss_bytes = 0
     peak_host_rss_bytes = 0
     peak_docker_memory_bytes = 0
     memory_limit_bytes = memory_limit_mib * MIB if memory_limit_mib is not None else None
     exceeded = False
     cancelled = False
+    wall_time_exceeded = False
     if trace_path is not None:
         append_trace_event(
             trace_path,
@@ -171,6 +177,7 @@ def wait_with_memory_watchdog(
             run_id=run_id,
             root_pid=process.pid,
             memory_limit_mib=memory_limit_mib,
+            wall_time_limit_seconds=wall_time_limit_seconds,
         )
     try:
         while True:
@@ -223,6 +230,24 @@ def wait_with_memory_watchdog(
                     )
                 _terminate_process_group(process, grace_seconds=termination_grace_seconds)
                 return_code = process.wait()
+            elapsed_seconds = time.monotonic() - started
+            if (
+                return_code is None
+                and wall_time_limit_seconds is not None
+                and elapsed_seconds > wall_time_limit_seconds
+            ):
+                wall_time_exceeded = True
+                if trace_path is not None:
+                    append_trace_event(
+                        trace_path,
+                        "wall_time_limit_exceeded",
+                        run_id=run_id,
+                        root_pid=process.pid,
+                        elapsed_seconds=elapsed_seconds,
+                        wall_time_limit_seconds=wall_time_limit_seconds,
+                    )
+                _terminate_process_group(process, grace_seconds=termination_grace_seconds)
+                return_code = process.wait()
             if return_code is not None:
                 break
             time.sleep(poll_interval_seconds)
@@ -242,6 +267,7 @@ def wait_with_memory_watchdog(
             peak_docker_memory_mib=peak_docker_memory_bytes / MIB,
             memory_limit_exceeded=exceeded,
             cancelled=cancelled,
+            wall_time_limit_exceeded=wall_time_exceeded,
         )
     return ProcessUsage(
         return_code=return_code,
@@ -250,6 +276,7 @@ def wait_with_memory_watchdog(
         peak_docker_memory_mib=peak_docker_memory_bytes / MIB,
         memory_limit_exceeded=exceeded,
         cancelled=cancelled,
+        wall_time_limit_exceeded=wall_time_exceeded,
     )
 
 

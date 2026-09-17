@@ -29,6 +29,14 @@ def build_parser() -> argparse.ArgumentParser:
     add_manifest_and_data_arguments(run)
     run.add_argument("--select", action="append", default=[], metavar="GLOB")
     run.add_argument("--max-parallel", type=int, default=1)
+    run.add_argument(
+        "--max-run-seconds",
+        type=float,
+        help=(
+            "Terminate a model subprocess that exceeds this wall time, preserving "
+            "its failed attempt and allowing other selected jobs to continue."
+        ),
+    )
     run.add_argument("--retry-failed", action="store_true")
     run.add_argument(
         "--recover-running",
@@ -118,6 +126,7 @@ def command_run(args: argparse.Namespace) -> int:
         max_parallel=args.max_parallel,
         retry_failed=args.retry_failed,
         recover_running=args.recover_running,
+        max_run_seconds=args.max_run_seconds,
     )
     for result in results:
         if result.attempt is not None:

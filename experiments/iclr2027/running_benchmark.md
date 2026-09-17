@@ -655,6 +655,7 @@ words literally.
 uv run --frozen rxnhaystack run experiments/iclr2027/full-campaign.toml \
   --select 'RUN-NAME-PATTERN' \
   --max-parallel 4 \
+  --max-run-seconds 21600 \
   --secret-file OPENROUTER_API_KEY=~/.openrouter_api_key \
   --secret-file SWISSAI_RESEARCH_API_KEY=~/.swissai_research_api_key \
   --secret-file WANDB_API_KEY=~/.wandb_api_key
@@ -664,6 +665,14 @@ Use the parallelism recommended after the trial jobs, not necessarily `4`.
 `--max-parallel` controls the number of separate worker processes. Inside each
 worker, LLM can have up to four questions in flight, CodeAct up to two isolated
 agents, and RLM one question at a time.
+
+`--max-run-seconds 21600` is a six-hour outer process boundary. It is separate
+from the per-question RLM/CodeAct limits: if a provider client or SDK hangs
+inside one request and never returns control to those inner checks, the launcher
+terminates that job's complete process group, records the attempt as failed, and
+continues with the other selected jobs. Six hours accommodates the benchmark's
+largest ten-question job at its recorded 30-minute-per-question allowance plus
+one hour of cleanup/finalization headroom.
 
 If the same SwissAI key is active on another host, set that host's assigned
 `RXNHAYSTACK_SWISSAI_HOST_REQUESTS_PER_MINUTE_CAP` in the batch script before
@@ -704,6 +713,7 @@ uv run --frozen rxnhaystack run experiments/iclr2027/full-campaign.toml \
   --select 'RUN-NAME-PATTERN' \
   --retry-failed \
   --max-parallel 2 \
+  --max-run-seconds 21600 \
   --secret-file OPENROUTER_API_KEY=~/.openrouter_api_key \
   --secret-file SWISSAI_RESEARCH_API_KEY=~/.swissai_research_api_key \
   --secret-file WANDB_API_KEY=~/.wandb_api_key

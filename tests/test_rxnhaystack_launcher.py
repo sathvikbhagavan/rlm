@@ -156,9 +156,7 @@ def test_launcher_executes_parallel_runs_records_artifacts_and_resumes(
         assert any(event["event"] == "resource_sample" for event in resource_events)
         assert metadata["execution"]["secret_names"] == ["TEST_API_KEY"]
         assert (
-            metadata["execution"]["environment"][
-                "RXNHAYSTACK_SWISSAI_HOST_REQUESTS_PER_MINUTE_CAP"
-            ]
+            metadata["execution"]["environment"]["RXNHAYSTACK_SWISSAI_HOST_REQUESTS_PER_MINUTE_CAP"]
             == "6"
         )
         assert "never-record-this" not in json.dumps(metadata)
@@ -226,6 +224,36 @@ def test_launcher_fails_successful_process_that_omits_required_metrics(tmp_path:
         RunLedger(manifest.campaign.artifact_dir / "ledger.sqlite3").get(result.run_id).status
         == "failed"
     )
+
+
+def test_launcher_records_wall_time_failure_and_continues(tmp_path: Path) -> None:
+    project_root = tmp_path / "project"
+    project_root.mkdir()
+    initialize_git_repository(project_root)
+    worker = project_root / "worker.py"
+    write_worker(worker, hold_seconds=60)
+    manifest = load_manifest(write_campaign(tmp_path, project_root, worker, repetitions=1))
+
+    [result] = run_selected(
+        manifest,
+        preflight=perform_preflight(manifest),
+        selected=list(manifest.runs),
+        secrets={},
+        max_parallel=1,
+        retry_failed=False,
+        recover_running=False,
+        max_run_seconds=0.1,
+    )
+
+    assert result.status == "failed"
+    assert "wall time exceeded" in (result.error or "")
+    assert result.artifact_dir is not None
+    metadata = json.loads((result.artifact_dir / "metadata.json").read_text())
+    resources = metadata["execution"]["resources"]
+    assert resources["wall_time_limit_seconds"] == 0.1
+    assert resources["wall_time_limit_exceeded"] is True
+    record = RunLedger(manifest.campaign.artifact_dir / "ledger.sqlite3").get(result.run_id)
+    assert record.status == "failed"
 
 
 def test_budget_includes_failed_attempt_before_retry(tmp_path: Path) -> None:
@@ -447,6 +475,8 @@ def test_keyboard_interrupt_terminates_worker_and_records_failure(
     assert record.status == "failed"
     assert record.error == "Run interrupted by launcher shutdown"
     metadata = json.loads(
-        (manifest.campaign.artifact_dir / "runs/integration-cell/attempt-001/metadata.json").read_text()
+        (
+            manifest.campaign.artifact_dir / "runs/integration-cell/attempt-001/metadata.json"
+        ).read_text()
     )
     assert metadata["result"]["error"] == "Run interrupted by launcher shutdown"

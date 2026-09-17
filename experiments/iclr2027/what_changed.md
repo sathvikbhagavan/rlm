@@ -622,3 +622,20 @@ e4b2959  Prevent CodeAct context duplication
 The current documentation revision supersedes the first execution guide. Use
 `git log --oneline` to see its final commit after this revision is approved and
 pushed.
+
+## 22. The launcher now terminates a completely hung model subprocess
+
+A DeepSeek RLM job stopped producing model events while four HTTPS sockets
+remained in `CLOSE-WAIT`. Its 1,800-second RLM cutoff could not help because
+that cutoff is evaluated between iterations and the provider call never
+returned. Resource sampling continued for more than eight hours, confirming
+that this was a live but stalled process rather than a memory termination.
+
+The runner now accepts `--max-run-seconds`. This is enforced by the parent
+launcher, outside the model SDK and task script. At the boundary it terminates
+the complete process group, records `wall_time_limit_exceeded` in the resource
+trace and metadata, marks the attempt failed, and permits other selected jobs
+to continue. The resumed full benchmark uses 21,600 seconds (six hours): the
+largest jobs contain ten questions at a 30-minute per-question ceiling, leaving
+one additional hour for finalization and cleanup. Focused tests exercise both
+the watchdog termination and the persisted failed-attempt record.
