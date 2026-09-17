@@ -4,7 +4,7 @@ This is the shared coordination record for the final benchmark. It says who
 owns each part, where it is running, what is complete, and what must happen
 next. Update this file whenever a phase starts, stops, or materially changes.
 
-Last consolidated: **2026-09-17 16:34 Europe/Zurich**
+Last consolidated: **2026-09-17 16:36 Europe/Zurich**
 
 Repository commit at consolidation: `b8f6120c0a3764579b0ca46cb6ec90943d39e949`
 
@@ -300,6 +300,18 @@ ledger SHA-256 is
 Both release gates are therefore passed. Model work must still begin with one
 exact Qwen x100 repetition and one exact Claude x100 repetition before the
 remaining oracle cells are released.
+
+Those two pilots started on `liacpc14` at approximately 16:36 Europe/Zurich:
+`oracle-qwen3.5-397b-tier3-task6-x100-r01` and
+`oracle-claude-haiku-4.5-tier3-task6-x100-r01`. They are the only selected
+oracle model runs; the other 148 ledger rows remain pending. Both run with one
+question at a time and a six-hour launcher wall limit. The Qwen pilot shares
+the existing machine-wide six-request-per-minute SwissAI limiter with the
+DeepSeek worker, so it does not increase `liacpc14` beyond its assigned quota.
+The Claude pilot uses OpenRouter. Planned model cost is CHF 0.00 for Qwen and
+CHF 0.29 for Claude. Inspect scientific metrics, provider accounting, prompt
+and predicate hashes, W&B logging, and resource artifacts before releasing any
+additional oracle jobs.
 
 The project lead confirms that the reused original ground-truth predicates were
 previously reviewed by a chemist. Preserve the reviewer/date/version record for
