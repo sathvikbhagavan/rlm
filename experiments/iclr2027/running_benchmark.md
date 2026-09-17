@@ -7,6 +7,10 @@ The live ownership, machine assignments, completed counts, blockers, and next
 actions are maintained in [`benchmark_status.md`](benchmark_status.md). Read
 and update that file before launching any additional jobs.
 
+Live machine and ledger progress is published through the read-only
+[`experiment control room`](experiment_control_room.md). Use it instead of
+copying completion counts by hand between chats.
+
 We first run a few small tests with real models, check their cost, memory use, outputs,
 and logs, and only then choose how much parallelism each machine can safely use.
 

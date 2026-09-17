@@ -575,7 +575,7 @@ one allocation and share the same local limiter state.
 - The three API/W&B credential values are currently required before any selected
   part of the full experiment starts, even when only one provider is selected.
 - Separate machines keep separate local SQLite completion records. W&B and the
-  unique job names provide the common view; local database files must not
+  shared control room provide the common view; local database files must not
   overwrite one another.
 - Cost estimates depend on historical GPT-5-mini token use. Model-specific
   trajectory lengths must be checked with the small trials.
@@ -639,3 +639,20 @@ to continue. The resumed full benchmark uses 21,600 seconds (six hours): the
 largest jobs contain ten questions at a 30-minute per-question ceiling, leaving
 one additional hour for finalization and cleanup. Focused tests exercise both
 the watchdog termination and the persisted failed-attempt record.
+
+## 23. All machines now share a read-only experiment control room
+
+Manually copied status counts became unreliable once work was divided among
+`liacpc14`, `liacpc15`, Jed, and Kuma. The control room reads each machine's
+SQLite ledger and publishes a sanitized, compressed snapshot to one W&B team
+project. It merges by immutable run and attempt identity, so copied ledgers are
+not double-counted and independent duplicate execution is highlighted.
+
+The interactive page shows the model/method completion matrix, active and stale
+work, reporting machines, failure classes, calls, tokens, recorded cost, and
+peak memory. A concise Markdown view is generated from the same data. Neither
+view can mutate experiments. Prompts, responses, raw errors, credentials,
+commands, and local paths are explicitly excluded from uploaded records.
+
+See [`experiment_control_room.md`](experiment_control_room.md) for the exact
+per-machine update and viewing commands.

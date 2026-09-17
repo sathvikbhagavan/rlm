@@ -1,10 +1,26 @@
 from __future__ import annotations
 
 import argparse
+import os
 import sys
+import time
 from collections import Counter
+from functools import partial
+from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
+from rxnhaystack.control_room import (
+    ControlRoomError,
+    build_snapshot,
+    load_snapshot_directory,
+    merge_snapshots,
+    publish_snapshot,
+    snapshot_state_digest,
+    sync_snapshots,
+    write_dashboard,
+    write_markdown,
+    write_snapshot,
+)
 from rxnhaystack.dataset import DatasetError
 from rxnhaystack.launcher import run_selected, select_runs
 from rxnhaystack.ledger import LedgerError, RunLedger
@@ -53,6 +69,54 @@ def build_parser() -> argparse.ArgumentParser:
 
     status = subparsers.add_parser("status", help="Summarize a campaign ledger.")
     status.add_argument("manifest", type=Path)
+
+    control_room = subparsers.add_parser(
+        "control-room", help="Publish and view shared, sanitized experiment status."
+    )
+    control_commands = control_room.add_subparsers(dest="control_command", required=True)
+    update = control_commands.add_parser(
+        "update", help="Read one local ledger and publish its current status."
+    )
+    update.add_argument("manifest", type=Path)
+    update.add_argument("--source-id", required=True)
+    update.add_argument("--machine", required=True)
+    update.add_argument("--owner", required=True)
+    update.add_argument("--scheduler-job-id")
+    update.add_argument("--session-name")
+    update.add_argument("--entity", default="liac")
+    update.add_argument("--project", default="rxnhaystack-control-room")
+    update.add_argument("--output-dir", type=Path)
+    update.add_argument("--local-only", action="store_true")
+    update.add_argument("--watch-seconds", type=float)
+    update.add_argument("--heartbeat-seconds", type=float, default=1800)
+    update.add_argument(
+        "--secret-file",
+        action="append",
+        default=[],
+        metavar="NAME=PATH",
+        help="Read WANDB_API_KEY from a private mode-0600 file.",
+    )
+
+    view = control_commands.add_parser(
+        "view", help="Download shared updates and build the read-only dashboard."
+    )
+    view.add_argument("--entity", default="liac")
+    view.add_argument("--project", default="rxnhaystack-control-room")
+    view.add_argument("--cache-dir", type=Path, default=Path("artifacts/control-room/shared"))
+    view.add_argument("--html", type=Path, default=Path("artifacts/control-room/index.html"))
+    view.add_argument("--markdown", type=Path, default=Path("artifacts/control-room/status.md"))
+    view.add_argument("--stale-after-hours", type=float, default=2)
+    view.add_argument("--host", default="127.0.0.1")
+    view.add_argument("--port", type=int, default=8765)
+    view.add_argument("--no-sync", action="store_true")
+    view.add_argument("--no-serve", action="store_true")
+    view.add_argument(
+        "--secret-file",
+        action="append",
+        default=[],
+        metavar="NAME=PATH",
+        help="Read WANDB_API_KEY from a private mode-0600 file.",
+    )
     return parser
 
 
@@ -156,6 +220,115 @@ def command_status(args: argparse.Namespace) -> int:
     return 0
 
 
+def command_control_room_update(args: argparse.Namespace) -> int:
+    manifest = load_manifest(args.manifest)
+    output_dir = (
+        args.output_dir
+        if args.output_dir is not None
+        else manifest.campaign.project_root / "artifacts" / "control-room" / "local"
+    )
+    output_path = output_dir.expanduser().resolve() / f"{args.source_id}.json"
+    api_key = None if args.local_only else resolve_wandb_key(args.secret_file)
+    if args.watch_seconds is not None and args.watch_seconds <= 0:
+        raise ManifestError("--watch-seconds must be greater than zero")
+    if args.heartbeat_seconds <= 0:
+        raise ManifestError("--heartbeat-seconds must be greater than zero")
+
+    previous_state: str | None = None
+    last_published = 0.0
+    while True:
+        snapshot = build_snapshot(
+            manifest,
+            source_id=args.source_id,
+            machine=args.machine,
+            owner=args.owner,
+            scheduler_job_id=args.scheduler_job_id or os.environ.get("SLURM_JOB_ID"),
+            session_name=args.session_name,
+        )
+        write_snapshot(output_path, snapshot)
+        state = snapshot_state_digest(snapshot)
+        now = time.monotonic()
+        should_publish = not args.local_only and (
+            state != previous_state or now - last_published >= args.heartbeat_seconds
+        )
+        if should_publish:
+            url = publish_snapshot(
+                output_path,
+                api_key=api_key or "",
+                entity=args.entity,
+                project=args.project,
+            )
+            print(
+                f"Published {args.source_id}: {len(snapshot['observations'])}/"
+                f"{len(snapshot['experiment']['expected_runs'])} observed; {url or 'W&B complete'}"
+            )
+            last_published = now
+        elif args.local_only:
+            print(f"Wrote local status snapshot: {output_path}")
+        previous_state = state
+        if args.watch_seconds is None:
+            return 0
+        try:
+            time.sleep(args.watch_seconds)
+        except KeyboardInterrupt:
+            print("\nControl-room updater stopped; the experiment was not touched")
+            return 0
+
+
+def command_control_room_view(args: argparse.Namespace) -> int:
+    cache_dir = args.cache_dir.expanduser().resolve()
+    if args.stale_after_hours <= 0:
+        raise ManifestError("--stale-after-hours must be greater than zero")
+    if not 1 <= args.port <= 65535:
+        raise ManifestError("--port must be between 1 and 65535")
+    if not args.no_sync:
+        paths = sync_snapshots(
+            api_key=resolve_wandb_key(args.secret_file),
+            entity=args.entity,
+            project=args.project,
+            output_dir=cache_dir,
+        )
+        print(f"Downloaded {len(paths)} current machine snapshots")
+    snapshots = load_snapshot_directory(cache_dir)
+    merged = merge_snapshots(snapshots, stale_after_seconds=args.stale_after_hours * 3600)
+    html_path = args.html.expanduser().resolve()
+    markdown_path = args.markdown.expanduser().resolve()
+    write_dashboard(html_path, merged)
+    write_markdown(markdown_path, merged)
+    print(f"Dashboard: {html_path}")
+    print(f"Markdown: {markdown_path}")
+    if args.no_serve:
+        return 0
+    if args.host not in {"127.0.0.1", "localhost", "::1"}:
+        print("warning: the dashboard is being exposed beyond this machine", file=sys.stderr)
+    handler = partial(SimpleHTTPRequestHandler, directory=str(html_path.parent))
+    server = ThreadingHTTPServer((args.host, args.port), handler)
+    print(f"Open http://{args.host}:{args.port}/{html_path.name} (Ctrl-C stops the server)")
+    try:
+        server.serve_forever()
+    except KeyboardInterrupt:
+        print("\nDashboard server stopped")
+    finally:
+        server.server_close()
+    return 0
+
+
+def resolve_wandb_key(specifications: list[str]) -> str:
+    supplied = load_secret_specs(specifications)
+    unexpected = sorted(set(supplied) - {"WANDB_API_KEY"})
+    if unexpected:
+        raise ManifestError(
+            "Control-room commands accept only WANDB_API_KEY; unexpected secret name(s): "
+            + ", ".join(unexpected)
+        )
+    key = supplied.get("WANDB_API_KEY") or os.environ.get("WANDB_API_KEY")
+    if not key:
+        raise ManifestError(
+            "Missing WANDB_API_KEY. Export it or use --secret-file WANDB_API_KEY=~/.wandb_api_key"
+        )
+    return key
+
+
 def main(argv: list[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
     commands = {
@@ -163,10 +336,15 @@ def main(argv: list[str] | None = None) -> int:
         "plan": command_plan,
         "run": command_run,
         "status": command_status,
+        "control-room": lambda parsed: (
+            command_control_room_update(parsed)
+            if parsed.control_command == "update"
+            else command_control_room_view(parsed)
+        ),
     }
     try:
         return commands[args.command](args)
-    except (DatasetError, LedgerError, ManifestError) as error:
+    except (ControlRoomError, DatasetError, LedgerError, ManifestError) as error:
         print(f"error: {error}", file=sys.stderr)
         return 2
 

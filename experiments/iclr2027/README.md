@@ -6,6 +6,8 @@ The step-by-step launch instructions are in
 [`running_benchmark.md`](running_benchmark.md).
 The Task-16 target-name/structure control is documented in
 [`prospective_decomposition.md`](prospective_decomposition.md).
+Experiments split across several machines are tracked in the shared, read-only
+[`experiment control room`](experiment_control_room.md).
 
 The campaign launcher treats an experiment matrix as immutable scientific input.
 Changing a command, model, seed, condition, or other run field requires a new run
