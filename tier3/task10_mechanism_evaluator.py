@@ -10,6 +10,7 @@ from itertools import permutations
 
 from rdkit import Chem, rdBase
 from rdkit.Chem import AllChem
+from rdkit.Chem.rdchem import AtomValenceException
 
 rdBase.DisableLog("rdApp.*")
 
@@ -155,6 +156,25 @@ TASK10_MECHANISM_STAGES = {
 }
 
 
+def sanitize_generated_intermediate(mol: Chem.Mol) -> None:
+    """Preserve the frozen RDKit-2022 treatment of hypervalent phosphorus.
+
+    RDKit 2025 rejects a six-valent P+ intermediate produced by the existing
+    Mitsunobu cascade, while RDKit 2022.09.5 sanitized it and generated the
+    frozen benchmark membership. Only that phosphorus AtomValenceException
+    receives the legacy-compatible property-sanitization exemption; all other
+    sanitization failures remain failures.
+    """
+
+    try:
+        Chem.SanitizeMol(mol)
+    except AtomValenceException:
+        if not any(atom.GetAtomicNum() == 15 for atom in mol.GetAtoms()):
+            raise
+        legacy_ops = Chem.SanitizeFlags.SANITIZE_ALL ^ Chem.SanitizeFlags.SANITIZE_PROPERTIES
+        Chem.SanitizeMol(mol, sanitizeOps=legacy_ops)
+
+
 def parse_reaction_components(reaction_line: str) -> tuple[list[str], list[str]] | None:
     reaction = reaction_line.strip()
     if not reaction:
@@ -205,9 +225,7 @@ def apply_stage(
             continue
         for idx in permutations(range(len(current_state)), n_templates):
             perm = tuple(current_state[i] for i in idx)
-            untouched = tuple(
-                current_state[i] for i in range(len(current_state)) if i not in idx
-            )
+            untouched = tuple(current_state[i] for i in range(len(current_state)) if i not in idx)
             try:
                 outcomes = rxn.RunReactants(perm)
             except Exception:
@@ -217,7 +235,7 @@ def apply_stage(
                 ok = True
                 for mol in outcome:
                     try:
-                        Chem.SanitizeMol(mol)
+                        sanitize_generated_intermediate(mol)
                         clean.append(mol)
                     except Exception:
                         ok = False

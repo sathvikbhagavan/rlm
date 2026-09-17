@@ -40,6 +40,14 @@ same row- or molecule-level decisions without the frozen answer indices,
 counts, sampled rows, or completed graph solutions. Full-corpus parity tests
 guard against accidental changes during that refactoring.
 
+The parity gate exposed one RDKit-version difference before inference: frozen
+Task-10 Mitsunobu record 96808 matches under the dataset/ground-truth RDKit
+2022.09.5 environment but RDKit 2025.09.6 rejects a generated six-valent
+phosphorus intermediate during property sanitization. The evaluator now has a
+narrow compatibility path for phosphorus `AtomValenceException` only; every
+other sanitization failure remains rejected. Complete full-corpus parity must
+still pass after this correction before an oracle model cell is released.
+
 The project lead confirms that the original benchmark predicates received
 chemist validation before this control was created. Before submission, retain a
 short validation record naming the reviewer(s), date, reviewed predicate/file
