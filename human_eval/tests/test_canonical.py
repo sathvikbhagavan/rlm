@@ -28,8 +28,7 @@ def test_real_extraction_is_exact_and_deterministic(tmp_path: Path):
     assert all("representation" not in item for item in public)
     assert all("relevant_reaction_indices" not in item for item in public)
     assert all(
-        item["suggested_time_minutes"] == SUGGESTED_MINUTES_BY_TIER[item["tier"]]
-        for item in public
+        item["suggested_time_minutes"] == SUGGESTED_MINUTES_BY_TIER[item["tier"]] for item in public
     )
 
 
@@ -42,3 +41,15 @@ def test_schema_round_trip_and_stable_ids():
     assert Counter(q.tier for q in questions) == Counter(EXPECTED["tiers"])
     warnings = [q for q in questions if q.metadata.get("extraction_warning")]
     assert len(warnings) == 4
+    task16 = [q for q in questions if "-task16-" in q.question_id and q.tier == 4]
+    sequential = [
+        q
+        for q in questions
+        if q.tier == 4 and ("-task17-" in q.question_id or "-task17b-" in q.question_id)
+    ]
+    assert len(task16) == 10
+    assert len(sequential) == 10
+    assert {q.metadata["conceptual_family"] for q in task16} == {"prospective-truncated-synthesis"}
+    assert {q.metadata["conceptual_family"] for q in sequential} == {
+        "multi-constraint-sequential-template"
+    }

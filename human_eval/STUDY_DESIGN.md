@@ -7,6 +7,11 @@ The audit estimates benchmark defect prevalence/severity. Prospective review
 estimates the fraction of evaluator-rejected routes that chemistry-aware humans
 consider plausible, retaining uncertainty as its own outcome.
 
+The target-completability estimand applies to Task 16 truncated-synthesis
+prefixes. Tasks 17 and 17b have no target or withheld final step; if their
+multi-constraint chains are reviewed, report that as a separate estimand and use
+the sequential-constraint rubric rather than pooling it with Task 16.
+
 These modes must not be pooled. Baseline must precede any audit exposure for a
 given person/question. Record recruitment, assignment manifest, bundle checksum,
 corpus checksum, software commit, dates, and annotator eligibility before launch.

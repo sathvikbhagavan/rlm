@@ -9,23 +9,19 @@ from dataclasses import dataclass
 from functools import lru_cache
 from pathlib import Path
 
-from rlm.codeact_helpers import build_context_pipeline
-
 from task16_truncated_synthesis_graph import (
     DATASET_TOTAL_REACTIONS,
     FULL_CHAIN_LENGTH,
-    MAX_HEAVY_ATOMS,
-    MIN_HEAVY_ATOMS,
     PREFIX_LENGTH,
     ReactionRecord,
     TargetQuestionSpec,
     filter_context_lines,
     ground_truth_prefixes_in_context,
-    prefixes_from_full_chains,
     parse_records_from_lines,
     records_subset,
-    terminal_indices_from_full_chains,
 )
+
+from rlm.codeact_helpers import build_context_pipeline
 
 TASK16_TOTAL_REACTIONS = DATASET_TOTAL_REACTIONS
 TASK16_FORCED_PREFIX_COUNT = 2
@@ -63,9 +59,7 @@ DEFAULT_TARGET_QUESTIONS: tuple[TargetQuestionSpec, ...] = (
     ),
     TargetQuestionSpec(
         question_id="pyrimidine_piperazine",
-        target_smiles=(
-            "COc1ncc(-c2cc(N3CC(CC(=O)O)C(F)(F)C3)c3nccn3n2)c(OC)n1"
-        ),
+        target_smiles=("COc1ncc(-c2cc(N3CC(CC(=O)O)C(F)(F)C3)c3nccn3n2)c(OC)n1"),
         target_name="dimethoxypyrimidine with fluorinated piperazine carboxylate",
         label="pyrimidine piperazine",
         description=(
@@ -76,9 +70,7 @@ DEFAULT_TARGET_QUESTIONS: tuple[TargetQuestionSpec, ...] = (
     ),
     TargetQuestionSpec(
         question_id="phthalimide_glutarimide",
-        target_smiles=(
-            "O=C1CCC(N2C(=O)c3ccc(N4CCC(CN5CCS(=O)(=NCC6CCNCC6)CC5)CC4)cc3C2=O)C(=O)N1"
-        ),
+        target_smiles=("O=C1CCC(N2C(=O)c3ccc(N4CCC(CN5CCS(=O)(=NCC6CCNCC6)CC5)CC4)cc3C2=O)C(=O)N1"),
         target_name="glutarimide-phthalimide with sulfonimidoyl piperazine side chain",
         label="phthalimide glutarimide",
         description=(
@@ -90,9 +82,7 @@ DEFAULT_TARGET_QUESTIONS: tuple[TargetQuestionSpec, ...] = (
     ),
     TargetQuestionSpec(
         question_id="pyridine_kinase_like",
-        target_smiles=(
-            "Cc1ccc(NC(=O)c2cc(C(F)(F)F)ccn2)cc1C1=Cc2cnc(Nc3nccs3)nc2N2CCN=C12"
-        ),
+        target_smiles=("Cc1ccc(NC(=O)c2cc(C(F)(F)F)ccn2)cc1C1=Cc2cnc(Nc3nccs3)nc2N2CCN=C12"),
         target_name="fused pyrimidine-pyridine nicotinamide with thiazolyl substituent",
         label="pyridine kinase-like",
         description=(
@@ -126,9 +116,7 @@ DEFAULT_TARGET_QUESTIONS: tuple[TargetQuestionSpec, ...] = (
     ),
     TargetQuestionSpec(
         question_id="benzamide_pyrazole",
-        target_smiles=(
-            "NC(=O)c1ccc(-c2cnn(C(Cc3ccn(C(F)F)n3)c3ccc(B(O)O)cn3)c2)cc1F"
-        ),
+        target_smiles=("NC(=O)c1ccc(-c2cnn(C(Cc3ccn(C(F)F)n3)c3ccc(B(O)O)cn3)c2)cc1F"),
         target_name="fluorobenzamide biaryl pyrazole with boronic acid handle",
         label="benzamide pyrazole",
         description=(
@@ -140,9 +128,7 @@ DEFAULT_TARGET_QUESTIONS: tuple[TargetQuestionSpec, ...] = (
     ),
     TargetQuestionSpec(
         question_id="quinazoline_halide",
-        target_smiles=(
-            "C[C@@H]1CN(c2nc(Cl)nc3c(F)c(Br)c(Cl)cc23)[C@@H](C)CN1C(=O)OC(C)(C)C"
-        ),
+        target_smiles=("C[C@@H]1CN(c2nc(Cl)nc3c(F)c(Br)c(Cl)cc23)[C@@H](C)CN1C(=O)OC(C)(C)C"),
         target_name="Boc-protected diamine on a polyhalogenated quinazoline",
         label="quinazoline halide",
         description=(
@@ -170,42 +156,42 @@ DEFAULT_TARGET_QUESTIONS: tuple[TargetQuestionSpec, ...] = (
 HARDCODED_CHAINS_JSON = Path(__file__).with_name("task16_truncated_hardcoded_chains.json")
 
 HARDCODED_GT_PREFIX_COUNTS: dict[str, int] = {
-    'indole_oxindole': 52,
-    'acrylamide_biaryl': 31,
-    'pyrimidine_piperazine': 31,
-    'phthalimide_glutarimide': 17,
-    'pyridine_kinase_like': 12,
-    'lactam_dipeptide': 10,
-    'uracil_piperazine': 10,
-    'benzamide_pyrazole': 12,
-    'quinazoline_halide': 6,
-    'piperidine_scaffold': 5,
+    "indole_oxindole": 52,
+    "acrylamide_biaryl": 31,
+    "pyrimidine_piperazine": 31,
+    "phthalimide_glutarimide": 17,
+    "pyridine_kinase_like": 12,
+    "lactam_dipeptide": 10,
+    "uracil_piperazine": 10,
+    "benzamide_pyrazole": 12,
+    "quinazoline_halide": 6,
+    "piperidine_scaffold": 5,
 }
 
 HARDCODED_GT_FULL_CHAIN_COUNTS: dict[str, int] = {
-    'indole_oxindole': 52,
-    'acrylamide_biaryl': 31,
-    'pyrimidine_piperazine': 62,
-    'phthalimide_glutarimide': 17,
-    'pyridine_kinase_like': 12,
-    'lactam_dipeptide': 20,
-    'uracil_piperazine': 10,
-    'benzamide_pyrazole': 18,
-    'quinazoline_halide': 8,
-    'piperidine_scaffold': 10,
+    "indole_oxindole": 52,
+    "acrylamide_biaryl": 31,
+    "pyrimidine_piperazine": 62,
+    "phthalimide_glutarimide": 17,
+    "pyridine_kinase_like": 12,
+    "lactam_dipeptide": 20,
+    "uracil_piperazine": 10,
+    "benzamide_pyrazole": 18,
+    "quinazoline_halide": 8,
+    "piperidine_scaffold": 10,
 }
 
 HARDCODED_GT_EXAMPLE: dict[str, tuple[int, ...]] = {
-    'indole_oxindole': (9245, 26791, 81856, 81879),
-    'acrylamide_biaryl': (868, 869, 3611, 3638),
-    'pyrimidine_piperazine': (868, 869, 3611, 3638),
-    'phthalimide_glutarimide': (9245, 26692, 61605, 68652),
-    'pyridine_kinase_like': (40943, 40944, 40988, 41391),
-    'lactam_dipeptide': (9742, 16689, 16690, 91553),
-    'uracil_piperazine': (12346, 26761, 39775, 39776),
-    'benzamide_pyrazole': (13443, 64738, 64754, 64755),
-    'quinazoline_halide': (18145, 18146, 63271, 72074),
-    'piperidine_scaffold': (2269, 89471, 89472, 89473),
+    "indole_oxindole": (9245, 26791, 81856, 81879),
+    "acrylamide_biaryl": (868, 869, 3611, 3638),
+    "pyrimidine_piperazine": (868, 869, 3611, 3638),
+    "phthalimide_glutarimide": (9245, 26692, 61605, 68652),
+    "pyridine_kinase_like": (40943, 40944, 40988, 41391),
+    "lactam_dipeptide": (9742, 16689, 16690, 91553),
+    "uracil_piperazine": (12346, 26761, 39775, 39776),
+    "benzamide_pyrazole": (13443, 64738, 64754, 64755),
+    "quinazoline_halide": (18145, 18146, 63271, 72074),
+    "piperidine_scaffold": (2269, 89471, 89472, 89473),
 }
 
 
@@ -373,15 +359,17 @@ def build_task16_eval_context(
     min_scored_prefixes: int = TASK16_FORCED_PREFIX_COUNT,
     max_attempts: int = 25,
     full_records: dict[int, ReactionRecord] | None = None,
+    additional_excluded_indices: set[int] | frozenset[int] = frozenset(),
 ) -> Task16BuiltContext:
     """Build context with the forced GT prefixes injected into the sample."""
     full_chains = hardcoded_full_chains_for_question(question.question_id)
     excluded = terminal_indices_for_question(question.question_id)
+    context_excluded = frozenset(excluded | set(additional_excluded_indices))
 
     if context_size < 0:
         context_lines = filter_context_lines(
             [line for line in lines if line.strip()],
-            excluded,
+            context_excluded,
         )
         if full_records is None:
             raise ValueError(
@@ -432,11 +420,11 @@ def build_task16_eval_context(
     )
     support_indices = set(sampling.support_indices)
     required_prefixes = min(min_scored_prefixes, sampling.selected_prefix_count)
-    sampling_excluded = random_pool_excluded_indices(question, support_indices)
+    sampling_excluded = frozenset(
+        random_pool_excluded_indices(question, support_indices) | set(additional_excluded_indices)
+    )
 
-    last_context_lines: list[str] = []
     last_gt = None
-    last_filters = None
     last_records: dict[int, ReactionRecord] | None = None
     last_support_in_context = 0
 
@@ -483,13 +471,9 @@ def build_task16_eval_context(
             limit_to_prefixes=sampling.selected_prefixes,
         )
         scored = len(gt.accepted_reaction_indices) if gt else 0
-        last_context_lines = context_lines
         last_gt = gt
-        last_filters = filters
         last_records = context_records or (
-            records_subset(full_records, context_lines)
-            if full_records is not None
-            else None
+            records_subset(full_records, context_lines) if full_records is not None else None
         )
         last_support_in_context = support_in_context
 
@@ -565,9 +549,7 @@ def terminal_indices_for_question(question_id: str) -> frozenset[int]:
 
 def full_support_indices_for_question(question: TruncatedSynthesisQuestion) -> set[int]:
     return {
-        idx
-        for prefix in hardcoded_prefixes_for_question(question.question_id)
-        for idx in prefix
+        idx for prefix in hardcoded_prefixes_for_question(question.question_id) for idx in prefix
     }
 
 
@@ -767,9 +749,7 @@ def update_task16_run_summary(
     run.summary["macro_precision"] = macro_precision
     run.summary["macro_recall"] = macro_recall
     run.summary["macro_f1"] = macro_f1
-    run.summary["avg_total_input_tokens_per_sample"] = (
-        total_input_tokens / total if total else 0.0
-    )
+    run.summary["avg_total_input_tokens_per_sample"] = total_input_tokens / total if total else 0.0
     run.summary["avg_total_output_tokens_per_sample"] = (
         total_output_tokens / total if total else 0.0
     )

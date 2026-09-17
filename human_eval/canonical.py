@@ -452,6 +452,7 @@ class BundleBuilder:
                     "tier4/task16_truncated_synthesis_ground_truth.py",
                     "tier4/task16_truncated_hardcoded_chains.json",
                 ],
+                metadata={"conceptual_family": "prospective-truncated-synthesis"},
             )
         for suffix in ("17", "17b"):
             graph = imported("tier4", f"task{suffix}_smirks_sequential_graph", self.root)
@@ -472,6 +473,7 @@ class BundleBuilder:
                         f"tier4/task{suffix}_ground_truth.py",
                         f"tier4/task{suffix}_hardcoded_chains.json",
                     ],
+                    metadata={"conceptual_family": "multi-constraint-sequential-template"},
                 )
 
 

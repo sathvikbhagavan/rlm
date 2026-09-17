@@ -4,6 +4,8 @@ Read [`testing_and_safety_report.md`](testing_and_safety_report.md) for the
 real-model findings, Docker corrections, effective limits, and release checks.
 The step-by-step launch instructions are in
 [`running_benchmark.md`](running_benchmark.md).
+The Task-16 target-name/structure control is documented in
+[`prospective_decomposition.md`](prospective_decomposition.md).
 
 The campaign launcher treats an experiment matrix as immutable scientific input.
 Changing a command, model, seed, condition, or other run field requires a new run
