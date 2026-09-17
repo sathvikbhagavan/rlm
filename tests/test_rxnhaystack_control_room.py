@@ -339,6 +339,7 @@ def test_sync_downloads_and_validates_latest_snapshot(
     source = tmp_path / "published.json"
     write_snapshot(source, snapshot)
     fake_api = FakePublicApi(source, snapshot)
+    monkeypatch.setenv("WANDB_API_KEY", "original")
 
     paths = sync_snapshots(
         api_key="secret",
@@ -350,6 +351,7 @@ def test_sync_downloads_and_validates_latest_snapshot(
 
     assert paths == [tmp_path / "shared" / "liacpc14-test.json"]
     assert load_snapshot(paths[0]) == snapshot
+    assert control_room.os.environ["WANDB_API_KEY"] == "original"
 
 
 def test_dashboard_and_markdown_are_generated(

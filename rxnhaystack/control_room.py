@@ -400,7 +400,7 @@ def publish_snapshot(
             name=f"{snapshot['source']['id']}-{snapshot['generated_at'].replace(':', '')[:15]}",
             config=config,
             save_code=False,
-            reinit=True,
+            reinit="finish_previous",
         )
         if run is None:
             raise ControlRoomError("W&B did not create a status-publisher run")
@@ -459,6 +459,28 @@ def sync_snapshots(
         import wandb as imported_wandb
 
         wandb = imported_wandb
+    old_key = os.environ.get("WANDB_API_KEY")
+    os.environ["WANDB_API_KEY"] = api_key
+    try:
+        return sync_snapshots_with_api(
+            wandb=wandb,
+            api_key=api_key,
+            entity=entity,
+            project=project,
+            output_dir=output_dir,
+        )
+    finally:
+        restore_environment("WANDB_API_KEY", old_key)
+
+
+def sync_snapshots_with_api(
+    *,
+    wandb: Any,
+    api_key: str,
+    entity: str,
+    project: str,
+    output_dir: Path,
+) -> list[Path]:
     api = wandb.Api(api_key=api_key)
     runs = api.runs(
         f"{entity}/{project}", filters={"jobType": "status-publisher"}, order="-created_at"
