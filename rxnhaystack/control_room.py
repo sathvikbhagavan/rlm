@@ -906,6 +906,8 @@ DASHBOARD_TEMPLATE = r"""<!doctype html>
   --source-id UNIQUE-SOURCE-ID --machine MACHINE --owner OWNER \
   --watch-seconds 300 --heartbeat-seconds 1800 \
   --secret-file WANDB_API_KEY=~/.wandb_api_key</code>
+<p>For the current full and matched experiments, automatic discovery and setup are available:</p>
+<code>bash experiments/iclr2027/start_dashboard_reporting.sh OWNER MACHINE "$HOME"</code>
 <p>Set this up once per physical ledger. Restart its updater only after a machine reboot, if the tmux session stops, or if work moves to a new ledger. This page is read-only. Only one viewer server is needed. Keep its viewer process running on the host and keep your laptop's SSH tunnel open. If the tunnel drops, the existing page remains visible and shows a connection warning; reconnect the tunnel for fresh data.</p>
 </div></details><div id="app"></div></main>
 <script>const DATA=__CONTROL_ROOM_DATA__;

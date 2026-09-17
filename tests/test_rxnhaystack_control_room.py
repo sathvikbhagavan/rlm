@@ -391,6 +391,7 @@ def test_dashboard_and_markdown_are_generated(
     markdown = markdown_path.read_text(encoding="utf-8")
     assert "RxnHaystack Dashboard" in dashboard
     assert "Keep reporting sources up to date" in dashboard
+    assert "start_dashboard_reporting.sh OWNER MACHINE" in dashboard
     assert "refreshSafely" in dashboard
     assert 'http-equiv="refresh"' not in dashboard
     assert "Run explorer" in dashboard

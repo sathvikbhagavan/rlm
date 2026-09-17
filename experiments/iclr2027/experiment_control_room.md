@@ -56,6 +56,27 @@ Recommended names for the current work are:
 
 If several phases truly share one ledger, publish it once under one source ID.
 
+### Automatic setup when no coding assistant is available
+
+The checked-in helper discovers every populated full-v34 and matched-v7 ledger
+below a user's home directory, validates each one read-only against the current
+experiment file, ignores empty and smoke-test ledgers, avoids publishing a hard
+linked ledger twice, and starts one persistent tmux updater per ledger. Run:
+
+```bash
+bash experiments/iclr2027/start_dashboard_reporting.sh Sathvik liacpc15 "$HOME"
+```
+
+Running the same command again is safe: existing updater sessions are reported
+and left alone. On Jed, change only the machine name:
+
+```bash
+bash experiments/iclr2027/start_dashboard_reporting.sh Sathvik jed "$HOME"
+```
+
+The helper never changes experiment ledgers or model processes. Its preliminary
+publication check is local-only; W&B publication begins inside the updater.
+
 ## Publish one update
 
 Pull the current repository version on the machine, then run from its clone:
