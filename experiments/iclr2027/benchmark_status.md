@@ -4,9 +4,9 @@ This is the shared coordination record for the final benchmark. It says who
 owns each part, where it is running, what is complete, and what must happen
 next. Update this file whenever a phase starts, stops, or materially changes.
 
-Last consolidated: **2026-09-17 14:40 Europe/Zurich**
+Last consolidated: **2026-09-17 16:34 Europe/Zurich**
 
-Repository commit at consolidation: pending Task-10 RDKit compatibility commit
+Repository commit at consolidation: `b8f6120c0a3764579b0ca46cb6ec90943d39e949`
 
 ## How to read the counts
 
@@ -158,10 +158,11 @@ machines' ledgers and confirm which run IDs remain.
 ## Paper blockers, not merely missing leaderboard cells
 
 1. **The central causal claim is still confounded.** The oracle-predicate
-   control is implemented but has not yet cleared its complete parity and
-   execution gates, and matched cardinality is incomplete. Without completed
-   results, corpus size, answer cardinality, chemical diversity, and
-   abstraction difficulty remain entangled.
+   control is implemented and has cleared its complete parity and deterministic
+   execution gates, but its model cells have not run and matched cardinality is
+   incomplete. Without completed model results, corpus size, answer
+   cardinality, chemical diversity, and abstraction difficulty remain
+   entangled.
 2. **The obvious competing systems are absent.** There is no completed
    retrieval-augmented or non-recursive map-reduce baseline. A six-model
    replication does not answer whether RLM recursion is necessary.
@@ -271,7 +272,7 @@ and leakage audits pass:
 
 | Branch | Work | Launch tonight? |
 | --- | --- | --- |
-| `feature/oracle-predicate-control` at `7649255` | Five-task oracle prompts, deterministic ceiling, generated experiment and parity/leakage tests | Merged to main at `3646060`; Task-10 full-corpus parity remains a pre-launch gate |
+| `feature/oracle-predicate-control` at `7649255` | Five-task oracle prompts, deterministic ceiling, generated experiment and parity/leakage tests | Merged to main at `3646060`; full parity and deterministic gates passed at `b8f6120`; model pilots pending |
 | `feature/task16-prospective-decomposition` at `6cc7719` | Correct Task-16 name/structure/class conditions, remove exact-target leakage, fix taxonomy and prepare human-review export | Merged to main at `6a85c01`; class arm held for chemist approval |
 | `feature/flat-map-reduce-baseline` at `475d018` | Resumable Tier-1--3 flat mapper/union reducer, artifacts and mocked experiment definition | Shelved on its remote branch by author decision; do not merge or launch before post-submission review |
 
@@ -285,18 +286,20 @@ pilot unless the author reopens it after the ICLR deadline.
 
 The oracle definition contains 150 model jobs and 480 question trajectories,
 estimated at CHF 17.90 with a CHF 30 ceiling, plus 15 deterministic jobs and
-48 zero-API evaluations. Jed's full-corpus audit passed Tasks 6, 23, 13, and
-14 and four of five Task-10 mechanisms. The sole mismatch was frozen
-Mitsunobu-positive record 96808: the frozen set contains 719 rows, whereas the
-current RDKit 2025.09.6 evaluator returned 718. Reproduction under the
-dataset-pinned RDKit 2022.09.5 recovered that row. RDKit 2025 rejects the
-existing cascade's generated six-valent phosphorus intermediate during
-property sanitization; RDKit 2022 accepts it. A narrow phosphorus-only
-compatibility path and a regression test now recover the frozen decision.
-This changes neither the chemistry predicate nor any prompt. Jed must rerun
-complete parity after the correction; only exact parity may release the 15
-deterministic cells, and only successful deterministic cells may release
-oracle model inference.
+48 zero-API evaluations. At exact commit `b8f6120`, Jed's complete 122,456-row
+audit achieved exact parity for every predicate. This includes all 719 frozen
+Task-10 Mitsunobu rows with zero missing and zero additional entries. The
+persisted parity report has SHA-256
+`7800e871bc56a668e5bc6636a1f8248ab09f3af486c6092effa318c0762d09e1`.
+All 15 deterministic jobs then succeeded on their first attempts, with
+macro-F1 and exact-match accuracy both 1.0, zero model calls, zero tokens and
+zero API cost. Campaign wall time was 46 minutes 22 seconds; maximum traced
+run memory was 340.01 MiB and the Slurm step peak was 394.12 MiB. The executor
+ledger SHA-256 is
+`1c2472d15599ee51b4d69b2c74b435f79c4d10ba80330c8960ecf65e83bbcd2c`.
+Both release gates are therefore passed. Model work must still begin with one
+exact Qwen x100 repetition and one exact Claude x100 repetition before the
+remaining oracle cells are released.
 
 The project lead confirms that the reused original ground-truth predicates were
 previously reviewed by a chemist. Preserve the reviewer/date/version record for

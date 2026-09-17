@@ -84,6 +84,16 @@ Run the deterministic ceiling before model work. It costs no API money:
 uv run --frozen rxnhaystack run experiments/iclr2027/oracle-executor-campaign.toml
 ```
 
+Both gates passed on Jed at exact commit `b8f6120c0a3764579b0ca46cb6ec90943d39e949`
+on September 17, 2026. Complete parity covered all 122,456 cleaned reactions;
+the Task-10 Mitsunobu result exactly matched all 719 frozen entries with no
+missing or additional rows. The persisted parity report has SHA-256
+`7800e871bc56a668e5bc6636a1f8248ab09f3af486c6092effa318c0762d09e1`.
+All 15 deterministic jobs then succeeded on their first attempt with macro-F1
+and exact-match accuracy of 1.0, zero model calls, zero tokens, and zero API
+cost. The executor ledger has SHA-256
+`1c2472d15599ee51b4d69b2c74b435f79c4d10ba80330c8960ecf65e83bbcd2c`.
+
 Then release one inexpensive oracle cell per provider. Only after inspecting
 its prompt, metrics, predicate hash, context hash, and artifacts should the
 remaining model cells be run. Qwen shares the SwissAI account-wide request
