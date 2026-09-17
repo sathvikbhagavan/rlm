@@ -369,6 +369,8 @@ def test_dashboard_and_markdown_are_generated(
     dashboard = html_path.read_text(encoding="utf-8")
     markdown = markdown_path.read_text(encoding="utf-8")
     assert "Run explorer" in dashboard
+    assert '<details class="panel run-explorer">' in dashboard
+    assert '<details class="panel run-explorer" open>' not in dashboard
     assert "GPT-5 mini" in dashboard
     assert "Model and method matrix" in dashboard
     assert "| GPT-5 mini | llm | 2 | 1 |" in markdown
