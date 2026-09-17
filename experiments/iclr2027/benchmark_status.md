@@ -4,9 +4,9 @@ This is the shared coordination record for the final benchmark. It says who
 owns each part, where it is running, what is complete, and what must happen
 next. Update this file whenever a phase starts, stops, or materially changes.
 
-Last consolidated: **2026-09-17 01:41 Europe/Zurich**
+Last consolidated: **2026-09-17 13:26 Europe/Zurich**
 
-Repository commit at consolidation: `fdf792c026dcdc8067c56febd3eb631a1a7e022c`
+Repository commit at consolidation: `c73c91bcb985218fe2020cf3f098f210e7f5e57e`
 
 ## How to read the counts
 
@@ -42,7 +42,7 @@ changing this table and checking both ledgers for overlap.
 
 | Model | Owner / machine | LLM | CodeAct | RLM | Confidence |
 | --- | --- | ---: | ---: | ---: | --- |
-| DeepSeek V4 Flash | Amin / `liacpc14` | 300 succeeded | Finished: 243 succeeded, 57 failed | 12 succeeded, 1 running, 437 pending | Verified locally at consolidation time |
+| DeepSeek V4 Flash | Amin / `liacpc14` | 300 succeeded | Finished: 243 succeeded, 57 failed | 34 succeeded, 1 stalled, 415 pending | Verified locally at consolidation time |
 | GLM 5.2 | shared / Jed | 300 succeeded in reusable v28 results on `liacpc14` | Release pilot failed; remaining 299 held | 22 succeeded, 6 failed, 1 running, 376 pending among 405 non-Docker jobs; 45 Docker jobs held | GLM LLM verified locally; RLM from Jed report |
 | Qwen 3.5 | Sathvik / `liacpc15` | Reported complete, nominally 300 | Reported complete, nominally 300 | Reported near completion; exact success/failure/running/pending split missing | Reported by Sathvik through Amin |
 | Gemini Flash | Sathvik / `liacpc15` | Reported complete; exact ledger count missing | Reported complete; exact ledger count missing | Reported launched; progress and outcome counts unknown | Unverified collaborator report |
@@ -53,12 +53,19 @@ changing this table and checking both ledgers for overlap.
 
 - CodeAct finished with 243 successful and 57 failed jobs.
 - Active phase: RLM, one worker, six SwissAI request starts per minute at most.
-- Active run at consolidation:
-  `full-deepseek-v4-flash-tier1-task1-rlm-xfull-r03`.
+- Stalled run at consolidation:
+  `full-deepseek-v4-flash-tier2-task3-rlm-x100-r05`.
 - The CodeAct failures are retained for a later failed-only review/retry. Do
   not retry them while they would compete with the active RLM phase.
-- RLM started automatically at `2026-09-16T21:13:47Z`. Twelve jobs succeeded,
-  one was active, 437 were pending, and none had failed at consolidation.
+- RLM started automatically at `2026-09-16T21:13:47Z`. Thirty-four jobs
+  succeeded and 415 were pending at consolidation. The current job had been
+  marked running for more than eight hours, but its last model/iteration event
+  was at `2026-09-17T03:21:37Z`. Four HTTPS sockets were in `CLOSE-WAIT`; only
+  resource samples continued. The configured 1,800-second RLM timeout is
+  checked between iterations and therefore did not interrupt this hung client
+  call. Preserve its artifacts, terminate only this attempt, verify that the
+  launcher records a failure and advances, and add a launcher-enforced
+  process-wall-time guard before leaving another long unattended phase.
 
 ### GLM details on Jed
 
