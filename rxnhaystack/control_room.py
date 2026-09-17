@@ -565,6 +565,8 @@ def merge_snapshots(
     for snapshot in snapshots:
         validate_snapshot(snapshot)
         experiment = snapshot["experiment"]
+        if is_smoke_experiment(str(experiment["name"])):
+            continue
         key = (str(experiment["name"]), str(experiment["definition_sha256"]))
         by_experiment[key].append(snapshot)
     campaigns = [
@@ -572,6 +574,12 @@ def merge_snapshots(
         for _, group in sorted(by_experiment.items())
     ]
     return {"generated_at": reference_time.isoformat(), "campaigns": campaigns}
+
+
+def is_smoke_experiment(name: str) -> bool:
+    """Keep infrastructure validation records out of the scientific dashboard."""
+
+    return "smoke" in {part for part in re.split(r"[^a-z0-9]+", name.lower()) if part}
 
 
 def merge_experiment(

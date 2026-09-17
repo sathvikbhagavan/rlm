@@ -21,6 +21,10 @@ Local SQLite ledgers remain the authoritative scientific records.
 - duplicate execution when independent machines appear to have attempted the
   same immutable run ID.
 
+Infrastructure, concurrency, and metrics-adapter smoke tests remain preserved
+in their local ledgers and W&B status records, but are deliberately excluded
+from the dashboard and its generated Markdown report.
+
 It never publishes prompts, responses, raw errors, commands, environment
 variables, credentials, artifact paths, resource-trace paths, or dataset paths.
 Status files are mode `0600`. W&B uploads are gzip-compressed; the current

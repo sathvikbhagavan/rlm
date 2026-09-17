@@ -187,6 +187,27 @@ def test_merge_deduplicates_copied_attempts_and_flags_independent_execution(
     assert merged_independent["metrics"]["attempts"] == 3
 
 
+def test_smoke_experiments_are_not_shown_in_dashboard_outputs(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    scientific = populated_snapshot(tmp_path, monkeypatch)
+    smoke = deepcopy(scientific)
+    smoke["source"]["id"] = "jed-infrastructure-smoke"
+    smoke["experiment"]["name"] = "iclr2027-infrastructure-smoke-v4"
+    smoke["experiment"]["definition_sha256"] = "b" * 64
+    resign(smoke)
+
+    merged = merge_snapshots([smoke, scientific], now=datetime(2026, 9, 17, 12, 10, tzinfo=UTC))
+    assert [campaign["name"] for campaign in merged["campaigns"]] == ["control-room-test"]
+
+    html_path = tmp_path / "index.html"
+    markdown_path = tmp_path / "status.md"
+    write_dashboard(html_path, merged)
+    write_markdown(markdown_path, merged)
+    assert "infrastructure-smoke" not in html_path.read_text(encoding="utf-8")
+    assert "infrastructure-smoke" not in markdown_path.read_text(encoding="utf-8")
+
+
 def test_stale_is_based_on_machine_heartbeat(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
