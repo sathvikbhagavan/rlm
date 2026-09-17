@@ -71,15 +71,16 @@ def test_prospective_prompt_conditions_isolate_information(question_id: str) -> 
     assert spec.description in legacy
 
 
-def test_final_transformation_candidates_have_explicit_provenance_and_review_gate() -> None:
+def test_final_transformations_have_explicit_provenance_and_author_approval() -> None:
     assert set(FINAL_TRANSFORMATIONS) == set(INITIAL_QUESTION_IDS)
     for value in FINAL_TRANSFORMATIONS.values():
         assert value.accepted_terminal_indices
         assert set(value.accepted_terminal_indices) <= set(value.supporting_target_product_indices)
         assert "cleaned USPTO" in value.provenance
-        assert (
-            value.review_status == "requires-author-chemist-confirmation-before-scientific-launch"
-        )
+        assert value.review_status == "approved-by-author-chemist-2026-09-17"
+    assert FINAL_TRANSFORMATIONS["lactam_dipeptide"].summary == (
+        "Boc deprotection of secondary amine"
+    )
 
 
 def test_exact_target_product_indices_uses_canonical_component_equality() -> None:
@@ -126,7 +127,7 @@ def test_control_context_excludes_every_exact_target_product_and_preserves_gt(
     )
 
 
-def test_generated_prospective_study_is_small_paired_and_held_for_class_review() -> None:
+def test_generated_prospective_study_is_small_paired_and_author_approved() -> None:
     path = ROOT / "experiments/iclr2027/prospective-decomposition.toml"
     assert path.read_text(encoding="utf-8") == generate_prospective_decomposition.render()
     manifest = load_manifest(path)
@@ -140,7 +141,7 @@ def test_generated_prospective_study_is_small_paired_and_held_for_class_review()
         assert run.method == "rlm"
         assert run.env["RXNHAYSTACK_TASK16_QUESTION_IDS"] == ",".join(INITIAL_QUESTION_IDS)
         assert run.env["RXNHAYSTACK_TASK16_EXCLUDE_ALL_TARGET_PRODUCTS"] == "1"
-        assert run.env["RXNHAYSTACK_TASK16_CLASS_LABELS_AUTHOR_APPROVED"] == "0"
+        assert run.env["RXNHAYSTACK_TASK16_CLASS_LABELS_AUTHOR_APPROVED"] == "1"
     assert len(grouped) == 2
     for model_runs in grouped.values():
         assert len(model_runs) == 15

@@ -166,9 +166,11 @@ machines' ledgers and confirm which run IDs remain.
 2. **The obvious competing systems are absent.** There is no completed
    retrieval-augmented or non-recursive map-reduce baseline. A six-model
    replication does not answer whether RLM recursion is necessary.
-3. **Prospective validity is unresolved.** Task 16 target-name, target-structure,
-   and target-structure-plus-class conditions have not been run, and the available
-   chemist-review application has not yet produced annotations.
+3. **Prospective validity is unresolved experimentally.** Task 16 target-name,
+   target-structure, and target-structure-plus-class conditions have not been
+   run. An author chemist approved the three final-step class descriptions on
+   September 17, correcting the lactam description to "Boc deprotection of
+   secondary amine," so the label-review gate is now cleared.
 4. **The final benchmark matrix is incomplete.** Several RLM phases are active,
    GLM CodeAct is blocked, GPT retries are policy-blocked, transient failures
    remain, and Docker coverage is unresolved. The paper can tolerate disclosed
@@ -273,7 +275,7 @@ and leakage audits pass:
 | Branch | Work | Launch tonight? |
 | --- | --- | --- |
 | `feature/oracle-predicate-control` at `7649255` | Five-task oracle prompts, deterministic ceiling, generated experiment and parity/leakage tests | Merged to main at `3646060`; full parity and deterministic gates passed at `b8f6120`; model pilots pending |
-| `feature/task16-prospective-decomposition` at `6cc7719` | Correct Task-16 name/structure/class conditions, remove exact-target leakage, fix taxonomy and prepare human-review export | Merged to main at `6a85c01`; class arm held for chemist approval |
+| `feature/task16-prospective-decomposition` at `6cc7719` | Correct Task-16 name/structure/class conditions, remove exact-target leakage, fix taxonomy and prepare human-review export | Merged to main at `6a85c01`; author-chemist label approval received September 17; pilot pending |
 | `feature/flat-map-reduce-baseline` at `475d018` | Resumable Tier-1--3 flat mapper/union reducer, artifacts and mocked experiment definition | Shelved on its remote branch by author decision; do not merge or launch before post-submission review |
 
 The prospective definition contains 30 jobs and 90 trajectories, with an
@@ -320,8 +322,10 @@ Do not duplicate either r01 selector on another machine.
 
 The project lead confirms that the reused original ground-truth predicates were
 previously reviewed by a chemist. Preserve the reviewer/date/version record for
-the paper. This prior validation is distinct from the still-pending review of
-the three new Task-16 final-transformation class labels.
+the paper. Separately, an author chemist approved the three new Task-16
+final-transformation class labels on September 17, with the lactam wording
+changed from "spirocyclic amine" to "secondary amine." The project lead must
+add the reviewer's name to the internal manuscript record.
 
 Separately, Sathvik should queue matched Qwen behind the current full-Qwen RLM
 only after reporting his SwissAI key fingerprint and exact current ledger. Kuma

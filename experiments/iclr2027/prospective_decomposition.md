@@ -31,25 +31,27 @@ legacy descriptions also named a final transformation inconsistent with their
 withheld reaction. Preserve those results as a reproducible legacy condition;
 use the corrected control for prospective claims.
 
-Code can verify exact-target removal and consistency with the frozen records.
-A chemist must still confirm the intended synthetic interpretation and the
-three concise final-step class labels before that experimental arm is released.
+Code verifies exact-target removal and consistency with the frozen records. On
+September 17, 2026, the project lead relayed the chemistry co-author's approval
+of the three concise final-step classes. The reviewer accepted the first and
+third labels and corrected the second from "spirocyclic amine" to "secondary
+amine." Record the reviewer's name in the manuscript's internal validation
+record before submission.
 
 ## Initial scope
 
 The initial control contains three targets with distinct, auditable final steps:
 
 - `pyrimidine_piperazine`: aryl carbon-nitrogen coupling;
-- `lactam_dipeptide`: Boc deprotection;
+- `lactam_dipeptide`: Boc deprotection of secondary amine;
 - `benzamide_pyrazole`: aryl-halide borylation.
 
-The labels and supporting cleaned-USPTO indices are frozen in
-`tier4/task16_prospective.py`. They were engineering-audited against the source
-records, but the `structure_plus_class` arm is blocked until an author chemist
-confirms them. Approval requires changing `CLASS_LABELS_AUTHOR_APPROVED` in the
-generator, regenerating the experiment definition, reviewing the diff, and
-committing it. Do not bypass the gate through an ad-hoc environment override in
-a recorded run.
+The approved labels and supporting cleaned-USPTO indices are frozen in
+`tier4/task16_prospective.py`. The generated experiment records the approval;
+do not replace these descriptions through an ad-hoc environment override in a
+recorded run. None of the labels contains an exact precursor, reaction index,
+or preceding route. Their intended role is specifically to disclose the broad
+final-step class in that experimental condition.
 
 The study uses Qwen3.5-397B-A17B and Claude Haiku 4.5, five repetitions, full
 corpus RLM, and three questions per run:
@@ -71,8 +73,9 @@ uv run --frozen rxnhaystack validate experiments/iclr2027/prospective-decomposit
 uv run --frozen rxnhaystack plan experiments/iclr2027/prospective-decomposition.toml
 ```
 
-Do not launch until the class-label gate is reviewed and a single-repetition
-pilot has produced valid metrics and `task16-predictions.json`.
+The class-label gate is approved. Do not launch the remaining jobs until one
+single-repetition pilot has produced valid metrics and
+`task16-predictions.json`.
 
 ## Human-review candidates
 

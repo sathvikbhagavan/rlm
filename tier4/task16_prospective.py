@@ -45,13 +45,14 @@ class FinalTransformation:
     accepted_terminal_indices: tuple[int, ...]
     supporting_target_product_indices: tuple[int, ...]
     provenance: str
-    review_status: str = "requires-author-chemist-confirmation-before-scientific-launch"
+    review_status: str = "approved-by-author-chemist-2026-09-17"
 
 
 # These labels were checked against the listed cleaned-USPTO records during the
-# 2026-09-17 engineering audit.  They are intentionally narrow descriptions,
-# not automatically selected Rxn-INSIGHT labels.  An author chemist must confirm
-# them before STRUCTURE_PLUS_CLASS results are treated as scientific evidence.
+# 2026-09-17 engineering audit. They are intentionally concise descriptions,
+# not automatically selected Rxn-INSIGHT labels. On 2026-09-17 the project lead
+# relayed approval from an author chemist, including the Task-16 lactam wording
+# correction recorded below.
 FINAL_TRANSFORMATIONS: Mapping[str, FinalTransformation] = {
     "pyrimidine_piperazine": FinalTransformation(
         summary=(
@@ -63,7 +64,7 @@ FINAL_TRANSFORMATIONS: Mapping[str, FinalTransformation] = {
         provenance="cleaned USPTO target-producing records 11072, 11737, and 12317",
     ),
     "lactam_dipeptide": FinalTransformation(
-        summary="Boc deprotection of the spirocyclic amine",
+        summary="Boc deprotection of secondary amine",
         accepted_terminal_indices=(91554, 91619),
         supporting_target_product_indices=(91554, 91619),
         provenance="cleaned USPTO target-producing records 91554 and 91619",
