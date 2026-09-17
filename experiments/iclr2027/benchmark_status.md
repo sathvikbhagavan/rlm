@@ -4,7 +4,7 @@ This is the shared coordination record for the final benchmark. It says who
 owns each part, where it is running, what is complete, and what must happen
 next. Update this file whenever a phase starts, stops, or materially changes.
 
-Last consolidated: **2026-09-17 16:36 Europe/Zurich**
+Last consolidated: **2026-09-17 18:47 Europe/Zurich**
 
 Repository commit at consolidation: `b8f6120c0a3764579b0ca46cb6ec90943d39e949`
 
@@ -275,7 +275,7 @@ and leakage audits pass:
 | Branch | Work | Launch tonight? |
 | --- | --- | --- |
 | `feature/oracle-predicate-control` at `7649255` | Five-task oracle prompts, deterministic ceiling, generated experiment and parity/leakage tests | Merged to main at `3646060`; full parity and deterministic gates passed at `b8f6120`; model pilots pending |
-| `feature/task16-prospective-decomposition` at `6cc7719` | Correct Task-16 name/structure/class conditions, remove exact-target leakage, fix taxonomy and prepare human-review export | Merged to main at `6a85c01`; author-chemist label approval received September 17; pilot pending |
+| `feature/task16-prospective-decomposition` at `6cc7719` | Correct Task-16 name/structure/class conditions, remove exact-target leakage, fix taxonomy and prepare human-review export | Merged to main at `6a85c01`; label approval encoded at `3546de4`; one Claude class-arm pilot running on `liacpc14` |
 | `feature/flat-map-reduce-baseline` at `475d018` | Resumable Tier-1--3 flat mapper/union reducer, artifacts and mocked experiment definition | Shelved on its remote branch by author decision; do not merge or launch before post-submission review |
 
 The prospective definition contains 30 jobs and 90 trajectories, with an
@@ -285,6 +285,16 @@ must cover 245 chunks. Real-corpus calibration estimates about 12.5 million
 input tokens per job; its Qwen/Gemini paid ceiling is CHF 180 within a CHF 200
 budget. This work is now explicitly post-submission: do not launch even the
 pilot unless the author reopens it after the ICLR deadline.
+
+The single prospective release pilot
+`prospective-claude-haiku-4.5-task16-structure_plus_class-rlm-xfull-r01`
+started on Docker-capable `liacpc14` at approximately 18:47 Europe/Zurich on
+September 17. It is the only selected prospective run; 29 jobs remain pending.
+It uses one worker, a 30,720-MiB process-tree limit, the existing 4,096-MiB
+Docker-tool limit, and a six-hour launcher wall limit. Planned API cost is CHF
+0.18. Do not release additional prospective runs until it produces valid
+metrics, `task16-predictions.json`, provider accounting, W&B synchronization,
+and complete resource artifacts.
 
 The oracle definition contains 150 model jobs and 480 question trajectories,
 estimated at CHF 17.90 with a CHF 30 ceiling, plus 15 deterministic jobs and
