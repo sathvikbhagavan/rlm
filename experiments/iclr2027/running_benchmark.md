@@ -465,6 +465,16 @@ before the host controller is endangered. Full-corpus RLM jobs reserve 28,672
 MiB; the 49,152-MiB machine allowance therefore permits only one at a time,
 regardless of a larger `--max-parallel` value.
 
+For the September 18 `liacpc14` Docker catch-up, use
+`experiments/iclr2027/run_local_docker_catchup.sh` for Claude. It enumerates
+exactly the 45 Task-16/17/17b RLM cells, runs one at a time with x100 before
+x500 and full-corpus work, checks the live OpenRouter balance before every
+cell, and stops while retaining a USD 50 reserve. It never retries failures and
+the ledger skips any cell already completed elsewhere. Its dry-run mode is
+covered by a test that checks all 45 unique selectors. GPT Docker work remains
+held until the reviewed provider-denial and missing-usage recovery branch is
+merged; do not substitute it into this queue by editing model names.
+
 The 30-minute trajectory limit comes from the final GPT-5-mini stress test. The
 first seven full-corpus Task-16 questions finished in 14 seconds, 9.6 minutes,
 24.9 minutes, 19 seconds, 17 seconds, 4.1 minutes, and 5.8 minutes. The eighth

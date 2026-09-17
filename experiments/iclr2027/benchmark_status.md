@@ -4,7 +4,7 @@ This is the shared coordination record for the final benchmark. It says who
 owns each part, where it is running, what is complete, and what must happen
 next. Update this file whenever a phase starts, stops, or materially changes.
 
-Last consolidated: **2026-09-17 23:40 Europe/Zurich**
+Last consolidated: **2026-09-18 00:51 Europe/Zurich**
 
 Repository commit at consolidation: `b8f6120c0a3764579b0ca46cb6ec90943d39e949`
 
@@ -145,7 +145,7 @@ Each model has 45 RLM jobs for Tier-4 Tasks 16, 17, and 17b.
 
 | Machine | Docker status | Consequence |
 | --- | --- | --- |
-| `liacpc14` | Available and tested | Candidate machine for assigned Docker catch-up |
+| `liacpc14` | Available and tested | Claude and DeepSeek Docker catch-up assigned; GPT held pending recovery merge |
 | `liacpc15` | Not yet recorded here | Sathvik must report whether Qwen/Gemini Docker jobs ran |
 | Jed | Unavailable | Cannot run the 45 GLM or DeepSeek Docker jobs |
 | Kuma | Unavailable; Apptainer is not an approved silent substitute | Cannot run the 45 GPT or Claude Docker jobs |
@@ -288,13 +288,27 @@ pilot unless the author reopens it after the ICLR deadline.
 
 The single prospective release pilot
 `prospective-claude-haiku-4.5-task16-structure_plus_class-rlm-xfull-r01`
-started on Docker-capable `liacpc14` at approximately 18:47 Europe/Zurich on
-September 17. It is the only selected prospective run; 29 jobs remain pending.
-It uses one worker, a 30,720-MiB process-tree limit, the existing 4,096-MiB
-Docker-tool limit, and a six-hour launcher wall limit. Planned API cost is CHF
-0.18. Do not release additional prospective runs until it produces valid
-metrics, `task16-predictions.json`, provider accounting, W&B synchronization,
-and complete resource artifacts.
+completed successfully on Docker-capable `liacpc14`. It evaluated all three
+targets, produced valid metrics and `task16-predictions.json`, synchronized to
+W&B, and recorded complete provider and resource accounting. It made 31 calls,
+used 814,558 tokens, cost CHF 1.0163, ran for 2,156 seconds, and peaked at
+4,074.09 MiB combined host-plus-Docker memory. Macro-F1 and exact match were
+both 1/3: one target was exactly solved and two returned no parsed chains. No
+timeout or memory boundary was reached. The other 29 prospective jobs remain
+pending until their revised cost and machine schedule are approved; the CHF
+0.18 estimate materially understated this pilot.
+
+At 00:51 Europe/Zurich on September 18, the local Docker catch-up plan assigns
+the 45 held Claude Tier-4 RLM cells (Tasks 16, 17, and 17b) to `liacpc14`. They
+run serially, low-context first, with a live OpenRouter balance check before
+every cell and a protected USD 50 reserve. The balance before launch was USD
+125.97. The planned estimate is CHF 22.37, but the queue treats it as unreliable
+after the prospective and oracle calibrations. A second local worker may claim
+only DeepSeek's 45 Docker cells; SQLite claims prevent overlap with the existing
+all-DeepSeek RLM worker, and both DeepSeek workers share the same six-RPM local
+limiter. Do not start GPT Docker cells: its correct 403/missing-usage handling
+remains on an unmerged review branch, so current `main` is not an archival-safe
+launcher for those cells.
 
 The oracle definition contains 150 model jobs and 480 question trajectories,
 estimated at CHF 17.90 with a CHF 30 ceiling, plus 15 deterministic jobs and
