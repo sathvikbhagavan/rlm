@@ -288,6 +288,11 @@ estimated at CHF 17.90 with a CHF 30 ceiling, plus 15 deterministic jobs and
 Task 10 passed its x100 deterministic check but its slower full-corpus parity
 audit must pass before inference is released.
 
+The project lead confirms that the reused original ground-truth predicates were
+previously reviewed by a chemist. Preserve the reviewer/date/version record for
+the paper. This prior validation is distinct from the still-pending review of
+the three new Task-16 final-transformation class labels.
+
 Separately, Sathvik should queue matched Qwen behind the current full-Qwen RLM
 only after reporting his SwissAI key fingerprint and exact current ledger. Kuma
 may prepare a staged Azure-only GPT diagnostic using unchanged prompts; one

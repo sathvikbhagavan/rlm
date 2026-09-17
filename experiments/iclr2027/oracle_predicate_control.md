@@ -40,11 +40,16 @@ same row- or molecule-level decisions without the frozen answer indices,
 counts, sampled rows, or completed graph solutions. Full-corpus parity tests
 guard against accidental changes during that refactoring.
 
+The project lead confirms that the original benchmark predicates received
+chemist validation before this control was created. Before submission, retain a
+short validation record naming the reviewer(s), date, reviewed predicate/file
+version, and scope so the manuscript can state this with auditable provenance.
+
 This origin is important to interpretation. The control intentionally asks,
 "Can the RLM execute the benchmark reliably when given the benchmark's own
 label function?" It does not independently establish that the label function
-is chemically complete or universally correct. That separate validity claim
-requires chemist review of the original benchmark definitions.
+is universally complete beyond the benchmark definition; the prior chemist
+review supports the benchmark's intended chemical validity.
 
 Generate and check the two experiment definitions:
 
