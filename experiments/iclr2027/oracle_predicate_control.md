@@ -21,6 +21,31 @@ only identify functional groups or protecting-group events. The RLM must still
 scan the context, apply filters, construct exact-SMILES links, search or join
 the graph, and format the result.
 
+## Source of the predicates
+
+These are the benchmark's existing ground-truth computations, not new chemical
+definitions written for this control. Git history attributes the source
+definitions to Sathvik Bhagavan's June/July benchmark commits:
+
+| Control | Existing benchmark source reused exactly |
+| --- | --- |
+| Tier-3 Task 6 | Amide-coupling reaction SMARTS and RDKit `RunReactants` matching from `tier3/generate_hardcoded_ground_truth.py` and `tier3/task6_hardcoded_ground_truth.py` |
+| Tier-3 Task 10 | `reaction_line_matches_mechanism` from `tier3/task10_mechanism_evaluator.py` |
+| Tier-3 Task 23 | `reaction_creates_stereocenter_from_achiral` from `tier3/task23_stereocenter_evaluator.py` |
+| Tier-4 Task 13 | `FUNCTIONAL_GROUP_SMARTS` and functional-group detection from `tier4/task13_fg_chain_graph.py` |
+| Tier-4 Task 14 | `PROTECTING_GROUPS`, substructure detection, and stripped-scaffold logic from `tier4/task14_protecting_group_graph.py` |
+
+The new `oracle_predicates.py` files are answer-free adapters: they expose the
+same row- or molecule-level decisions without the frozen answer indices,
+counts, sampled rows, or completed graph solutions. Full-corpus parity tests
+guard against accidental changes during that refactoring.
+
+This origin is important to interpretation. The control intentionally asks,
+"Can the RLM execute the benchmark reliably when given the benchmark's own
+label function?" It does not independently establish that the label function
+is chemically complete or universally correct. That separate validity claim
+requires chemist review of the original benchmark definitions.
+
 Generate and check the two experiment definitions:
 
 ```bash

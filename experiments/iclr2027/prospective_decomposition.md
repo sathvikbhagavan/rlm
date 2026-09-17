@@ -24,6 +24,17 @@ only target-producing reactions used as terminals in accepted five-step routes.
 Without the stricter rule, four targets remain visible as products elsewhere in
 the full corpus and the structure condition can collapse into exact lookup.
 
+This does not show that all original Task-16 reaction chains or scores were
+wrong. It shows that the legacy prompt and corpus-exclusion protocol did not
+support the strong interpretation of a clean name-only prospective test. Two
+legacy descriptions also named a final transformation inconsistent with their
+withheld reaction. Preserve those results as a reproducible legacy condition;
+use the corrected control for prospective claims.
+
+Code can verify exact-target removal and consistency with the frozen records.
+A chemist must still confirm the intended synthetic interpretation and the
+three concise final-step class labels before that experimental arm is released.
+
 ## Initial scope
 
 The initial control contains three targets with distinct, auditable final steps:

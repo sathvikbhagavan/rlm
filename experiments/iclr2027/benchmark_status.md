@@ -4,9 +4,9 @@ This is the shared coordination record for the final benchmark. It says who
 owns each part, where it is running, what is complete, and what must happen
 next. Update this file whenever a phase starts, stops, or materially changes.
 
-Last consolidated: **2026-09-17 13:26 Europe/Zurich**
+Last consolidated: **2026-09-17 13:45 Europe/Zurich**
 
-Repository commit at consolidation: `c73c91bcb985218fe2020cf3f098f210e7f5e57e`
+Repository commit at consolidation: `6a85c01cb65ea2495d292308bba6cbbc9d747dce`
 
 ## How to read the counts
 
@@ -42,7 +42,7 @@ changing this table and checking both ledgers for overlap.
 
 | Model | Owner / machine | LLM | CodeAct | RLM | Confidence |
 | --- | --- | ---: | ---: | ---: | --- |
-| DeepSeek V4 Flash | Amin / `liacpc14` | 300 succeeded | Finished: 243 succeeded, 57 failed | 34 succeeded, 1 stalled, 415 pending | Verified locally at consolidation time |
+| DeepSeek V4 Flash | Amin / `liacpc14` | 300 succeeded | Finished: 243 succeeded, 57 failed | 34 succeeded, 1 failed after clean interruption, 1 running, 414 pending | Verified locally after guarded restart |
 | GLM 5.2 | shared / Jed | 300 succeeded in reusable v28 results on `liacpc14` | Release pilot failed; remaining 299 held | 22 succeeded, 6 failed, 1 running, 376 pending among 405 non-Docker jobs; 45 Docker jobs held | GLM LLM verified locally; RLM from Jed report |
 | Qwen 3.5 | Sathvik / `liacpc15` | Reported complete, nominally 300 | Reported complete, nominally 300 | Reported near completion; exact success/failure/running/pending split missing | Reported by Sathvik through Amin |
 | Gemini Flash | Sathvik / `liacpc15` | Reported complete; exact ledger count missing | Reported complete; exact ledger count missing | Reported launched; progress and outcome counts unknown | Unverified collaborator report |
@@ -53,7 +53,7 @@ changing this table and checking both ledgers for overlap.
 
 - CodeAct finished with 243 successful and 57 failed jobs.
 - Active phase: RLM, one worker, six SwissAI request starts per minute at most.
-- Stalled run at consolidation:
+- Formerly stalled run:
   `full-deepseek-v4-flash-tier2-task3-rlm-x100-r05`.
 - The CodeAct failures are retained for a later failed-only review/retry. Do
   not retry them while they would compete with the active RLM phase.
@@ -63,9 +63,16 @@ changing this table and checking both ledgers for overlap.
   was at `2026-09-17T03:21:37Z`. Four HTTPS sockets were in `CLOSE-WAIT`; only
   resource samples continued. The configured 1,800-second RLM timeout is
   checked between iterations and therefore did not interrupt this hung client
-  call. Preserve its artifacts, terminate only this attempt, verify that the
-  launcher records a failure and advances, and add a launcher-enforced
-  process-wall-time guard before leaving another long unattended phase.
+  call. It was cleanly interrupted and retained as failed with return code 143.
+  Commit `6f99e12` adds and tests a launcher-owned wall-time boundary outside
+  the model SDK. The phase resumed with `--max-run-seconds 21600`; the next job,
+  `full-deepseek-v4-flash-tier2-task3-rlm-x500-r01`, started successfully.
+- The 57 CodeAct failures were not blindly retried because they would consume
+  the same SwissAI quota as the active RLM phase and include non-retryable
+  configurations. Their first-error taxonomy is: 20 workflow timeouts, 17 API
+  timeouts, 11 generic timeouts, six context-window 400 errors, one provider
+  status error, and two interrupted attempts. Retry transient classes only
+  after RLM; change the six context-overflow configurations before retrying.
 
 ### GLM details on Jed
 
@@ -263,8 +270,8 @@ and leakage audits pass:
 
 | Branch | Work | Launch tonight? |
 | --- | --- | --- |
-| `feature/oracle-predicate-control` at `7649255` | Five-task oracle prompts, deterministic ceiling, generated experiment and parity/leakage tests | Pushed; 444 tests passed, 11 skipped; Task-10 full-corpus parity remains a pre-launch gate |
-| `feature/task16-prospective-decomposition` at `6cc7719` | Correct Task-16 name/structure/class conditions, remove exact-target leakage, fix taxonomy and prepare human-review export | Pushed; 449 tests passed, 10 skipped; class arm held for chemist approval |
+| `feature/oracle-predicate-control` at `7649255` | Five-task oracle prompts, deterministic ceiling, generated experiment and parity/leakage tests | Merged to main at `3646060`; Task-10 full-corpus parity remains a pre-launch gate |
+| `feature/task16-prospective-decomposition` at `6cc7719` | Correct Task-16 name/structure/class conditions, remove exact-target leakage, fix taxonomy and prepare human-review export | Merged to main at `6a85c01`; class arm held for chemist approval |
 | `feature/flat-map-reduce-baseline` at `475d018` | Resumable Tier-1--3 flat mapper/union reducer, artifacts and mocked experiment definition | Shelved on its remote branch by author decision; do not merge or launch before post-submission review |
 
 The prospective definition contains 30 jobs and 90 trajectories, with an
