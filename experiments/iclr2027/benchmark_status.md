@@ -304,14 +304,19 @@ remaining oracle cells are released.
 Those two pilots started on `liacpc14` at approximately 16:36 Europe/Zurich:
 `oracle-qwen3.5-397b-tier3-task6-x100-r01` and
 `oracle-claude-haiku-4.5-tier3-task6-x100-r01`. They are the only selected
-oracle model runs; the other 148 ledger rows remain pending. Both run with one
-question at a time and a six-hour launcher wall limit. The Qwen pilot shares
+oracle model runs completed successfully on their first attempts. Qwen handled
+four questions in 369 seconds using 25 calls and 141,401 tokens, scored 0.75
+macro-F1/exact match, cost CHF 0.00, and peaked at 378.79 MiB. Claude handled
+the same four questions in 51 seconds using eight calls and 53,986 tokens,
+scored 0.50 macro-F1/exact match, cost CHF 0.0691, and peaked at 379.80 MiB.
+Both produced metrics, resource traces and W&B records without timeout or
+memory failure. These scores are scientific outcomes, not release failures:
+the pilots establish that each model received and executed the answer-free
+helper, while showing that orchestration errors remain even with the chemistry
+abstraction supplied. The other 148 runs remain pending. The Qwen pilot shared
 the existing machine-wide six-request-per-minute SwissAI limiter with the
-DeepSeek worker, so it does not increase `liacpc14` beyond its assigned quota.
-The Claude pilot uses OpenRouter. Planned model cost is CHF 0.00 for Qwen and
-CHF 0.29 for Claude. Inspect scientific metrics, provider accounting, prompt
-and predicate hashes, W&B logging, and resource artifacts before releasing any
-additional oracle jobs.
+DeepSeek worker, so it did not increase `liacpc14` beyond its assigned quota.
+Do not duplicate either r01 selector on another machine.
 
 The project lead confirms that the reused original ground-truth predicates were
 previously reviewed by a chemist. Preserve the reviewer/date/version record for
