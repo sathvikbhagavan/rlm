@@ -573,3 +573,27 @@ Update benchmark execution status
 ```
 
 Do not edit generated TOML files just to update this coordination record.
+
+## Email completion notifications
+
+Commit `73fe65f` adds the project-independent `task-notify` utility and installs
+it for Amin under `~/.local/bin`. It can wrap any command or watch selected
+rows in a compatible SQLite ledger. Messages report completion, failure, early
+launcher termination, or a cost/balance ceiling, together with the task
+description, execution host, project, selected run scope, counts, calls,
+tokens, recorded cost, and the explicit Codex chat title and machine.
+
+Two durable watchers started on `liacpc14` at 12:17 Europe/Zurich:
+
+- `task-notify-claude-docker` watches all 45 Claude Docker RLM cells, launcher
+  PID `3147146`, and the guarded OpenRouter queue log;
+- `task-notify-gpt-docker` watches all 45 direct-OpenAI GPT Docker RLM cells,
+  launcher PID `3156222`, and the CHF 30 experiment ceiling.
+
+Both use the canonical chat label `RxnHaystack ICLR 2027 master chat` and chat
+machine `liacpc14`. Their mode-600 states are under
+`~/.local/state/task-notify/`. SMTP is configured for
+`amansouri3476@gmail.com`, but delivery remains pending until the private
+`~/.smtp_app_password` file exists with mode 600. If either experiment ends
+before that file is configured, its terminal message remains pending and the
+watcher retries rather than discarding it.
