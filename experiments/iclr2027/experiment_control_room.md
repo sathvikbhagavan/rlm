@@ -61,7 +61,9 @@ If several phases truly share one ledger, publish it once under one source ID.
 The checked-in helper discovers every populated full-v34 and matched-v7 ledger
 below a user's home directory, validates each one read-only against the current
 experiment file, ignores empty and smoke-test ledgers, avoids publishing a hard
-linked ledger twice, and starts one persistent tmux updater per ledger. Run:
+linked ledger twice, and starts one persistent tmux updater per ledger. It
+prunes Git metadata, virtual environments, caches and W&B logs, and stops
+descending as soon as it finds an exact experiment directory. Run:
 
 ```bash
 bash experiments/iclr2027/start_dashboard_reporting.sh Sathvik liacpc15 "$HOME"

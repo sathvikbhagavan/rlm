@@ -24,7 +24,13 @@ dashboard_started=0
 dashboard_existing=0
 dashboard_skipped=0
 
-while IFS= read -r -d '' dashboard_ledger; do
+echo "Scanning $dashboard_search_root for full-v34 and matched-v7 ledgers..."
+
+while IFS= read -r -d '' dashboard_campaign_dir; do
+  dashboard_ledger="$dashboard_campaign_dir/ledger.sqlite3"
+  if [[ ! -f "$dashboard_ledger" ]]; then
+    continue
+  fi
   dashboard_inode="$(stat -Lc '%d:%i' "$dashboard_ledger")"
   if [[ -n "${dashboard_seen_inodes[$dashboard_inode]:-}" ]]; then
     continue
@@ -83,10 +89,12 @@ while IFS= read -r -d '' dashboard_ledger; do
   echo "Started: $dashboard_ledger ($dashboard_session, $dashboard_observed observed jobs)"
   dashboard_started=$((dashboard_started + 1))
 done < <(
-  find "$dashboard_search_root" -type f \
-    \( -path '*/artifacts/iclr2027-six-model-full-v34/ledger.sqlite3' \
-    -o -path '*/artifacts/iclr2027-matched-cardinality-v7/ledger.sqlite3' \) \
-    -print0 2>/dev/null
+  find "$dashboard_search_root" \
+    \( -type d \( -name .git -o -name .venv -o -name .cache -o -name wandb \
+    -o -name node_modules \) -prune \) -o \
+    \( -type d \( -name iclr2027-six-model-full-v34 \
+    -o -name iclr2027-matched-cardinality-v7 \) -print0 -prune \) \
+    2>/dev/null
 )
 
 if ((dashboard_started == 0 && dashboard_existing == 0)); then
