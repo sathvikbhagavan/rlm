@@ -4,9 +4,9 @@ This is the shared coordination record for the final benchmark. It says who
 owns each part, where it is running, what is complete, and what must happen
 next. Update this file whenever a phase starts, stops, or materially changes.
 
-Last consolidated: **2026-09-18 10:26 Europe/Zurich**
+Last consolidated: **2026-09-18 10:48 Europe/Zurich**
 
-Repository commit at consolidation: `b915375`
+Repository commit at consolidation: `c6c56ef`
 
 ## How to read the counts
 
@@ -47,7 +47,7 @@ changing this table and checking both ledgers for overlap.
 | Qwen 3.5 | Sathvik / `liacpc15` | Reported complete, nominally 300 | Reported complete, nominally 300 | Reported near completion; exact success/failure/running/pending split missing | Reported by Sathvik through Amin |
 | Gemini Flash | Sathvik / `liacpc15` | Reported complete; exact ledger count missing | Reported complete; exact ledger count missing | Reported launched; progress and outcome counts unknown | Unverified collaborator report |
 | Claude Haiku | Amin / Kuma and `liacpc14` | 300 succeeded | Effectively 300 succeeded: 299 assigned cells plus one compatible prior cell | At least 390 succeeded across the last Kuma report and 23 non-overlapping local Docker cells; one prior failure; exact current Kuma remainder needs refresh | Local Docker ledger verified; Kuma count remains a lower-bound reconciliation |
-| GPT-5-mini | Amin / Kuma | 300 succeeded | 300 succeeded | 384/405 succeeded; 19 missing-usage/empty-response failures and 2 memory failures; 45 Docker jobs held | Verified by Kuma ledger audit |
+| GPT-5-mini | Amin / Kuma and `liacpc14` | 300 succeeded | 300 succeeded | Kuma non-Docker: 384/405 succeeded with 21 failed; direct-OpenAI Docker: 1 succeeded, 1 running, 43 pending | Both ledgers verified; Docker transport change is explicit |
 
 ### DeepSeek details on `liacpc14`
 
@@ -324,12 +324,36 @@ computation and waiting but does not increase the machine's account request
 rate. At the latest check the machine used 7.5 GiB of 61 GiB RAM with 53 GiB
 available, and the active Docker container was healthy.
 
-GPT's 45 Docker cells were not launched. Its correct 403/missing-usage handling
-remains on the unmerged `review/gpt-retry-definitions` branch, and the tested
-upstream OpenAI route still returns policy refusals. Launching those cells from
-current `main` would not produce archival-safe failure or accounting records.
-The relevant tmux sessions are `rxn-claude-docker-catchup-v34` (stopped safely)
-and `rxn-deepseek-docker-catchup-v34` (active).
+GPT's 45 Docker cells now run through a distinct, provenance-preserving direct
+OpenAI experiment rather than silently changing the transport of the v34 run
+IDs. The `.openai_api_key_liac` credential is a valid OpenAI project key: model
+access and a minimal paid completion succeeded. Numeric project balance is not
+available to that key because both OpenAI billing endpoints returned HTTP 403,
+so the experiment enforces its own CHF 30 hard budget and calculates cost from
+official GPT-5-mini input, cached-input and output token prices. Commit
+`c6c56ef` adds this transport, its generated 45-cell definition and its staged
+runner. The complete suite passed 487 tests with 11 skipped.
+
+The direct-OpenAI release cell
+`direct-openai-gpt-5-mini-tier4-task17-rlm-x100-r01` passed: five questions,
+39 calls, 606,136 tokens, CHF 0.0759, 372 seconds, 462.16 MiB peak combined
+memory, complete W&B and artifacts, and no timeout or policy refusal. This
+demonstrates that the earlier empty-choice HTTP 403 is specific to the
+OpenRouter/upstream route or its account-policy context, not a universal block
+on the unchanged benchmark task. The remaining 44 cells released
+automatically; Task-16 x100 r01 was active at consolidation. The tmux session
+is `rxn-gpt-direct-openai-docker-v1`, using the isolated clone
+`/home/amin/rlm-gpt-direct-openai` and ledger
+`artifacts/iclr2027-gpt5mini-direct-openai-docker-v1/ledger.sqlite3` there.
+
+Claude's guarded queue was resumed with an explicit USD 3 reserve after author
+approval. It advanced to 24 succeeded, one running and 20 pending; recorded
+Docker cost was CHF 30.7043 and OpenRouter reported USD 40.39 remaining. The
+queue still checks that allowance before every new cell and will stop before
+the reserve rather than repeatedly submit after the account limit is reached.
+The relevant Claude and DeepSeek tmux sessions are
+`rxn-claude-docker-catchup-v34-resume` and
+`rxn-deepseek-docker-catchup-v34`.
 
 The oracle definition contains 150 model jobs and 480 question trajectories,
 estimated at CHF 17.90 with a CHF 30 ceiling, plus 15 deterministic jobs and
