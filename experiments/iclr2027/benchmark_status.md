@@ -4,9 +4,9 @@ This is the shared coordination record for the final benchmark. It says who
 owns each part, where it is running, what is complete, and what must happen
 next. Update this file whenever a phase starts, stops, or materially changes.
 
-Last consolidated: **2026-09-18 00:51 Europe/Zurich**
+Last consolidated: **2026-09-18 10:26 Europe/Zurich**
 
-Repository commit at consolidation: `b8f6120c0a3764579b0ca46cb6ec90943d39e949`
+Repository commit at consolidation: `b915375`
 
 ## How to read the counts
 
@@ -42,11 +42,11 @@ changing this table and checking both ledgers for overlap.
 
 | Model | Owner / machine | LLM | CodeAct | RLM | Confidence |
 | --- | --- | ---: | ---: | ---: | --- |
-| DeepSeek V4 Flash | Amin / `liacpc14` | 300 succeeded | Finished: 243 succeeded, 57 failed | 34 succeeded, 1 failed after clean interruption, 1 running, 414 pending | Verified locally after guarded restart |
+| DeepSeek V4 Flash | Amin / `liacpc14` | 300 succeeded | Finished: 243 succeeded, 57 failed | 116 succeeded, 2 failed, 2 running, 330 pending | Verified locally at 10:26 September 18; includes ordinary and Docker workers |
 | GLM 5.2 | shared / Jed | 300 succeeded in reusable v28 results on `liacpc14` | Release pilot failed; remaining 299 held | 22 succeeded, 6 failed, 1 running, 376 pending among 405 non-Docker jobs; 45 Docker jobs held | GLM LLM verified locally; RLM from Jed report |
 | Qwen 3.5 | Sathvik / `liacpc15` | Reported complete, nominally 300 | Reported complete, nominally 300 | Reported near completion; exact success/failure/running/pending split missing | Reported by Sathvik through Amin |
 | Gemini Flash | Sathvik / `liacpc15` | Reported complete; exact ledger count missing | Reported complete; exact ledger count missing | Reported launched; progress and outcome counts unknown | Unverified collaborator report |
-| Claude Haiku | Amin / Kuma | 300 succeeded | Effectively 300 succeeded: 299 assigned cells plus one compatible prior cell | Last confirmed: 163/405 succeeded, 1 running, 241 pending; 45 Docker jobs held | Kuma ledger report, but RLM count is stale and needs refresh |
+| Claude Haiku | Amin / Kuma and `liacpc14` | 300 succeeded | Effectively 300 succeeded: 299 assigned cells plus one compatible prior cell | At least 390 succeeded across the last Kuma report and 23 non-overlapping local Docker cells; one prior failure; exact current Kuma remainder needs refresh | Local Docker ledger verified; Kuma count remains a lower-bound reconciliation |
 | GPT-5-mini | Amin / Kuma | 300 succeeded | 300 succeeded | 384/405 succeeded; 19 missing-usage/empty-response failures and 2 memory failures; 45 Docker jobs held | Verified by Kuma ledger audit |
 
 ### DeepSeek details on `liacpc14`
@@ -299,21 +299,37 @@ pending until their revised cost and machine schedule are approved; the CHF
 0.18 estimate materially understated this pilot.
 
 At 00:55 Europe/Zurich on September 18, the local Docker catch-up plan launched
-the 45 held Claude Tier-4 RLM cells (Tasks 16, 17, and 17b) to `liacpc14`. They
-run serially, low-context first, with a live OpenRouter balance check before
-every cell and a protected USD 50 reserve. The balance before launch was USD
-125.97. The planned estimate is CHF 22.37, but the queue treats it as unreliable
-after the prospective and oracle calibrations. A second local worker may claim
-only DeepSeek's 45 Docker cells; SQLite claims prevent overlap with the existing
-all-DeepSeek RLM worker, and both DeepSeek workers share the same six-RPM local
-limiter. Do not start GPT Docker cells: its correct 403/missing-usage handling
-remains on an unmerged review branch, so current `main` is not an archival-safe
-launcher for those cells. The Claude queue started with Task-17 x100 r01. The
-DeepSeek Docker-only worker simultaneously claimed Task-16 x100 r01 while the
-original DeepSeek worker continued its non-Docker phase. Two labelled sandbox
-containers were healthy and total machine memory remained at 8.7 GiB used with
-52 GiB available during the initial check. The tmux sessions are
-`rxn-claude-docker-catchup-v34` and `rxn-deepseek-docker-catchup-v34`.
+separate serial Claude and DeepSeek workers on `liacpc14`. By 10:26, 29 Docker
+jobs had succeeded with no queue failures. Claude completed 23/45: all 15 x100
+jobs, all five Task-17 x500 repetitions, and three of five Task-17b x500
+repetitions. Those jobs made 845 model calls, used 24,153,936 tokens, recorded
+CHF 29.9779, and peaked at 616.8 MiB combined process-tree-plus-Docker memory.
+The queue checked the live OpenRouter allowance before every cell and stopped
+cleanly at 05:23 when it observed USD 47.70 remaining, below the protected USD
+50 reserve. A later read-only check showed USD 42.12 remaining; the key is also
+used by other project processes, so the additional balance movement is not
+attributed to this stopped queue. The other 22 Claude Docker jobs remain
+pending and the queue will resume without repeating its 23 successes after a
+budget decision or key-limit increase.
+
+DeepSeek completed all five Task-16 x100 repetitions and Task-16 x500 r01;
+Task-16 x500 r02 was active. Its six successful Docker jobs made 1,458 calls,
+used 79,873,974 tokens, cost CHF 0.00 through SwissAI, and peaked at 708.2 MiB.
+The original DeepSeek worker simultaneously progressed through the non-Docker
+queue. Together, DeepSeek RLM advanced from the previously documented 34
+successes to 116 successes; two independent cells were active, two failures
+were preserved, and 330 remained pending. Both workers share the same local
+six-request-per-minute SwissAI limiter, so the second worker overlaps local
+computation and waiting but does not increase the machine's account request
+rate. At the latest check the machine used 7.5 GiB of 61 GiB RAM with 53 GiB
+available, and the active Docker container was healthy.
+
+GPT's 45 Docker cells were not launched. Its correct 403/missing-usage handling
+remains on the unmerged `review/gpt-retry-definitions` branch, and the tested
+upstream OpenAI route still returns policy refusals. Launching those cells from
+current `main` would not produce archival-safe failure or accounting records.
+The relevant tmux sessions are `rxn-claude-docker-catchup-v34` (stopped safely)
+and `rxn-deepseek-docker-catchup-v34` (active).
 
 The oracle definition contains 150 model jobs and 480 question trajectories,
 estimated at CHF 17.90 with a CHF 30 ceiling, plus 15 deterministic jobs and
