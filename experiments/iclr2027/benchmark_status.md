@@ -576,11 +576,11 @@ Do not edit generated TOML files just to update this coordination record.
 
 ## Email completion notifications
 
-`task-notify` is now a standalone utility at `/home/amin/tasknotify`, installed
-for Amin under `~/.local/bin`. RxnHaystack contains only this project-specific
-coordination record and examples. The reusable implementation is intentionally
-not coupled to this repository, so it can also monitor CoQ, Catelier, and other
-projects.
+`task-notify` is now a standalone utility at
+<https://github.com/amansouri3476/tasknotify>, installed for Amin under
+`~/.local/bin`. RxnHaystack contains only this project-specific coordination
+record and examples. The reusable implementation is intentionally not coupled
+to this repository, so it can also monitor CoQ, Catelier, and other projects.
 
 In addition to completion, failure, launcher termination, and cost-limit mail,
 the utility now sends hourly updates by default. It labels a message

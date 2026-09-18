@@ -1,14 +1,16 @@
 # Email notifications for RxnHaystack jobs
 
 RxnHaystack uses the standalone, project-independent `task-notify` utility.
-Its source, complete setup guide, tests, and attachment examples live in
-`/home/amin/tasknotify` on `liacpc14`; they are not part of this research
-repository. The same utility can monitor CoQ, Catelier, or unrelated work.
+Its source, complete setup guide, tests, and attachment examples live at
+<https://github.com/amansouri3476/tasknotify>; they are not part of this
+research repository. The same utility can monitor CoQ, Catelier, or unrelated
+work.
 
 Install it separately:
 
 ```bash
-uv tool install --editable /absolute/path/to/tasknotify
+git clone git@github.com:amansouri3476/tasknotify.git ~/tasknotify
+uv tool install --editable ~/tasknotify
 task-notify --help
 ```
 
