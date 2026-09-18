@@ -48,3 +48,25 @@ def test_local_docker_catchup_dry_run_covers_exact_claude_docker_scope(
         "xfull",
     }
     assert not any("gpt" in run_id or "deepseek" in run_id for run_id in run_ids)
+
+
+def test_local_docker_catchup_rejects_invalid_balance_reserve(tmp_path: Path) -> None:
+    environment = os.environ.copy()
+    environment.update(
+        {
+            "RXNHAYSTACK_DOCKER_QUEUE_DRY_RUN": "1",
+            "RXNHAYSTACK_DOCKER_QUEUE_LOG": str(tmp_path / "queue.log"),
+            "RXNHAYSTACK_OPENROUTER_RESERVE_USD": "not-a-number",
+        }
+    )
+    completed = subprocess.run(
+        ["bash", str(SCRIPT)],
+        check=False,
+        cwd=ROOT,
+        env=environment,
+        capture_output=True,
+        text=True,
+    )
+
+    assert completed.returncode == 2
+    assert "must be a non-negative number" in completed.stderr

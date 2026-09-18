@@ -11,9 +11,14 @@ set -uo pipefail
 project_root="/home/amin/rlm"
 experiment_file="experiments/iclr2027/full-campaign.toml"
 openrouter_key_file="/home/amin/.openrouter_api_key"
-minimum_remaining_usd="50"
+minimum_remaining_usd="${RXNHAYSTACK_OPENROUTER_RESERVE_USD:-50}"
 log_file="${RXNHAYSTACK_DOCKER_QUEUE_LOG:-${project_root}/artifacts/iclr2027-six-model-full-v34/docker-claude-queue.log}"
 dry_run="${RXNHAYSTACK_DOCKER_QUEUE_DRY_RUN:-0}"
+
+if [[ ! "${minimum_remaining_usd}" =~ ^[0-9]+([.][0-9]+)?$ ]]; then
+  printf 'RXNHAYSTACK_OPENROUTER_RESERVE_USD must be a non-negative number\n' >&2
+  exit 2
+fi
 
 secret_arguments=(
   --secret-file "OPENROUTER_API_KEY=${openrouter_key_file}"
