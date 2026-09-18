@@ -376,6 +376,31 @@ def test_sync_downloads_and_validates_latest_snapshot(
     assert control_room.os.environ["WANDB_API_KEY"] == "original"
 
 
+def test_sync_does_not_replace_a_newer_cross_project_snapshot(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    older = populated_snapshot(tmp_path, monkeypatch)
+    published = tmp_path / "published.json"
+    write_snapshot(published, older)
+    newer = deepcopy(older)
+    newer["generated_at"] = "2026-09-17T13:00:00+00:00"
+    resign(newer)
+    shared = tmp_path / "shared"
+    shared.mkdir()
+    destination = shared / "liacpc14-test.json"
+    write_snapshot(destination, newer)
+
+    sync_snapshots(
+        api_key="secret",
+        entity="liac",
+        project="rxnhaystack-control-room",
+        output_dir=shared,
+        wandb_module=FakeWandbDownloader(FakePublicApi(published, older)),
+    )
+
+    assert load_snapshot(destination) == newer
+
+
 def test_dashboard_and_markdown_are_generated(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
@@ -418,7 +443,7 @@ def test_dashboard_view_accepts_additional_wandb_projects() -> None:
             "dashboard",
             "view",
             "--source",
-            "sathvik/rxnhaystack-control-room",
+            "sathvik/rxnhaystack-dashboard",
             "--source",
             "liac/rxnhaystack-control-room",
             "--no-sync",
@@ -427,8 +452,9 @@ def test_dashboard_view_accepts_additional_wandb_projects() -> None:
     )
 
     assert cli.dashboard_sources(args) == [
+        ("liac", "rxnhaystack-dashboard"),
+        ("sathvik", "rxnhaystack-dashboard"),
         ("liac", "rxnhaystack-control-room"),
-        ("sathvik", "rxnhaystack-control-room"),
     ]
 
 
@@ -462,8 +488,8 @@ def test_unavailable_optional_wandb_project_does_not_block_dashboard(
     args = SimpleNamespace(
         no_sync=False,
         entity="liac",
-        project="rxnhaystack-control-room",
-        source=["sathvikbhagavan-epfl/rxnhaystack-control-room"],
+        project="rxnhaystack-dashboard",
+        source=["sathvikbhagavan-epfl/rxnhaystack-dashboard"],
         stale_after_hours=2,
     )
 
@@ -476,8 +502,8 @@ def test_unavailable_optional_wandb_project_does_not_block_dashboard(
     )
 
     assert calls == [
-        ("liac", "rxnhaystack-control-room"),
-        ("sathvikbhagavan-epfl", "rxnhaystack-control-room"),
+        ("liac", "rxnhaystack-dashboard"),
+        ("sathvikbhagavan-epfl", "rxnhaystack-dashboard"),
     ]
     assert "optional dashboard source" in capsys.readouterr().err
 

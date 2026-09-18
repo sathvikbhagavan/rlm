@@ -87,7 +87,7 @@ def build_parser() -> argparse.ArgumentParser:
     update.add_argument("--scheduler-job-id")
     update.add_argument("--session-name")
     update.add_argument("--entity", default="liac")
-    update.add_argument("--project", default="rxnhaystack-control-room")
+    update.add_argument("--project", default="rxnhaystack-dashboard")
     update.add_argument("--output-dir", type=Path)
     update.add_argument(
         "--ledger-path",
@@ -109,7 +109,7 @@ def build_parser() -> argparse.ArgumentParser:
         "view", help="Download shared updates and build the read-only dashboard."
     )
     view.add_argument("--entity", default="liac")
-    view.add_argument("--project", default="rxnhaystack-control-room")
+    view.add_argument("--project", default="rxnhaystack-dashboard")
     view.add_argument(
         "--source",
         action="append",
@@ -331,7 +331,7 @@ def command_control_room_view(args: argparse.Namespace) -> int:
                 "markdown_path": markdown_path,
                 "stop": stop_refresh,
             },
-            name="rxnhaystack-control-room-refresh",
+            name="rxnhaystack-dashboard-refresh",
             daemon=True,
         )
         refresh_thread.start()

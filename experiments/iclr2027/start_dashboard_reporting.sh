@@ -7,7 +7,7 @@ dashboard_search_root="${3:-$HOME}"
 dashboard_repo="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 dashboard_key="$HOME/.wandb_api_key"
 dashboard_entity="${RXNHAYSTACK_DASHBOARD_ENTITY:-liac}"
-dashboard_project="${RXNHAYSTACK_DASHBOARD_PROJECT:-rxnhaystack-control-room}"
+dashboard_project="${RXNHAYSTACK_DASHBOARD_PROJECT:-rxnhaystack-dashboard}"
 
 if [[ ! -f "$dashboard_key" ]]; then
   echo "Missing $dashboard_key" >&2

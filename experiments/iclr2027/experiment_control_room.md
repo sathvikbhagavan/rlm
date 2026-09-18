@@ -85,13 +85,13 @@ RXNHAYSTACK_DASHBOARD_ENTITY=SATHVIK_WANDB_ENTITY \
   bash experiments/iclr2027/start_dashboard_reporting.sh Sathvik liacpc15 "$HOME"
 ```
 
-They should make only the `rxnhaystack-control-room` project public. Their
+They should make only the `rxnhaystack-dashboard` project public. Their
 original experiment projects and runs can remain private. A viewer can then
 merge the public status project with the lab project using:
 
 ```bash
 uv run --frozen rxnhaystack dashboard view \
-  --source SATHVIK_WANDB_ENTITY/rxnhaystack-control-room \
+  --source SATHVIK_WANDB_ENTITY/rxnhaystack-dashboard \
   --secret-file WANDB_API_KEY=~/.wandb_api_key
 ```
 
@@ -99,6 +99,11 @@ Additional projects are optional sources: if one has not been created yet or
 is temporarily unreadable, the lab dashboard remains available and logs a
 warning. It checks again at every refresh and begins merging that source as
 soon as access succeeds.
+
+The former W&B project name was `rxnhaystack-control-room`. During migration,
+add `--source liac/rxnhaystack-control-room` to retain sources whose remote
+updaters have not yet moved. If the same source appears in both projects, only
+its newest timestamped snapshot is kept.
 
 ## Publish one update
 

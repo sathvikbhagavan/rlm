@@ -527,7 +527,10 @@ def sync_snapshots_with_api(
                     f"Latest status artifact for {source_id} does not match its publisher run"
                 )
             destination = output_dir / f"{source_id}.json"
-            write_snapshot(destination, snapshot)
+            if not destination.is_file() or parse_timestamp(
+                load_snapshot(destination)["generated_at"]
+            ) <= parse_timestamp(snapshot["generated_at"]):
+                write_snapshot(destination, snapshot)
         seen.add(source_id)
         written.append(destination)
     return written
