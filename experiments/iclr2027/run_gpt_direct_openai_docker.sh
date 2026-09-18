@@ -50,11 +50,12 @@ if ! uv run --frozen rxnhaystack run "${experiment_file}" \
 fi
 log "PASS release pilot ${pilot}; releasing remaining direct-OpenAI GPT Docker cells"
 
-if uv run --frozen rxnhaystack run "${experiment_file}" \
-  "${common_arguments[@]}" >> "${log_file}" 2>&1; then
+uv run --frozen rxnhaystack run "${experiment_file}" \
+  "${common_arguments[@]}" >> "${log_file}" 2>&1
+status=$?
+if (( status == 0 )); then
   log "FINISH all direct-OpenAI GPT Docker cells"
   exit 0
 fi
-status=$?
 log "GPT Docker queue ended with status ${status}; successes remain resumable"
 exit "${status}"
