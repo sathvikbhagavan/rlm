@@ -1,271 +1,112 @@
 # RxnHaystack Dashboard
 
-This is the common live view for experiments running on `liacpc14`,
-`liacpc15`, Jed, and Kuma. It replaces status numbers copied by hand between
-chats. Each machine reads its own SQLite result ledger, removes sensitive
-information, and publishes a compressed status record to the shared `liac`
-W&B team. The dashboard merges those records by exact run ID.
+The dashboard combines sanitized, read-only summaries of the authoritative
+SQLite experiment ledgers on `liacpc14`, `liacpc15`, Jed, and Kuma. The ledgers
+remain the scientific source of truth. W&B only carries status snapshots; it
+never receives prompts, responses, secrets, commands, or artifact paths.
 
-The dashboard is read-only. It cannot launch, retry, or cancel model work.
-Local SQLite ledgers remain the authoritative scientific records.
+## 1. Open it from Amin's laptop
 
-## What it reports
-
-- expected, successful, active, stale, failed, and pending jobs;
-- a model-by-method matrix for LLM, CodeAct, and RLM;
-- owner, machine, Git commit, Slurm job or tmux session, and last update;
-- API calls, tokens, recorded cost, unknown-cost attempts, duration, and peak
-  memory when the local metrics contain them;
-- sanitized failure classes such as API timeout, rate limit, context overflow,
-  policy refusal, memory limit, or interruption;
-- duplicate execution when independent machines appear to have attempted the
-  same immutable run ID.
-
-Infrastructure, concurrency, and metrics-adapter smoke tests remain preserved
-in their local ledgers and W&B status records, but are deliberately excluded
-from the dashboard and its generated Markdown report.
-
-It never publishes prompts, responses, raw errors, commands, environment
-variables, credentials, artifact paths, resource-trace paths, or dataset paths.
-Status files are mode `0600`. W&B uploads are gzip-compressed; the current
-6,300-job definition compresses to roughly half a megabyte per update.
-
-## One source means one ledger
-
-A source ID identifies one physical SQLite ledger and must remain stable. Do
-not reuse it for another clone or ledger. If phases use separate clones and
-ledgers, give each phase its own source ID. This lets the merger distinguish a
-copied ledger from accidental duplicate execution.
-
-Recommended names for the current work are:
-
-| Work | Source ID |
-| --- | --- |
-| Amin's local v34 ledger | `liacpc14-v34` |
-| Sathvik's Qwen full ledger | `liacpc15-qwen-v34` |
-| Sathvik's Gemini full ledger | `liacpc15-gemini-v34` |
-| Jed GLM RLM ledger | `jed-glm-rlm-v34` |
-| Kuma GPT LLM ledger | `kuma-gpt-llm-v34` |
-| Kuma GPT CodeAct ledger | `kuma-gpt-codeact-v34` |
-| Kuma GPT RLM ledger | `kuma-gpt-rlm-v34` |
-| Kuma Claude LLM ledger | `kuma-claude-llm-v34` |
-| Kuma Claude CodeAct ledger | `kuma-claude-codeact-v34` |
-| Kuma Claude RLM ledger | `kuma-claude-rlm-v34` |
-| Qwen matched-cardinality ledger | `liacpc15-qwen-matched-v7` |
-| GPT matched-cardinality ledger | `kuma-gpt-matched-v7` |
-
-If several phases truly share one ledger, publish it once under one source ID.
-
-### Automatic setup when no coding assistant is available
-
-The checked-in helper discovers every populated full-v34 and matched-v7 ledger
-below a user's home directory, validates each one read-only against the current
-experiment file, ignores empty and smoke-test ledgers, avoids publishing a hard
-linked ledger twice, and starts one persistent tmux updater per ledger. It
-prunes Git metadata, virtual environments, caches and W&B logs, and stops
-descending as soon as it finds an exact experiment directory. Run:
+Paste this single line into the laptop terminal:
 
 ```bash
-bash experiments/iclr2027/start_dashboard_reporting.sh Sathvik liacpc15 "$HOME"
+ssh amin@128.178.38.26 'test -d "$HOME/rlm_dashboard/.git" || git clone git@github.com:sathvikbhagavan/rlm.git "$HOME/rlm_dashboard"; cd "$HOME/rlm_dashboard" && git pull --ff-only origin main && uv sync --frozen && bash experiments/iclr2027/start_dashboard_viewer.sh' && (fuser -k 8876/tcp >/dev/null 2>&1 || true) && ssh -fN -o ExitOnForwardFailure=yes -o ServerAliveInterval=30 -o ServerAliveCountMax=3 -L 8876:127.0.0.1:8765 amin@128.178.38.26 && xdg-open "http://127.0.0.1:8876/index.html?$(date +%s)"
 ```
 
-Running the same command again is safe: existing updater sessions are reported
-and left alone. On Jed, change only the machine name:
+It updates the separate dashboard checkout on `liacpc14`, restarts the viewer,
+closes an old local tunnel on port 8876, opens a new tunnel, and opens the page.
+It does not touch a benchmark process. If the page later reports a lost
+connection, paste the same line again.
+
+## 2. Make each execution machine report
+
+Run the applicable one-line command once on each machine now. The command:
+
+1. creates or updates a separate `~/rlm_dashboard` checkout;
+2. finds every authoritative ledger assigned to that machine;
+3. validates it without changing it;
+4. publishes immediately; and
+5. leaves a reporter running in `tmux`, checking every five minutes and sending
+   a heartbeat at least every 30 minutes.
+
+On `liacpc14`:
 
 ```bash
-bash experiments/iclr2027/start_dashboard_reporting.sh Sathvik jed "$HOME"
+test -d "$HOME/rlm_dashboard/.git" || git clone git@github.com:sathvikbhagavan/rlm.git "$HOME/rlm_dashboard"; cd "$HOME/rlm_dashboard" && git pull --ff-only origin main && uv sync --frozen && RXNHAYSTACK_DASHBOARD_ENTITY=liac bash experiments/iclr2027/start_dashboard_reporting.sh Amin liacpc14 "$HOME" --restart
 ```
 
-The helper never changes experiment ledgers or model processes. Its preliminary
-publication check is local-only; W&B publication begins inside the updater.
-
-If a collaborator cannot publish to the `liac` team, they can publish the
-sanitized snapshots to a project under their own W&B entity:
+On Jed:
 
 ```bash
-RXNHAYSTACK_DASHBOARD_ENTITY=SATHVIK_WANDB_ENTITY \
-  bash experiments/iclr2027/start_dashboard_reporting.sh Sathvik liacpc15 "$HOME"
+test -d "$HOME/rlm_dashboard/.git" || git clone git@github.com:sathvikbhagavan/rlm.git "$HOME/rlm_dashboard"; cd "$HOME/rlm_dashboard" && git pull --ff-only origin main && uv sync --frozen && RXNHAYSTACK_DASHBOARD_ENTITY=liac bash experiments/iclr2027/start_dashboard_reporting.sh Amin jed "$HOME" --restart
 ```
 
-They should make only the `rxnhaystack-dashboard` project public. Their
-original experiment projects and runs can remain private. A viewer can then
-merge the public status project with the lab project using:
+On Kuma:
 
 ```bash
-uv run --frozen rxnhaystack dashboard view \
-  --source SATHVIK_WANDB_ENTITY/rxnhaystack-dashboard \
-  --secret-file WANDB_API_KEY=~/.wandb_api_key
+test -d "$HOME/rlm_dashboard/.git" || git clone git@github.com:sathvikbhagavan/rlm.git "$HOME/rlm_dashboard"; cd "$HOME/rlm_dashboard" && git pull --ff-only origin main && uv sync --frozen && RXNHAYSTACK_DASHBOARD_ENTITY=liac bash experiments/iclr2027/start_dashboard_reporting.sh Amin kuma "$HOME" --restart
 ```
 
-Additional projects are optional sources: if one has not been created yet or
-is temporarily unreadable, the lab dashboard remains available and logs a
-warning. It checks again at every refresh and begins merging that source as
-soon as access succeeds.
-
-The former W&B project name was `rxnhaystack-control-room`. During migration,
-add `--source liac/rxnhaystack-control-room` to retain sources whose remote
-updaters have not yet moved. If the same source appears in both projects, only
-its newest timestamped snapshot is kept.
-
-## Publish one update
-
-Pull the current repository version on the machine, then run from its clone:
+On Sathvik's `liacpc15`:
 
 ```bash
-uv run --frozen rxnhaystack dashboard update \
-  experiments/iclr2027/full-campaign.toml \
-  --source-id jed-glm-rlm-v34 \
-  --machine jed \
-  --owner Sathvik \
-  --scheduler-job-id 66534424 \
-  --secret-file WANDB_API_KEY=~/.wandb_api_key
+test -d "$HOME/rlm_dashboard/.git" || git clone git@github.com:sathvikbhagavan/rlm.git "$HOME/rlm_dashboard"; cd "$HOME/rlm_dashboard" && git pull --ff-only origin main && uv sync --frozen && RXNHAYSTACK_DASHBOARD_ENTITY=sathvikbhagavan-epfl bash experiments/iclr2027/start_dashboard_reporting.sh Sathvik liacpc15 "$HOME" --restart
 ```
 
-Change the source ID, machine, owner, and optional job/session label for the
-ledger being reported. Every person uses their own W&B key. The key file must
-be private (`chmod 600 ~/.wandb_api_key`). Its value and path are not included
-in the status record.
+Each person uses their own `~/.wandb_api_key`, with file mode 600. Sathvik can
+publish to his own W&B entity; the viewer merges that public status project
+with the lab project. His underlying experiment projects may remain private.
 
-Do not pull new code into a checkout that is actively launching model
-subprocesses. Instead, use a separate current checkout for the dashboard and
-point it read-only at the active ledger:
+## 3. Know whether the display is trustworthy
 
-```bash
-uv run --frozen rxnhaystack dashboard update \
-  experiments/iclr2027/full-campaign.toml \
-  --ledger-path /path/to/active/clone/artifacts/iclr2027-six-model-full-v34/ledger.sqlite3 \
-  --source-id kuma-gpt-rlm-v34 \
-  --machine kuma \
-  --owner Amin \
-  --scheduler-job-id 4250000 \
-  --secret-file WANDB_API_KEY=~/.wandb_api_key
-```
+Every model/method/machine row shows:
 
-The external ledger must contain the same campaign and immutable run
-specifications as the experiment file. Any mismatch stops publication.
+- `Results recorded`: jobs with at least one ledger attempt, out of jobs
+  assigned to that row;
+- `Last reporter check`: when that machine last inspected its ledger;
+- `current`: the reporter checked within two hours;
+- `stale`: unfinished work exists, but its reporter has not checked within two
+  hours;
+- `unreported`: no reporter from the assigned machine has reached the combined
+  dashboard;
+- `final`: all jobs in the row are success or failure, so an ongoing heartbeat
+  is no longer needed.
 
-For a tmux-run phase, use a session label instead:
+Each individual run also shows its last result update and last reporter check.
+For a stale or unreported row/run, press **copy refresh command**, paste it into
+the named machine, wait for publication to finish, and refresh the browser.
+That button supplies the exact command and W&B entity for the owner.
 
-```bash
-uv run --frozen rxnhaystack dashboard update \
-  experiments/iclr2027/full-campaign.toml \
-  --source-id liacpc14-v34 \
-  --machine liacpc14 \
-  --owner Amin \
-  --session-name rxn-deepseek-capped-v34 \
-  --secret-file WANDB_API_KEY=~/.wandb_api_key
-```
+The dashboard cannot claim that an unreported ledger is empty. It displays the
+job as unknown/not started until its assigned machine reports. Finished results
+remain valid if their old reporter later stops.
 
-For matched cardinality, use
-`experiments/iclr2027/matched-cardinality-campaign.toml`.
+## 4. When must a reporter be restarted?
 
-### Keep a long experiment current
+Normally, setup is one-time. Restart the machine's command only after:
 
-An updater can remain in its own tmux session:
+- the machine rebooted;
+- its reporter `tmux` session was stopped;
+- a new authoritative ledger was created or moved; or
+- the dashboard marks unfinished work stale or unreported.
 
-```bash
-uv run --frozen rxnhaystack dashboard update \
-  experiments/iclr2027/full-campaign.toml \
-  --source-id liacpc14-v34 \
-  --machine liacpc14 \
-  --owner Amin \
-  --session-name rxn-deepseek-capped-v34 \
-  --watch-seconds 300 \
-  --heartbeat-seconds 1800 \
-  --secret-file WANDB_API_KEY=~/.wandb_api_key
-```
+Re-running the command is safe. `--restart` replaces only dashboard reporter
+sessions; it does not stop or alter experiments.
 
-It checks locally every five minutes. It publishes only when ledger state
-changes or when the 30-minute heartbeat is due. `Ctrl-C` stops only the status
-updater; it does not touch the experiment. Use `--local-only` to test record
-generation without contacting W&B.
+## 5. What is included
 
-This is a one-time setup for each physical ledger. Restart that updater only
-after a machine reboot, if its tmux session stops, or if the experiment moves
-to a new ledger. Finished ledgers do not need an updater forever: publish one
-final snapshot, verify it appears as complete, then the updater can stop.
+The automatic reporter recognizes the current full six-model benchmark,
+matched-cardinality study, oracle-predicate study, deterministic oracle ceiling,
+prospective Task-16 study, and direct-OpenAI GPT Docker completion study. It
+does not show infrastructure smoke tests. Old pilots and superseded experiment
+definitions are intentionally excluded from the main view.
 
-## Open the combined dashboard
+The viewer reads these W&B status projects:
 
-On `liacpc14`, or any machine with the repository and a W&B key:
+- `liac/rxnhaystack-dashboard`;
+- `sathvikbhagavan-epfl/rxnhaystack-dashboard`; and
+- the old `liac/rxnhaystack-control-room` project during migration.
 
-```bash
-uv run --frozen rxnhaystack dashboard view \
-  --secret-file WANDB_API_KEY=~/.wandb_api_key
-```
-
-This downloads the latest record from every source, writes:
-
-- `artifacts/control-room/index.html` — interactive dashboard;
-- `artifacts/control-room/status.md` — concise generated Markdown status;
-- `artifacts/control-room/shared/*.json` — verified local cache;
-
-and serves the dashboard at `http://127.0.0.1:8765/index.html`. Press `Ctrl-C`
-to stop the web server. While it is open, it downloads fresh source records and
-regenerates the page every five minutes. The browser checks safely once per
-minute: if the SSH tunnel is unavailable, the current page stays visible and
-shows a connection warning. Override the server interval with
-`--refresh-seconds` if needed.
-
-When viewing a remote machine from a laptop, forward the local-only port:
-
-```bash
-ssh -fN -o ExitOnForwardFailure=yes \
-  -o ServerAliveInterval=30 -o ServerAliveCountMax=3 \
-  -L 8876:127.0.0.1:8765 amin@128.178.38.26
-```
-
-Then open `http://127.0.0.1:8876/index.html` on the laptop. This command puts
-the tunnel in the background, so its terminal does not need to remain open.
-Laptop sleep, a VPN change, or a network interruption can still close it; rerun
-the same command if the dashboard reports that its connection was lost.
-Keeping the server bound to `127.0.0.1` avoids exposing it to the network.
-
-To generate the files without starting a web server:
-
-```bash
-uv run --frozen rxnhaystack dashboard view \
-  --no-serve \
-  --secret-file WANDB_API_KEY=~/.wandb_api_key
-```
-
-## How merging works
-
-Every experiment file defines the expected run IDs. Machines publish only runs
-that actually started, so their thousands of untouched pending rows are never
-added together. The dashboard takes the union of expected IDs and merges
-attempts using their run ID, specification hash, attempt number, and start time.
-
-- A successful attempt is counted once even if its ledger was copied.
-- A fresh active attempt is shown as running.
-- An active attempt reported only by a source whose heartbeat is older than two
-  hours is shown as stale.
-- A failed result stays failed unless another source has a valid success.
-- Independent attempt histories for one run ID raise a duplicate warning.
-- Costs and calls are summed once per unique attempt. Missing cost remains
-  unknown rather than becoming zero.
-- Different experiment-file hashes are displayed separately, never combined.
-
-## What each Codex should report back
-
-After updating its clone, each Codex should:
-
-1. run its focused tests and confirm the exact Git commit;
-2. identify every local ledger and assign one stable source ID to each;
-3. publish one update with the correct owner, machine, and Slurm/tmux label;
-4. report the W&B URL, source ID, expected/observed counts, snapshot hash, and
-   whether the worktree was clean;
-5. leave the updater watching only while its associated experiment is active.
-
-It must not change or recover ledger state merely to publish status. A status
-failure must not stop, restart, or alter the model experiment.
-
-## Current limitations
-
-- Scheduler state is supplied as a label; the dashboard does not query remote
-  Slurm clusters.
-- Cost comes from ledger metrics, not the provider's live account balance.
-  Attempts without usage metadata remain unknown.
-- Median duration is descriptive, not a reliable completion forecast, because
-  task durations differ greatly.
-- The dashboard deliberately has no controls that mutate experiments.
+Duplicate snapshots of the same immutable attempt are deduplicated. Low-level
+reporter diagnostics are collapsed by default; the main status table is the
+normal operational view.

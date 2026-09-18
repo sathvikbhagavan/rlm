@@ -161,6 +161,8 @@ def test_merge_deduplicates_copied_attempts_and_flags_independent_execution(
     assert campaign["metrics"]["attempts"] == 2
     assert campaign["metrics"]["cost_chf"] == 0.25
     assert campaign["duplicate_runs"] == 0
+    assert campaign["cells"][0]["report_state"] == "final"
+    assert campaign["cells"][0]["recorded"] == 2
 
     independent = deepcopy(copied)
     failed = independent["observations"][1]
@@ -226,6 +228,67 @@ def test_stale_is_based_on_machine_heartbeat(
     )["campaigns"][0]
     assert merged["counts"]["stale"] == 1
     assert merged["sources"][0]["stale"] is True
+    stale_run = next(item for item in merged["runs"] if item["status"] == "stale")
+    assert stale_run["report_state"] == "stale"
+    assert stale_run["reporter_checked_at"] == "2026-09-17T12:00:00+00:00"
+    assert "--restart" in stale_run["update_command"]
+
+
+def test_fresh_assigned_reporter_marks_not_started_runs_current(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    snapshot = populated_snapshot(tmp_path, monkeypatch)
+    snapshot["observations"] = []
+    resign(snapshot)
+
+    campaign = merge_snapshots(
+        [snapshot],
+        stale_after_seconds=3600,
+        now=datetime(2026, 9, 17, 12, 10, tzinfo=UTC),
+    )["campaigns"][0]
+
+    assert campaign["counts"]["pending"] == 2
+    assert campaign["cells"][0]["recorded"] == 0
+    assert campaign["cells"][0]["report_state"] == "current"
+    assert all(run["report_state"] == "current" for run in campaign["runs"])
+
+
+def test_missing_assigned_reporter_is_unreported_even_if_another_machine_reports(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    snapshot = populated_snapshot(tmp_path, monkeypatch)
+    snapshot["source"]["machine"] = "jed"
+    snapshot["observations"] = []
+    resign(snapshot)
+
+    campaign = merge_snapshots(
+        [snapshot],
+        stale_after_seconds=3600,
+        now=datetime(2026, 9, 17, 12, 10, tzinfo=UTC),
+    )["campaigns"][0]
+
+    assert campaign["cells"][0]["report_state"] == "unreported"
+    assert campaign["cells"][0]["last_reported_at"] is None
+    assert "liacpc14" in campaign["cells"][0]["update_command"]
+
+
+@pytest.mark.parametrize(
+    ("run_id", "owner", "machine"),
+    [
+        ("full-qwen3.5-tier1-task1-llm-x100-r01", "Sathvik", "liacpc15"),
+        ("full-glm-5.2-tier2-task2-rlm-xfull-r04", "Amin", "jed"),
+        ("full-gpt-5-mini-tier4-task13-rlm-xfull-r01", "Amin", "kuma"),
+        ("full-gpt-5-mini-tier4-task16-rlm-xfull-r01", "Amin", "liacpc14"),
+        ("oracle-claude-haiku-4.5-tier3-task6-x100", "Amin", "jed"),
+        ("oracle-qwen3.5-397b-tier3-task6-x100", "Amin", "liacpc14"),
+    ],
+)
+def test_reporting_assignments_are_explicit(run_id: str, owner: str, machine: str) -> None:
+    assignment = control_room.reporting_assignment(run_id)
+
+    assert assignment["owner"] == owner
+    assert assignment["machine"] == machine
+    assert machine in assignment["command"]
 
 
 @pytest.mark.parametrize(
@@ -419,12 +482,14 @@ def test_dashboard_and_markdown_are_generated(
     assert "start_dashboard_reporting.sh OWNER MACHINE" in dashboard
     assert "refreshSafely" in dashboard
     assert 'http-equiv="refresh"' not in dashboard
-    assert "Run explorer" in dashboard
+    assert "Individual runs" in dashboard
+    assert "Last reporter check" in dashboard
+    assert "copy refresh command" in dashboard
     assert '<details class="panel run-explorer">' in dashboard
     assert '<details class="panel run-explorer" open>' not in dashboard
     assert "GPT-5 mini" in dashboard
-    assert "Model and method matrix" in dashboard
-    assert "| GPT-5 mini | llm | 2 | 1 |" in markdown
+    assert "Experiment status and data freshness" in dashboard
+    assert "| GPT-5 mini | llm | Amin / liacpc14 | 2/2 |" in markdown
 
 
 def test_dashboard_command_and_legacy_alias_are_both_available() -> None:

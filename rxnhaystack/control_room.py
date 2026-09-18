@@ -596,15 +596,14 @@ def merge_experiment(
         source = snapshot["source"]
         age_seconds = max(0.0, (now - parse_timestamp(snapshot["generated_at"])).total_seconds())
         source_stale = age_seconds > stale_after_seconds
-        sources.append(
-            {
-                **source,
-                "generated_at": snapshot["generated_at"],
-                "age_seconds": age_seconds,
-                "stale": source_stale,
-                "observed_runs": len(snapshot["observations"]),
-            }
-        )
+        reported_source = {
+            **source,
+            "generated_at": snapshot["generated_at"],
+            "age_seconds": age_seconds,
+            "stale": source_stale,
+            "observed_runs": len(snapshot["observations"]),
+        }
+        sources.append(reported_source)
         for spec in snapshot["experiment"]["expected_runs"]:
             previous = expected.setdefault(spec["run_id"], spec)
             if previous != spec:
@@ -612,10 +611,11 @@ def merge_experiment(
                     f"Sources disagree on the specification of run {spec['run_id']!r}"
                 )
         for observation in snapshot["observations"]:
-            observations[observation["run_id"]].append((observation, source, source_stale))
+            observations[observation["run_id"]].append((observation, reported_source, source_stale))
 
     merged_runs = [
-        merge_run(spec, observations.get(run_id, [])) for run_id, spec in expected.items()
+        merge_run(spec, observations.get(run_id, []), reporting_sources=sources)
+        for run_id, spec in expected.items()
     ]
     merged_runs.sort(key=lambda item: item["run_id"])
     counts = Counter(run["status"] for run in merged_runs)
@@ -637,6 +637,8 @@ def merge_experiment(
 def merge_run(
     spec: dict[str, Any],
     candidates: list[tuple[dict[str, Any], dict[str, Any], bool]],
+    *,
+    reporting_sources: list[dict[str, Any]],
 ) -> dict[str, Any]:
     all_attempts: dict[str, dict[str, Any]] = {}
     attempt_sources: dict[str, set[str]] = defaultdict(set)
@@ -685,6 +687,27 @@ def merge_run(
     active_sources = sorted(
         source["id"] for observation, source, _ in current if observation["status"] == "running"
     )
+    assignment = reporting_assignment(str(spec["run_id"]))
+    assigned_sources = [
+        source
+        for source in reporting_sources
+        if str(source["machine"]).casefold() == assignment["machine"].casefold()
+    ]
+    reporter_checked_at = newest_timestamp(
+        str(source["generated_at"]) for source in assigned_sources
+    )
+    result_updated_at = newest_timestamp(
+        str(attempt.get("finished_at") or attempt["started_at"]) for attempt in distinct_attempts
+    )
+    has_fresh_report = any(not bool(source["stale"]) for source in assigned_sources)
+    if status in {"succeeded", "failed"}:
+        report_state = "final"
+    elif not assigned_sources:
+        report_state = "unreported"
+    elif has_fresh_report:
+        report_state = "current"
+    else:
+        report_state = "stale"
     return {
         **{key: value for key, value in spec.items() if key != "spec_hash"},
         "status": status,
@@ -694,15 +717,70 @@ def merge_run(
         "attempt_count": len(distinct_attempts),
         "duplicate_execution": duplicate_execution,
         "failure_categories": dict(sorted(failure_categories.items())),
+        "reporter_checked_at": reporter_checked_at,
+        "result_updated_at": result_updated_at,
+        "report_state": report_state,
+        "assigned_machine": assignment["machine"],
+        "assigned_owner": assignment["owner"],
+        "update_command": assignment["command"],
     }
 
 
+def newest_timestamp(values: Iterable[str]) -> str | None:
+    available = [value for value in values if value]
+    return max(available, key=parse_timestamp) if available else None
+
+
+def reporting_assignment(run_id: str) -> dict[str, str]:
+    normalized = run_id.lower()
+    machine = "liacpc14"
+    owner = "Amin"
+    entity = "liac"
+    if normalized.startswith("full-glm") or normalized.startswith("oracle-executor"):
+        machine = "jed"
+    elif normalized.startswith("oracle-claude"):
+        machine = "jed"
+    elif normalized.startswith("full-qwen") or normalized.startswith("full-gemini"):
+        machine, owner, entity = "liacpc15", "Sathvik", "sathvikbhagavan-epfl"
+    elif normalized.startswith("matched-qwen"):
+        machine, owner, entity = "liacpc15", "Sathvik", "sathvikbhagavan-epfl"
+    elif normalized.startswith("matched-gpt"):
+        machine = "kuma"
+    elif normalized.startswith("full-gpt"):
+        machine = "liacpc14" if is_docker_rlm_run(normalized) else "kuma"
+    elif normalized.startswith("full-claude"):
+        machine = "liacpc14" if is_docker_rlm_run(normalized) else "kuma"
+    command = (
+        'test -d "$HOME/rlm_dashboard/.git" || '
+        'git clone git@github.com:sathvikbhagavan/rlm.git "$HOME/rlm_dashboard"; '
+        'cd "$HOME/rlm_dashboard" && git pull --ff-only origin main && '
+        f"RXNHAYSTACK_DASHBOARD_ENTITY={entity} bash "
+        "experiments/iclr2027/start_dashboard_reporting.sh "
+        f'{owner} {machine} "$HOME" --restart'
+    )
+    return {"machine": machine, "owner": owner, "command": command}
+
+
+def is_docker_rlm_run(run_id: str) -> bool:
+    return any(
+        marker in run_id
+        for marker in ("-tier4-task16-rlm-", "-tier4-task17-rlm-", "-tier4-task17b-rlm-")
+    )
+
+
 def aggregate_cells(runs: list[dict[str, Any]]) -> list[dict[str, Any]]:
-    grouped: dict[tuple[str, str], list[dict[str, Any]]] = defaultdict(list)
+    grouped: dict[tuple[str, str, str, str], list[dict[str, Any]]] = defaultdict(list)
     for run in runs:
-        grouped[(friendly_model(run["model"]), run["method"])].append(run)
+        grouped[
+            (
+                friendly_model(run["model"]),
+                run["method"],
+                run["assigned_owner"],
+                run["assigned_machine"],
+            )
+        ].append(run)
     cells: list[dict[str, Any]] = []
-    for (model, method), items in sorted(grouped.items()):
+    for (model, method, owner, machine), items in sorted(grouped.items()):
         counts = Counter(item["status"] for item in items)
         durations = [
             attempt_duration(attempt)
@@ -716,11 +794,27 @@ def aggregate_cells(runs: list[dict[str, Any]]) -> list[dict[str, Any]]:
                 "model": model,
                 "method": method,
                 "expected": len(items),
+                "recorded": sum(item["attempt_count"] > 0 for item in items),
                 "counts": {status: counts[status] for status in STATUS_ORDER},
                 "median_attempt_seconds": statistics.median(durations) if durations else None,
+                "last_reported_at": newest_timestamp(item["reporter_checked_at"] for item in items),
+                "report_state": cell_report_state(items),
+                "assigned_machine": machine,
+                "assigned_owner": owner,
+                "update_command": items[0]["update_command"],
             }
         )
     return cells
+
+
+def cell_report_state(items: list[dict[str, Any]]) -> str:
+    if all(item["status"] in {"succeeded", "failed"} for item in items):
+        return "final"
+    if any(item["report_state"] == "current" for item in items):
+        return "current"
+    if all(item["report_state"] == "unreported" for item in items):
+        return "unreported"
+    return "stale"
 
 
 def attempt_duration(attempt: Mapping[str, Any]) -> float | None:
@@ -825,21 +919,23 @@ def write_markdown(path: Path, merged: Mapping[str, Any]) -> None:
                 f"running: **{counts['running']:,}**; stale: **{counts['stale']:,}**; "
                 f"failed: **{counts['failed']:,}**; pending: **{counts['pending']:,}**.",
                 "",
-                "| Model | Method | Expected | Succeeded | Running | Stale | Failed | Pending |",
-                "| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: |",
+                "| Model | Method | Assignment | Results recorded | Last report | Data state | Succeeded | Running | Failed | Not started |",
+                "| --- | --- | --- | ---: | --- | --- | ---: | ---: | ---: | ---: |",
             ]
         )
         for cell in campaign["cells"]:
             item = cell["counts"]
             lines.append(
-                f"| {cell['model']} | {cell['method']} | {cell['expected']} | "
-                f"{item['succeeded']} | {item['running']} | {item['stale']} | "
-                f"{item['failed']} | {item['pending']} |"
+                f"| {cell['model']} | {cell['method']} | {cell['assigned_owner']} / "
+                f"{cell['assigned_machine']} | {cell['recorded']}/{cell['expected']} | "
+                f"{cell['last_reported_at'] or 'never'} | {cell['report_state']} | "
+                f"{item['succeeded']} | {item['running']} | {item['failed']} | "
+                f"{item['pending']} |"
             )
         lines.extend(
             [
                 "",
-                "### Reporting sources",
+                "<details><summary>Reporting-source diagnostics</summary>",
                 "",
                 "| Source | Owner | Machine | Updated | Observed | State |",
                 "| --- | --- | --- | --- | ---: | --- |",
@@ -858,6 +954,7 @@ def write_markdown(path: Path, merged: Mapping[str, Any]) -> None:
                     f"Warning: **{campaign['duplicate_runs']}** run IDs have attempts from more than one source.",
                 ]
             )
+        lines.extend(["", "</details>"])
         lines.append("")
     atomic_write_text(path, "\n".join(lines).rstrip() + "\n")
 
@@ -897,34 +994,32 @@ DASHBOARD_TEMPLATE = r"""<!doctype html>
 <title>RxnHaystack Dashboard</title>
 <style>
 :root{color-scheme:dark;--bg:#0d1117;--panel:#161b22;--line:#30363d;--text:#e6edf3;--muted:#8b949e;--green:#3fb950;--blue:#58a6ff;--red:#f85149;--yellow:#d29922;--purple:#bc8cff}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:14px/1.45 ui-sans-serif,system-ui,-apple-system,sans-serif}header{padding:22px 28px;border-bottom:1px solid var(--line);position:sticky;top:0;background:rgba(13,17,23,.96);z-index:3}h1{font-size:21px;margin:0 0 5px}.sub{color:var(--muted)}main{padding:22px 28px;max-width:1700px;margin:auto}.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:16px 0}.card,.panel{background:var(--panel);border:1px solid var(--line);border-radius:8px}.card{padding:14px}.label{color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.06em}.value{font-size:23px;font-weight:700;margin-top:4px}.panel{margin:14px 0;padding:16px;overflow:auto}h2{font-size:16px;margin:0 0 12px}.run-explorer{padding:0;overflow:hidden}.run-explorer summary{cursor:pointer;padding:16px;list-style-position:inside;font-size:16px}.run-explorer summary:hover{background:#1c2128}.run-explorer[open] summary{border-bottom:1px solid var(--line)}.run-explorer-content{padding:16px;overflow:auto}.summary-note{color:var(--muted);font-size:13px;margin-left:8px}.filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}input,select{background:var(--bg);border:1px solid var(--line);border-radius:6px;color:var(--text);padding:7px 9px}input{min-width:280px;flex:1}table{width:100%;border-collapse:collapse;white-space:nowrap}th,td{text-align:left;padding:8px 9px;border-bottom:1px solid var(--line)}th{color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.05em;position:sticky;top:0;background:var(--panel)}.ok{color:var(--green)}.running{color:var(--blue)}.failed{color:var(--red)}.stale{color:var(--yellow)}.pending{color:var(--muted)}.pill{display:inline-block;border:1px solid var(--line);border-radius:999px;padding:2px 7px;font-size:12px}.bar{height:7px;background:#21262d;border-radius:9px;overflow:hidden;min-width:130px}.bar>span{height:100%;display:block;background:var(--green)}.warn{color:var(--yellow)}.mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px}.hidden{display:none}a{color:var(--blue)}.reporting-help{padding:0;overflow:hidden}.reporting-help summary{cursor:pointer;padding:16px;list-style-position:inside}.reporting-help summary:hover{background:#1c2128}.reporting-help[open] summary{border-bottom:1px solid var(--line)}.reporting-help-content{padding:16px;max-width:1050px}.reporting-help li{margin:8px 0}.reporting-help code{display:block;margin:10px 0;padding:12px;background:var(--bg);border:1px solid var(--line);border-radius:6px;white-space:pre-wrap;overflow-wrap:anywhere}.connection-lost{color:var(--red)}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:14px/1.45 ui-sans-serif,system-ui,-apple-system,sans-serif}header{padding:22px 28px;border-bottom:1px solid var(--line);position:sticky;top:0;background:rgba(13,17,23,.96);z-index:3}h1{font-size:21px;margin:0 0 5px}.sub{color:var(--muted)}main{padding:22px 28px;max-width:1700px;margin:auto}.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:16px 0}.card,.panel{background:var(--panel);border:1px solid var(--line);border-radius:8px}.card{padding:14px}.label{color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.06em}.value{font-size:23px;font-weight:700;margin-top:4px}.panel{margin:14px 0;padding:16px;overflow:auto}h2{font-size:16px;margin:0 0 12px}.run-explorer,.source-details{padding:0;overflow:hidden}.run-explorer summary,.source-details summary{cursor:pointer;padding:16px;list-style-position:inside;font-size:16px}.run-explorer summary:hover,.source-details summary:hover{background:#1c2128}.run-explorer[open] summary,.source-details[open] summary{border-bottom:1px solid var(--line)}.run-explorer-content,.source-details-content{padding:16px;overflow:auto}.summary-note{color:var(--muted);font-size:13px;margin-left:8px}.filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}input,select,button{background:var(--bg);border:1px solid var(--line);border-radius:6px;color:var(--text);padding:7px 9px}button{cursor:pointer;color:var(--blue)}input{min-width:280px;flex:1}table{width:100%;border-collapse:collapse;white-space:nowrap}th,td{text-align:left;padding:8px 9px;border-bottom:1px solid var(--line)}th{color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.05em;position:sticky;top:0;background:var(--panel)}.ok,.final{color:var(--green)}.current,.running{color:var(--blue)}.failed,.unreported{color:var(--red)}.stale{color:var(--yellow)}.pending{color:var(--muted)}.pill{display:inline-block;border:1px solid var(--line);border-radius:999px;padding:2px 7px;font-size:12px}.bar{height:7px;background:#21262d;border-radius:9px;overflow:hidden;min-width:130px}.bar>span{height:100%;display:block;background:var(--green)}.warn{color:var(--yellow)}.mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px}.hidden{display:none}a{color:var(--blue)}.reporting-help{padding:0;overflow:hidden}.reporting-help summary{cursor:pointer;padding:16px;list-style-position:inside}.reporting-help summary:hover{background:#1c2128}.reporting-help[open] summary{border-bottom:1px solid var(--line)}.reporting-help-content{padding:16px;max-width:1050px}.reporting-help li{margin:8px 0}.reporting-help code,.command{display:block;margin:10px 0;padding:12px;background:var(--bg);border:1px solid var(--line);border-radius:6px;white-space:pre-wrap;overflow-wrap:anywhere}.connection-lost{color:var(--red)}.health-note{padding:12px 16px;border-left:4px solid var(--yellow);background:#2a2112;margin:14px 0}.health-note.ok{border-color:var(--green);background:#122416}.small{font-size:12px}
 </style>
 </head>
 <body>
 <header><h1>RxnHaystack Dashboard</h1><div class="sub"><span id="updated"></span><span id="connection"></span></div></header>
 <main><details class="panel reporting-help"><summary><strong>Keep reporting sources up to date</strong><span class="summary-note">one updater per physical ledger</span></summary><div class="reporting-help-content">
-<ol><li>Use a separate, current repository checkout for reporting; do not update the checkout that is running an experiment.</li><li>Run an updater for every distinct experiment ledger. If several models share one ledger, publish it once; if they use separate ledgers, run one updater for each.</li><li>Give every updater a stable, unique source ID and identify its machine and owner. Each collaborator uses their own W&amp;B key; keys and prompts are never published.</li><li>Keep the updater running in tmux. It publishes a sanitized snapshot every five minutes and a heartbeat every 30 minutes. A stale source is highlighted on this page.</li></ol>
-<code>uv run --frozen rxnhaystack dashboard update EXPERIMENT_FILE \
-  --ledger-path /ABSOLUTE/PATH/TO/ledger.sqlite3 \
-  --source-id UNIQUE-SOURCE-ID --machine MACHINE --owner OWNER \
-  --watch-seconds 300 --heartbeat-seconds 1800 \
-  --secret-file WANDB_API_KEY=~/.wandb_api_key</code>
-<p>For the current full and matched experiments, automatic discovery and setup are available:</p>
-<code>bash experiments/iclr2027/start_dashboard_reporting.sh OWNER MACHINE "$HOME"</code>
-<p>Set this up once per physical ledger. Restart its updater only after a machine reboot, if the tmux session stops, or if work moves to a new ledger. This page is read-only. Only one viewer server is needed. Keep its viewer process running on the host and keep your laptop's SSH tunnel open. If the tunnel drops, the existing page remains visible and shows a connection warning; reconnect the tunnel for fresh data.</p>
+<p>Run the indicated command on every execution machine after a reboot, code update, stopped reporter, or stale warning. It discovers only the authoritative experiments assigned to that machine, validates every ledger read-only, restarts its reporters and publishes immediately.</p>
+<code>cd "$HOME/rlm_dashboard" &amp;&amp; git pull --ff-only origin main &amp;&amp; RXNHAYSTACK_DASHBOARD_ENTITY=ENTITY bash experiments/iclr2027/start_dashboard_reporting.sh OWNER MACHINE "$HOME" --restart</code>
+<p>Use <code>ENTITY=liac</code> for Amin's machines and <code>ENTITY=sathvikbhagavan-epfl</code> for Sathvik. A red <strong>unreported</strong> cell means no authoritative ledger has reached the dashboard. Yellow <strong>stale</strong> means unfinished work has not received a fresh heartbeat. Green <strong>final</strong> means every expected run is terminal and does not require a continuing heartbeat.</p>
 </div></details><div id="app"></div></main>
 <script>const DATA=__CONTROL_ROOM_DATA__;
 const fmt=n=>new Intl.NumberFormat().format(n||0); const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const duration=s=>s==null?'—':s<120?Math.round(s)+'s':s<7200?Math.round(s/60)+'m':(s/3600).toFixed(1)+'h';
+const when=s=>s?new Date(s).toLocaleString():'never reported';
+const refreshButton=x=>['stale','unreported'].includes(x.report_state)?`<button class="copy-command" data-command="${esc(x.update_command)}">copy refresh command</button>`:'—';
 const statusClass=s=>s==='succeeded'?'ok':s; document.getElementById('updated').textContent='Merged '+new Date(DATA.generated_at).toLocaleString()+' · read-only view';
-function renderCampaign(c,idx){const total=Object.values(c.counts).reduce((a,b)=>a+b,0),done=c.counts.succeeded,metrics=c.metrics;
+function renderCampaign(c,idx){const total=Object.values(c.counts).reduce((a,b)=>a+b,0),done=c.counts.succeeded,metrics=c.metrics,bad=c.cells.filter(x=>['stale','unreported'].includes(x.report_state));
 return `<section data-campaign="${idx}"><h2>${esc(c.name)} <span class="pill mono">${esc(c.definition_sha256.slice(0,12))}</span></h2>
-<div class="cards"><div class="card"><div class="label">Completed</div><div class="value ok">${fmt(done)} / ${fmt(total)}</div></div><div class="card"><div class="label">Running</div><div class="value running">${fmt(c.counts.running)}</div></div><div class="card"><div class="label">Failed</div><div class="value failed">${fmt(c.counts.failed)}</div></div><div class="card"><div class="label">Pending</div><div class="value pending">${fmt(c.counts.pending)}</div></div><div class="card"><div class="label">Recorded cost</div><div class="value">CHF ${(metrics.cost_chf||0).toFixed(2)}</div><div class="sub">${fmt(metrics.unknown_cost_attempts)} attempts unknown</div></div><div class="card"><div class="label">Model calls</div><div class="value">${fmt(metrics.calls)}</div></div><div class="card"><div class="label">Tokens</div><div class="value">${fmt(metrics.total_tokens)}</div></div><div class="card"><div class="label">Peak memory</div><div class="value">${(metrics.peak_memory_mib/1024).toFixed(1)} GiB</div></div></div>
-<div class="panel"><h2>Model and method matrix</h2><table><thead><tr><th>Model</th><th>Method</th><th>Progress</th><th>Success</th><th>Running</th><th>Stale</th><th>Failed</th><th>Pending</th><th>Median attempt</th></tr></thead><tbody>${c.cells.map(x=>{const pct=100*x.counts.succeeded/x.expected;return `<tr><td>${esc(x.model)}</td><td>${esc(x.method)}</td><td><div class="bar"><span style="width:${pct}%"></span></div></td><td class="ok">${x.counts.succeeded}/${x.expected}</td><td class="running">${x.counts.running}</td><td class="stale">${x.counts.stale}</td><td class="failed">${x.counts.failed}</td><td class="pending">${x.counts.pending}</td><td>${duration(x.median_attempt_seconds)}</td></tr>`}).join('')}</tbody></table></div>
-<div class="panel"><h2>Reporting sources ${c.duplicate_runs?`<span class="warn">· ${c.duplicate_runs} duplicate run IDs</span>`:''}</h2><table><thead><tr><th>Source</th><th>Owner</th><th>Machine</th><th>Last update</th><th>Observed</th><th>Git</th><th>Scheduler / session</th><th>State</th></tr></thead><tbody>${c.sources.map(s=>`<tr><td class="mono">${esc(s.id)}</td><td>${esc(s.owner)}</td><td>${esc(s.machine)}</td><td>${esc(new Date(s.generated_at).toLocaleString())}</td><td>${fmt(s.observed_runs)}</td><td class="mono">${esc(s.git_commit.slice(0,12))}${s.tracked_dirty?' *':''}</td><td>${esc(s.scheduler_job_id||s.session_name||'—')}</td><td class="${s.stale?'stale':'ok'}">${s.stale?'STALE':'current'}</td></tr>`).join('')}</tbody></table></div>
-<details class="panel run-explorer"><summary><strong>Run explorer</strong><span class="summary-note">${fmt(c.runs.length)} jobs · open to search and filter</span></summary><div class="run-explorer-content"><div class="filters"><input class="search" placeholder="Filter run ID, model, task, source…"><select class="method"><option value="">all methods</option>${[...new Set(c.runs.map(r=>r.method))].map(v=>`<option>${esc(v)}</option>`).join('')}</select><select class="status"><option value="">all states</option>${['succeeded','running','stale','failed','pending'].map(v=>`<option>${v}</option>`).join('')}</select></div><table><thead><tr><th>Run</th><th>Model</th><th>Task</th><th>Method</th><th>Condition</th><th>Status</th><th>Attempts</th><th>Source</th><th>Failure class</th></tr></thead><tbody class="runs">${c.runs.map(r=>`<tr data-search="${esc((r.run_id+' '+r.model+' '+r.task+' '+r.sources.join(' ')).toLowerCase())}" data-method="${esc(r.method)}" data-status="${esc(r.status)}"><td class="mono">${esc(r.run_id)}</td><td>${esc(r.model)}</td><td>${esc(r.task)}</td><td>${esc(r.method)}</td><td>${esc(r.condition)}</td><td class="${statusClass(r.status)}">${esc(r.status)}</td><td>${r.attempt_count}</td><td>${esc(r.sources.join(', ')||'—')}</td><td>${esc(Object.keys(r.failure_categories).join(', ')||'—')}</td></tr>`).join('')}</tbody></table></div></details></section>`}
+<div class="health-note ${bad.length?'':'ok'}">${bad.length?`Coverage is not trustworthy yet: ${bad.length} model/method cells are stale or unreported. Use their refresh buttons below.`:'Every model/method cell is currently reported or final.'}</div>
+<div class="cards"><div class="card"><div class="label">Succeeded</div><div class="value ok">${fmt(done)} / ${fmt(total)}</div></div><div class="card"><div class="label">Running</div><div class="value running">${fmt(c.counts.running)}</div></div><div class="card"><div class="label">Failed</div><div class="value failed">${fmt(c.counts.failed)}</div></div><div class="card"><div class="label">Pending</div><div class="value pending">${fmt(c.counts.pending)}</div></div><div class="card"><div class="label">Data gaps</div><div class="value ${bad.length?'failed':'ok'}">${bad.length}</div><div class="sub">stale or unreported cells</div></div><div class="card"><div class="label">Recorded cost</div><div class="value">CHF ${(metrics.cost_chf||0).toFixed(2)}</div><div class="sub">${fmt(metrics.unknown_cost_attempts)} attempts unknown</div></div></div>
+<div class="panel"><h2>Experiment status and data freshness</h2><table><thead><tr><th>Model</th><th>Method</th><th>Assigned</th><th>Results recorded</th><th>Last reporter check</th><th>Data state</th><th>Success</th><th>Running</th><th>Failed</th><th>Not started</th><th>Refresh</th></tr></thead><tbody>${c.cells.map(x=>`<tr><td>${esc(x.model)}</td><td>${esc(x.method)}</td><td>${esc(x.assigned_owner)} · ${esc(x.assigned_machine)}</td><td>${x.recorded}/${x.expected}</td><td>${esc(when(x.last_reported_at))}</td><td class="${esc(x.report_state)}">${esc(x.report_state)}</td><td class="ok">${x.counts.succeeded}</td><td class="running">${x.counts.running}</td><td class="failed">${x.counts.failed}</td><td class="pending">${x.counts.pending}</td><td>${refreshButton(x)}</td></tr>`).join('')}</tbody></table></div>
+<details class="panel source-details"><summary><strong>Reporting diagnostics</strong><span class="summary-note">${c.sources.length} snapshots · normally keep this closed${c.duplicate_runs?` · ${c.duplicate_runs} duplicate run IDs`:''}</span></summary><div class="source-details-content"><table><thead><tr><th>Reporter ID</th><th>Owner</th><th>Reporting host</th><th>Last heartbeat</th><th>Observed</th><th>Git</th><th>State</th></tr></thead><tbody>${c.sources.map(s=>`<tr><td class="mono">${esc(s.id)}</td><td>${esc(s.owner)}</td><td>${esc(s.machine)}</td><td>${esc(when(s.generated_at))}</td><td>${fmt(s.observed_runs)}</td><td class="mono">${esc(s.git_commit.slice(0,12))}${s.tracked_dirty?' *':''}</td><td class="${s.stale?'stale':'current'}">${s.stale?'stale':'current'}</td></tr>`).join('')}</tbody></table></div></details>
+<details class="panel run-explorer"><summary><strong>Individual runs</strong><span class="summary-note">${fmt(c.runs.length)} jobs · open to search and inspect timestamps</span></summary><div class="run-explorer-content"><div class="filters"><input class="search" placeholder="Filter run ID, model, task…"><select class="method"><option value="">all methods</option>${[...new Set(c.runs.map(r=>r.method))].map(v=>`<option>${esc(v)}</option>`).join('')}</select><select class="status"><option value="">all states</option>${['succeeded','running','stale','failed','pending'].map(v=>`<option>${v}</option>`).join('')}</select></div><table><thead><tr><th>Run</th><th>Assigned</th><th>Task</th><th>Method</th><th>Status</th><th>Result updated</th><th>Reporter checked</th><th>Data state</th><th>Attempts</th><th>Failure</th><th>Refresh</th></tr></thead><tbody class="runs">${c.runs.map(r=>`<tr data-search="${esc((r.run_id+' '+r.model+' '+r.task).toLowerCase())}" data-method="${esc(r.method)}" data-status="${esc(r.status)}"><td class="mono">${esc(r.run_id)}</td><td>${esc(r.assigned_owner)} · ${esc(r.assigned_machine)}</td><td>${esc(r.task)}</td><td>${esc(r.method)}</td><td class="${statusClass(r.status)}">${esc(r.status)}</td><td>${esc(when(r.result_updated_at))}</td><td>${esc(when(r.reporter_checked_at))}</td><td class="${esc(r.report_state)}">${esc(r.report_state)}</td><td>${r.attempt_count}</td><td>${esc(Object.keys(r.failure_categories).join(', ')||'—')}</td><td>${refreshButton(r)}</td></tr>`).join('')}</tbody></table></div></details></section>`}
 document.getElementById('app').innerHTML=DATA.campaigns.map(renderCampaign).join('');
 document.querySelectorAll('section').forEach(section=>{const q=section.querySelector('.search'),m=section.querySelector('.method'),s=section.querySelector('.status'),rows=[...section.querySelectorAll('.runs tr')];const apply=()=>{const needle=q.value.toLowerCase();rows.forEach(r=>r.classList.toggle('hidden',!!((needle&&!r.dataset.search.includes(needle))||(m.value&&r.dataset.method!==m.value)||(s.value&&r.dataset.status!==s.value))))};q.oninput=apply;m.onchange=apply;s.onchange=apply});
+document.querySelectorAll('.copy-command').forEach(button=>button.onclick=async()=>{await navigator.clipboard.writeText(button.dataset.command);const old=button.textContent;button.textContent='copied';setTimeout(()=>button.textContent=old,1500)});
 async function refreshSafely(){const connection=document.getElementById('connection');try{const response=await fetch(location.href,{cache:'no-store'});if(!response.ok)throw new Error('HTTP '+response.status);const page=await response.text();connection.textContent='';connection.className='';if(!page.includes('"generated_at":"'+DATA.generated_at+'"')){document.open();document.write(page);document.close()}}catch(error){connection.textContent=' · connection lost—reopen the SSH tunnel for updates';connection.className='connection-lost'}}
 setInterval(refreshSafely,60000);
 </script></body></html>"""
