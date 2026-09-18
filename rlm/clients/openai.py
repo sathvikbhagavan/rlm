@@ -17,6 +17,10 @@ DEFAULT_OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
 DEFAULT_VERCEL_API_KEY = os.getenv("AI_GATEWAY_API_KEY")
 DEFAULT_PRIME_API_KEY = os.getenv("PRIME_API_KEY")
 DEFAULT_PRIME_INTELLECT_BASE_URL = "https://api.pinference.ai/api/v1/"
+OPENAI_BASE_URL = "https://api.openai.com/v1"
+DIRECT_OPENAI_TOKEN_PRICES_PER_MILLION = {
+    "gpt-5-mini": {"input": 0.25, "cached_input": 0.025, "output": 2.00},
+}
 
 
 class OpenAIClient(BaseLM):
@@ -35,11 +39,13 @@ class OpenAIClient(BaseLM):
         base_url: str | None = None,
         chat_completion_extra_body: dict[str, Any] | None = None,
         max_output_tokens: int | None = None,
+        reasoning_effort: str | None = None,
         **kwargs,
     ):
         super().__init__(model_name=model_name, **kwargs)
         self.chat_completion_extra_body = dict(chat_completion_extra_body or {})
         self.max_output_tokens = max_output_tokens
+        self.reasoning_effort = reasoning_effort
 
         if api_key is None:
             if base_url == "https://api.openai.com/v1" or base_url is None:
@@ -63,6 +69,7 @@ class OpenAIClient(BaseLM):
         self.async_client = openai.AsyncOpenAI(**client_kwargs)
         self.model_name = model_name
         self.base_url = base_url  # Track for cost extraction
+        self._is_direct_openai = base_url is None or base_url.rstrip("/") == OPENAI_BASE_URL
         self._api_key = api_key or ""
         self._is_swissai = is_swissai_url(base_url)
 
@@ -91,7 +98,10 @@ class OpenAIClient(BaseLM):
 
         request_kwargs = {"model": model, "messages": messages, "extra_body": extra_body}
         if self.max_output_tokens is not None:
-            request_kwargs["max_tokens"] = self.max_output_tokens
+            limit_key = "max_completion_tokens" if self._is_direct_openai else "max_tokens"
+            request_kwargs[limit_key] = self.max_output_tokens
+        if self.reasoning_effort is not None:
+            request_kwargs["reasoning_effort"] = self.reasoning_effort
 
         def request():
             return self.client.chat.completions.create(**request_kwargs)
@@ -122,7 +132,10 @@ class OpenAIClient(BaseLM):
 
         request_kwargs = {"model": model, "messages": messages, "extra_body": extra_body}
         if self.max_output_tokens is not None:
-            request_kwargs["max_tokens"] = self.max_output_tokens
+            limit_key = "max_completion_tokens" if self._is_direct_openai else "max_tokens"
+            request_kwargs[limit_key] = self.max_output_tokens
+        if self.reasoning_effort is not None:
+            request_kwargs["reasoning_effort"] = self.reasoning_effort
 
         async def request():
             return await self.async_client.chat.completions.create(**request_kwargs)
@@ -167,6 +180,19 @@ class OpenAIClient(BaseLM):
             # Fallback to upstream cost details
             elif extra.get("cost_details", {}).get("upstream_inference_cost"):
                 cost = extra["cost_details"]["upstream_inference_cost"]
+
+        if cost is None and self._is_direct_openai:
+            model_alias = model.removeprefix("openai/")
+            prices = DIRECT_OPENAI_TOKEN_PRICES_PER_MILLION.get(model_alias)
+            if prices is not None:
+                details = getattr(usage, "prompt_tokens_details", None)
+                cached_tokens = int(getattr(details, "cached_tokens", 0) or 0)
+                uncached_tokens = max(int(usage.prompt_tokens) - cached_tokens, 0)
+                cost = (
+                    uncached_tokens * prices["input"]
+                    + cached_tokens * prices["cached_input"]
+                    + int(usage.completion_tokens) * prices["output"]
+                ) / 1_000_000
 
         if cost is not None and cost > 0:
             self.last_cost = float(cost)

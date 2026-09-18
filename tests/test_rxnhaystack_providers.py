@@ -8,6 +8,7 @@ from rxnhaystack.providers import (
     CODEACT_MAX_OUTPUT_TOKENS,
     CODEACT_MAX_OUTPUT_TOKENS_ENV,
     LLM_MAX_OUTPUT_TOKENS_ENV,
+    OPENAI_BASE_URL,
     RLM_MAX_OUTPUT_TOKENS,
     RLM_MAX_OUTPUT_TOKENS_ENV,
     RLM_REASONING_EFFORT_ENV,
@@ -32,6 +33,61 @@ def test_swissai_records_zero_cost_without_provider_price(monkeypatch) -> None:
     monkeypatch.setenv("RXNHAYSTACK_PROVIDER", "swissai")
 
     assert not provider_reports_cost()
+
+
+def test_direct_openai_is_a_paid_provider(monkeypatch) -> None:
+    monkeypatch.setenv("RXNHAYSTACK_PROVIDER", "openai")
+
+    assert benchmark_provider() == "openai"
+    assert provider_reports_cost()
+
+
+def test_direct_openai_rlm_uses_native_model_and_bounded_client(monkeypatch) -> None:
+    monkeypatch.setenv("RXNHAYSTACK_PROVIDER", "openai")
+    monkeypatch.setenv("OPENAI_API_KEY", "private")
+    monkeypatch.setenv("RXNHAYSTACK_MODEL", "openai/gpt-5-mini")
+    monkeypatch.setenv(RLM_MAX_OUTPUT_TOKENS_ENV, "4096")
+    monkeypatch.setenv(RLM_REASONING_EFFORT_ENV, "low")
+
+    configured = configure_rlm_for_provider({"backend": "openrouter"})
+
+    assert configured == {
+        "backend": "openai",
+        "backend_kwargs": {
+            "api_key": "private",
+            "base_url": OPENAI_BASE_URL,
+            "max_output_tokens": 4096,
+            "max_retries": 0,
+            "model_name": "gpt-5-mini",
+            "reasoning_effort": "low",
+        },
+    }
+
+
+def test_direct_openai_llamaindex_client_uses_native_model(monkeypatch) -> None:
+    monkeypatch.setenv("RXNHAYSTACK_PROVIDER", "openai")
+    monkeypatch.setenv("OPENAI_API_KEY", "private")
+
+    client = build_benchmark_llm(
+        model="openai/gpt-5-mini",
+        api_key="must-be-replaced",
+        max_tokens=4096,
+        reasoning_effort="low",
+    )
+
+    assert client.model == "gpt-5-mini"
+    assert client.api_key == "private"
+    assert client.api_base == OPENAI_BASE_URL
+    assert client.max_retries == 0
+    assert client.reasoning_effort == "low"
+
+
+def test_direct_openai_requires_its_own_key(monkeypatch) -> None:
+    monkeypatch.setenv("RXNHAYSTACK_PROVIDER", "openai")
+    monkeypatch.delenv("OPENAI_API_KEY", raising=False)
+
+    with pytest.raises(ManifestError, match="OPENAI_API_KEY"):
+        configure_rlm_for_provider({"backend": "openrouter"})
 
 
 def test_swissai_rlm_uses_openai_compatible_transport(monkeypatch) -> None:
@@ -267,7 +323,7 @@ def test_reasoning_effort_is_rejected_for_swissai(monkeypatch) -> None:
     monkeypatch.setenv("SWISSAI_RESEARCH_API_KEY", "private")
     monkeypatch.setenv(RLM_REASONING_EFFORT_ENV, "low")
 
-    with pytest.raises(ManifestError, match="only supported by the OpenRouter"):
+    with pytest.raises(ManifestError, match="OpenAI-compatible reasoning"):
         configure_rlm_for_provider({"backend": "openrouter"})
 
 

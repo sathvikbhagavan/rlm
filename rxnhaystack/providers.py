@@ -3,6 +3,7 @@ from __future__ import annotations
 import os
 from typing import Any
 
+from llama_index.llms.openai import OpenAI
 from llama_index.llms.openai_like import OpenAILike
 from llama_index.llms.openrouter import OpenRouter
 
@@ -22,6 +23,8 @@ ANTHROPIC_CACHE_CONTROL = {"type": "ephemeral"}
 RUN_ID_ENV = "RXNHAYSTACK_RUN_ID"
 SWISSAI_API_KEY_ENV = "SWISSAI_RESEARCH_API_KEY"
 SWISSAI_BASE_URL = "https://api.swissai.svc.cscs.ch/v1"
+OPENAI_API_KEY_ENV = "OPENAI_API_KEY"
+OPENAI_BASE_URL = "https://api.openai.com/v1"
 SWISSAI_REQUEST_TIMEOUT_ENV = "RXNHAYSTACK_SWISSAI_REQUEST_TIMEOUT_SECONDS"
 SWISSAI_REQUEST_TIMEOUT_SECONDS = 300.0
 
@@ -48,7 +51,7 @@ class SwissAICompatibleLLM(OpenAILike):
 def benchmark_provider(environ: dict[str, str] | None = None) -> str:
     env = os.environ if environ is None else environ
     provider = env.get(PROVIDER_ENV, "openrouter").strip().lower()
-    if provider not in {"openrouter", "swissai"}:
+    if provider not in {"openai", "openrouter", "swissai"}:
         raise ManifestError(f"Unsupported {PROVIDER_ENV} value: {provider!r}")
     return provider
 
@@ -56,7 +59,13 @@ def benchmark_provider(environ: dict[str, str] | None = None) -> str:
 def provider_reports_cost(environ: dict[str, str] | None = None) -> bool:
     """Whether missing per-request price data must fail a benchmark job."""
 
-    return benchmark_provider(environ) == "openrouter"
+    return benchmark_provider(environ) in {"openai", "openrouter"}
+
+
+def _direct_openai_model(model: str) -> str:
+    """Translate an OpenRouter-qualified OpenAI slug to the native API name."""
+
+    return model.removeprefix("openai/")
 
 
 def _bounded_chat_kwargs(kwargs: dict[str, Any]) -> dict[str, Any]:
@@ -118,13 +127,24 @@ def _enable_anthropic_prompt_cache(kwargs: dict[str, Any]) -> dict[str, Any]:
     return configured
 
 
-def build_benchmark_llm(**kwargs: Any) -> OpenRouter | OpenAILike:
+def build_benchmark_llm(**kwargs: Any) -> OpenAI | OpenRouter | OpenAILike:
     """Build a LlamaIndex chat client without changing benchmark prompt semantics."""
 
     kwargs = _enable_anthropic_prompt_cache(_bounded_chat_kwargs(kwargs))
     provider = benchmark_provider()
     if provider == "openrouter":
         return OpenRouter(**kwargs)
+
+    if provider == "openai":
+        api_key = os.environ.get(OPENAI_API_KEY_ENV)
+        if not api_key:
+            raise ManifestError(f"{OPENAI_API_KEY_ENV} is required for direct OpenAI models")
+        configured = dict(kwargs)
+        configured["model"] = _direct_openai_model(str(configured["model"]))
+        configured["api_key"] = api_key
+        configured["api_base"] = OPENAI_BASE_URL
+        configured["max_retries"] = 0
+        return OpenAI(**configured)
 
     api_key = os.environ.get(SWISSAI_API_KEY_ENV)
     if not api_key:
@@ -194,13 +214,17 @@ def configure_rlm_for_provider(kwargs: dict[str, Any]) -> dict[str, Any]:
         if reasoning_effort not in OPENROUTER_REASONING_EFFORTS:
             choices = ", ".join(sorted(OPENROUTER_REASONING_EFFORTS))
             raise ManifestError(f"{RLM_REASONING_EFFORT_ENV} must be one of: {choices}")
-        if benchmark_provider() != "openrouter":
+        if benchmark_provider() not in {"openai", "openrouter"}:
             raise ManifestError(
-                f"{RLM_REASONING_EFFORT_ENV} is only supported by the OpenRouter transport"
+                f"{RLM_REASONING_EFFORT_ENV} is only supported by OpenAI-compatible "
+                "reasoning transports"
             )
-        extra_body = dict(backend_kwargs.get("chat_completion_extra_body", {}) or {})
-        extra_body["reasoning"] = {"effort": reasoning_effort}
-        backend_kwargs["chat_completion_extra_body"] = extra_body
+        if benchmark_provider() == "openrouter":
+            extra_body = dict(backend_kwargs.get("chat_completion_extra_body", {}) or {})
+            extra_body["reasoning"] = {"effort": reasoning_effort}
+            backend_kwargs["chat_completion_extra_body"] = extra_body
+        else:
+            backend_kwargs["reasoning_effort"] = reasoning_effort
     if (
         benchmark_provider() == "openrouter"
         and model is not None
@@ -228,6 +252,21 @@ def configure_rlm_for_provider(kwargs: dict[str, Any]) -> dict[str, Any]:
                 "timeout": SWISSAI_REQUEST_TIMEOUT_SECONDS,
                 "max_retries": 0,
                 "chat_completion_extra_body": {"chat_template_kwargs": {"enable_thinking": False}},
+            }
+        )
+    elif benchmark_provider() == "openai":
+        api_key = os.environ.get(OPENAI_API_KEY_ENV)
+        if not api_key:
+            raise ManifestError(f"{OPENAI_API_KEY_ENV} is required for direct OpenAI models")
+        configured["backend"] = "openai"
+        backend_kwargs.update(
+            {
+                "api_key": api_key,
+                "base_url": OPENAI_BASE_URL,
+                "model_name": _direct_openai_model(
+                    str(model or backend_kwargs.get("model_name", ""))
+                ),
+                "max_retries": 0,
             }
         )
     configured["backend_kwargs"] = backend_kwargs

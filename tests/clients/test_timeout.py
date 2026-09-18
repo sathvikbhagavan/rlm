@@ -122,7 +122,40 @@ class TestOpenAIClientTimeout:
                 assert client.completion("Hello") == "answer"
 
         assert "max_output_tokens" not in constructor.call_args.kwargs
-        assert mock_client.chat.completions.create.call_args.kwargs["max_tokens"] == 2048
+        assert mock_client.chat.completions.create.call_args.kwargs["max_completion_tokens"] == 2048
+
+    def test_direct_openai_uses_native_reasoning_limit_and_calculates_cost(self):
+        """Direct GPT calls use supported fields and official token prices."""
+        from rlm.clients.openai import OpenAIClient
+
+        mock_client = MagicMock()
+        response = mock_client.chat.completions.create.return_value
+        response.choices[0].message.content = "answer"
+        response.usage.prompt_tokens = 1_000_000
+        response.usage.completion_tokens = 100_000
+        response.usage.total_tokens = 1_100_000
+        response.usage.prompt_tokens_details.cached_tokens = 200_000
+        response.usage.cost = None
+        response.usage.model_extra = None
+
+        with patch("rlm.clients.openai.openai.OpenAI", return_value=mock_client):
+            with patch("rlm.clients.openai.openai.AsyncOpenAI"):
+                client = OpenAIClient(
+                    api_key="test-key",
+                    model_name="gpt-5-mini",
+                    base_url="https://api.openai.com/v1",
+                    max_output_tokens=4096,
+                    reasoning_effort="low",
+                )
+                assert client.completion("Hello") == "answer"
+
+        request = mock_client.chat.completions.create.call_args.kwargs
+        assert request["max_completion_tokens"] == 4096
+        assert "max_tokens" not in request
+        assert request["reasoning_effort"] == "low"
+        # 800k uncached input * $0.25/M + 200k cached * $0.025/M
+        # + 100k output * $2/M = $0.405.
+        assert client.get_last_usage().total_cost == pytest.approx(0.405)
 
     def test_swissai_rlm_completion_uses_shared_rate_limiter(self):
         """The native RLM client must share the same SwissAI quota boundary."""
