@@ -583,12 +583,16 @@ launcher termination, or a cost/balance ceiling, together with the task
 description, execution host, project, selected run scope, counts, calls,
 tokens, recorded cost, and the explicit Codex chat title and machine.
 
-Two durable watchers started on `liacpc14` at 12:17 Europe/Zurich:
+Four durable watchers are active on `liacpc14`:
 
 - `task-notify-claude-docker` watches all 45 Claude Docker RLM cells, launcher
   PID `3147146`, and the guarded OpenRouter queue log;
 - `task-notify-gpt-docker` watches all 45 direct-OpenAI GPT Docker RLM cells,
   launcher PID `3156222`, and the CHF 30 experiment ceiling.
+- `task-notify-deepseek-nondocker` watches the non-overlapping 405-cell
+  DeepSeek RLM scope and launcher PID `2698386`;
+- `task-notify-deepseek-docker` watches the 45-cell DeepSeek Docker scope and
+  launcher PID `2791520`.
 
 Both use the canonical chat label `RxnHaystack ICLR 2027 master chat` and chat
 machine `liacpc14`. Their mode-600 states are under
@@ -597,3 +601,8 @@ machine `liacpc14`. Their mode-600 states are under
 `~/.smtp_app_password` file exists with mode 600. If either experiment ends
 before that file is configured, its terminal message remains pending and the
 watcher retries rather than discarding it.
+
+Commit `7091e0e` adds native Slurm observation through `--slurm-job-id`. It
+checks `squeue` while an allocation is live, falls back to `sacct` afterward,
+and records the scheduler job ID and final state in the email. This is the
+preferred attachment mechanism for Jed and Kuma.
