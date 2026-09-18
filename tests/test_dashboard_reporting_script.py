@@ -14,3 +14,4 @@ def test_dashboard_reporting_helper_has_valid_shell_syntax() -> None:
     assert "iclr2027-matched-cardinality-v7/ledger.sqlite3" in content
     assert "--local-only" in content
     assert "tmux has-session" in content
+    assert "RXNHAYSTACK_DASHBOARD_ENTITY" in content

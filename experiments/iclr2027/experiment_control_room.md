@@ -77,6 +77,24 @@ bash experiments/iclr2027/start_dashboard_reporting.sh Sathvik jed "$HOME"
 The helper never changes experiment ledgers or model processes. Its preliminary
 publication check is local-only; W&B publication begins inside the updater.
 
+If a collaborator cannot publish to the `liac` team, they can publish the
+sanitized snapshots to a project under their own W&B entity:
+
+```bash
+RXNHAYSTACK_DASHBOARD_ENTITY=SATHVIK_WANDB_ENTITY \
+  bash experiments/iclr2027/start_dashboard_reporting.sh Sathvik liacpc15 "$HOME"
+```
+
+They should make only the `rxnhaystack-control-room` project public. Their
+original experiment projects and runs can remain private. A viewer can then
+merge the public status project with the lab project using:
+
+```bash
+uv run --frozen rxnhaystack dashboard view \
+  --source SATHVIK_WANDB_ENTITY/rxnhaystack-control-room \
+  --secret-file WANDB_API_KEY=~/.wandb_api_key
+```
+
 ## Publish one update
 
 Pull the current repository version on the machine, then run from its clone:

@@ -6,6 +6,8 @@ dashboard_machine="${2:?Usage: start_dashboard_reporting.sh OWNER MACHINE [SEARC
 dashboard_search_root="${3:-$HOME}"
 dashboard_repo="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 dashboard_key="$HOME/.wandb_api_key"
+dashboard_entity="${RXNHAYSTACK_DASHBOARD_ENTITY:-liac}"
+dashboard_project="${RXNHAYSTACK_DASHBOARD_PROJECT:-rxnhaystack-control-room}"
 
 if [[ ! -f "$dashboard_key" ]]; then
   echo "Missing $dashboard_key" >&2
@@ -68,12 +70,15 @@ while IFS= read -r -d '' dashboard_ledger; do
     --source-id "$dashboard_source" \
     --machine "$dashboard_machine" \
     --owner "$dashboard_owner" \
+    --entity "$dashboard_entity" \
+    --project "$dashboard_project" \
     --local-only
 
   printf -v dashboard_command \
-    'cd %q && uv run --frozen rxnhaystack dashboard update %q --ledger-path %q --source-id %q --machine %q --owner %q --watch-seconds 300 --heartbeat-seconds 1800 --secret-file %q' \
+    'cd %q && uv run --frozen rxnhaystack dashboard update %q --ledger-path %q --source-id %q --machine %q --owner %q --entity %q --project %q --watch-seconds 300 --heartbeat-seconds 1800 --secret-file %q' \
     "$dashboard_repo" "$dashboard_experiment" "$dashboard_ledger" "$dashboard_source" \
-    "$dashboard_machine" "$dashboard_owner" "WANDB_API_KEY=$dashboard_key"
+    "$dashboard_machine" "$dashboard_owner" "$dashboard_entity" "$dashboard_project" \
+    "WANDB_API_KEY=$dashboard_key"
   tmux new-session -d -s "$dashboard_session" "$dashboard_command"
   echo "Started: $dashboard_ledger ($dashboard_session, $dashboard_observed observed jobs)"
   dashboard_started=$((dashboard_started + 1))
@@ -89,4 +94,4 @@ if ((dashboard_started == 0 && dashboard_existing == 0)); then
   exit 1
 fi
 
-echo "Dashboard reporting ready: started=$dashboard_started, already_running=$dashboard_existing, empty_skipped=$dashboard_skipped"
+echo "Dashboard reporting ready in $dashboard_entity/$dashboard_project: started=$dashboard_started, already_running=$dashboard_existing, empty_skipped=$dashboard_skipped"

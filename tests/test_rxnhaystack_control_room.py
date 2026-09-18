@@ -25,7 +25,7 @@ from rxnhaystack.control_room import (
     write_snapshot,
 )
 from rxnhaystack.ledger import RunLedger
-from rxnhaystack.manifest import load_manifest
+from rxnhaystack.manifest import ManifestError, load_manifest
 from rxnhaystack.runtime import GitProvenance
 
 
@@ -409,6 +409,37 @@ def test_dashboard_command_and_legacy_alias_are_both_available() -> None:
 
     assert current.command == "dashboard"
     assert legacy.command == "control-room"
+
+
+def test_dashboard_view_accepts_additional_wandb_projects() -> None:
+    parser = cli.build_parser()
+    args = parser.parse_args(
+        [
+            "dashboard",
+            "view",
+            "--source",
+            "sathvik/rxnhaystack-control-room",
+            "--source",
+            "liac/rxnhaystack-control-room",
+            "--no-sync",
+            "--no-serve",
+        ]
+    )
+
+    assert cli.dashboard_sources(args) == [
+        ("liac", "rxnhaystack-control-room"),
+        ("sathvik", "rxnhaystack-control-room"),
+    ]
+
+
+def test_dashboard_rejects_malformed_additional_wandb_project() -> None:
+    parser = cli.build_parser()
+    args = parser.parse_args(
+        ["dashboard", "view", "--source", "missing-project", "--no-sync", "--no-serve"]
+    )
+
+    with pytest.raises(ManifestError, match="ENTITY/PROJECT"):
+        cli.dashboard_sources(args)
 
 
 def test_fresh_running_source_remains_running(

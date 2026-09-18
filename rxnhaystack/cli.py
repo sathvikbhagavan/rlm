@@ -110,6 +110,13 @@ def build_parser() -> argparse.ArgumentParser:
     )
     view.add_argument("--entity", default="liac")
     view.add_argument("--project", default="rxnhaystack-control-room")
+    view.add_argument(
+        "--source",
+        action="append",
+        default=[],
+        metavar="ENTITY/PROJECT",
+        help="Also merge dashboard snapshots from another readable W&B project.",
+    )
     view.add_argument("--cache-dir", type=Path, default=Path("artifacts/control-room/shared"))
     view.add_argument("--html", type=Path, default=Path("artifacts/control-room/index.html"))
     view.add_argument("--markdown", type=Path, default=Path("artifacts/control-room/status.md"))
@@ -350,17 +357,36 @@ def refresh_control_room(
     markdown_path: Path,
 ) -> None:
     if not args.no_sync:
-        paths = sync_snapshots(
-            api_key=api_key or "",
-            entity=args.entity,
-            project=args.project,
-            output_dir=cache_dir,
+        downloaded: set[Path] = set()
+        for entity, project in dashboard_sources(args):
+            downloaded.update(
+                sync_snapshots(
+                    api_key=api_key or "",
+                    entity=entity,
+                    project=project,
+                    output_dir=cache_dir,
+                )
+            )
+        print(
+            f"Downloaded {len(downloaded)} current machine snapshots from "
+            f"{len(dashboard_sources(args))} W&B project(s)"
         )
-        print(f"Downloaded {len(paths)} current machine snapshots")
     snapshots = load_snapshot_directory(cache_dir)
     merged = merge_snapshots(snapshots, stale_after_seconds=args.stale_after_hours * 3600)
     write_dashboard(html_path, merged)
     write_markdown(markdown_path, merged)
+
+
+def dashboard_sources(args: argparse.Namespace) -> list[tuple[str, str]]:
+    sources = [(str(args.entity), str(args.project))]
+    for specification in args.source:
+        if specification.count("/") != 1:
+            raise ManifestError("--source must have the form ENTITY/PROJECT")
+        entity, project = specification.split("/", 1)
+        if not entity.strip() or not project.strip():
+            raise ManifestError("--source must have the form ENTITY/PROJECT")
+        sources.append((entity.strip(), project.strip()))
+    return list(dict.fromkeys(sources))
 
 
 def refresh_control_room_until_stopped(
