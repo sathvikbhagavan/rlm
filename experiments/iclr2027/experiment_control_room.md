@@ -95,6 +95,11 @@ uv run --frozen rxnhaystack dashboard view \
   --secret-file WANDB_API_KEY=~/.wandb_api_key
 ```
 
+Additional projects are optional sources: if one has not been created yet or
+is temporarily unreadable, the lab dashboard remains available and logs a
+warning. It checks again at every refresh and begins merging that source as
+soon as access succeeds.
+
 ## Publish one update
 
 Pull the current repository version on the machine, then run from its clone:

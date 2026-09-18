@@ -358,18 +358,28 @@ def refresh_control_room(
 ) -> None:
     if not args.no_sync:
         downloaded: set[Path] = set()
-        for entity, project in dashboard_sources(args):
-            downloaded.update(
-                sync_snapshots(
-                    api_key=api_key or "",
-                    entity=entity,
-                    project=project,
-                    output_dir=cache_dir,
+        sources = dashboard_sources(args)
+        for index, (entity, project) in enumerate(sources):
+            try:
+                downloaded.update(
+                    sync_snapshots(
+                        api_key=api_key or "",
+                        entity=entity,
+                        project=project,
+                        output_dir=cache_dir,
+                    )
                 )
-            )
+            except Exception as error:
+                if index == 0:
+                    raise
+                print(
+                    f"warning: optional dashboard source {entity}/{project} is unavailable: "
+                    f"{error}",
+                    file=sys.stderr,
+                )
         print(
             f"Downloaded {len(downloaded)} current machine snapshots from "
-            f"{len(dashboard_sources(args))} W&B project(s)"
+            f"{len(sources)} configured W&B project(s)"
         )
     snapshots = load_snapshot_directory(cache_dir)
     merged = merge_snapshots(snapshots, stale_after_seconds=args.stale_after_hours * 3600)

@@ -442,6 +442,46 @@ def test_dashboard_rejects_malformed_additional_wandb_project() -> None:
         cli.dashboard_sources(args)
 
 
+def test_unavailable_optional_wandb_project_does_not_block_dashboard(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
+) -> None:
+    calls: list[tuple[str, str]] = []
+
+    def fake_sync(**kwargs: Any) -> list[Path]:
+        source = (kwargs["entity"], kwargs["project"])
+        calls.append(source)
+        if source[0] == "sathvikbhagavan-epfl":
+            raise ValueError("project not created yet")
+        return [tmp_path / "liac.json"]
+
+    monkeypatch.setattr(cli, "sync_snapshots", fake_sync)
+    monkeypatch.setattr(cli, "load_snapshot_directory", lambda _path: [{}])
+    monkeypatch.setattr(cli, "merge_snapshots", lambda *_args, **_kwargs: {"campaigns": []})
+    monkeypatch.setattr(cli, "write_dashboard", lambda *_args: None)
+    monkeypatch.setattr(cli, "write_markdown", lambda *_args: None)
+    args = SimpleNamespace(
+        no_sync=False,
+        entity="liac",
+        project="rxnhaystack-control-room",
+        source=["sathvikbhagavan-epfl/rxnhaystack-control-room"],
+        stale_after_hours=2,
+    )
+
+    cli.refresh_control_room(
+        args,
+        api_key="secret",
+        cache_dir=tmp_path / "cache",
+        html_path=tmp_path / "index.html",
+        markdown_path=tmp_path / "status.md",
+    )
+
+    assert calls == [
+        ("liac", "rxnhaystack-control-room"),
+        ("sathvikbhagavan-epfl", "rxnhaystack-control-room"),
+    ]
+    assert "optional dashboard source" in capsys.readouterr().err
+
+
 def test_fresh_running_source_remains_running(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
