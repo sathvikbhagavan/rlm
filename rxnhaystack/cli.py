@@ -303,13 +303,22 @@ def command_control_room_view(args: argparse.Namespace) -> int:
     api_key = None if args.no_sync else resolve_wandb_key(args.secret_file)
     html_path = args.html.expanduser().resolve()
     markdown_path = args.markdown.expanduser().resolve()
-    refresh_control_room(
-        args,
-        api_key=api_key,
-        cache_dir=cache_dir,
-        html_path=html_path,
-        markdown_path=markdown_path,
-    )
+    cached_snapshot_available = cache_dir.is_dir() and any(cache_dir.glob("*.json"))
+    if args.no_sync or not cached_snapshot_available:
+        refresh_control_room(
+            args,
+            api_key=api_key,
+            cache_dir=cache_dir,
+            html_path=html_path,
+            markdown_path=markdown_path,
+        )
+    else:
+        render_cached_control_room(
+            args,
+            cache_dir=cache_dir,
+            html_path=html_path,
+            markdown_path=markdown_path,
+        )
     print(f"Dashboard: {html_path}")
     print(f"Markdown: {markdown_path}")
     if args.no_serve:
@@ -330,6 +339,7 @@ def command_control_room_view(args: argparse.Namespace) -> int:
                 "html_path": html_path,
                 "markdown_path": markdown_path,
                 "stop": stop_refresh,
+                "refresh_immediately": cached_snapshot_available,
             },
             name="rxnhaystack-dashboard-refresh",
             daemon=True,
@@ -381,6 +391,21 @@ def refresh_control_room(
             f"Downloaded {len(downloaded)} current machine snapshots from "
             f"{len(sources)} configured W&B project(s)"
         )
+    render_cached_control_room(
+        args,
+        cache_dir=cache_dir,
+        html_path=html_path,
+        markdown_path=markdown_path,
+    )
+
+
+def render_cached_control_room(
+    args: argparse.Namespace,
+    *,
+    cache_dir: Path,
+    html_path: Path,
+    markdown_path: Path,
+) -> None:
     snapshots = load_snapshot_directory(cache_dir)
     merged = merge_snapshots(snapshots, stale_after_seconds=args.stale_after_hours * 3600)
     write_dashboard(html_path, merged)
@@ -407,7 +432,19 @@ def refresh_control_room_until_stopped(
     html_path: Path,
     markdown_path: Path,
     stop: threading.Event,
+    refresh_immediately: bool = False,
 ) -> None:
+    if refresh_immediately:
+        try:
+            refresh_control_room(
+                args,
+                api_key=api_key,
+                cache_dir=cache_dir,
+                html_path=html_path,
+                markdown_path=markdown_path,
+            )
+        except Exception as error:
+            print(f"warning: dashboard refresh failed: {error}", file=sys.stderr)
     while not stop.wait(args.refresh_seconds):
         try:
             refresh_control_room(

@@ -17,7 +17,7 @@ printf -v dashboard_command \
   "$dashboard_repo" "WANDB_API_KEY=$dashboard_key"
 tmux new-session -d -s "$dashboard_session" "$dashboard_command"
 
-for _ in $(seq 1 90); do
+for _ in $(seq 1 300); do
   if curl -fsS http://127.0.0.1:8765/index.html >/dev/null 2>&1; then
     echo "RxnHaystack Dashboard is ready on 127.0.0.1:8765"
     exit 0

@@ -573,6 +573,40 @@ def test_unavailable_optional_wandb_project_does_not_block_dashboard(
     assert "optional dashboard source" in capsys.readouterr().err
 
 
+def test_viewer_renders_existing_cache_without_blocking_on_wandb(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    cache_dir = tmp_path / "cache"
+    cache_dir.mkdir()
+    (cache_dir / "existing.json").write_text("{}", encoding="utf-8")
+    rendered: list[Path] = []
+    monkeypatch.setattr(cli, "resolve_wandb_key", lambda _specs: "secret")
+    monkeypatch.setattr(
+        cli,
+        "render_cached_control_room",
+        lambda _args, **kwargs: rendered.append(kwargs["cache_dir"]),
+    )
+    monkeypatch.setattr(
+        cli,
+        "refresh_control_room",
+        lambda *_args, **_kwargs: pytest.fail("W&B sync should not block cached startup"),
+    )
+    args = SimpleNamespace(
+        cache_dir=cache_dir,
+        stale_after_hours=2,
+        port=8765,
+        refresh_seconds=300,
+        secret_file=[],
+        html=tmp_path / "index.html",
+        markdown=tmp_path / "status.md",
+        no_sync=False,
+        no_serve=True,
+    )
+
+    assert cli.command_control_room_view(args) == 0
+    assert rendered == [cache_dir.resolve()]
+
+
 def test_fresh_running_source_remains_running(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
