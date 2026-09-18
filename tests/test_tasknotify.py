@@ -149,6 +149,7 @@ def test_terminal_failed_ledger_is_durable_and_sent_once(
         ledger=str(ledger),
         select=["run-*"],
         launcher_pid=None,
+        slurm_job_id=None,
         cost_ceiling_chf=None,
         log_file=None,
         ceiling_pattern=list(cli.DEFAULT_CEILING_PATTERNS),
@@ -173,3 +174,19 @@ def test_terminal_failed_ledger_is_durable_and_sent_once(
     assert state["sent_events"] == ["test-watch:failed"]
     assert state["pending"] == {}
     assert (tmp_path / "state.json").stat().st_mode & 0o777 == 0o600
+
+
+def test_slurm_job_state_checks_queue_then_accounting(monkeypatch: pytest.MonkeyPatch) -> None:
+    running = MagicMock(returncode=0, stdout="RUNNING\n", stderr="")
+    run = MagicMock(return_value=running)
+    monkeypatch.setattr(cli.subprocess, "run", run)
+
+    assert cli.slurm_job_state("123") == (True, "RUNNING")
+    assert run.call_args.args[0][0] == "squeue"
+
+    absent = MagicMock(returncode=0, stdout="", stderr="")
+    completed = MagicMock(returncode=0, stdout="COMPLETED|\n", stderr="")
+    run.side_effect = [absent, completed]
+
+    assert cli.slurm_job_state("123") == (False, "COMPLETED")
+    assert run.call_args.args[0][0] == "sacct"

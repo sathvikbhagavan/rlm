@@ -82,6 +82,8 @@ class Notification:
     command: str | None = None
     exit_code: int | None = None
     log_file: str | None = None
+    scheduler_job_id: str | None = None
+    scheduler_state: str | None = None
 
 
 def utc_now() -> str:
@@ -172,6 +174,10 @@ def notification_body(notification: Notification) -> str:
         lines.append(f"Command: {notification.command}")
     if notification.exit_code is not None:
         lines.append(f"Exit code: {notification.exit_code}")
+    if notification.scheduler_job_id:
+        lines.append(f"Scheduler job: {notification.scheduler_job_id}")
+    if notification.scheduler_state:
+        lines.append(f"Scheduler state: {notification.scheduler_state}")
     if notification.ledger:
         lines.append(f"Ledger: {notification.ledger}")
     if notification.selectors:
@@ -287,6 +293,54 @@ def process_alive(pid: int | None) -> bool:
     return True
 
 
+def slurm_job_state(job_id: str) -> tuple[bool, str]:
+    """Return whether a Slurm allocation is active and its normalized state."""
+
+    try:
+        queued = subprocess.run(
+            ["squeue", "--noheader", "--jobs", job_id, "--format", "%T"],
+            check=False,
+            capture_output=True,
+            text=True,
+            timeout=30,
+        )
+    except (OSError, subprocess.TimeoutExpired) as error:
+        raise NotifyError(f"Could not query Slurm job {job_id} with squeue: {error}") from error
+    if queued.returncode != 0:
+        raise NotifyError(f"squeue failed for job {job_id}: {queued.stderr.strip()}")
+    queued_states = [line.strip().upper() for line in queued.stdout.splitlines() if line.strip()]
+    if queued_states:
+        return True, queued_states[0]
+
+    try:
+        accounted = subprocess.run(
+            [
+                "sacct",
+                "--noheader",
+                "--allocations",
+                "--jobs",
+                job_id,
+                "--format",
+                "State",
+                "--parsable2",
+            ],
+            check=False,
+            capture_output=True,
+            text=True,
+            timeout=30,
+        )
+    except (OSError, subprocess.TimeoutExpired) as error:
+        raise NotifyError(f"Could not query Slurm job {job_id} with sacct: {error}") from error
+    if accounted.returncode != 0:
+        raise NotifyError(f"sacct failed for job {job_id}: {accounted.stderr.strip()}")
+    states = [
+        line.split("|", 1)[0].strip().upper().split()[0]
+        for line in accounted.stdout.splitlines()
+        if line.strip().strip("|")
+    ]
+    return False, states[0] if states else "UNKNOWN"
+
+
 def log_has_ceiling(path: str | None, patterns: tuple[str, ...]) -> bool:
     if path is None:
         return False
@@ -347,6 +401,8 @@ def common_notification(args: argparse.Namespace, *, outcome: str, event_id: str
         started_at=started.isoformat(),
         observed_at=now.isoformat(),
         elapsed_seconds=max((now - started.astimezone(UTC)).total_seconds(), 0),
+        scheduler_job_id=getattr(args, "slurm_job_id", None),
+        scheduler_state=getattr(args, "scheduler_state", None),
     )
 
 
@@ -370,7 +426,12 @@ def watch_ledger(args: argparse.Namespace) -> int:
     terminal_event: str | None = None
     while True:
         snapshot = read_ledger(args.ledger, tuple(args.select))
-        launcher_alive = process_alive(args.launcher_pid)
+        scheduler_state: str | None = None
+        if args.slurm_job_id:
+            launcher_alive, scheduler_state = slurm_job_state(args.slurm_job_id)
+        else:
+            launcher_alive = process_alive(args.launcher_pid)
+        args.scheduler_state = scheduler_state
         ceiling = (
             args.cost_ceiling_chf is not None and snapshot.cost_chf >= args.cost_ceiling_chf
         ) or log_has_ceiling(args.log_file, tuple(args.ceiling_pattern))
@@ -492,7 +553,12 @@ def build_parser() -> argparse.ArgumentParser:
     watch_parser.add_argument("--watch-id", required=True)
     watch_parser.add_argument("--ledger", required=True)
     watch_parser.add_argument("--select", action="append", default=[])
-    watch_parser.add_argument("--launcher-pid", type=int)
+    launcher = watch_parser.add_mutually_exclusive_group()
+    launcher.add_argument("--launcher-pid", type=int)
+    launcher.add_argument(
+        "--slurm-job-id",
+        help="Slurm allocation to observe with squeue and sacct instead of a local PID.",
+    )
     watch_parser.add_argument("--log-file")
     watch_parser.add_argument("--cost-ceiling-chf", type=float)
     watch_parser.add_argument(

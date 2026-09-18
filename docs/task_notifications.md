@@ -157,6 +157,15 @@ scientifically distinguish success from failure. For such jobs, start the next
 run with `task-notify run` or ask the assistant to define explicit success and
 failure records first.
 
+For a Slurm allocation, replace `--launcher-pid` with the scheduler ID:
+
+```bash
+--slurm-job-id 66534424
+```
+
+The watcher checks `squeue` while the allocation is active and `sacct` after it
+leaves the queue. The final email includes both the job ID and scheduler state.
+
 ## Short prompt for a coding assistant
 
 Use this when asking Codex or Claude to attach notifications:
