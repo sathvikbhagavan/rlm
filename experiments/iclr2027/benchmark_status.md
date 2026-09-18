@@ -576,12 +576,20 @@ Do not edit generated TOML files just to update this coordination record.
 
 ## Email completion notifications
 
-Commit `73fe65f` adds the project-independent `task-notify` utility and installs
-it for Amin under `~/.local/bin`. It can wrap any command or watch selected
-rows in a compatible SQLite ledger. Messages report completion, failure, early
-launcher termination, or a cost/balance ceiling, together with the task
-description, execution host, project, selected run scope, counts, calls,
-tokens, recorded cost, and the explicit Codex chat title and machine.
+`task-notify` is now a standalone utility at `/home/amin/tasknotify`, installed
+for Amin under `~/.local/bin`. RxnHaystack contains only this project-specific
+coordination record and examples. The reusable implementation is intentionally
+not coupled to this repository, so it can also monitor CoQ, Catelier, and other
+projects.
+
+In addition to completion, failure, launcher termination, and cost-limit mail,
+the utility now sends hourly updates by default. It labels a message
+`PROGRESS` if ledger counters, the active run, or a configured progress file
+changed; `STATUS` after one unchanged interval; and `STALL` after two hours
+without an observable change. A stall alert is explicitly not proof of a hang,
+because a legitimate model request can remain inside one trajectory for a long
+time. Per-watcher settings are `--status-interval-seconds` and
+`--stall-after-seconds`; setting the first to zero disables periodic mail.
 
 Four durable watchers are active on `liacpc14`:
 
@@ -594,13 +602,12 @@ Four durable watchers are active on `liacpc14`:
 - `task-notify-deepseek-docker` watches the 45-cell DeepSeek Docker scope and
   launcher PID `2791520`.
 
-Both use the canonical chat label `RxnHaystack ICLR 2027 master chat` and chat
+All four use the canonical chat label `RxnHaystack ICLR 2027 master chat` and chat
 machine `liacpc14`. Their mode-600 states are under
-`~/.local/state/task-notify/`. SMTP is configured for
-`amansouri3476@gmail.com`, but delivery remains pending until the private
-`~/.smtp_app_password` file exists with mode 600. If either experiment ends
-before that file is configured, its terminal message remains pending and the
-watcher retries rather than discarding it.
+`~/.local/state/task-notify/`. SMTP delivery to `amansouri3476@gmail.com` has
+been tested successfully. Credentials stay in private files outside Git. If
+SMTP is temporarily unavailable, a terminal message remains pending and the
+watcher retries it rather than discarding it.
 
 Commit `7091e0e` adds native Slurm observation through `--slurm-job-id`. It
 checks `squeue` while an allocation is live, falls back to `sacct` afterward,

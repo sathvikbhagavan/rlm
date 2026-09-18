@@ -41,7 +41,6 @@ Issues = "https://github.com/alexzhang13/rlm/issues"
 
 [project.scripts]
 rxnhaystack = "rxnhaystack.cli:main"
-task-notify = "tasknotify.cli:main"
 
 [project.optional-dependencies]
 modal = ["modal>=0.73.0", "dill>=0.3.7"]
@@ -61,7 +60,7 @@ requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools.packages.find]
-include = ["rlm", "rlm.*", "rxnhaystack", "rxnhaystack.*", "tasknotify", "tasknotify.*"]
+include = ["rlm", "rlm.*", "rxnhaystack", "rxnhaystack.*"]
 
 [dependency-groups]
 dev = [
