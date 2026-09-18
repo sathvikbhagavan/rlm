@@ -590,6 +590,9 @@ without an observable change. A stall alert is explicitly not proof of a hang,
 because a legitimate model request can remain inside one trajectory for a long
 time. Per-watcher settings are `--status-interval-seconds` and
 `--stall-after-seconds`; setting the first to zero disables periodic mail.
+Version 0.3.0 sends an immediate `STARTED` message when a watcher attaches and
+stores its email `Message-ID` in the private watcher state. Every later update
+and terminal alert is a reply under that same stable-subject conversation.
 
 Four durable watchers are active on `liacpc14`:
 

@@ -33,11 +33,12 @@ task-notify watch-ledger \
   --cost-ceiling-chf 30
 ```
 
-The default is one email per hour. It reports `PROGRESS` when the selected
-ledger, active run, or progress file changes; `STATUS` when the work remains
-active but unchanged for one interval; and `STALL` after two hours with no
-observable change. A stall alert is not proof of a hung request. Configure the
-schedule with:
+The watcher immediately sends `STARTED`, then uses that message as the root of
+one email thread. It reports `PROGRESS` once per hour when the selected ledger,
+active run, or progress file changes; `STATUS` when the work remains active but
+unchanged for one interval; and `STALL` after two hours with no observable
+change. Final and cost-limit messages are replies in the same thread. A stall
+alert is not proof of a hung request. Configure the schedule with:
 
 ```bash
 --status-interval-seconds 3600 --stall-after-seconds 7200
