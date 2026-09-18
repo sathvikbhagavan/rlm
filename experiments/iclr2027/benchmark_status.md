@@ -593,6 +593,9 @@ time. Per-watcher settings are `--status-interval-seconds` and
 Version 0.3.0 sends an immediate `STARTED` message when a watcher attaches and
 stores its email `Message-ID` in the private watcher state. Every later update
 and terminal alert is a reply under that same stable-subject conversation.
+Version 0.3.1 standardizes every new subject as
+`[tasknotify] Project | Task | execution-machine`; outcome remains in the body
+so progress and terminal mail do not acquire changing titles.
 
 Four durable watchers are active on `liacpc14`:
 

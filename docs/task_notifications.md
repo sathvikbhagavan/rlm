@@ -44,6 +44,15 @@ alert is not proof of a hung request. Configure the schedule with:
 --status-interval-seconds 3600 --stall-after-seconds 7200
 ```
 
+New watcher subjects always use this stable structure:
+
+```text
+[tasknotify] Project | Task | execution-machine
+```
+
+Use a concise `--title` containing only the task, preferably
+`Model · Method · Scope`; do not repeat the project, machine, or outcome.
+
 Use `--slurm-job-id JOB_ID` instead of `--launcher-pid` on Jed or Kuma. The
 private SMTP settings and durable state remain outside every project at
 `~/.config/task-notify/` and `~/.local/state/task-notify/`.
