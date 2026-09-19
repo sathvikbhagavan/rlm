@@ -190,7 +190,9 @@ done < <(
     -o -name iclr2027-oracle-predicate-v1 \
     -o -name iclr2027-oracle-executor-v1 \
     -o -name iclr2027-task16-prospective-decomposition-v1 \
-    -o -name iclr2027-gpt5mini-direct-openai-docker-v1 \) -print0 -prune \) \
+    -o -name iclr2027-gpt5mini-direct-openai-docker-v1 \
+    -o -name iclr2027-gpt5mini-direct-openai-recovery-v1 \
+    -o -name iclr2027-deepseek-paid-openrouter-continuation-v1 \) -print0 -prune \) \
     2>/dev/null
 )
 
