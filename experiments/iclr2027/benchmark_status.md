@@ -4,9 +4,9 @@ This is the shared coordination record for the final benchmark. It says who
 owns each part, where it is running, what is complete, and what must happen
 next. Update this file whenever a phase starts, stops, or materially changes.
 
-Last consolidated: **2026-09-18 10:48 Europe/Zurich**
+Last consolidated: **2026-09-19 11:55 Europe/Zurich**
 
-Repository commit at consolidation: `c6c56ef`
+Repository commit at consolidation: `6d1743b`
 
 ## How to read the counts
 
@@ -42,12 +42,12 @@ changing this table and checking both ledgers for overlap.
 
 | Model | Owner / machine | LLM | CodeAct | RLM | Confidence |
 | --- | --- | ---: | ---: | ---: | --- |
-| DeepSeek V4 Flash | Amin / `liacpc14` | 300 succeeded | Finished: 243 succeeded, 57 failed | 116 succeeded, 2 failed, 2 running, 330 pending | Verified locally at 10:26 September 18; includes ordinary and Docker workers |
+| DeepSeek V4 Flash | Amin / `liacpc14` | 300 succeeded | Finished: 243 succeeded, 57 failed | Non-Docker: 150 succeeded, 6 failed, 1 running, 248 pending; Docker reported separately on the dashboard | Verified locally at 11:50 September 19 |
 | GLM 5.2 | shared / Jed | 300 succeeded in reusable v28 results on `liacpc14` | Release pilot failed; remaining 299 held | 22 succeeded, 6 failed, 1 running, 376 pending among 405 non-Docker jobs; 45 Docker jobs held | GLM LLM verified locally; RLM from Jed report |
 | Qwen 3.5 | Sathvik / `liacpc15` | Reported complete, nominally 300 | Reported complete, nominally 300 | Reported near completion; exact success/failure/running/pending split missing | Reported by Sathvik through Amin |
 | Gemini Flash | Sathvik / `liacpc15` | Reported complete; exact ledger count missing | Reported complete; exact ledger count missing | Reported launched; progress and outcome counts unknown | Unverified collaborator report |
-| Claude Haiku | Amin / Kuma and `liacpc14` | 300 succeeded | Effectively 300 succeeded: 299 assigned cells plus one compatible prior cell | At least 390 succeeded across the last Kuma report and 23 non-overlapping local Docker cells; one prior failure; exact current Kuma remainder needs refresh | Local Docker ledger verified; Kuma count remains a lower-bound reconciliation |
-| GPT-5-mini | Amin / Kuma and `liacpc14` | 300 succeeded | 300 succeeded | Kuma non-Docker: 384/405 succeeded with 21 failed; direct-OpenAI Docker: 1 succeeded, 1 running, 43 pending | Both ledgers verified; Docker transport change is explicit |
+| Claude Haiku | Amin / Kuma and `liacpc14` | 300 succeeded | Effectively 300 succeeded: 299 assigned cells plus one compatible prior cell | Kuma: 401/405 succeeded and 4 failed; local Docker: 44 succeeded and the sole failed cell is running its second attempt | Dashboard and local ledger verified September 19 |
+| GPT-5-mini | Amin / Kuma and `liacpc14` | 300 succeeded | 300 succeeded | Kuma non-Docker: 384/405 succeeded with 21 failed; direct-OpenAI Docker: 45/45 succeeded | Both ledgers verified; Docker transport change is explicit |
 
 ### DeepSeek details on `liacpc14`
 
@@ -343,7 +343,7 @@ OpenRouter/upstream route or its account-policy context, not a universal block
 on the unchanged benchmark task. The remaining 44 cells released
 automatically; Task-16 x100 r01 was active at consolidation. The tmux session
 is `rxn-gpt-direct-openai-docker-v1`, using the isolated clone
-`/home/amin/rlm-gpt-direct-openai` and ledger
+`/home/amin/rlm/rlm-gpt-direct-openai` and ledger
 `artifacts/iclr2027-gpt5mini-direct-openai-docker-v1/ledger.sqlite3` there.
 
 Claude's guarded queue was resumed with an explicit USD 3 reserve after author
@@ -354,6 +354,44 @@ the reserve rather than repeatedly submit after the account limit is reached.
 The relevant Claude and DeepSeek tmux sessions are
 `rxn-claude-docker-catchup-v34-resume` and
 `rxn-deepseek-docker-catchup-v34`.
+
+The Claude Docker queue ultimately completed 44/45 cells. The sole failure,
+`full-claude-haiku-4.5-tier4-task16-rlm-x500-r01`, completed six of ten
+questions before model-generated code in the seventh question allocated Docker
+memory from about 0.7 GiB to 20.4 GiB in approximately ten seconds. Host RSS
+remained about 494 MiB. The launcher correctly terminated the attempt at
+20,902 MiB combined usage against its 20,480 MiB limit. Four other repetitions
+of the same configuration succeeded at only 529--542 MiB, so this is a
+stochastic runaway tool computation rather than normal configuration memory.
+The second attempt started at 11:47 Europe/Zurich on September 19 with the same
+safety limit; it remained healthy below 505 MiB during the initial audit. Its
+tmux session is `rxn-claude-docker-retry-task16-x500-r01`, and a dedicated
+`task-notify` watcher will report the terminal result.
+
+DeepSeek's 405-cell non-Docker scope had 150 successes, six retained failures,
+one active cell and 248 pending at 11:50 on September 19. The 150 successes
+represent 752 question trajectories, 9,695 calls, 273,877,125 input tokens and
+10,154,562 output tokens. OpenRouter currently lists the exact
+`deepseek/deepseek-v4-flash-0731` at USD 0.04 per million input tokens and USD
+0.08 per million output tokens, plus a zero-priced `:free` variant. Applying
+the completed per-trajectory usage to the remaining 448 trajectories,
+including failed-only retries, estimates USD 7.01 or CHF 5.61; reserve CHF 12
+for task-mix variance. A provider switch must use new provenance-preserving run
+identities rather than rewriting the active SwissAI attempts.
+
+The shared dashboard merger previously stopped refreshing when a legacy source
+contained the running form of an attempt and the current reporter contained
+the terminal form of that same attempt. Commit `6d1743b` now reconciles that
+normal monotonic state transition while continuing to reject conflicting
+terminal records. Thirty-five focused dashboard tests pass. The viewer
+successfully regenerated at 11:50 and now includes all reported local, Jed and
+Kuma succeeded/running/failed/pending states, including the 45/45 direct-OpenAI
+GPT Docker result and the active Claude retry. Sathvik's Qwen/Gemini LLM and
+CodeAct ledgers remain explicitly *unreported*, not silently counted as
+pending evidence: Amin's viewer receives HTTP 403 for
+`sathvikbhagavan-epfl/rxnhaystack-dashboard`. Complete cross-machine coverage
+requires that project to grant Amin read access or Sathvik to publish the
+snapshots to a mutually readable W&B dashboard project.
 
 The oracle definition contains 150 model jobs and 480 question trajectories,
 estimated at CHF 17.90 with a CHF 30 ceiling, plus 15 deterministic jobs and
