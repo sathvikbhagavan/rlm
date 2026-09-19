@@ -4,7 +4,7 @@ This is the shared coordination record for the final benchmark. It says who
 owns each part, where it is running, what is complete, and what must happen
 next. Update this file whenever a phase starts, stops, or materially changes.
 
-Last consolidated: **2026-09-19 12:35 Europe/Zurich**
+Last consolidated: **2026-09-19 19:20 Europe/Zurich**
 
 Repository commit at consolidation: `b022a09`
 
@@ -61,6 +61,11 @@ changing this table and checking both ledgers for overlap.
   estimate is CHF 11.56 and its hard budget is CHF 40.
 - A single paid pilot is running. If it succeeds, the remaining cells release
   automatically, one at a time while the GPT recovery also uses this host.
+- The paid pilot passed and eight cells have succeeded for CHF 0.58; one is
+  running and 270 remain pending. This is intentionally one-at-a-time while
+  the GPT recovery shares `liacpc14`. A dedicated `task-notify` watcher was
+  attached at 19:19 after discovering that only the dashboard reporter—not an
+  email watcher—had initially been configured.
 
 - CodeAct finished with 243 successful and 57 failed jobs.
 - Active phase: RLM, one worker, six SwissAI request starts per minute at most.
@@ -120,6 +125,10 @@ changing this table and checking both ledgers for overlap.
   failures. Task 13 receives an 8 GiB local-tool allowance. A Task-15 pilot
   succeeded; the Task-13 memory pilot is running, after which the remaining
   cells release automatically. Estimated cost is CHF 1.74 with a CHF 20 cap.
+- Both Task-13 memory cells succeeded, peaking at 4.40 and 4.36 GiB. At 19:20,
+  19/21 recovery cells had succeeded for CHF 1.39, one Task-15 full-corpus cell
+  was running, and the final cell was pending. Its dedicated email watcher was
+  attached at 19:19.
 
 - Claude was explicitly left untouched by the GPT repair work. Its current RLM
   ledger count still needs a fresh read.
@@ -657,7 +666,7 @@ Version 0.3.1 standardizes every new subject as
 `[tasknotify] Project | Task | execution-machine`; outcome remains in the body
 so progress and terminal mail do not acquire changing titles.
 
-Four durable watchers are active on `liacpc14`:
+Six durable benchmark watchers are configured on `liacpc14`:
 
 - `task-notify-claude-docker` watches all 45 Claude Docker RLM cells, launcher
   PID `3147146`, and the guarded OpenRouter queue log;
@@ -667,6 +676,10 @@ Four durable watchers are active on `liacpc14`:
   DeepSeek RLM scope and launcher PID `2698386`;
 - `task-notify-deepseek-docker` watches the 45-cell DeepSeek Docker scope and
   launcher PID `2791520`.
+- `task-notify-deepseek-paid` watches the 279-cell paid OpenRouter continuation
+  with its CHF 40 ceiling;
+- `task-notify-gpt-nondocker-recovery` watches the exact 21-cell direct-OpenAI
+  recovery with its CHF 20 ceiling.
 
 All four use the canonical chat label `RxnHaystack ICLR 2027 master chat` and chat
 machine `liacpc14`. Their mode-600 states are under
