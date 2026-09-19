@@ -1,6 +1,13 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# Non-interactive SSH and scheduler shells commonly omit user tools from PATH.
+export PATH="$HOME/.local/bin:$PATH"
+if ! command -v uv >/dev/null; then
+  echo "uv is missing; expected it at $HOME/.local/bin/uv" >&2
+  exit 2
+fi
+
 dashboard_owner="${1:?Usage: start_dashboard_reporting.sh OWNER MACHINE [SEARCH_ROOT] [--restart]}"
 dashboard_machine="${2:?Usage: start_dashboard_reporting.sh OWNER MACHINE [SEARCH_ROOT] [--restart]}"
 dashboard_search_root="${3:-$HOME}"

@@ -1,6 +1,13 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# Non-interactive SSH shells commonly omit user-installed commands from PATH.
+export PATH="$HOME/.local/bin:$PATH"
+if ! command -v uv >/dev/null; then
+  echo "uv is missing; expected it at $HOME/.local/bin/uv" >&2
+  exit 2
+fi
+
 dashboard_repo="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 dashboard_session="rxn-dashboard-view"
 dashboard_key="$HOME/.wandb_api_key"

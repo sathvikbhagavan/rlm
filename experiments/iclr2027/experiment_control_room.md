@@ -10,7 +10,7 @@ never receives prompts, responses, secrets, commands, or artifact paths.
 Paste this single line into the laptop terminal:
 
 ```bash
-ssh amin@128.178.38.26 'test -d "$HOME/rlm_dashboard/.git" || git clone git@github.com:sathvikbhagavan/rlm.git "$HOME/rlm_dashboard"; cd "$HOME/rlm_dashboard" && git pull --ff-only origin main && uv sync --frozen && bash experiments/iclr2027/start_dashboard_viewer.sh' && (fuser -k 8876/tcp >/dev/null 2>&1 || true) && ssh -fN -o ExitOnForwardFailure=yes -o ServerAliveInterval=30 -o ServerAliveCountMax=3 -L 8876:127.0.0.1:8765 amin@128.178.38.26 && xdg-open "http://127.0.0.1:8876/index.html?$(date +%s)"
+ssh amin@128.178.38.26 'test -d "$HOME/rlm_dashboard/.git" || git clone git@github.com:sathvikbhagavan/rlm.git "$HOME/rlm_dashboard"; cd "$HOME/rlm_dashboard" && git pull --ff-only origin main && "$HOME/.local/bin/uv" sync --frozen && bash experiments/iclr2027/start_dashboard_viewer.sh' && (fuser -k 8876/tcp >/dev/null 2>&1 || true) && ssh -fN -o ExitOnForwardFailure=yes -o ServerAliveInterval=30 -o ServerAliveCountMax=3 -L 8876:127.0.0.1:8765 amin@128.178.38.26 && xdg-open "http://127.0.0.1:8876/index.html?$(date +%s)"
 ```
 
 It updates the separate dashboard checkout on `liacpc14`, restarts the viewer,
@@ -32,25 +32,25 @@ Run the applicable one-line command once on each machine now. The command:
 On `liacpc14`:
 
 ```bash
-test -d "$HOME/rlm_dashboard/.git" || git clone git@github.com:sathvikbhagavan/rlm.git "$HOME/rlm_dashboard"; cd "$HOME/rlm_dashboard" && git pull --ff-only origin main && uv sync --frozen && RXNHAYSTACK_DASHBOARD_ENTITY=liac bash experiments/iclr2027/start_dashboard_reporting.sh Amin liacpc14 "$HOME" --restart
+test -d "$HOME/rlm_dashboard/.git" || git clone git@github.com:sathvikbhagavan/rlm.git "$HOME/rlm_dashboard"; cd "$HOME/rlm_dashboard" && git pull --ff-only origin main && "$HOME/.local/bin/uv" sync --frozen && RXNHAYSTACK_DASHBOARD_ENTITY=liac bash experiments/iclr2027/start_dashboard_reporting.sh Amin liacpc14 "$HOME" --restart
 ```
 
 On Jed:
 
 ```bash
-test -d "$HOME/rlm_dashboard/.git" || git clone git@github.com:sathvikbhagavan/rlm.git "$HOME/rlm_dashboard"; cd "$HOME/rlm_dashboard" && git pull --ff-only origin main && uv sync --frozen && RXNHAYSTACK_DASHBOARD_ENTITY=liac bash experiments/iclr2027/start_dashboard_reporting.sh Amin jed "$HOME" --restart
+test -d "$HOME/rlm_dashboard/.git" || git clone git@github.com:sathvikbhagavan/rlm.git "$HOME/rlm_dashboard"; cd "$HOME/rlm_dashboard" && git pull --ff-only origin main && "$HOME/.local/bin/uv" sync --frozen && RXNHAYSTACK_DASHBOARD_ENTITY=liac bash experiments/iclr2027/start_dashboard_reporting.sh Amin jed "$HOME" --restart
 ```
 
 On Kuma:
 
 ```bash
-test -d "$HOME/rlm_dashboard/.git" || git clone git@github.com:sathvikbhagavan/rlm.git "$HOME/rlm_dashboard"; cd "$HOME/rlm_dashboard" && git pull --ff-only origin main && uv sync --frozen && RXNHAYSTACK_DASHBOARD_ENTITY=liac bash experiments/iclr2027/start_dashboard_reporting.sh Amin kuma "$HOME" --restart
+test -d "$HOME/rlm_dashboard/.git" || git clone git@github.com:sathvikbhagavan/rlm.git "$HOME/rlm_dashboard"; cd "$HOME/rlm_dashboard" && git pull --ff-only origin main && "$HOME/.local/bin/uv" sync --frozen && RXNHAYSTACK_DASHBOARD_ENTITY=liac bash experiments/iclr2027/start_dashboard_reporting.sh Amin kuma "$HOME" --restart
 ```
 
 On Sathvik's `liacpc15`:
 
 ```bash
-test -d "$HOME/rlm_dashboard/.git" || git clone git@github.com:sathvikbhagavan/rlm.git "$HOME/rlm_dashboard"; cd "$HOME/rlm_dashboard" && git pull --ff-only origin main && uv sync --frozen && RXNHAYSTACK_DASHBOARD_ENTITY=sathvikbhagavan-epfl bash experiments/iclr2027/start_dashboard_reporting.sh Sathvik liacpc15 "$HOME" --restart
+test -d "$HOME/rlm_dashboard/.git" || git clone git@github.com:sathvikbhagavan/rlm.git "$HOME/rlm_dashboard"; cd "$HOME/rlm_dashboard" && git pull --ff-only origin main && "$HOME/.local/bin/uv" sync --frozen && RXNHAYSTACK_DASHBOARD_ENTITY=sathvikbhagavan-epfl bash experiments/iclr2027/start_dashboard_reporting.sh Sathvik liacpc15 "$HOME" --restart
 ```
 
 Each person uses their own `~/.wandb_api_key`, with file mode 600. Sathvik can
