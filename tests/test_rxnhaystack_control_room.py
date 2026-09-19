@@ -533,8 +533,10 @@ def test_dashboard_and_markdown_are_generated(
     assert "refreshSafely" in dashboard
     assert 'http-equiv="refresh"' not in dashboard
     assert "Individual runs" in dashboard
-    assert "Last reporter check" in dashboard
+    assert "Reporter last checked" in dashboard
     assert "Successful progress" in dashboard
+    assert "Result last changed" in dashboard
+    assert "Reporter last checked" in dashboard
     assert 'role="progressbar"' in dashboard
     assert "100*x.counts.succeeded/x.expected" in dashboard
     assert "copy refresh command" in dashboard

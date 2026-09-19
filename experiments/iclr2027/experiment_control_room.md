@@ -63,7 +63,9 @@ Every model/method/machine row shows:
 
 - `Results recorded`: jobs with at least one ledger attempt, out of jobs
   assigned to that row;
-- `Last reporter check`: when that machine last inspected its ledger;
+- `Result last changed`: the newest start or finish time among the row's runs;
+- `Reporter last checked`: when that machine last inspected its ledger, which
+  can advance even when no experimental result changes;
 - `current`: the reporter checked within two hours;
 - `stale`: unfinished work exists, but its reporter has not checked within two
   hours;
@@ -97,9 +99,10 @@ sessions; it does not stop or alter experiments.
 
 The automatic reporter recognizes the current full six-model benchmark,
 matched-cardinality study, oracle-predicate study, deterministic oracle ceiling,
-prospective Task-16 study, and direct-OpenAI GPT Docker completion study. It
-does not show infrastructure smoke tests. Old pilots and superseded experiment
-definitions are intentionally excluded from the main view.
+prospective Task-16 study, direct-OpenAI GPT Docker completion and non-Docker
+recovery studies, and the paid DeepSeek continuation. It does not show
+infrastructure smoke tests. Old pilots and superseded experiment definitions
+are intentionally excluded from the main view.
 
 The viewer reads these W&B status projects:
 
