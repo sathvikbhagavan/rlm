@@ -4,9 +4,9 @@ This is the shared coordination record for the final benchmark. It says who
 owns each part, where it is running, what is complete, and what must happen
 next. Update this file whenever a phase starts, stops, or materially changes.
 
-Last consolidated: **2026-09-19 11:55 Europe/Zurich**
+Last consolidated: **2026-09-19 12:35 Europe/Zurich**
 
-Repository commit at consolidation: `6d1743b`
+Repository commit at consolidation: `b022a09`
 
 ## How to read the counts
 
@@ -42,14 +42,25 @@ changing this table and checking both ledgers for overlap.
 
 | Model | Owner / machine | LLM | CodeAct | RLM | Confidence |
 | --- | --- | ---: | ---: | ---: | --- |
-| DeepSeek V4 Flash | Amin / `liacpc14` | 300 succeeded | Finished: 243 succeeded, 57 failed | Non-Docker: 150 succeeded, 6 failed, 1 running, 248 pending; Docker reported separately on the dashboard | Verified locally at 11:50 September 19 |
+| DeepSeek V4 Flash | Amin / `liacpc14` | 300 succeeded | Finished: 243 succeeded, 57 failed | Original ledger: 171 succeeded, 10 failed/interrupted, 269 pending across all 450; the 279 unfinished cells are now in a paid-OpenRouter continuation with one pilot running | Verified locally at 12:35 September 19 |
 | GLM 5.2 | shared / Jed | 300 succeeded in reusable v28 results on `liacpc14` | Release pilot failed; remaining 299 held | 22 succeeded, 6 failed, 1 running, 376 pending among 405 non-Docker jobs; 45 Docker jobs held | GLM LLM verified locally; RLM from Jed report |
-| Qwen 3.5 | Sathvik / `liacpc15` | Reported complete, nominally 300 | Reported complete, nominally 300 | Reported near completion; exact success/failure/running/pending split missing | Reported by Sathvik through Amin |
-| Gemini Flash | Sathvik / `liacpc15` | Reported complete; exact ledger count missing | Reported complete; exact ledger count missing | Reported launched; progress and outcome counts unknown | Unverified collaborator report |
-| Claude Haiku | Amin / Kuma and `liacpc14` | 300 succeeded | Effectively 300 succeeded: 299 assigned cells plus one compatible prior cell | Kuma: 401/405 succeeded and 4 failed; local Docker: 44 succeeded and the sole failed cell is running its second attempt | Dashboard and local ledger verified September 19 |
-| GPT-5-mini | Amin / Kuma and `liacpc14` | 300 succeeded | 300 succeeded | Kuma non-Docker: 384/405 succeeded with 21 failed; direct-OpenAI Docker: 45/45 succeeded | Both ledgers verified; Docker transport change is explicit |
+| Qwen 3.5 | Sathvik / `liacpc15` | 300 succeeded | 300 succeeded | 444 succeeded; six cells have no successful archived record | Verified from Sathvik's checksummed 2,086-result archive |
+| Gemini Flash | Sathvik / `liacpc15` | 300 succeeded | 300 succeeded | 442 succeeded; eight cells remain failed in the older dashboard source | Verified from Sathvik's archive and prior dashboard source |
+| Claude Haiku | Amin / Kuma and `liacpc14` | 300 succeeded | Effectively 300 succeeded: 299 assigned cells plus one compatible prior cell | Kuma: 401/405 succeeded and 4 failed; local Docker: 45/45 succeeded after the memory-failed cell passed on retry | Dashboard and local ledger verified September 19 |
+| GPT-5-mini | Amin / Kuma and `liacpc14` | 300 succeeded | 300 succeeded | Kuma non-Docker: 384/405 succeeded with 21 failed; direct-OpenAI Docker: 45/45 succeeded; direct-OpenAI recovery has passed its Task-15 pilot and is testing Task 13 | Both original and recovery ledgers verified |
 
 ### DeepSeek details on `liacpc14`
+
+- At 12:35 on September 19, the two six-RPM SwissAI launchers were stopped.
+  Their active attempts were preserved as intentionally interrupted, not lost.
+- All 279 cells without a successful source result were mapped one-to-one into
+  `iclr2027-deepseek-paid-openrouter-continuation-v1`. It uses the exact paid
+  model `deepseek/deepseek-v4-flash-0731`, never the free variant. The live
+  OpenRouter key had USD 598.05 remaining before launch. The measured-token
+  estimate is about CHF 5.61; the deliberately conservative experiment-file
+  estimate is CHF 11.56 and its hard budget is CHF 40.
+- A single paid pilot is running. If it succeeds, the remaining cells release
+  automatically, one at a time while the GPT recovery also uses this host.
 
 - CodeAct finished with 243 successful and 57 failed jobs.
 - Active phase: RLM, one worker, six SwissAI request starts per minute at most.
@@ -99,6 +110,17 @@ changing this table and checking both ledgers for overlap.
 
 ### GPT and Claude details on Kuma
 
+- The sole local Claude Docker failure,
+  `full-claude-haiku-4.5-tier4-task16-rlm-x500-r01`, succeeded on attempt two.
+  It completed all ten questions in 29m58s, cost CHF 3.84, and peaked at only
+  530.65 MiB combined memory. Local Claude Docker coverage is therefore 45/45.
+- The 21 failed GPT non-Docker cells are being rerun through direct OpenAI,
+  not through the OpenRouter path that returned policy refusals. The exact set
+  is two Task-13 memory aborts, four Task-14 failures, and fifteen Task-15
+  failures. Task 13 receives an 8 GiB local-tool allowance. A Task-15 pilot
+  succeeded; the Task-13 memory pilot is running, after which the remaining
+  cells release automatically. Estimated cost is CHF 1.74 with a CHF 20 cap.
+
 - Claude was explicitly left untouched by the GPT repair work. Its current RLM
   ledger count still needs a fresh read.
 - The original GPT missing-usage audit found no recoverable scientific result:
@@ -145,7 +167,7 @@ Each model has 45 RLM jobs for Tier-4 Tasks 16, 17, and 17b.
 
 | Machine | Docker status | Consequence |
 | --- | --- | --- |
-| `liacpc14` | Available and tested | Claude and DeepSeek Docker catch-up assigned; GPT held pending recovery merge |
+| `liacpc14` | Available and tested | Claude and direct-OpenAI GPT Docker are 45/45 complete; unfinished DeepSeek Docker cells are included in the paid continuation |
 | `liacpc15` | Not yet recorded here | Sathvik must report whether Qwen/Gemini Docker jobs ran |
 | Jed | Unavailable | Cannot run the 45 GLM or DeepSeek Docker jobs |
 | Kuma | Unavailable; Apptainer is not an approved silent substitute | Cannot run the 45 GPT or Claude Docker jobs |

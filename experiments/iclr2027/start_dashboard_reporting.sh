@@ -83,6 +83,14 @@ while IFS= read -r -d '' dashboard_campaign_dir; do
       dashboard_experiment="experiments/iclr2027/gpt-direct-openai-docker-campaign.toml"
       dashboard_kind="gpt-direct-docker-v1"
       ;;
+    iclr2027-gpt5mini-direct-openai-recovery-v1)
+      dashboard_experiment="experiments/iclr2027/gpt-direct-openai-recovery-campaign.toml"
+      dashboard_kind="gpt-direct-recovery-v1"
+      ;;
+    iclr2027-deepseek-paid-openrouter-continuation-v1)
+      dashboard_experiment="experiments/iclr2027/deepseek-paid-openrouter-continuation.toml"
+      dashboard_kind="deepseek-paid-continuation-v1"
+      ;;
     *)
       continue
       ;;
@@ -121,7 +129,7 @@ while IFS= read -r -d '' dashboard_campaign_dir; do
     liacpc14:full-v34)
       grep -Eqi 'deepseek|claude|GLM-5\.2' <<<"$dashboard_models" || dashboard_assigned=false
       ;;
-    liacpc14:oracle-predicate-v1 | liacpc14:prospective-v1 | liacpc14:gpt-direct-docker-v1)
+    liacpc14:oracle-predicate-v1 | liacpc14:prospective-v1 | liacpc14:gpt-direct-docker-v1 | liacpc14:gpt-direct-recovery-v1 | liacpc14:deepseek-paid-continuation-v1)
       ;;
     liacpc14:*)
       dashboard_assigned=false
