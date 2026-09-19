@@ -62,12 +62,16 @@ with the lab project. His underlying experiment projects may remain private.
 
 Every model/method/machine row shows:
 
-- `Results recorded`: jobs with at least one ledger attempt, out of jobs
+- `Attempted`: jobs with at least one ledger attempt, out of jobs
   assigned to that row;
+- `Terminal coverage`: a normalized bar whose green portion is successful jobs
+  and red portion is terminal failures; unfilled space is running or pending;
 - `Result last changed`: the newest start or finish time among the row's runs;
 - `Reporter last checked`: when that machine last inspected its ledger, which
   can advance even when no experimental result changes;
-- `current`: the reporter checked within two hours;
+- `Execution`: `running`, `paused`, `not started`, `complete`, or `complete
+  with failures`; this describes the work rather than the reporter;
+- `fresh`: the reporter checked within two hours;
 - `stale`: unfinished work exists, but its reporter has not checked within two
   hours;
 - `unreported`: no reporter from the assigned machine has reached the combined
@@ -104,6 +108,12 @@ prospective Task-16 study, direct-OpenAI GPT Docker completion and non-Docker
 recovery studies, and the paid DeepSeek continuation. It does not show
 infrastructure smoke tests. Old pilots and superseded experiment definitions
 are intentionally excluded from the main view.
+
+Direct-OpenAI GPT completion/recovery records and paid-OpenRouter DeepSeek
+continuations are folded into the corresponding original run IDs in the full
+benchmark view. They are not displayed as competing experiments. The
+individual-run table retains each alternate completion run ID so the transport
+change remains auditable.
 
 The viewer reads these W&B status projects:
 

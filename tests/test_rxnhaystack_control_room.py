@@ -222,6 +222,59 @@ def test_merge_reconciles_running_attempt_with_its_terminal_record(
     assert merged_run["attempts"][0]["finished_at"] is not None
 
 
+def test_transport_continuations_fold_into_full_benchmark(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    snapshot = populated_snapshot(tmp_path, monkeypatch)
+    merged = merge_snapshots([snapshot], now=datetime(2026, 9, 17, 12, 10, tzinfo=UTC))[
+        "campaigns"
+    ][0]
+    merged["name"] = control_room.FULL_CAMPAIGN
+    first, second = merged["runs"]
+    first["run_id"] = "full-gpt-5-mini-tier4-task16-rlm-x100-r01"
+    second["run_id"] = "full-gpt-5-mini-tier4-task16-rlm-x100-r02"
+
+    continuation = deepcopy(merged)
+    continuation["name"] = "iclr2027-gpt5mini-direct-openai-docker-v1"
+    recovered = deepcopy(second)
+    recovered["run_id"] = "direct-openai-gpt-5-mini-tier4-task16-rlm-x100-r02"
+    recovered["status"] = "succeeded"
+    recovered["failure_categories"] = {}
+    recovered["attempts"][0].update(
+        {
+            "attempt_key": "c" * 64,
+            "status": "succeeded",
+            "return_code": 0,
+            "failure_category": None,
+            "metrics": {"calls": 2, "cost_chf": 0.1},
+        }
+    )
+    continuation["runs"] = [recovered]
+
+    folded = control_room.fold_full_benchmark_continuations([merged, continuation])
+
+    assert len(folded) == 1
+    assert folded[0]["counts"]["succeeded"] == 2
+    run = next(item for item in folded[0]["runs"] if item["run_id"].endswith("r02"))
+    assert run["status"] == "succeeded"
+    assert run["completion_run_ids"] == [recovered["run_id"]]
+    assert folded[0]["continuation_campaigns"] == [continuation["name"]]
+
+
+def test_execution_state_distinguishes_paused_from_fresh_data(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    snapshot = populated_snapshot(tmp_path, monkeypatch)
+    snapshot["observations"] = snapshot["observations"][:1]
+    resign(snapshot)
+    campaign = merge_snapshots([snapshot], now=datetime(2026, 9, 17, 12, 10, tzinfo=UTC))[
+        "campaigns"
+    ][0]
+
+    assert campaign["cells"][0]["report_state"] == "current"
+    assert campaign["cells"][0]["execution_state"] == "paused"
+
+
 def test_merge_still_rejects_conflicting_terminal_attempts(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
@@ -534,11 +587,13 @@ def test_dashboard_and_markdown_are_generated(
     assert 'http-equiv="refresh"' not in dashboard
     assert "Individual runs" in dashboard
     assert "Reporter last checked" in dashboard
-    assert "Successful progress" in dashboard
+    assert "Terminal coverage" in dashboard
     assert "Result last changed" in dashboard
     assert "Reporter last checked" in dashboard
     assert 'role="progressbar"' in dashboard
     assert "100*x.counts.succeeded/x.expected" in dashboard
+    assert "100*x.counts.failed/x.expected" in dashboard
+    assert "Execution" in dashboard
     assert "copy refresh command" in dashboard
     assert '<details class="panel run-explorer">' in dashboard
     assert '<details class="panel run-explorer" open>' not in dashboard

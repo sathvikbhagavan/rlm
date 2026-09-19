@@ -40,6 +40,12 @@ SAFE_RESOURCE_FIELDS = (
     "process_wall_time_seconds",
 )
 STATUS_ORDER = ("succeeded", "running", "stale", "failed", "pending")
+FULL_CAMPAIGN = "iclr2027-six-model-full-v34"
+CONTINUATION_CAMPAIGNS = {
+    "iclr2027-gpt5mini-direct-openai-docker-v1",
+    "iclr2027-gpt5mini-direct-openai-recovery-v1",
+    "iclr2027-deepseek-paid-openrouter-continuation-v1",
+}
 
 
 class ControlRoomError(RuntimeError):
@@ -576,7 +582,96 @@ def merge_snapshots(
         merge_experiment(group, stale_after_seconds=stale_after_seconds, now=reference_time)
         for _, group in sorted(by_experiment.items())
     ]
+    campaigns = fold_full_benchmark_continuations(campaigns)
     return {"generated_at": reference_time.isoformat(), "campaigns": campaigns}
+
+
+def continuation_target_run_id(run_id: str) -> str | None:
+    prefixes = (
+        ("direct-openai-recovery-", ""),
+        ("paid-openrouter-", ""),
+        ("direct-openai-gpt-5-mini-", "full-gpt-5-mini-"),
+    )
+    for prefix, replacement in prefixes:
+        if run_id.startswith(prefix):
+            return replacement + run_id.removeprefix(prefix)
+    return None
+
+
+def fold_full_benchmark_continuations(campaigns: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Fold transport-specific completion runs into the canonical full benchmark."""
+
+    full = next((campaign for campaign in campaigns if campaign["name"] == FULL_CAMPAIGN), None)
+    if full is None:
+        return campaigns
+    canonical = {run["run_id"]: run for run in full["runs"]}
+    folded_names: list[str] = []
+    folded_sources = {source["id"]: source for source in full["sources"]}
+    for campaign in campaigns:
+        if campaign["name"] not in CONTINUATION_CAMPAIGNS:
+            continue
+        used = False
+        for continuation in campaign["runs"]:
+            target_id = continuation_target_run_id(str(continuation["run_id"]))
+            if target_id not in canonical or continuation["attempt_count"] == 0:
+                continue
+            canonical[target_id] = overlay_continuation(canonical[target_id], continuation)
+            used = True
+        if used:
+            folded_names.append(str(campaign["name"]))
+            folded_sources.update({source["id"]: source for source in campaign["sources"]})
+    if not folded_names:
+        return campaigns
+    full["runs"] = sorted(canonical.values(), key=lambda item: item["run_id"])
+    counts = Counter(run["status"] for run in full["runs"])
+    full["counts"] = {status: counts[status] for status in STATUS_ORDER}
+    full["cells"] = aggregate_cells(full["runs"])
+    full["metrics"] = aggregate_attempt_metrics(full["runs"])
+    full["sources"] = sorted(folded_sources.values(), key=lambda item: item["id"])
+    full["continuation_campaigns"] = sorted(folded_names)
+    return [campaign for campaign in campaigns if campaign["name"] not in CONTINUATION_CAMPAIGNS]
+
+
+def overlay_continuation(original: dict[str, Any], continuation: dict[str, Any]) -> dict[str, Any]:
+    attempts = {attempt["attempt_key"]: attempt for attempt in original["attempts"]}
+    attempts.update({attempt["attempt_key"]: attempt for attempt in continuation["attempts"]})
+    status = original["status"]
+    if status != "succeeded":
+        if continuation["status"] == "succeeded":
+            status = "succeeded"
+        elif continuation["status"] in {"running", "stale", "failed"}:
+            status = continuation["status"]
+    failure_categories = Counter(original["failure_categories"])
+    failure_categories.update(continuation["failure_categories"])
+    result_updated_at = newest_timestamp(
+        value
+        for value in (original["result_updated_at"], continuation["result_updated_at"])
+        if value
+    )
+    reporter_checked_at = newest_timestamp(
+        value
+        for value in (original["reporter_checked_at"], continuation["reporter_checked_at"])
+        if value
+    )
+    return {
+        **original,
+        "status": status,
+        "attempts": sorted(attempts.values(), key=lambda item: item["started_at"]),
+        "attempt_count": len(attempts),
+        "sources": sorted(set(original["sources"]) | set(continuation["sources"])),
+        "active_sources": sorted(
+            set(original["active_sources"]) | set(continuation["active_sources"])
+        ),
+        "failure_categories": dict(sorted(failure_categories.items())),
+        "result_updated_at": result_updated_at,
+        "reporter_checked_at": reporter_checked_at,
+        "report_state": "final"
+        if status in {"succeeded", "failed"}
+        else continuation["report_state"],
+        "completion_run_ids": sorted(
+            set(original.get("completion_run_ids", ())) | {continuation["run_id"]}
+        ),
+    }
 
 
 def is_smoke_experiment(name: str) -> bool:
@@ -826,6 +921,7 @@ def aggregate_cells(runs: list[dict[str, Any]]) -> list[dict[str, Any]]:
                 "result_updated_at": newest_timestamp(item["result_updated_at"] for item in items),
                 "last_reported_at": newest_timestamp(item["reporter_checked_at"] for item in items),
                 "report_state": cell_report_state(items),
+                "execution_state": cell_execution_state(items),
                 "assigned_machine": machine,
                 "assigned_owner": owner,
                 "update_command": items[0]["update_command"],
@@ -842,6 +938,20 @@ def cell_report_state(items: list[dict[str, Any]]) -> str:
     if all(item["report_state"] == "unreported" for item in items):
         return "unreported"
     return "stale"
+
+
+def cell_execution_state(items: list[dict[str, Any]]) -> str:
+    counts = Counter(item["status"] for item in items)
+    terminal = counts["succeeded"] + counts["failed"]
+    if terminal == len(items):
+        return "complete" if counts["failed"] == 0 else "complete with failures"
+    if counts["running"]:
+        return "running"
+    if counts["stale"]:
+        return "stalled or disconnected"
+    if any(item["attempt_count"] > 0 for item in items):
+        return "paused"
+    return "not started"
 
 
 def attempt_duration(attempt: Mapping[str, Any]) -> float | None:
@@ -946,8 +1056,8 @@ def write_markdown(path: Path, merged: Mapping[str, Any]) -> None:
                 f"running: **{counts['running']:,}**; stale: **{counts['stale']:,}**; "
                 f"failed: **{counts['failed']:,}**; pending: **{counts['pending']:,}**.",
                 "",
-                "| Model | Method | Assignment | Results recorded | Result last changed | Reporter last checked | Data state | Succeeded | Running | Failed | Not started |",
-                "| --- | --- | --- | ---: | --- | --- | --- | ---: | ---: | ---: | ---: |",
+                "| Model | Method | Assignment | Attempted | Result last changed | Reporter last checked | Execution | Data freshness | Succeeded | Running | Failed | Not started |",
+                "| --- | --- | --- | ---: | --- | --- | --- | --- | ---: | ---: | ---: | ---: |",
             ]
         )
         for cell in campaign["cells"]:
@@ -956,7 +1066,8 @@ def write_markdown(path: Path, merged: Mapping[str, Any]) -> None:
                 f"| {cell['model']} | {cell['method']} | {cell['assigned_owner']} / "
                 f"{cell['assigned_machine']} | {cell['recorded']}/{cell['expected']} | "
                 f"{cell['result_updated_at'] or 'never'} | "
-                f"{cell['last_reported_at'] or 'never'} | {cell['report_state']} | "
+                f"{cell['last_reported_at'] or 'never'} | {cell['execution_state']} | "
+                f"{cell['report_state']} | "
                 f"{item['succeeded']} | {item['running']} | {item['failed']} | "
                 f"{item['pending']} |"
             )
@@ -1022,7 +1133,7 @@ DASHBOARD_TEMPLATE = r"""<!doctype html>
 <title>RxnHaystack Dashboard</title>
 <style>
 :root{color-scheme:dark;--bg:#0d1117;--panel:#161b22;--line:#30363d;--text:#e6edf3;--muted:#8b949e;--green:#3fb950;--blue:#58a6ff;--red:#f85149;--yellow:#d29922;--purple:#bc8cff}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:14px/1.45 ui-sans-serif,system-ui,-apple-system,sans-serif}header{padding:22px 28px;border-bottom:1px solid var(--line);position:sticky;top:0;background:rgba(13,17,23,.96);z-index:3}h1{font-size:21px;margin:0 0 5px}.sub{color:var(--muted)}main{padding:22px 28px;max-width:1700px;margin:auto}.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:16px 0}.card,.panel{background:var(--panel);border:1px solid var(--line);border-radius:8px}.card{padding:14px}.label{color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.06em}.value{font-size:23px;font-weight:700;margin-top:4px}.panel{margin:14px 0;padding:16px;overflow:auto}h2{font-size:16px;margin:0 0 12px}.run-explorer,.source-details{padding:0;overflow:hidden}.run-explorer summary,.source-details summary{cursor:pointer;padding:16px;list-style-position:inside;font-size:16px}.run-explorer summary:hover,.source-details summary:hover{background:#1c2128}.run-explorer[open] summary,.source-details[open] summary{border-bottom:1px solid var(--line)}.run-explorer-content,.source-details-content{padding:16px;overflow:auto}.summary-note{color:var(--muted);font-size:13px;margin-left:8px}.filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}input,select,button{background:var(--bg);border:1px solid var(--line);border-radius:6px;color:var(--text);padding:7px 9px}button{cursor:pointer;color:var(--blue)}input{min-width:280px;flex:1}table{width:100%;border-collapse:collapse;white-space:nowrap}th,td{text-align:left;padding:8px 9px;border-bottom:1px solid var(--line)}th{color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.05em;position:sticky;top:0;background:var(--panel)}.ok,.final{color:var(--green)}.current,.running{color:var(--blue)}.failed,.unreported{color:var(--red)}.stale{color:var(--yellow)}.pending{color:var(--muted)}.pill{display:inline-block;border:1px solid var(--line);border-radius:999px;padding:2px 7px;font-size:12px}.bar{height:7px;background:#21262d;border-radius:9px;overflow:hidden;min-width:130px}.bar>span{height:100%;display:block;background:var(--green)}.warn{color:var(--yellow)}.mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px}.hidden{display:none}a{color:var(--blue)}.reporting-help{padding:0;overflow:hidden}.reporting-help summary{cursor:pointer;padding:16px;list-style-position:inside}.reporting-help summary:hover{background:#1c2128}.reporting-help[open] summary{border-bottom:1px solid var(--line)}.reporting-help-content{padding:16px;max-width:1050px}.reporting-help li{margin:8px 0}.reporting-help code,.command{display:block;margin:10px 0;padding:12px;background:var(--bg);border:1px solid var(--line);border-radius:6px;white-space:pre-wrap;overflow-wrap:anywhere}.connection-lost{color:var(--red)}.health-note{padding:12px 16px;border-left:4px solid var(--yellow);background:#2a2112;margin:14px 0}.health-note.ok{border-color:var(--green);background:#122416}.small{font-size:12px}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:14px/1.45 ui-sans-serif,system-ui,-apple-system,sans-serif}header{padding:22px 28px;border-bottom:1px solid var(--line);position:sticky;top:0;background:rgba(13,17,23,.96);z-index:3}h1{font-size:21px;margin:0 0 5px}.sub{color:var(--muted)}main{padding:22px 28px;max-width:1700px;margin:auto}.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:16px 0}.card,.panel{background:var(--panel);border:1px solid var(--line);border-radius:8px}.card{padding:14px}.label{color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.06em}.value{font-size:23px;font-weight:700;margin-top:4px}.panel{margin:14px 0;padding:16px;overflow:auto}h2{font-size:16px;margin:0 0 12px}.run-explorer,.source-details{padding:0;overflow:hidden}.run-explorer summary,.source-details summary{cursor:pointer;padding:16px;list-style-position:inside;font-size:16px}.run-explorer summary:hover,.source-details summary:hover{background:#1c2128}.run-explorer[open] summary,.source-details[open] summary{border-bottom:1px solid var(--line)}.run-explorer-content,.source-details-content{padding:16px;overflow:auto}.summary-note{color:var(--muted);font-size:13px;margin-left:8px}.filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}input,select,button{background:var(--bg);border:1px solid var(--line);border-radius:6px;color:var(--text);padding:7px 9px}button{cursor:pointer;color:var(--blue)}input{min-width:280px;flex:1}table{width:100%;border-collapse:collapse;white-space:nowrap}th,td{text-align:left;padding:8px 9px;border-bottom:1px solid var(--line)}th{color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.05em;position:sticky;top:0;background:var(--panel)}.ok,.final,.complete{color:var(--green)}.current,.running{color:var(--blue)}.failed,.unreported{color:var(--red)}.stale,.paused{color:var(--yellow)}.pending{color:var(--muted)}.pill{display:inline-block;border:1px solid var(--line);border-radius:999px;padding:2px 7px;font-size:12px}.bar{height:7px;background:#21262d;border-radius:9px;overflow:hidden;min-width:130px;display:flex}.bar>span{height:100%;display:block}.bar>.success{background:var(--green)}.bar>.failure{background:var(--red)}.warn{color:var(--yellow)}.mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px}.hidden{display:none}a{color:var(--blue)}.reporting-help{padding:0;overflow:hidden}.reporting-help summary{cursor:pointer;padding:16px;list-style-position:inside}.reporting-help summary:hover{background:#1c2128}.reporting-help[open] summary{border-bottom:1px solid var(--line)}.reporting-help-content{padding:16px;max-width:1050px}.reporting-help li{margin:8px 0}.reporting-help code,.command{display:block;margin:10px 0;padding:12px;background:var(--bg);border:1px solid var(--line);border-radius:6px;white-space:pre-wrap;overflow-wrap:anywhere}.connection-lost{color:var(--red)}.health-note{padding:12px 16px;border-left:4px solid var(--yellow);background:#2a2112;margin:14px 0}.health-note.ok{border-color:var(--green);background:#122416}.small{font-size:12px}
 </style>
 </head>
 <body>
@@ -1037,15 +1148,17 @@ const fmt=n=>new Intl.NumberFormat().format(n||0); const esc=s=>String(s??'').re
 const duration=s=>s==null?'—':s<120?Math.round(s)+'s':s<7200?Math.round(s/60)+'m':(s/3600).toFixed(1)+'h';
 const when=s=>s?new Date(s).toLocaleString():'never reported';
 const refreshButton=x=>['stale','unreported'].includes(x.report_state)?`<button class="copy-command" data-command="${esc(x.update_command)}">copy refresh command</button>`:'—';
-const progressBar=x=>{const pct=x.expected?Math.max(0,Math.min(100,100*x.counts.succeeded/x.expected)):0;return `<div class="bar" role="progressbar" aria-label="${esc(x.model+' '+x.method+' successful jobs')}" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${pct.toFixed(1)}" title="${x.counts.succeeded}/${x.expected} successful (${pct.toFixed(1)}%)"><span style="width:${pct.toFixed(2)}%"></span></div>`};
+const progressBar=x=>{const success=x.expected?100*x.counts.succeeded/x.expected:0,failure=x.expected?100*x.counts.failed/x.expected:0,terminal=success+failure;return `<div class="bar" role="progressbar" aria-label="${esc(x.model+' '+x.method+' terminal jobs')}" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${terminal.toFixed(1)}" title="${x.counts.succeeded} succeeded + ${x.counts.failed} failed / ${x.expected} expected (${terminal.toFixed(1)}% terminal)"><span class="success" style="width:${success.toFixed(2)}%"></span><span class="failure" style="width:${failure.toFixed(2)}%"></span></div>`};
+const freshness=s=>s==='current'?'fresh':s;
+const executionClass=s=>s.startsWith('complete')?'complete':s.startsWith('stalled')?'stale':s;
 const statusClass=s=>s==='succeeded'?'ok':s; document.getElementById('updated').textContent='Merged '+new Date(DATA.generated_at).toLocaleString()+' · read-only view';
 function renderCampaign(c,idx){const total=Object.values(c.counts).reduce((a,b)=>a+b,0),done=c.counts.succeeded,metrics=c.metrics,bad=c.cells.filter(x=>['stale','unreported'].includes(x.report_state));
 return `<section data-campaign="${idx}"><h2>${esc(c.name)} <span class="pill mono">${esc(c.definition_sha256.slice(0,12))}</span></h2>
-<div class="health-note ${bad.length?'':'ok'}">${bad.length?`Coverage is not trustworthy yet: ${bad.length} model/method cells are stale or unreported. Use their refresh buttons below.`:'Every model/method cell is currently reported or final.'}</div>
+<div class="health-note ${bad.length?'':'ok'}">${bad.length?`Coverage is not trustworthy yet: ${bad.length} model/method cells have stale or unreported data. Use their refresh buttons below.`:'Every model/method cell has fresh or final data.'}${c.continuation_campaigns?.length?` Transport-specific completion records are folded into this full-benchmark view: ${c.continuation_campaigns.map(esc).join(', ')}.`:''}</div>
 <div class="cards"><div class="card"><div class="label">Succeeded</div><div class="value ok">${fmt(done)} / ${fmt(total)}</div></div><div class="card"><div class="label">Running</div><div class="value running">${fmt(c.counts.running)}</div></div><div class="card"><div class="label">Failed</div><div class="value failed">${fmt(c.counts.failed)}</div></div><div class="card"><div class="label">Pending</div><div class="value pending">${fmt(c.counts.pending)}</div></div><div class="card"><div class="label">Data gaps</div><div class="value ${bad.length?'failed':'ok'}">${bad.length}</div><div class="sub">stale or unreported cells</div></div><div class="card"><div class="label">Recorded cost</div><div class="value">CHF ${(metrics.cost_chf||0).toFixed(2)}</div><div class="sub">${fmt(metrics.unknown_cost_attempts)} attempts unknown</div></div></div>
-<div class="panel"><h2>Experiment status and data freshness</h2><table><thead><tr><th>Model</th><th>Method</th><th>Assigned</th><th>Successful progress</th><th>Results recorded</th><th>Result last changed</th><th>Reporter last checked</th><th>Data state</th><th>Success</th><th>Running</th><th>Failed</th><th>Not started</th><th>Refresh</th></tr></thead><tbody>${c.cells.map(x=>`<tr><td>${esc(x.model)}</td><td>${esc(x.method)}</td><td>${esc(x.assigned_owner)} · ${esc(x.assigned_machine)}</td><td>${progressBar(x)}</td><td>${x.recorded}/${x.expected}</td><td>${esc(when(x.result_updated_at))}</td><td>${esc(when(x.last_reported_at))}</td><td class="${esc(x.report_state)}">${esc(x.report_state)}</td><td class="ok">${x.counts.succeeded}</td><td class="running">${x.counts.running}</td><td class="failed">${x.counts.failed}</td><td class="pending">${x.counts.pending}</td><td>${refreshButton(x)}</td></tr>`).join('')}</tbody></table></div>
+<div class="panel"><h2>Experiment status and data freshness</h2><table><thead><tr><th>Model</th><th>Method</th><th>Assigned</th><th>Terminal coverage</th><th>Attempted</th><th>Result last changed</th><th>Reporter last checked</th><th>Execution</th><th>Data freshness</th><th>Success</th><th>Running</th><th>Failed</th><th>Not started</th><th>Refresh</th></tr></thead><tbody>${c.cells.map(x=>`<tr><td>${esc(x.model)}</td><td>${esc(x.method)}</td><td>${esc(x.assigned_owner)} · ${esc(x.assigned_machine)}</td><td>${progressBar(x)}</td><td>${x.recorded}/${x.expected}</td><td>${esc(when(x.result_updated_at))}</td><td>${esc(when(x.last_reported_at))}</td><td class="${executionClass(x.execution_state)}">${esc(x.execution_state)}</td><td class="${esc(x.report_state)}">${esc(freshness(x.report_state))}</td><td class="ok">${x.counts.succeeded}</td><td class="running">${x.counts.running}</td><td class="failed">${x.counts.failed}</td><td class="pending">${x.counts.pending}</td><td>${refreshButton(x)}</td></tr>`).join('')}</tbody></table></div>
 <details class="panel source-details"><summary><strong>Reporting diagnostics</strong><span class="summary-note">${c.sources.length} snapshots · normally keep this closed${c.duplicate_runs?` · ${c.duplicate_runs} duplicate run IDs`:''}</span></summary><div class="source-details-content"><table><thead><tr><th>Reporter ID</th><th>Owner</th><th>Reporting host</th><th>Last heartbeat</th><th>Observed</th><th>Git</th><th>State</th></tr></thead><tbody>${c.sources.map(s=>`<tr><td class="mono">${esc(s.id)}</td><td>${esc(s.owner)}</td><td>${esc(s.machine)}</td><td>${esc(when(s.generated_at))}</td><td>${fmt(s.observed_runs)}</td><td class="mono">${esc(s.git_commit.slice(0,12))}${s.tracked_dirty?' *':''}</td><td class="${s.stale?'stale':'current'}">${s.stale?'stale':'current'}</td></tr>`).join('')}</tbody></table></div></details>
-<details class="panel run-explorer"><summary><strong>Individual runs</strong><span class="summary-note">${fmt(c.runs.length)} jobs · open to search and inspect timestamps</span></summary><div class="run-explorer-content"><div class="filters"><input class="search" placeholder="Filter run ID, model, task…"><select class="method"><option value="">all methods</option>${[...new Set(c.runs.map(r=>r.method))].map(v=>`<option>${esc(v)}</option>`).join('')}</select><select class="status"><option value="">all states</option>${['succeeded','running','stale','failed','pending'].map(v=>`<option>${v}</option>`).join('')}</select></div><table><thead><tr><th>Run</th><th>Assigned</th><th>Task</th><th>Method</th><th>Status</th><th>Result updated</th><th>Reporter checked</th><th>Data state</th><th>Attempts</th><th>Failure</th><th>Refresh</th></tr></thead><tbody class="runs">${c.runs.map(r=>`<tr data-search="${esc((r.run_id+' '+r.model+' '+r.task).toLowerCase())}" data-method="${esc(r.method)}" data-status="${esc(r.status)}"><td class="mono">${esc(r.run_id)}</td><td>${esc(r.assigned_owner)} · ${esc(r.assigned_machine)}</td><td>${esc(r.task)}</td><td>${esc(r.method)}</td><td class="${statusClass(r.status)}">${esc(r.status)}</td><td>${esc(when(r.result_updated_at))}</td><td>${esc(when(r.reporter_checked_at))}</td><td class="${esc(r.report_state)}">${esc(r.report_state)}</td><td>${r.attempt_count}</td><td>${esc(Object.keys(r.failure_categories).join(', ')||'—')}</td><td>${refreshButton(r)}</td></tr>`).join('')}</tbody></table></div></details></section>`}
+<details class="panel run-explorer"><summary><strong>Individual runs</strong><span class="summary-note">${fmt(c.runs.length)} jobs · open to search and inspect timestamps</span></summary><div class="run-explorer-content"><div class="filters"><input class="search" placeholder="Filter run ID, model, task…"><select class="method"><option value="">all methods</option>${[...new Set(c.runs.map(r=>r.method))].map(v=>`<option>${esc(v)}</option>`).join('')}</select><select class="status"><option value="">all states</option>${['succeeded','running','stale','failed','pending'].map(v=>`<option>${v}</option>`).join('')}</select></div><table><thead><tr><th>Benchmark run</th><th>Completion record</th><th>Assigned</th><th>Task</th><th>Method</th><th>Status</th><th>Result updated</th><th>Reporter checked</th><th>Data freshness</th><th>Attempts</th><th>Failure history</th><th>Refresh</th></tr></thead><tbody class="runs">${c.runs.map(r=>`<tr data-search="${esc((r.run_id+' '+r.model+' '+r.task+' '+(r.completion_run_ids||[]).join(' ')).toLowerCase())}" data-method="${esc(r.method)}" data-status="${esc(r.status)}"><td class="mono">${esc(r.run_id)}</td><td class="mono">${esc((r.completion_run_ids||[]).join(', ')||'original')}</td><td>${esc(r.assigned_owner)} · ${esc(r.assigned_machine)}</td><td>${esc(r.task)}</td><td>${esc(r.method)}</td><td class="${statusClass(r.status)}">${esc(r.status)}</td><td>${esc(when(r.result_updated_at))}</td><td>${esc(when(r.reporter_checked_at))}</td><td class="${esc(r.report_state)}">${esc(freshness(r.report_state))}</td><td>${r.attempt_count}</td><td>${esc(Object.keys(r.failure_categories).join(', ')||'—')}</td><td>${refreshButton(r)}</td></tr>`).join('')}</tbody></table></div></details></section>`}
 document.getElementById('app').innerHTML=DATA.campaigns.map(renderCampaign).join('');
 document.querySelectorAll('section').forEach(section=>{const q=section.querySelector('.search'),m=section.querySelector('.method'),s=section.querySelector('.status'),rows=[...section.querySelectorAll('.runs tr')];const apply=()=>{const needle=q.value.toLowerCase();rows.forEach(r=>r.classList.toggle('hidden',!!((needle&&!r.dataset.search.includes(needle))||(m.value&&r.dataset.method!==m.value)||(s.value&&r.dataset.status!==s.value))))};q.oninput=apply;m.onchange=apply;s.onchange=apply});
 document.querySelectorAll('.copy-command').forEach(button=>button.onclick=async()=>{await navigator.clipboard.writeText(button.dataset.command);const old=button.textContent;button.textContent='copied';setTimeout(()=>button.textContent=old,1500)});
