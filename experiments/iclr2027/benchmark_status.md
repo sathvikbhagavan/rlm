@@ -40,13 +40,39 @@ changing this table and checking both ledgers for overlap.
 
 ## Full-benchmark status
 
+### Execution queue agreed on September 19
+
+The remaining work is assigned by execution requirement rather than by model:
+
+1. **Jed, non-Docker parallel work:** move the unfinished paid-OpenRouter
+   DeepSeek RLM continuation to disjoint Slurm shards; replace the slow SwissAI
+   GLM non-Docker RLM continuation with exact `z-ai/glm-5.2` OpenRouter shards;
+   retry the four Claude Task-14 RLM cells; run the GPT-5-mini failed-only
+   matched-cardinality recovery through direct OpenAI; run Qwen matched
+   cardinality through paid OpenRouter; and complete the Qwen/Claude
+   oracle-predicate model control through OpenRouter. Every shard must have a
+   non-overlapping selector list, an isolated ledger/artifact directory, a hard
+   API budget, dashboard reporting, and task-notify monitoring.
+2. **`liacpc14`, Docker work:** after the active GPT recovery releases memory,
+   retry the six missing Qwen and eight missing Gemini Docker RLM cells, run the
+   remaining Task-16 prospective-decomposition cells through OpenRouter, and
+   later run the 45 GLM Docker RLM cells. Only one full-corpus Docker RLM cell
+   should be active at a time unless a measured pilot justifies more.
+3. **CodeAct:** GLM CodeAct remains a separate later phase. DeepSeek CodeAct's
+   57 failed cells also require a classified failed-only repair rather than an
+   indiscriminate rerun.
+
+Neither Jed nor Kuma currently provides Docker on compute nodes. Apptainer is
+installed, but the benchmark has no validated Apptainer backend; Docker-required
+work therefore stays on `liacpc14` until that changes.
+
 | Model | Owner / machine | LLM | CodeAct | RLM | Confidence |
 | --- | --- | ---: | ---: | ---: | --- |
 | DeepSeek V4 Flash | Amin / `liacpc14` | 300 succeeded | Finished: 243 succeeded, 57 failed | Original ledger: 171 succeeded, 10 failed/interrupted, 269 pending across all 450; the 279 unfinished cells are now in a paid-OpenRouter continuation with one pilot running | Verified locally at 12:35 September 19 |
-| GLM 5.2 | shared / Jed | 300 succeeded in reusable v28 results on `liacpc14` | Release pilot failed; remaining 299 held | 22 succeeded, 6 failed, 1 running, 376 pending among 405 non-Docker jobs; 45 Docker jobs held | GLM LLM verified locally; RLM from Jed report |
+| GLM 5.2 | shared / Jed | 300 succeeded in reusable v28 results on `liacpc14`; an archive reporter now publishes them to the dashboard | Release pilot failed; remaining 299 held | The slow SwissAI non-Docker continuation is to be replaced by disjoint paid-OpenRouter `z-ai/glm-5.2` shards on Jed; 45 Docker jobs remain assigned to `liacpc14` | GLM LLM verified directly from the v28 ledger; RLM transition pending |
 | Qwen 3.5 | Sathvik / `liacpc15` | 300 succeeded | 300 succeeded | 444 succeeded; six cells have no successful archived record | Verified from Sathvik's checksummed 2,086-result archive |
 | Gemini Flash | Sathvik / `liacpc15` | 300 succeeded | 300 succeeded | 442 succeeded; eight cells remain failed in the older dashboard source | Verified from Sathvik's archive and prior dashboard source |
-| Claude Haiku | Amin / Kuma and `liacpc14` | 300 succeeded | Effectively 300 succeeded: 299 assigned cells plus one compatible prior cell | Kuma: 401/405 succeeded and 4 failed; local Docker: 45/45 succeeded after the memory-failed cell passed on retry | Dashboard and local ledger verified September 19 |
+| Claude Haiku | Amin / Kuma and `liacpc14` | 300 succeeded | 300 exact cells succeeded; the missing v34 Task-16 x500 cell completed locally with exit code 0 and valid metrics | Kuma: 401/405 succeeded and 4 failed, assigned to a failed-only Jed retry; local Docker: 45/45 succeeded after the memory-failed cell passed on retry | Dashboard and local ledgers verified September 19 |
 | GPT-5-mini | Amin / Kuma and `liacpc14` | 300 succeeded | 300 succeeded | Original non-Docker: 384/405 succeeded; direct recovery: 19 succeeded, one running, one pending; direct-OpenAI Docker: 45/45 succeeded | All three ledgers verified and folded in the dashboard |
 
 Dashboard interpretation was tightened at 20:40. Transport-specific GPT and
