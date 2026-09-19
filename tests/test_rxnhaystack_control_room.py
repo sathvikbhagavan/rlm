@@ -189,6 +189,56 @@ def test_merge_deduplicates_copied_attempts_and_flags_independent_execution(
     assert merged_independent["metrics"]["attempts"] == 3
 
 
+def test_merge_reconciles_running_attempt_with_its_terminal_record(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    terminal = populated_snapshot(tmp_path, monkeypatch)
+    running = deepcopy(terminal)
+    running["source"].update({"id": "liacpc14-legacy", "machine": "liacpc14"})
+    observation = running["observations"][0]
+    observation["status"] = "running"
+    observation["finished_at"] = None
+    attempt = observation["attempts"][0]
+    attempt.update(
+        {
+            "status": "running",
+            "finished_at": None,
+            "return_code": None,
+            "failure_category": None,
+            "metrics": {},
+        }
+    )
+    resign(running)
+
+    merged = merge_snapshots(
+        [running, terminal],
+        now=datetime(2026, 9, 17, 12, 10, tzinfo=UTC),
+    )["campaigns"][0]
+
+    merged_run = next(run for run in merged["runs"] if run["run_id"] == observation["run_id"])
+    assert merged_run["status"] == "succeeded"
+    assert merged_run["attempt_count"] == 1
+    assert merged_run["attempts"][0]["status"] == "succeeded"
+    assert merged_run["attempts"][0]["finished_at"] is not None
+
+
+def test_merge_still_rejects_conflicting_terminal_attempts(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    first = populated_snapshot(tmp_path, monkeypatch)
+    conflicting = deepcopy(first)
+    conflicting["source"].update({"id": "liacpc14-conflict", "machine": "liacpc14"})
+    attempt = conflicting["observations"][0]["attempts"][0]
+    attempt["metrics"] = {"calls": 999, "cost_chf": 999}
+    resign(conflicting)
+
+    with pytest.raises(ControlRoomError, match="Sources disagree on attempt"):
+        merge_snapshots(
+            [first, conflicting],
+            now=datetime(2026, 9, 17, 12, 10, tzinfo=UTC),
+        )
+
+
 def test_smoke_experiments_are_not_shown_in_dashboard_outputs(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:

@@ -650,7 +650,7 @@ def merge_run(
             key = attempt["attempt_key"]
             existing = all_attempts.setdefault(key, attempt)
             if existing != attempt:
-                raise ControlRoomError(f"Sources disagree on attempt {key}")
+                all_attempts[key] = reconcile_attempt_versions(existing, attempt, key=key)
             source_id = str(source["id"])
             attempt_sources[key].add(source_id)
             source_attempts[source_id].add(key)
@@ -724,6 +724,32 @@ def merge_run(
         "assigned_owner": assignment["owner"],
         "update_command": assignment["command"],
     }
+
+
+def reconcile_attempt_versions(
+    first: dict[str, Any], second: dict[str, Any], *, key: str
+) -> dict[str, Any]:
+    """Reconcile a running snapshot with the later terminal form of one attempt.
+
+    Reporters can observe the same immutable ledger attempt before and after it
+    finishes. Terminal records are authoritative over their running precursor;
+    two different terminal records remain a hard scientific-data conflict.
+    """
+
+    immutable_fields = ("attempt", "attempt_key", "started_at")
+    if any(first.get(field) != second.get(field) for field in immutable_fields):
+        raise ControlRoomError(f"Sources disagree on attempt {key}")
+    first_terminal = first.get("status") in {"succeeded", "failed"}
+    second_terminal = second.get("status") in {"succeeded", "failed"}
+    if first_terminal and second_terminal:
+        raise ControlRoomError(f"Sources disagree on attempt {key}")
+    if first_terminal:
+        return first
+    if second_terminal:
+        return second
+    # Two running observations should be byte-identical because private live
+    # telemetry is not part of a dashboard snapshot.
+    raise ControlRoomError(f"Sources disagree on attempt {key}")
 
 
 def newest_timestamp(values: Iterable[str]) -> str | None:
