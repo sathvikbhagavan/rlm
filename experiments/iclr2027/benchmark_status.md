@@ -4,7 +4,7 @@ This is the shared coordination record for the final benchmark. It says who
 owns each part, where it is running, what is complete, and what must happen
 next. Update this file whenever a phase starts, stops, or materially changes.
 
-Last consolidated: **2026-09-19 19:20 Europe/Zurich**
+Last consolidated: **2026-09-19 20:40 Europe/Zurich**
 
 Repository commit at consolidation: `b022a09`
 
@@ -47,7 +47,13 @@ changing this table and checking both ledgers for overlap.
 | Qwen 3.5 | Sathvik / `liacpc15` | 300 succeeded | 300 succeeded | 444 succeeded; six cells have no successful archived record | Verified from Sathvik's checksummed 2,086-result archive |
 | Gemini Flash | Sathvik / `liacpc15` | 300 succeeded | 300 succeeded | 442 succeeded; eight cells remain failed in the older dashboard source | Verified from Sathvik's archive and prior dashboard source |
 | Claude Haiku | Amin / Kuma and `liacpc14` | 300 succeeded | Effectively 300 succeeded: 299 assigned cells plus one compatible prior cell | Kuma: 401/405 succeeded and 4 failed; local Docker: 45/45 succeeded after the memory-failed cell passed on retry | Dashboard and local ledger verified September 19 |
-| GPT-5-mini | Amin / Kuma and `liacpc14` | 300 succeeded | 300 succeeded | Kuma non-Docker: 384/405 succeeded with 21 failed; direct-OpenAI Docker: 45/45 succeeded; direct-OpenAI recovery has passed its Task-15 pilot and is testing Task 13 | Both original and recovery ledgers verified |
+| GPT-5-mini | Amin / Kuma and `liacpc14` | 300 succeeded | 300 succeeded | Original non-Docker: 384/405 succeeded; direct recovery: 19 succeeded, one running, one pending; direct-OpenAI Docker: 45/45 succeeded | All three ledgers verified and folded in the dashboard |
+
+Dashboard interpretation was tightened at 20:40. Transport-specific GPT and
+DeepSeek completion records are folded into their original full-benchmark run
+IDs. `Attempted` no longer implies success; the terminal-coverage bar is green
+for successes and red for failures. Execution state (`running`, `paused`, `not
+started`, or complete) is separate from reporter freshness.
 
 ### DeepSeek details on `liacpc14`
 
@@ -129,6 +135,14 @@ changing this table and checking both ledgers for overlap.
   19/21 recovery cells had succeeded for CHF 1.39, one Task-15 full-corpus cell
   was running, and the final cell was pending. Its dedicated email watcher was
   attached at 19:19.
+- The sole absent Claude CodeAct v34 cell is
+  `full-claude-haiku-4.5-tier4-task16-codeact-x500-r01`. A successful v25
+  result exists, but v34 added an explicit workflow-timeout setting. Rather
+  than silently transplant it, the exact v34 cell was launched locally at
+  20:37 with a CHF 5 notification ceiling and is running.
+- Kuma's four terminal Claude RLM failures have not been converted into
+  successes: 401 succeeded plus four failed equals 405 terminal outcomes.
+  They remain a four-cell failed-only retry set.
 
 - Claude was explicitly left untouched by the GPT repair work. Its current RLM
   ledger count still needs a fresh read.
