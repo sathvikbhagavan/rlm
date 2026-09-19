@@ -5,18 +5,19 @@ SQLite experiment ledgers on `liacpc14`, `liacpc15`, Jed, and Kuma. The ledgers
 remain the scientific source of truth. W&B only carries status snapshots; it
 never receives prompts, responses, secrets, commands, or artifact paths.
 
-## 1. Open it from Amin's laptop
+## 1. Open it from Amin's Mac
 
 Paste this single line into the laptop terminal:
 
 ```bash
-ssh amin@128.178.38.26 'test -d "$HOME/rlm_dashboard/.git" || git clone git@github.com:sathvikbhagavan/rlm.git "$HOME/rlm_dashboard"; cd "$HOME/rlm_dashboard" && git pull --ff-only origin main && "$HOME/.local/bin/uv" sync --frozen && bash experiments/iclr2027/start_dashboard_viewer.sh' && (fuser -k 8876/tcp >/dev/null 2>&1 || true) && ssh -fN -o ExitOnForwardFailure=yes -o ServerAliveInterval=30 -o ServerAliveCountMax=3 -L 8876:127.0.0.1:8765 amin@128.178.38.26 && xdg-open "http://127.0.0.1:8876/index.html?$(date +%s)"
+DASHBOARD_HOST=amin@128.178.38.26; DASHBOARD_SOCKET="$HOME/.ssh/rxnhaystack-dashboard.sock"; ssh "$DASHBOARD_HOST" 'test -d "$HOME/rlm_dashboard/.git" || git clone git@github.com:sathvikbhagavan/rlm.git "$HOME/rlm_dashboard"; cd "$HOME/rlm_dashboard" && git pull --ff-only origin main && "$HOME/.local/bin/uv" sync --frozen && bash experiments/iclr2027/start_dashboard_viewer.sh' && { ssh -S "$DASHBOARD_SOCKET" -O exit "$DASHBOARD_HOST" >/dev/null 2>&1 || true; rm -f "$DASHBOARD_SOCKET"; for dashboard_pid in $(lsof -nP -tiTCP:8876 -sTCP:LISTEN 2>/dev/null); do kill "$dashboard_pid"; done; for dashboard_wait in $(seq 1 50); do lsof -nP -tiTCP:8876 -sTCP:LISTEN >/dev/null 2>&1 || break; sleep 0.1; done; ! lsof -nP -tiTCP:8876 -sTCP:LISTEN >/dev/null 2>&1; } && ssh -fN -M -S "$DASHBOARD_SOCKET" -o ExitOnForwardFailure=yes -o ServerAliveInterval=30 -o ServerAliveCountMax=3 -L 8876:127.0.0.1:8765 "$DASHBOARD_HOST" && open "http://127.0.0.1:8876/index.html?$(date +%s)"
 ```
 
 It updates the separate dashboard checkout on `liacpc14`, restarts the viewer,
-closes an old local tunnel on port 8876, opens a new tunnel, and opens the page.
-It does not touch a benchmark process. If the page later reports a lost
-connection, paste the same line again.
+closes the named dashboard tunnel, clears a legacy listener left by an older
+version of this command, opens one new managed tunnel, and opens the page with
+macOS `open`. It never touches a benchmark process. If the page later reports
+a lost connection, paste the same line again.
 
 ## 2. Make each execution machine report
 
