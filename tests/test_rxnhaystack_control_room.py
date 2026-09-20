@@ -278,6 +278,19 @@ def test_legacy_full_run_identity_is_preserved_for_parent_folding() -> None:
     assert control_room.continuation_target_run_id(run_id) == run_id
 
 
+def test_qwen_docker_repair_folds_into_full_benchmark() -> None:
+    assert (
+        control_room.continuation_parent_campaign("iclr2027-qwen-paid-openrouter-docker-repair-v1")
+        == control_room.FULL_CAMPAIGN
+    )
+    assert (
+        control_room.continuation_target_run_id(
+            "paid-openrouter-full-qwen3.5-397b-tier4-task16-rlm-xfull-r02"
+        )
+        == "full-qwen3.5-397b-tier4-task16-rlm-xfull-r02"
+    )
+
+
 @pytest.mark.parametrize(
     ("parent_name", "shard_name", "canonical_id", "continuation_id"),
     [

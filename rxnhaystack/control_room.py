@@ -49,6 +49,7 @@ CONTINUATION_CAMPAIGNS = {
     "iclr2027-gpt5mini-direct-openai-recovery-v1",
     "iclr2027-gpt5mini-direct-openai-task15-highmem-v1",
     "iclr2027-deepseek-paid-openrouter-continuation-v1",
+    "iclr2027-qwen-paid-openrouter-docker-repair-v1",
 }
 LEGACY_FULL_CAMPAIGNS = {"iclr2027-six-model-full-v28"}
 CONTINUATION_CAMPAIGN_PREFIXES = (
