@@ -1,16 +1,6 @@
 import argparse
 import random
-import os
 import uuid
-
-import wandb
-
-from rxnhaystack.campaign_metrics import install_campaign_metrics
-
-from rlm import RLM
-from rxnhaystack.worker import instrument_rlm_from_environment
-from rlm.codeact_helpers import build_context_pipeline, load_lines
-from rlm.tracing import init_tracing, using_tracing_attributes
 
 from task15_ring_chain_graph import (
     MAX_HEAVY_ATOMS,
@@ -18,8 +8,8 @@ from task15_ring_chain_graph import (
     PATH_LENGTH,
     build_rlm_question,
     ground_truth_ring_path_in_context,
-    parse_records_from_lines,
     parse_response,
+    parse_selected_records_from_lines,
     score_prediction,
 )
 from task15_ring_chain_ground_truth import (
@@ -39,11 +29,23 @@ from task15_ring_chain_ground_truth import (
     update_task15_run_summary,
 )
 
+import wandb
+from rlm import RLM
+from rlm.codeact_helpers import build_context_pipeline, load_lines
+from rlm.tracing import init_tracing, using_tracing_attributes
+from rxnhaystack.campaign_metrics import install_campaign_metrics
+from rxnhaystack.worker import instrument_rlm_from_environment
+
 install_campaign_metrics(wandb)
 
 # os.environ["WANDB_MODE"] = "disabled"
 
-DATASET_PATH = __import__("os").environ.get("RXNHAYSTACK_CLEANED_DATASET", __import__("os").path.expanduser("~/datasets/rxnhaystack/reactionSmilesFigShareUSPTO2023_cleaned.txt"))
+DATASET_PATH = __import__("os").environ.get(
+    "RXNHAYSTACK_CLEANED_DATASET",
+    __import__("os").path.expanduser(
+        "~/datasets/rxnhaystack/reactionSmilesFigShareUSPTO2023_cleaned.txt"
+    ),
+)
 BACKEND = "openrouter"
 MODEL_NAME = __import__("os").environ.get("RXNHAYSTACK_MODEL", "openai/gpt-5-mini")
 ENABLE_TRACING = True
@@ -227,7 +229,7 @@ def main(model_name: str, context_size: int) -> None:
 
         iteration_metrics = rlm.get_last_iteration_metrics()
         pred_rxns = parse_response(response)
-        records = parse_records_from_lines(context_lines)
+        records = parse_selected_records_from_lines(context_lines, pred_rxns)
         scores = score_prediction(
             pred_rxns=pred_rxns,
             gt=gt,

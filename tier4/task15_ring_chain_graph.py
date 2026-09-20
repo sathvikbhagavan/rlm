@@ -240,6 +240,40 @@ def parse_records_from_lines(lines: list[str]) -> dict[int, ReactionRecord]:
     return records
 
 
+def parse_selected_records_from_lines(
+    lines: list[str], reaction_indices: tuple[int, ...]
+) -> dict[int, ReactionRecord]:
+    """Parse only the reaction records needed to score one prediction.
+
+    Path validation only dereferences indices returned by the model.  Parsing
+    and canonicalizing the complete 122k-row context after every completion is
+    therefore unnecessary, and can become pathological after a memory-heavy
+    local REPL turn.  The context-wide frequency filters are computed
+    separately and remain unchanged.
+    """
+    wanted = set(reaction_indices)
+    if not wanted:
+        return {}
+
+    selected: list[str] = []
+    for line in lines:
+        stripped = line.strip()
+        if not stripped:
+            continue
+        index_text, separator, _ = stripped.partition(" ")
+        if not separator:
+            continue
+        try:
+            index = int(index_text)
+        except ValueError:
+            continue
+        if index in wanted:
+            selected.append(stripped)
+            if len(selected) == len(wanted):
+                break
+    return parse_records_from_lines(selected)
+
+
 def build_molecule_graphs(
     records: dict[int, ReactionRecord],
     filters: ContextFilters | None = None,
@@ -309,9 +343,7 @@ def build_ground_truth_from_solutions(
 
     reaction_indices = accepted_reactions[0]
     molecule_chain = accepted_molecules[0]
-    node_ring_systems = tuple(
-        annotations[smiles].ring_systems for smiles in molecule_chain
-    )
+    node_ring_systems = tuple(annotations[smiles].ring_systems for smiles in molecule_chain)
     return GroundTruthPath(
         ring_system=ring_system,
         objective=objective,
@@ -331,7 +363,8 @@ def shortest_ring_construction_path(
     max_path_reactions: int,
 ) -> GroundTruthPath | None:
     targets = sorted(
-        smiles for smiles, annotation in annotations.items()
+        smiles
+        for smiles, annotation in annotations.items()
         if ring_system in annotation.ring_systems
     )
     paths: list[tuple[str, tuple[int, ...], tuple[str, ...]]] = [
@@ -392,7 +425,8 @@ def longest_ring_construction_path(
     max_path_reactions: int,
 ) -> GroundTruthPath | None:
     targets = sorted(
-        smiles for smiles, annotation in annotations.items()
+        smiles
+        for smiles, annotation in annotations.items()
         if ring_system in annotation.ring_systems
     )
     paths: list[tuple[str, tuple[int, ...], tuple[str, ...]]] = [
@@ -527,7 +561,11 @@ def verify_predicted_path(
         if not is_allowed_node(reactant):
             continue
         annotation = cached_annotation(reactant)
-        if annotation is not None and annotation.acyclic and ring_system not in annotation.ring_systems:
+        if (
+            annotation is not None
+            and annotation.acyclic
+            and ring_system not in annotation.ring_systems
+        ):
             states.append((reactant, (reactant,)))
 
     if not states:
@@ -588,9 +626,7 @@ def lcs_length(pred: tuple[int, ...], gt: tuple[int, ...]) -> int:
     return dp[n][m]
 
 
-def precision_recall_f1(
-    predicted: set[int], ground_truth: set[int]
-) -> tuple[float, float, float]:
+def precision_recall_f1(predicted: set[int], ground_truth: set[int]) -> tuple[float, float, float]:
     tp = len(predicted & ground_truth)
     precision = tp / len(predicted) if predicted else 0.0
     recall = tp / len(ground_truth) if ground_truth else 0.0
@@ -646,7 +682,9 @@ def score_prediction(
         "reaction_lcs": float(best_lcs),
         "normalized_lcs": best_norm_lcs,
         "inferred_molecule_chain": json.dumps(list(inferred_mols)),
-        "inferred_node_ring_systems": json.dumps([list(labels) for labels in inferred_ring_systems]),
+        "inferred_node_ring_systems": json.dumps(
+            [list(labels) for labels in inferred_ring_systems]
+        ),
     }
 
 
