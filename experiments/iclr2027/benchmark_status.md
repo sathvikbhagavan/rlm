@@ -4,7 +4,7 @@ This is the shared coordination record for the final benchmark. It says who
 owns each part, where it is running, what is complete, and what must happen
 next. Update this file whenever a phase starts, stops, or materially changes.
 
-Last consolidated: **2026-09-20 12:30 Europe/Zurich**
+Last consolidated: **2026-09-20 20:15 Europe/Zurich**
 
 Dashboard/assignment implementation at consolidation: `17cd68b`
 
@@ -21,13 +21,14 @@ Slurm shards and repairs are folded into their parent experiment.
 | Qwen matched cardinality | Jed / paid OpenRouter | Running under Amin, not Sathvik: 169 succeeded, 4 running and 552 pending after folding the newest two-cell repair. | Stop the four launchers through their tested shutdown path, rebuild the exact unfinished set, and repartition it into about 20 disjoint one-worker shards for a sub-10-hour target. |
 | Oracle-predicate Qwen | Jed / paid OpenRouter | 70/75 succeeded. Five full-corpus cells failed in the latest repair. | Inspect their Jed stderr/artifacts, classify the common cause, then retry only the five failed cells. |
 | Task-16 prospective decomposition | `liacpc14` / Claude OpenRouter and Qwen | Pilot succeeded; 1/30 jobs complete. The remaining 29 Docker-required, 28--30 GiB jobs are in the explicit local queue. | Run locally one at a time after the 14 Qwen/Gemini repairs. |
-| Qwen/Gemini full RLM repair | `liacpc14` / OpenRouter | The six-cell Qwen repair started at 12:47 on September 20. Task-16 r02 is the release pilot; a success automatically releases the other five sequentially. Gemini's eight cells remain next. | Let the gated Qwen queue run; then prepare and launch the exact eight-cell Gemini retry. |
+| Qwen/Gemini full RLM repair | `liacpc14` / OpenRouter | The Qwen Task-16 r02 release pilot failed at 15:09 on September 20 after completing four questions and starting the fifth. OpenRouter returned HTTP 402 because the account had exhausted its credits (`$18,000.77` usage against `$18,000` credits). The other five Qwen cells correctly remained gated and Gemini's eight cells have not started. | Add OpenRouter credits, revise the Qwen cost estimate from observed usage, then retry only the failed pilot. Do not release the remaining Qwen or Gemini work until that pilot succeeds. |
 | GLM Docker RLM | `liacpc14` / OpenRouter | 45 jobs held. | Run locally after the prospective and Qwen/Gemini Docker repairs, unless paper priority changes. |
 | DeepSeek CodeAct repair | Not launched | 57 failures: 48 timeouts, 6 context overflows, 2 interrupted attempts and 1 other provider error. | Retry transient/interrupted cells; first correct and pilot the six context-overflow configurations. |
 | GLM CodeAct | Jed, later | One pilot failed; 299 jobs held. | Diagnose/revise the release pilot before broad execution. |
 
 The recurring local Docker queue, which must appear in every execution-status
-handoff until empty, is: (1) six Qwen repairs (**active, pilot-gated**), (2)
+handoff until empty, is: (1) six Qwen repairs (**blocked on OpenRouter credits;
+pilot failed and five remain gated**), (2)
 eight Gemini repairs, (3) 29 prospective Task-16 jobs, (4) 24 remaining
 DeepSeek Docker jobs, and (5) 45 GLM Docker jobs. Only one large Docker RLM cell
 runs at a time.
