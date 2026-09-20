@@ -6,7 +6,7 @@ next. Update this file whenever a phase starts, stops, or materially changes.
 
 Last consolidated: **2026-09-20 12:30 Europe/Zurich**
 
-Repository commit at consolidation: `d75465c` plus the pending dashboard-assignment fix
+Dashboard/assignment implementation at consolidation: `17cd68b`
 
 ## Current execution and held-work queue
 
@@ -52,9 +52,9 @@ does not by itself prove that scientific metrics were produced.
 
 | Person | Machine | Assigned work | Must not duplicate |
 | --- | --- | --- | --- |
-| Amin | `liacpc14` | DeepSeek full benchmark; later Docker-required catch-up where assigned | GLM work assigned to Jed; Qwen/Gemini owned by Sathvik |
-| Sathvik | `liacpc15` | Qwen and Gemini full benchmarks; Qwen matched-cardinality | DeepSeek, GLM, Claude, GPT |
-| Amin and Sathvik | Jed CPU cluster | GLM CodeAct and GLM non-Docker RLM in one quota-coordinated allocation | DeepSeek remains on `liacpc14`; do not launch a second independent Jed SwissAI allocation |
+| Amin | `liacpc14` | Active paid DeepSeek continuation; Docker-required catch-up and prospective study | Do not duplicate active Jed shards |
+| Sathvik | `liacpc15` | Qwen and Gemini full benchmarks | DeepSeek, GLM, Claude, GPT, or the new Qwen matched Jed shards |
+| Amin and Sathvik | Jed CPU cluster | GLM RLM, Qwen matched cardinality, oracle-predicate controls, and approved non-Docker rescue shards | Keep every shard disjoint from active `liacpc14` work |
 | Amin | Kuma | Claude and GPT-5-mini full benchmarks; GPT matched-cardinality; GPT repair pilots | SwissAI models and Sathvik's models |
 
 No owner should launch another machine for the same run names without first
