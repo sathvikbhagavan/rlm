@@ -8,6 +8,7 @@ import re
 import sqlite3
 import statistics
 import tempfile
+import warnings
 from collections import Counter, defaultdict
 from collections.abc import Iterable, Mapping
 from datetime import UTC, datetime
@@ -526,13 +527,23 @@ def sync_snapshots_with_api(
             else:
                 raise ControlRoomError(f"Status artifact for {source_id} has no snapshot file")
             if snapshot["source"]["id"] != source_id or artifact_name(snapshot) != name:
-                raise ControlRoomError(
-                    f"Downloaded status artifact for {source_id} is inconsistent"
+                warnings.warn(
+                    f"Skipping inconsistent status artifact for {source_id}; "
+                    "the last verified cached snapshot remains available",
+                    RuntimeWarning,
+                    stacklevel=2,
                 )
+                seen.add(source_id)
+                continue
             if snapshot["snapshot_id"] != expected_snapshot_id:
-                raise ControlRoomError(
-                    f"Latest status artifact for {source_id} does not match its publisher run"
+                warnings.warn(
+                    f"Skipping racing status artifact for {source_id}; its latest artifact "
+                    "does not yet match the newest publisher run",
+                    RuntimeWarning,
+                    stacklevel=2,
                 )
+                seen.add(source_id)
+                continue
             destination = output_dir / f"{source_id}.json"
             if not destination.is_file() or parse_timestamp(
                 load_snapshot(destination)["generated_at"]

@@ -575,6 +575,34 @@ def test_sync_does_not_replace_a_newer_cross_project_snapshot(
     assert load_snapshot(destination) == newer
 
 
+def test_sync_skips_racing_latest_artifact_without_aborting_other_refreshes(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    snapshot = populated_snapshot(tmp_path, monkeypatch)
+    published = tmp_path / "published.json"
+    write_snapshot(published, snapshot)
+    fake_api = FakePublicApi(published, snapshot)
+    original_runs = fake_api.runs
+
+    def mismatched_runs(path: str, **kwargs: Any) -> list[SimpleNamespace]:
+        runs = original_runs(path, **kwargs)
+        runs[0].config["snapshot_id"] = "0" * 64
+        return runs
+
+    fake_api.runs = mismatched_runs  # type: ignore[method-assign]
+
+    with pytest.warns(RuntimeWarning, match="racing status artifact"):
+        paths = sync_snapshots(
+            api_key="secret",
+            entity="liac",
+            project="rxnhaystack-control-room",
+            output_dir=tmp_path / "shared",
+            wandb_module=FakeWandbDownloader(fake_api),
+        )
+
+    assert paths == []
+
+
 def test_dashboard_and_markdown_are_generated(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
