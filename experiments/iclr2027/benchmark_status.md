@@ -4,9 +4,31 @@ This is the shared coordination record for the final benchmark. It says who
 owns each part, where it is running, what is complete, and what must happen
 next. Update this file whenever a phase starts, stops, or materially changes.
 
-Last consolidated: **2026-09-19 20:40 Europe/Zurich**
+Last consolidated: **2026-09-20 12:30 Europe/Zurich**
 
-Repository commit at consolidation: `b022a09`
+Repository commit at consolidation: `d75465c` plus the pending dashboard-assignment fix
+
+## Current execution and held-work queue
+
+This table supersedes older point-in-time counts later in this document. The
+dashboard intentionally keeps five scientific sections; transport changes,
+Slurm shards and repairs are folded into their parent experiment.
+
+| Work | Where / provider | Current state at consolidation | Next action |
+| --- | --- | --- | --- |
+| DeepSeek full RLM | `liacpc14` / paid OpenRouter | Running with one worker. Folded dashboard: 230 succeeded, 5 failed, 1 running, 214 pending. The paid continuation itself has 60 successes for CHF 2.16. | Continue; split remaining non-Docker work onto Jed if deadline speed is required, while preserving disjoint run identities. |
+| GLM full RLM | Jed / paid OpenRouter plus earlier SwissAI results | Running. Folded dashboard: 317 succeeded, 61 failed, 1 running, 2 stale, 69 pending. | Let the disjoint Jed shards finish, then make a failed-only repair set. Keep 45 Docker cells for `liacpc14`. |
+| Qwen matched cardinality | Jed / paid OpenRouter | Running under Amin, not Sathvik. Before folding the newest two-cell repair: 167 succeeded, 2 failed, 4 running, 552 pending. Those two failures already have successful repair records. | Continue the four active Jed repair shards; do not start another copy. |
+| Oracle-predicate Qwen | Jed / paid OpenRouter | 70/75 succeeded. Five full-corpus cells failed in the latest repair. | Inspect their Jed stderr/artifacts, classify the common cause, then retry only the five failed cells. |
+| Task-16 prospective decomposition | `liacpc14` / Claude OpenRouter and Qwen | Pilot succeeded; 1/30 jobs complete. The remaining 29 Docker-required, 28--30 GiB jobs are held. | Run locally one at a time after moving or finishing the competing DeepSeek work. |
+| Qwen/Gemini full RLM repair | `liacpc14` / OpenRouter | Not launched: Qwen has 6 and Gemini has 8 missing Docker cells. | Run locally one at a time when the large-memory slot is released. |
+| GLM Docker RLM | `liacpc14` / OpenRouter | 45 jobs held. | Run locally after the prospective and Qwen/Gemini Docker repairs, unless paper priority changes. |
+| DeepSeek CodeAct repair | Not launched | 57 failures: 48 timeouts, 6 context overflows, 2 interrupted attempts and 1 other provider error. | Retry transient/interrupted cells; first correct and pilot the six context-overflow configurations. |
+| GLM CodeAct | Jed, later | One pilot failed; 299 jobs held. | Diagnose/revise the release pilot before broad execution. |
+
+Completed since the previous consolidation: GPT matched cardinality is 725/725;
+Claude oracle-predicate is 75/75; Claude full CodeAct is 300/300; Claude full
+RLM is 450/450 across non-Docker and Docker rows; and GPT full RLM is 450/450.
 
 ## How to read the counts
 

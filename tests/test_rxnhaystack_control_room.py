@@ -294,6 +294,12 @@ def test_legacy_full_run_identity_is_preserved_for_parent_folding() -> None:
             "repair2-openrouter-qwen-matched-matched-qwen3.5-397b-tier2-task2-scale-x100-k1-r03",
         ),
         (
+            control_room.MATCHED_CAMPAIGN,
+            "iclr2027-jed-qwen-matched-openrouter-failed-now-v3",
+            "matched-qwen3.5-397b-tier2-task3-scale-x500-k1-r05",
+            "repair3-openrouter-qwen-matched-matched-qwen3.5-397b-tier2-task3-scale-x500-k1-r05",
+        ),
+        (
             control_room.ORACLE_CAMPAIGN,
             "iclr2027-jed-oracle-predicate-repair-qwen-x100-v2",
             "oracle-qwen3.5-397b-tier3-task10-x100-r02",
@@ -465,7 +471,8 @@ def test_missing_assigned_reporter_is_unreported_even_if_another_machine_reports
         ("full-gpt-5-mini-tier4-task13-rlm-xfull-r01", "Amin", "kuma"),
         ("full-gpt-5-mini-tier4-task16-rlm-xfull-r01", "Amin", "liacpc14"),
         ("oracle-claude-haiku-4.5-tier3-task6-x100", "Amin", "jed"),
-        ("oracle-qwen3.5-397b-tier3-task6-x100", "Amin", "liacpc14"),
+        ("oracle-qwen3.5-397b-tier3-task6-x100", "Amin", "jed"),
+        ("matched-qwen3.5-397b-tier2-task2-scale-x100-k1-r01", "Amin", "jed"),
     ],
 )
 def test_reporting_assignments_are_explicit(run_id: str, owner: str, machine: str) -> None:

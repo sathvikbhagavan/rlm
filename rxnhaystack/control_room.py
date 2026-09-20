@@ -614,6 +614,7 @@ def continuation_target_run_id(run_id: str) -> str | None:
         ("openrouter-glm-recovery-", ""),
         ("openrouter-claude-repair-", ""),
         ("repair2-direct-openai-recovery-", ""),
+        ("repair3-openrouter-qwen-matched-", ""),
         ("repair2-openrouter-qwen-matched-", ""),
         ("openrouter-qwen-matched-", ""),
         ("repair2-jed-oracle-recovery-", ""),
@@ -917,12 +918,12 @@ def reporting_assignment(run_id: str) -> dict[str, str]:
     entity = "liac"
     if normalized.startswith("full-glm") or normalized.startswith("oracle-executor"):
         machine = "jed"
-    elif normalized.startswith("oracle-claude"):
+    elif normalized.startswith("oracle-claude") or normalized.startswith("oracle-qwen"):
         machine = "jed"
     elif normalized.startswith("full-qwen") or normalized.startswith("full-gemini"):
         machine, owner, entity = "liacpc15", "Sathvik", "sathvikbhagavan-epfl"
     elif normalized.startswith("matched-qwen"):
-        machine, owner, entity = "liacpc15", "Sathvik", "sathvikbhagavan-epfl"
+        machine = "jed"
     elif normalized.startswith("matched-gpt"):
         machine = "kuma"
     elif normalized.startswith("full-gpt"):
