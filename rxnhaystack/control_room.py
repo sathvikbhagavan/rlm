@@ -42,12 +42,22 @@ SAFE_RESOURCE_FIELDS = (
 )
 STATUS_ORDER = ("succeeded", "running", "stale", "failed", "pending")
 FULL_CAMPAIGN = "iclr2027-six-model-full-v34"
+MATCHED_CAMPAIGN = "iclr2027-matched-cardinality-v7"
+ORACLE_CAMPAIGN = "iclr2027-oracle-predicate-v1"
 CONTINUATION_CAMPAIGNS = {
     "iclr2027-gpt5mini-direct-openai-docker-v1",
     "iclr2027-gpt5mini-direct-openai-recovery-v1",
     "iclr2027-gpt5mini-direct-openai-task15-highmem-v1",
     "iclr2027-deepseek-paid-openrouter-continuation-v1",
 }
+LEGACY_FULL_CAMPAIGNS = {"iclr2027-six-model-full-v28"}
+CONTINUATION_CAMPAIGN_PREFIXES = (
+    ("iclr2027-jed-claude-rlm-repair-", FULL_CAMPAIGN),
+    ("iclr2027-jed-glm-openrouter-rlm-", FULL_CAMPAIGN),
+    ("iclr2027-jed-gpt-matched-direct-", MATCHED_CAMPAIGN),
+    ("iclr2027-jed-qwen-matched-openrouter-", MATCHED_CAMPAIGN),
+    ("iclr2027-jed-oracle-predicate-", ORACLE_CAMPAIGN),
+)
 
 
 class ControlRoomError(RuntimeError):
@@ -594,12 +604,20 @@ def merge_snapshots(
         merge_experiment(group, stale_after_seconds=stale_after_seconds, now=reference_time)
         for _, group in sorted(by_experiment.items())
     ]
-    campaigns = fold_full_benchmark_continuations(campaigns)
+    campaigns = fold_scientific_continuations(campaigns)
     return {"generated_at": reference_time.isoformat(), "campaigns": campaigns}
 
 
 def continuation_target_run_id(run_id: str) -> str | None:
     prefixes = (
+        ("repair2-openrouter-glm-recovery-", ""),
+        ("openrouter-glm-recovery-", ""),
+        ("openrouter-claude-repair-", ""),
+        ("repair2-direct-openai-recovery-", ""),
+        ("repair2-openrouter-qwen-matched-", ""),
+        ("openrouter-qwen-matched-", ""),
+        ("repair2-jed-oracle-recovery-", ""),
+        ("jed-oracle-recovery-", ""),
         ("direct-openai-task15-highmem-", ""),
         ("direct-openai-recovery-", ""),
         ("paid-openrouter-", ""),
@@ -608,41 +626,68 @@ def continuation_target_run_id(run_id: str) -> str | None:
     for prefix, replacement in prefixes:
         if run_id.startswith(prefix):
             return replacement + run_id.removeprefix(prefix)
+    if run_id.startswith("full-"):
+        return run_id
     return None
 
 
-def fold_full_benchmark_continuations(campaigns: list[dict[str, Any]]) -> list[dict[str, Any]]:
-    """Fold transport-specific completion runs into the canonical full benchmark."""
+def continuation_parent_campaign(campaign_name: str) -> str | None:
+    if campaign_name in CONTINUATION_CAMPAIGNS or campaign_name in LEGACY_FULL_CAMPAIGNS:
+        return FULL_CAMPAIGN
+    for prefix, parent in CONTINUATION_CAMPAIGN_PREFIXES:
+        if campaign_name.startswith(prefix):
+            return parent
+    return None
 
-    full = next((campaign for campaign in campaigns if campaign["name"] == FULL_CAMPAIGN), None)
-    if full is None:
-        return campaigns
-    canonical = {run["run_id"]: run for run in full["runs"]}
-    folded_names: list[str] = []
-    folded_sources = {source["id"]: source for source in full["sources"]}
+
+def fold_scientific_continuations(campaigns: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Fold execution shards and repairs into their scientific parent studies."""
+
+    parents = {
+        campaign["name"]: campaign
+        for campaign in campaigns
+        if campaign["name"] in {FULL_CAMPAIGN, MATCHED_CAMPAIGN, ORACLE_CAMPAIGN}
+    }
+    continuations: dict[str, list[dict[str, Any]]] = defaultdict(list)
+    hidden_names: set[str] = set()
     for campaign in campaigns:
-        if campaign["name"] not in CONTINUATION_CAMPAIGNS:
-            continue
-        used = False
-        for continuation in campaign["runs"]:
-            target_id = continuation_target_run_id(str(continuation["run_id"]))
-            if target_id not in canonical or continuation["attempt_count"] == 0:
-                continue
-            canonical[target_id] = overlay_continuation(canonical[target_id], continuation)
-            used = True
-        if used:
-            folded_names.append(str(campaign["name"]))
-            folded_sources.update({source["id"]: source for source in campaign["sources"]})
-    if not folded_names:
-        return campaigns
-    full["runs"] = sorted(canonical.values(), key=lambda item: item["run_id"])
-    counts = Counter(run["status"] for run in full["runs"])
-    full["counts"] = {status: counts[status] for status in STATUS_ORDER}
-    full["cells"] = aggregate_cells(full["runs"])
-    full["metrics"] = aggregate_attempt_metrics(full["runs"])
-    full["sources"] = sorted(folded_sources.values(), key=lambda item: item["id"])
-    full["continuation_campaigns"] = sorted(folded_names)
-    return [campaign for campaign in campaigns if campaign["name"] not in CONTINUATION_CAMPAIGNS]
+        parent_name = continuation_parent_campaign(str(campaign["name"]))
+        if parent_name in parents:
+            continuations[parent_name].append(campaign)
+            hidden_names.add(str(campaign["name"]))
+
+    for parent_name, shards in continuations.items():
+        parent = parents[parent_name]
+        canonical = {run["run_id"]: run for run in parent["runs"]}
+        folded_names: list[str] = []
+        folded_sources = {source["id"]: source for source in parent["sources"]}
+        for shard in shards:
+            used = False
+            for continuation in shard["runs"]:
+                target_id = continuation_target_run_id(str(continuation["run_id"]))
+                if target_id not in canonical or continuation["attempt_count"] == 0:
+                    continue
+                canonical[target_id] = overlay_continuation(canonical[target_id], continuation)
+                used = True
+            if used:
+                folded_names.append(str(shard["name"]))
+                folded_sources.update({source["id"]: source for source in shard["sources"]})
+
+        parent["runs"] = sorted(canonical.values(), key=lambda item: item["run_id"])
+        counts = Counter(run["status"] for run in parent["runs"])
+        parent["counts"] = {status: counts[status] for status in STATUS_ORDER}
+        parent["cells"] = aggregate_cells(parent["runs"])
+        parent["metrics"] = aggregate_attempt_metrics(parent["runs"])
+        parent["sources"] = sorted(folded_sources.values(), key=lambda item: item["id"])
+        parent["continuation_campaigns"] = sorted(folded_names)
+
+    return [campaign for campaign in campaigns if campaign["name"] not in hidden_names]
+
+
+def fold_full_benchmark_continuations(campaigns: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Backward-compatible name for folding all scientific continuations."""
+
+    return fold_scientific_continuations(campaigns)
 
 
 def overlay_continuation(original: dict[str, Any], continuation: dict[str, Any]) -> dict[str, Any]:

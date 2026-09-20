@@ -269,6 +269,80 @@ def test_task15_high_memory_continuation_targets_canonical_run() -> None:
     )
 
 
+def test_legacy_full_run_identity_is_preserved_for_parent_folding() -> None:
+    run_id = "full-glm-5.2-tier1-task1-llm-x100-r01"
+
+    assert control_room.continuation_parent_campaign("iclr2027-six-model-full-v28") == (
+        control_room.FULL_CAMPAIGN
+    )
+    assert control_room.continuation_target_run_id(run_id) == run_id
+
+
+@pytest.mark.parametrize(
+    ("parent_name", "shard_name", "canonical_id", "continuation_id"),
+    [
+        (
+            control_room.MATCHED_CAMPAIGN,
+            "iclr2027-jed-gpt-matched-direct-repair1-v2",
+            "matched-gpt-5-mini-tier3-task10-scale-x500-k1-r05",
+            "repair2-direct-openai-recovery-matched-gpt-5-mini-tier3-task10-scale-x500-k1-r05",
+        ),
+        (
+            control_room.MATCHED_CAMPAIGN,
+            "iclr2027-jed-qwen-matched-openrouter-repair1-v2",
+            "matched-qwen3.5-397b-tier2-task2-scale-x100-k1-r03",
+            "repair2-openrouter-qwen-matched-matched-qwen3.5-397b-tier2-task2-scale-x100-k1-r03",
+        ),
+        (
+            control_room.ORACLE_CAMPAIGN,
+            "iclr2027-jed-oracle-predicate-repair-qwen-x100-v2",
+            "oracle-qwen3.5-397b-tier3-task10-x100-r02",
+            "repair2-jed-oracle-recovery-oracle-qwen3.5-397b-tier3-task10-x100-r02",
+        ),
+    ],
+)
+def test_execution_shards_fold_into_scientific_parent(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    parent_name: str,
+    shard_name: str,
+    canonical_id: str,
+    continuation_id: str,
+) -> None:
+    snapshot = populated_snapshot(tmp_path, monkeypatch)
+    parent = merge_snapshots([snapshot], now=datetime(2026, 9, 17, 12, 10, tzinfo=UTC))[
+        "campaigns"
+    ][0]
+    parent["name"] = parent_name
+    target = parent["runs"][1]
+    target["run_id"] = canonical_id
+    target["status"] = "failed"
+
+    shard = deepcopy(parent)
+    shard["name"] = shard_name
+    recovered = deepcopy(target)
+    recovered["run_id"] = continuation_id
+    recovered["status"] = "succeeded"
+    recovered["failure_categories"] = {}
+    recovered["attempts"][0].update(
+        {
+            "attempt_key": "d" * 64,
+            "status": "succeeded",
+            "return_code": 0,
+            "failure_category": None,
+        }
+    )
+    shard["runs"] = [recovered]
+
+    folded = control_room.fold_scientific_continuations([parent, shard])
+
+    assert len(folded) == 1
+    repaired = next(run for run in folded[0]["runs"] if run["run_id"] == canonical_id)
+    assert repaired["status"] == "succeeded"
+    assert repaired["completion_run_ids"] == [continuation_id]
+    assert folded[0]["continuation_campaigns"] == [shard_name]
+
+
 def test_execution_state_distinguishes_paused_from_fresh_data(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
