@@ -4,7 +4,7 @@ This is the shared coordination record for the final benchmark. It says who
 owns each part, where it is running, what is complete, and what must happen
 next. Update this file whenever a phase starts, stops, or materially changes.
 
-Last consolidated: **2026-09-21 00:30 Europe/Zurich**
+Last consolidated: **2026-09-21 00:38 Europe/Zurich**
 
 Dashboard/assignment implementation at consolidation: `17cd68b`
 
@@ -32,6 +32,16 @@ scheduled once with no retries**), (2)
 eight Gemini repairs, (3) 29 prospective Task-16 jobs, (4) 24 remaining
 DeepSeek Docker jobs, and (5) 45 GLM Docker jobs. Only one large Docker RLM cell
 runs at a time.
+
+The durable controller `rxn-local-docker-queue-v1` is armed at Git `57e5bba`.
+It waits for the active Qwen attempt, then advances through those five phases
+in order. Every never-attempted cell receives at most one attempt; scientific
+failures are preserved and never selected for retry. Each phase receives a
+task-notify watcher and dashboard publication. The controller waits rather
+than spending if either the shared OpenRouter account or the API key has less
+than USD 20 available. Its durable state and log are
+`~/.local/state/rxnhaystack/local-docker-queue.json` and
+`~/.local/state/rxnhaystack/local-docker-queue.log`.
 
 Completed since the previous consolidation: GPT matched cardinality is 725/725;
 Claude oracle-predicate is 75/75; Claude full CodeAct is 300/300; Claude full
