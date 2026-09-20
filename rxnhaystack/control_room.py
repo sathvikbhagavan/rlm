@@ -912,7 +912,8 @@ def newest_timestamp(values: Iterable[str]) -> str | None:
 
 
 def reporting_assignment(run_id: str) -> dict[str, str]:
-    normalized = run_id.lower()
+    target_run_id = continuation_target_run_id(run_id)
+    normalized = (target_run_id or run_id).lower()
     machine = "liacpc14"
     owner = "Amin"
     entity = "liac"

@@ -473,6 +473,11 @@ def test_missing_assigned_reporter_is_unreported_even_if_another_machine_reports
         ("oracle-claude-haiku-4.5-tier3-task6-x100", "Amin", "jed"),
         ("oracle-qwen3.5-397b-tier3-task6-x100", "Amin", "jed"),
         ("matched-qwen3.5-397b-tier2-task2-scale-x100-k1-r01", "Amin", "jed"),
+        (
+            "repair2-openrouter-qwen-matched-matched-qwen3.5-397b-tier2-task2-scale-x100-k1-r01",
+            "Amin",
+            "jed",
+        ),
     ],
 )
 def test_reporting_assignments_are_explicit(run_id: str, owner: str, machine: str) -> None:
