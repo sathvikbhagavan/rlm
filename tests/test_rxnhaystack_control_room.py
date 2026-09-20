@@ -283,6 +283,28 @@ def test_qwen_docker_repair_folds_into_full_benchmark() -> None:
         control_room.continuation_parent_campaign("iclr2027-qwen-paid-openrouter-docker-repair-v1")
         == control_room.FULL_CAMPAIGN
     )
+
+
+@pytest.mark.parametrize(
+    ("campaign", "run_id", "canonical"),
+    [
+        (
+            "iclr2027-gemini-paid-openrouter-docker-repair-v1",
+            "paid-openrouter-full-gemini-3.7-flash-tier4-task16-rlm-xfull-r02",
+            "full-gemini-3.7-flash-tier4-task16-rlm-xfull-r02",
+        ),
+        (
+            "iclr2027-glm-paid-openrouter-docker-v1",
+            "paid-openrouter-full-glm-5.2-tier4-task17b-rlm-x500-r05",
+            "full-glm-5.2-tier4-task17b-rlm-x500-r05",
+        ),
+    ],
+)
+def test_paid_docker_repairs_fold_into_full_benchmark(
+    campaign: str, run_id: str, canonical: str
+) -> None:
+    assert control_room.continuation_parent_campaign(campaign) == control_room.FULL_CAMPAIGN
+    assert control_room.continuation_target_run_id(run_id) == canonical
     assert (
         control_room.continuation_target_run_id(
             "paid-openrouter-full-qwen3.5-397b-tier4-task16-rlm-xfull-r02"
