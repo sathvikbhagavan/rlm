@@ -56,6 +56,10 @@ CONTINUATION_CAMPAIGNS = {
 LEGACY_FULL_CAMPAIGNS = {"iclr2027-six-model-full-v28"}
 CONTINUATION_CAMPAIGN_PREFIXES = (
     ("iclr2027-jed-claude-rlm-repair-", FULL_CAMPAIGN),
+    ("iclr2027-jed-credit-retry-deepseek-codeact-repair-", FULL_CAMPAIGN),
+    ("iclr2027-jed-credit-retry-deepseek-rlm-accelerated-", FULL_CAMPAIGN),
+    ("iclr2027-jed-deepseek-codeact-repair-", FULL_CAMPAIGN),
+    ("iclr2027-jed-deepseek-rlm-accelerated-", FULL_CAMPAIGN),
     ("iclr2027-jed-glm-openrouter-rlm-", FULL_CAMPAIGN),
     ("iclr2027-jed-gpt-matched-direct-", MATCHED_CAMPAIGN),
     ("iclr2027-jed-qwen-matched-openrouter-", MATCHED_CAMPAIGN),
@@ -613,6 +617,10 @@ def merge_snapshots(
 
 def continuation_target_run_id(run_id: str) -> str | None:
     prefixes = (
+        ("credit-retry-jed-accel-paid-openrouter-", ""),
+        ("credit-retry-paid-openrouter-repair-", ""),
+        ("jed-accel-paid-openrouter-", ""),
+        ("paid-openrouter-repair-", ""),
         ("repair2-openrouter-glm-recovery-", ""),
         ("openrouter-glm-recovery-", ""),
         ("openrouter-claude-repair-", ""),

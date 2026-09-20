@@ -340,6 +340,30 @@ def test_paid_docker_repairs_fold_into_full_benchmark(
             "oracle-qwen3.5-397b-tier3-task10-x100-r02",
             "repair2-jed-oracle-recovery-oracle-qwen3.5-397b-tier3-task10-x100-r02",
         ),
+        (
+            control_room.FULL_CAMPAIGN,
+            "iclr2027-jed-deepseek-rlm-accelerated-s01-19f4f69",
+            "full-deepseek-v4-flash-tier3-task17-rlm-x100-r03",
+            "jed-accel-paid-openrouter-full-deepseek-v4-flash-tier3-task17-rlm-x100-r03",
+        ),
+        (
+            control_room.FULL_CAMPAIGN,
+            "iclr2027-jed-credit-retry-deepseek-rlm-accelerated-r01",
+            "full-deepseek-v4-flash-tier4-task14-rlm-x100-r02",
+            "credit-retry-jed-accel-paid-openrouter-full-deepseek-v4-flash-tier4-task14-rlm-x100-r02",
+        ),
+        (
+            control_room.FULL_CAMPAIGN,
+            "iclr2027-jed-deepseek-codeact-repair-s01-19f4f69",
+            "full-deepseek-v4-flash-tier2-task3-codeact-x100-r01",
+            "paid-openrouter-repair-full-deepseek-v4-flash-tier2-task3-codeact-x100-r01",
+        ),
+        (
+            control_room.FULL_CAMPAIGN,
+            "iclr2027-jed-credit-retry-deepseek-codeact-repair-r01",
+            "full-deepseek-v4-flash-tier3-task10-codeact-x500-r03",
+            "credit-retry-paid-openrouter-repair-full-deepseek-v4-flash-tier3-task10-codeact-x500-r03",
+        ),
     ],
 )
 def test_execution_shards_fold_into_scientific_parent(
