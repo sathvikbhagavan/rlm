@@ -261,6 +261,14 @@ def test_transport_continuations_fold_into_full_benchmark(
     assert folded[0]["continuation_campaigns"] == [continuation["name"]]
 
 
+def test_task15_high_memory_continuation_targets_canonical_run() -> None:
+    run_id = "direct-openai-task15-highmem-full-gpt-5-mini-tier4-task15-rlm-xfull-r04"
+
+    assert control_room.continuation_target_run_id(run_id) == (
+        "full-gpt-5-mini-tier4-task15-rlm-xfull-r04"
+    )
+
+
 def test_execution_state_distinguishes_paused_from_fresh_data(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:

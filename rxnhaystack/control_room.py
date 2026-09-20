@@ -44,6 +44,7 @@ FULL_CAMPAIGN = "iclr2027-six-model-full-v34"
 CONTINUATION_CAMPAIGNS = {
     "iclr2027-gpt5mini-direct-openai-docker-v1",
     "iclr2027-gpt5mini-direct-openai-recovery-v1",
+    "iclr2027-gpt5mini-direct-openai-task15-highmem-v1",
     "iclr2027-deepseek-paid-openrouter-continuation-v1",
 }
 
@@ -588,6 +589,7 @@ def merge_snapshots(
 
 def continuation_target_run_id(run_id: str) -> str | None:
     prefixes = (
+        ("direct-openai-task15-highmem-", ""),
         ("direct-openai-recovery-", ""),
         ("paid-openrouter-", ""),
         ("direct-openai-gpt-5-mini-", "full-gpt-5-mini-"),
