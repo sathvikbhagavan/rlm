@@ -9,6 +9,7 @@ import hashlib
 import json
 import statistics
 import subprocess
+import tarfile
 from collections import Counter, defaultdict
 from datetime import UTC, datetime
 from pathlib import Path
@@ -99,6 +100,10 @@ METRIC_FIELDS = (
     "tool_time_seconds",
 )
 
+DEFAULT_GEMINI_X1000_PACK = Path(
+    "paper_plots/gold/source_packs/gemini-codeact-x1000-succeeded-pack.tgz"
+)
+
 
 def sha256_file(path: Path) -> str:
     digest = hashlib.sha256()
@@ -130,6 +135,8 @@ def result_score(task: str, metrics: dict[str, Any]) -> tuple[str, float | None]
 
 
 def model_slug(model: str) -> str:
+    if model in MODEL_ORDER:
+        return model
     try:
         return MODEL_ALIASES[model]
     except KeyError as error:
@@ -167,6 +174,95 @@ def flatten_run(run: dict[str, Any], *, scope: str) -> dict[str, Any]:
     row.update({field: metrics.get(field) for field in METRIC_FIELDS})
     row.update({field: resources.get(field) for field in RESOURCE_FIELDS})
     return row
+
+
+def flatten_packed_run(run: dict[str, Any], *, packed_at: str, pack_name: str) -> dict[str, Any]:
+    """Convert one sanitized external result-pack row to the gold schema."""
+    tier = int(run["tier"])
+    task = f"tier{tier}/task{run['task']}"
+    score_name = "macro_reaction_f1" if task == "tier4/task15" else "macro_f1"
+    f1 = run.get(f"metrics.results.{score_name}")
+    slug = model_slug(str(run["model"]))
+    row: dict[str, Any] = {
+        "scope": "codeact_x1000",
+        "run_id": run["run_id"],
+        "model": slug,
+        "model_label": MODEL_LABELS[slug],
+        "method": run["method"],
+        "tier": tier,
+        "task": task,
+        "context": normalize_context(run["context"]),
+        "repetition": int(run["repetition"]),
+        "question_count": QUESTION_COUNTS[task],
+        "status": run["status"],
+        "report_state": "external-succeeded-result-pack",
+        "result_updated_at": packed_at,
+        "attempt_count": int(run["attempt"]),
+        "sources": pack_name,
+        "failure_categories": "{}",
+        "score_name": score_name,
+        "score_available": f1 is not None,
+        "f1": None if f1 is None else float(f1),
+    }
+    row.update({field: run.get(f"metrics.{field}") for field in METRIC_FIELDS})
+    row.update({field: run.get(f"metrics.resources.{field}") for field in RESOURCE_FIELDS})
+    return row
+
+
+def load_result_pack(
+    path: Path, *, expected_model: str, expected_run_ids: set[str]
+) -> tuple[list[dict[str, Any]], dict[str, Any]]:
+    """Read and strictly validate a sanitized result pack without extracting it."""
+    with tarfile.open(path, "r:gz") as archive:
+        manifest_members = [
+            member for member in archive.getmembers() if member.name.endswith("/manifest.json")
+        ]
+        run_members = [
+            member for member in archive.getmembers() if member.name.endswith("/runs.json")
+        ]
+        if len(manifest_members) != 1 or len(run_members) != 1:
+            raise ValueError(f"{path} must contain exactly one manifest.json and runs.json")
+        manifest_stream = archive.extractfile(manifest_members[0])
+        runs_stream = archive.extractfile(run_members[0])
+        if manifest_stream is None or runs_stream is None:
+            raise ValueError(f"Could not read required members from {path}")
+        manifest = json.load(manifest_stream)
+        packed_runs = json.load(runs_stream)
+
+    if manifest.get("models") != [expected_model]:
+        raise ValueError(f"Unexpected models in {path}: {manifest.get('models')!r}")
+    if manifest.get("n_runs") != len(packed_runs):
+        raise ValueError(f"Pack manifest cardinality does not match runs.json in {path}")
+    actual_run_ids = {str(run["run_id"]) for run in packed_runs}
+    if len(actual_run_ids) != len(packed_runs):
+        raise ValueError(f"Duplicate run IDs in {path}")
+    if actual_run_ids != expected_run_ids:
+        missing = sorted(expected_run_ids - actual_run_ids)
+        unexpected = sorted(actual_run_ids - expected_run_ids)
+        raise ValueError(
+            f"Unexpected run set in {path}: missing={missing[:3]!r}, unexpected={unexpected[:3]!r}"
+        )
+    for run in packed_runs:
+        if (
+            run.get("model") != expected_model
+            or run.get("method") != "codeact"
+            or normalize_context(run.get("context")) != "1000"
+            or run.get("status") != "succeeded"
+        ):
+            raise ValueError(f"Unexpected result-pack row {run.get('run_id')!r} in {path}")
+
+    rows = [
+        flatten_packed_run(
+            run,
+            packed_at=str(manifest["packed_at"]),
+            pack_name=path.name,
+        )
+        for run in packed_runs
+    ]
+    unscored = [row["run_id"] for row in rows if not row["score_available"]]
+    if unscored:
+        raise ValueError(f"Result pack {path} has runs without plot scores: {unscored[:3]!r}")
+    return rows, manifest
 
 
 def arm_summaries(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
@@ -332,7 +428,7 @@ def write_readme(path: Path, arms: list[dict[str, Any]], *, as_of: str) -> None:
             "## Files",
             "",
             "- `full_benchmark_records.csv`: every one of the 6,300 expected main-benchmark jobs.",
-            "- `codeact_x1000_records.csv`: the final DeepSeek CodeAct x1000 extension.",
+            "- `codeact_x1000_records.csv`: the final DeepSeek and Gemini CodeAct x1000 extensions.",
             "- `final_arm_records.csv`: records belonging to terminal arms.",
             "- `provisional_arm_records.csv`: records belonging to unfinished arms.",
             "- `arm_status.csv`: the finality decision used for legend asterisks.",
@@ -356,6 +452,12 @@ def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--snapshot-dir", type=Path, default=Path("artifacts/control-room/shared"))
     parser.add_argument("--output", type=Path, default=Path("paper_plots/gold/iclr2027"))
+    parser.add_argument(
+        "--gemini-x1000-pack",
+        type=Path,
+        default=DEFAULT_GEMINI_X1000_PACK,
+        help="Sanitized Gemini CodeAct x1000 result pack.",
+    )
     return parser.parse_args()
 
 
@@ -367,7 +469,20 @@ def main() -> None:
     full = campaigns[FULL_CAMPAIGN]
     x1000 = campaigns[DEEPSEEK_CODEACT_X1000_CAMPAIGN]
     rows = [flatten_run(run, scope="full_benchmark") for run in full["runs"]]
-    extension_rows = [flatten_run(run, scope="codeact_x1000") for run in x1000["runs"]]
+    deepseek_extension_rows = [flatten_run(run, scope="codeact_x1000") for run in x1000["runs"]]
+    expected_gemini_ids = {
+        str(row["run_id"]).replace("-x500-", "-x1000-")
+        for row in rows
+        if row["model"] == "gemini-3.7-flash"
+        and row["method"] == "codeact"
+        and row["context"] == "500"
+    }
+    gemini_extension_rows, gemini_pack_manifest = load_result_pack(
+        args.gemini_x1000_pack,
+        expected_model="gemini-3.7-flash",
+        expected_run_ids=expected_gemini_ids,
+    )
+    extension_rows = deepseek_extension_rows + gemini_extension_rows
     all_rows = rows + extension_rows
     arms = arm_summaries(all_rows)
     add_arm_finality(all_rows, arms)
@@ -411,6 +526,17 @@ def main() -> None:
                 "counts": x1000["counts"],
             },
         },
+        "result_packs": [
+            {
+                "path": str(args.gemini_x1000_pack),
+                "sha256": sha256_file(args.gemini_x1000_pack),
+                "bytes": args.gemini_x1000_pack.stat().st_size,
+                "packed_at": gemini_pack_manifest["packed_at"],
+                "models": gemini_pack_manifest["models"],
+                "n_runs": gemini_pack_manifest["n_runs"],
+                "rule": gemini_pack_manifest["rule"],
+            }
+        ],
         "source_snapshots": [
             {
                 "source_id": source_id,
@@ -430,9 +556,11 @@ def main() -> None:
     (output / "source_manifest.json").write_text(
         json.dumps(manifest, indent=2, sort_keys=True) + "\n"
     )
-    if len(rows) != 6300 or len(extension_rows) != 150:
+    if len(rows) != 6300 or len(deepseek_extension_rows) != 150 or len(extension_rows) != 300:
         raise ValueError(
-            f"Gold export cardinality mismatch: {len(rows)} main and {len(extension_rows)} x1000"
+            "Gold export cardinality mismatch: "
+            f"{len(rows)} main, {len(deepseek_extension_rows)} DeepSeek x1000, "
+            f"and {len(gemini_extension_rows)} Gemini x1000"
         )
     print(f"Wrote {len(rows):,} main and {len(extension_rows):,} x1000 records to {output}")
 

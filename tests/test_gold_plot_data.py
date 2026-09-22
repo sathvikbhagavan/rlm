@@ -1,10 +1,15 @@
 from __future__ import annotations
 
+import io
+import json
+import tarfile
+
 import pytest
 
 from paper_plots.scripts.build_gold_results import (
     add_arm_finality,
     arm_summaries,
+    load_result_pack,
     result_score,
     scaling_summaries,
 )
@@ -95,3 +100,48 @@ def test_success_without_a_scientific_score_is_provisional() -> None:
 
     assert summary["is_final"] is False
     assert summary["unscored_success_jobs"] == 1
+
+
+def test_external_x1000_result_pack_is_validated_and_flattened(tmp_path) -> None:
+    run_id = "full-gemini-3.7-flash-tier4-task15-codeact-x1000-r01"
+    manifest = {
+        "packed_at": "2026-09-22T13:42:48+00:00",
+        "models": ["gemini-3.7-flash"],
+        "n_runs": 1,
+        "rule": "test pack",
+    }
+    runs = [
+        {
+            "run_id": run_id,
+            "model": "gemini-3.7-flash",
+            "tier": "4",
+            "task": "15",
+            "method": "codeact",
+            "context": "1000",
+            "repetition": "01",
+            "status": "succeeded",
+            "attempt": 2,
+            "metrics.results.macro_f1": 0.1,
+            "metrics.results.macro_reaction_f1": 0.75,
+            "metrics.total_tokens": 123,
+        }
+    ]
+    archive_path = tmp_path / "results.tgz"
+    with tarfile.open(archive_path, "w:gz") as archive:
+        for name, payload in (("manifest.json", manifest), ("runs.json", runs)):
+            data = json.dumps(payload).encode()
+            info = tarfile.TarInfo(f"pack/{name}")
+            info.size = len(data)
+            archive.addfile(info, io.BytesIO(data))
+
+    rows, loaded_manifest = load_result_pack(
+        archive_path,
+        expected_model="gemini-3.7-flash",
+        expected_run_ids={run_id},
+    )
+
+    assert loaded_manifest == manifest
+    assert rows[0]["task"] == "tier4/task15"
+    assert rows[0]["score_name"] == "macro_reaction_f1"
+    assert rows[0]["f1"] == 0.75
+    assert rows[0]["total_tokens"] == 123
