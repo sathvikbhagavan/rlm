@@ -141,8 +141,7 @@ def efficiency_figure(
     for axis in axes[2:]:
         axis.set_xticks(range(len(contexts)), ("100", "500", "1000", "Full"))
         axis.set_xlabel("Context size (reactions)")
-    for axis in axes[::2]:
-        axis.set_ylabel(ylabel)
+    fig.supylabel(ylabel, x=0.012, fontsize=8)
 
     provisional_methods = {
         method: any(row["method"] == method and not as_bool(row["is_final"]) for row in rows)
