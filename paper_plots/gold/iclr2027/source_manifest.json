@@ -1,5 +1,5 @@
 {
-  "as_of": "2026-09-22T15:05:59.351833+00:00",
+  "as_of": "2026-09-22T15:19:52.014577+00:00",
   "campaigns": {
     "iclr2027-deepseek-codeact-x1000-v1": {
       "counts": {
@@ -13,26 +13,26 @@
     },
     "iclr2027-six-model-full-v34": {
       "counts": {
-        "failed": 92,
+        "failed": 90,
         "pending": 389,
-        "running": 7,
+        "running": 6,
         "stale": 1,
-        "succeeded": 5811
+        "succeeded": 5814
       },
       "definition_sha256": "07d10a000e115a60cc66011b2fea3503af2499aec1c5df40a441375abb804136"
     }
   },
-  "generated_at": "2026-09-22T15:17:44.559320+00:00",
+  "generated_at": "2026-09-22T15:25:23.657137+00:00",
   "gold_files": [
     {
-      "bytes": 1893,
+      "bytes": 2054,
       "path": "README.md",
-      "sha256": "fa74c1ee88a62a98a586da9b455816d95fd63dc1291f425deeae9365b6c6f741"
+      "sha256": "3856f47e2175a70a69337e7649a88299a6e010ccb0cd73cdd369244c253870b0"
     },
     {
       "bytes": 2281,
       "path": "arm_status.csv",
-      "sha256": "3f216826e4199ebd09638e947768ca0f2a9cf49e278cf3628e400cb3510782c8"
+      "sha256": "2ea2fb256889fe4adce219df48931eb6f9d02fce98a5e1b858ad88399482b42b"
     },
     {
       "bytes": 115122,
@@ -45,27 +45,27 @@
       "sha256": "2b836ace0724ef42ccb95b9cd985aff4fb960fe5024e2f9d2afdbbe98e7abcf3"
     },
     {
-      "bytes": 2258728,
+      "bytes": 2259333,
       "path": "full_benchmark_records.csv",
-      "sha256": "1064e8afa880387e98a7c3817ea41ea4c1e0492366b89ca4fa215b372a33262f"
+      "sha256": "f5441cc9b7e782dd56ce15c0b4180fba555e83c72d800b012b45e668688410a1"
     },
     {
-      "bytes": 481628,
+      "bytes": 482233,
       "path": "provisional_arm_records.csv",
-      "sha256": "d5f8730306ba060a8c4f2eb1068b6188e22adf7db60790ef00765640fb4c3668"
+      "sha256": "a9c908ee8e8350bf3c33f6dc1014248ad13338f1edda1afae8fe8f38be5f2d35"
     },
     {
-      "bytes": 23710,
+      "bytes": 30977,
       "path": "tier_scaling.csv",
-      "sha256": "74a6904e8e028995582942a1ce191bee7b26f88e292ac9cc260f8e7ab161415f"
+      "sha256": "866fd6133ed943c2eda69b35a1ed1f6491333b9bb6ff3b95fe9df3666b8f92f1"
     },
     {
-      "bytes": 5467,
+      "bytes": 5475,
       "path": "tier_scaling_across_models.csv",
-      "sha256": "125a5bdd52c3ab4da2a4c3c32d43eb6567bcc8841358822a65bb1225e60115a7"
+      "sha256": "5bf94d2aee22cc3475658f674614417e0a10d0ee56a25d7be07cc4762e1cca0e"
     }
   ],
-  "repository_commit": "d0dbe5220851c259d6a62d12de58161e0aa0f247",
+  "repository_commit": "f77011e77fd9277ccc036b4da298e9e246ff979c",
   "result_packs": [
     {
       "bytes": 51628,
@@ -159,45 +159,45 @@
       "source_id": "jed-preflight-v34"
     },
     {
-      "generated_at": "2026-09-22T15:03:08.132273+00:00",
+      "generated_at": "2026-09-22T15:18:14.445904+00:00",
       "path": "artifacts/control-room/shared/jed13-final-credit-deepseek-codeact-repair-r01.json",
-      "sha256": "0d0640f14b6d4d09c06347262a3a2cacda6100238157649fee708bda5d8fbf3f",
-      "snapshot_id": "a7746f05c80e34950e74d1444f520fe72ac243903469b36b7d35d712196bfb01",
+      "sha256": "3774e459a435c45ffc1b83e3694144fbd4eea88edac94f62b4b2037a3d84032e",
+      "snapshot_id": "edfb526e1aab046154a99c4f8e3d10fbdc1e9b1188c2fe8d7a011c57f60aa9de",
       "source_id": "jed13-final-credit-deepseek-codeact-repair-r01"
     },
     {
-      "generated_at": "2026-09-22T14:42:58.062442+00:00",
+      "generated_at": "2026-09-22T15:08:06.981422+00:00",
       "path": "artifacts/control-room/shared/jed13-final-credit-deepseek-codeact-repair-r02.json",
-      "sha256": "0c2f08b80b269226ac252a5aa51b30dda5f99f4d105adb18e583091eeb6d72f2",
-      "snapshot_id": "e640123d767395d7f458202fb4fa1750460369d944ddf015dff2f976eab3ccea",
+      "sha256": "ff6bd203b1545e8825a2cfbb709e834adb3c048ec88340c003b67dce14b67776",
+      "snapshot_id": "bacdfeef8c843e388755bb095a83760565842566ac90b9142318d4edc9334140",
       "source_id": "jed13-final-credit-deepseek-codeact-repair-r02"
     },
     {
-      "generated_at": "2026-09-22T14:38:01.364670+00:00",
+      "generated_at": "2026-09-22T15:08:08.556399+00:00",
       "path": "artifacts/control-room/shared/jed13-final-credit-deepseek-codeact-repair-r03.json",
-      "sha256": "9a1af87fcc1115daa5cce6af4f9ea883c4053f11875f1be9e97c341300609747",
-      "snapshot_id": "210abb9797b1b605cfb9f334090f4e7c22d432dbdc93042544ef46fd205cfc91",
+      "sha256": "a29e379708a8572a7d76f6cc9d4882cba27d6b12f7cd0c9fe9715c431ad5cd9d",
+      "snapshot_id": "4ab6440a55d0a085f22e093474d7d3e6f49f7408888137df3be999c208a86959",
       "source_id": "jed13-final-credit-deepseek-codeact-repair-r03"
     },
     {
-      "generated_at": "2026-09-22T14:43:01.523193+00:00",
+      "generated_at": "2026-09-22T15:13:07.062129+00:00",
       "path": "artifacts/control-room/shared/jed13-final-credit-deepseek-codeact-repair-r04.json",
-      "sha256": "9b89b3703227ce732a6481b911177d9bc84c1dffb93f9d4056c54e2e0a5117bf",
-      "snapshot_id": "3a492cd6b2ed4df4faa2f5c1ea6582ac680458785ddfcd0b245589c0000a9ae8",
+      "sha256": "101cd3d902ce6a6dabe850dd3ecdae5713edd9036a00cb4ac6c03848ba2c83db",
+      "snapshot_id": "7c26c920d6572bfad50d521b43fdc9566dc5503e6e57c1f3d77e65ef051dc0cb",
       "source_id": "jed13-final-credit-deepseek-codeact-repair-r04"
     },
     {
-      "generated_at": "2026-09-22T14:42:32.465727+00:00",
+      "generated_at": "2026-09-22T15:18:10.059104+00:00",
       "path": "artifacts/control-room/shared/jed13-final-credit-deepseek-rlm-accelerated-r01.json",
-      "sha256": "7e61cef154f195d7e781d21009e5c70839aaaa63e271d720ac123b66088f505d",
-      "snapshot_id": "33eaddf1a0e293b0351d7d3e02378e243ecbaef209bc1e74a1999dc427e6df86",
+      "sha256": "4fd0b139c7be87f1b3cf9a43110e2d161ed65d5fb52784bdb748d3b78a0d1a71",
+      "snapshot_id": "60a496cc4df599005302c1fb409ace9cdaa9838b14ea24d0b6ff623e4a66bc74",
       "source_id": "jed13-final-credit-deepseek-rlm-accelerated-r01"
     },
     {
-      "generated_at": "2026-09-22T14:42:32.464987+00:00",
+      "generated_at": "2026-09-22T15:13:04.611252+00:00",
       "path": "artifacts/control-room/shared/jed13-final-credit-deepseek-rlm-accelerated-r02.json",
-      "sha256": "2e22930ca9e38d1aacfd3f99900076cbac6d9398124263bd41e42e51d8141b69",
-      "snapshot_id": "cfaf49eb74cd4cf12607f4fe0757acb2a7faaf5de1fdd6734c019085099727b1",
+      "sha256": "d4f99e1c24068f8a2e60d2ba185faadf24b722a9737618e4d03dbec21d58121c",
+      "snapshot_id": "f53a9de067b5784167c6f4d84be69938963a49b0d1dec6efdf511e5dcfea5d31",
       "source_id": "jed13-final-credit-deepseek-rlm-accelerated-r02"
     },
     {
@@ -397,24 +397,24 @@
       "source_id": "jed19-credit-deepseek-rlm-accelerated-r06"
     },
     {
-      "generated_at": "2026-09-22T14:39:30.869226+00:00",
+      "generated_at": "2026-09-22T15:09:41.826553+00:00",
       "path": "artifacts/control-room/shared/jed19-credit-glm-openrouter-rlm-r01.json",
-      "sha256": "451ec22d2065ccdbdd9aa56772a6511cd99c2abdaa0fa2113a1d40c0a50c5535",
-      "snapshot_id": "7dfd98589747d8ae5da878244a6b495022bff1de4356ba0a89ee49faa4c44a93",
+      "sha256": "c68ccbbf8a4f1e768108b710f745f2f5386a78a77e9cd8ba79c353d18c6502d9",
+      "snapshot_id": "30410ed30014fbf73f71dc864976d975f0f60122a9e165e19f42845dbb965775",
       "source_id": "jed19-credit-glm-openrouter-rlm-r01"
     },
     {
-      "generated_at": "2026-09-22T14:44:32.058881+00:00",
+      "generated_at": "2026-09-22T15:14:48.027505+00:00",
       "path": "artifacts/control-room/shared/jed19-credit-glm-openrouter-rlm-r02.json",
-      "sha256": "2f8f1f9923e9d38aeff65e84c7d405dfdfa40203a2f0d7b71b6b048eb9896248",
-      "snapshot_id": "abdbad198ad1b16d394b5afc4235f6dfd0204969283a7e97e633323bc7a8a2ce",
+      "sha256": "b2935b7613c90e22c0f46be574482af0eeb7838a2450e1009801f38752a49fef",
+      "snapshot_id": "257687260632ad1b74cd8d0b2f26632225c4090daca7fb09697e2ee2e6dddf63",
       "source_id": "jed19-credit-glm-openrouter-rlm-r02"
     },
     {
-      "generated_at": "2026-09-22T14:45:48.017455+00:00",
+      "generated_at": "2026-09-22T15:15:59.606363+00:00",
       "path": "artifacts/control-room/shared/jed19-credit-glm-openrouter-rlm-r03.json",
-      "sha256": "3b8649e8bddd878a24d9ef440ec231ae49b331a11c9558de22dd4752034954b4",
-      "snapshot_id": "dc817d1388c9ebc38184744944ce0f17bb7df3728c0e98fd05b0d6382780bac6",
+      "sha256": "1a782d830ea226c979dd0042e377d256d40d1a09cdae2ec50ed3b26fcf1eb499",
+      "snapshot_id": "cfbc916c10821c88e98947b83578e5cacb965f606a5f8b964a77abf1571de436",
       "source_id": "jed19-credit-glm-openrouter-rlm-r03"
     },
     {
@@ -425,17 +425,17 @@
       "source_id": "jed19-credit-glm-openrouter-rlm-r04"
     },
     {
-      "generated_at": "2026-09-22T14:40:47.181271+00:00",
+      "generated_at": "2026-09-22T15:10:59.512467+00:00",
       "path": "artifacts/control-room/shared/jed19-credit2-glm-openrouter-rlm-r01.json",
-      "sha256": "53fb44e536dd958365aafd7cca48b239efb421a058026fb9dac52f79b4c5aae2",
-      "snapshot_id": "b68e1baf3d550fb41bba21fe482ee5246226aec313f839f8da440ca16b030bcc",
+      "sha256": "51929dd0facf2545063e862003cc741b4cef900a6371f63c56a9d11543a99aec",
+      "snapshot_id": "a4973a87be7dd03c15f1b85f0f29ee7071dc4e08a96ae2178aad2f9c205ea11c",
       "source_id": "jed19-credit2-glm-openrouter-rlm-r01"
     },
     {
-      "generated_at": "2026-09-22T14:44:32.058717+00:00",
+      "generated_at": "2026-09-22T15:14:42.788141+00:00",
       "path": "artifacts/control-room/shared/jed19-credit2-glm-openrouter-rlm-r02.json",
-      "sha256": "120dcb72b75ac75b285b827853da96a498ade736e4edb79cb1b72c7cb71dcaa8",
-      "snapshot_id": "1f52afe08b22a8c3a9b49ff0d358ba36e2ce3411613fe8f354498efc48443c87",
+      "sha256": "77bfe21ee4d14aaf373ea3781324cc1c700df3d0761c58103e2fc6899081a284",
+      "snapshot_id": "191f9de3af6f278a80eb1ae38afa44339302f476a67537313dfb840c93434e04",
       "source_id": "jed19-credit2-glm-openrouter-rlm-r02"
     },
     {
@@ -495,10 +495,10 @@
       "source_id": "jed19-overnight-deepseek-rlm-accelerated-r04"
     },
     {
-      "generated_at": "2026-09-22T14:36:07.633946+00:00",
+      "generated_at": "2026-09-22T15:06:20.929422+00:00",
       "path": "artifacts/control-room/shared/jed19-overnight-deepseek-rlm-accelerated-r06.json",
-      "sha256": "c2930d8fcb9c8495ea7f4f55eada3833b90a5766d422c2b85bf720cf6863e885",
-      "snapshot_id": "ba978f6f3e1876008a2e9566e6b28ce1e985b8896a4c0360808c60d19e8401fb",
+      "sha256": "597bac4caff099a2a356982f03a71ecb36564595aef31a8a26d74f54eb00b5b3",
+      "snapshot_id": "c4a684c64c9e112be634a5c5639c04fbc1e697913ec6075b67fbc563459b4299",
       "source_id": "jed19-overnight-deepseek-rlm-accelerated-r06"
     },
     {
@@ -614,10 +614,10 @@
       "source_id": "jed4c-deepseek-codeact-x1000-s02"
     },
     {
-      "generated_at": "2026-09-22T14:37:58.470968+00:00",
+      "generated_at": "2026-09-22T15:08:10.049797+00:00",
       "path": "artifacts/control-room/shared/jed4c-deepseek-codeact-x1000-s03.json",
-      "sha256": "b5badc4410814af2d94bc27150d608ed2b9e83fb4dbad614a3fa3eeb17ecffd9",
-      "snapshot_id": "1c22ad556e12ffd1bb41a5f20f4445587dd9d146b4a0801a207e1bed26bc7c3f",
+      "sha256": "1e686c2e39ac08c288a54c1d811d40c2be42122c38fe7eaf16f6bb113ba63174",
+      "snapshot_id": "358a4e245061599dac0c0a8918f08ce2c62965bfc306d935baedc238d69b8b9b",
       "source_id": "jed4c-deepseek-codeact-x1000-s03"
     },
     {
@@ -642,10 +642,10 @@
       "source_id": "jed4c-deepseek-codeact-x1000-s06"
     },
     {
-      "generated_at": "2026-09-22T14:42:59.697493+00:00",
+      "generated_at": "2026-09-22T15:13:10.878254+00:00",
       "path": "artifacts/control-room/shared/jed4c-deepseek-codeact-x1000-s07.json",
-      "sha256": "6b74992f9c8a7fdc5e88f989e8be0e0d54332a7964e40ba98b582d90fde54e72",
-      "snapshot_id": "d86e8f7b3e84428f14dfae45dfd6a3e4dcfb37c9c5af4a109e0357cd48228fa6",
+      "sha256": "b7e732609beb9ee33f064ab5b058662f47cf7aaefd7c4d53a9a39bc0018c69f9",
+      "snapshot_id": "399a9661def2065931b8fb23b5dbf1c7308416a757f6f6fef4f9491a90b42792",
       "source_id": "jed4c-deepseek-codeact-x1000-s07"
     },
     {
@@ -705,10 +705,10 @@
       "source_id": "jed4c-deepseek-codeact-x1000-s15"
     },
     {
-      "generated_at": "2026-09-22T14:37:58.470673+00:00",
+      "generated_at": "2026-09-22T15:08:10.049689+00:00",
       "path": "artifacts/control-room/shared/jed4c-deepseek-codeact-x1000-s16.json",
-      "sha256": "b04ec21021612ec54ab79041449bbe96eee81baf8c9ca6cda6b830f95ad8035f",
-      "snapshot_id": "d4b00648b0dcbd90a9e06f108046f40e9cd576ff513ef72a8f4040461ec68add",
+      "sha256": "4111404022ca037d8315ba91e739f842037dae405464073dc69f6e06d48a642a",
+      "snapshot_id": "ad877430408440543be7e253baa1eb0f406f2e21198dba5f1174fdb3132f22ff",
       "source_id": "jed4c-deepseek-codeact-x1000-s16"
     },
     {
@@ -887,10 +887,10 @@
       "source_id": "liacpc14-glm-llm-v28-archive-exact"
     },
     {
-      "generated_at": "2026-09-22T15:04:40.900597+00:00",
+      "generated_at": "2026-09-22T15:19:52.014577+00:00",
       "path": "artifacts/control-room/shared/liacpc14-gpt-direct-docker-v1-13b56467.json",
-      "sha256": "7e139e51779091172a7ca89519b131ef889043e7e864a8ccc51c220317cc1827",
-      "snapshot_id": "cc9edb296df96646e9a40c23e0476c3761ebccd67f13835b778e35788bf171c8",
+      "sha256": "bdd3e25888a9e49c1e4e774547658dd3e2a733e2d514f7506c33da5b09db3aa1",
+      "snapshot_id": "88f40ac07dd3147cd7cca895dfe05fe69f46ef138a7aa5e94b9ffa72ee7e63ba",
       "source_id": "liacpc14-gpt-direct-docker-v1-13b56467"
     },
     {

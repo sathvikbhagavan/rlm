@@ -1,17 +1,18 @@
 # Gold ICLR 2027 plotting results
 
-Frozen from the shared experiment dashboard at `2026-09-22T15:05:59.351833+00:00`.
+Frozen from the shared experiment dashboard at `2026-09-22T15:19:52.014577+00:00`.
 
 Gold means that the plotting input is frozen, auditable, and provenance-recorded. It does not mean every experiment arm is finished. `arm_status.csv` and the `arm_final` columns distinguish terminal arms from provisional ones.
 
 The CSV files contain sanitized metrics sufficient to regenerate paper plots; bulky raw trajectories remain in their original experiment artifact stores.
+All plotting aggregates score terminal failed jobs as zero. Running, stale, and pending jobs are excluded from the current score and keep their arm provisional.
 
 ## Main benchmark arms
 
 | Model | LLM | CodeAct | RLM |
 | --- | ---: | ---: | ---: |
 | Qwen 3.5 | 300/300 final | 300/300 final | 449/450 final |
-| DeepSeek V4 Flash | 300/300 final | 268/300 provisional | 408/450 provisional |
+| DeepSeek V4 Flash | 300/300 final | 269/300 provisional | 410/450 provisional |
 | GLM 5.2 | 300/300 final | 0/300 provisional | 344/450 provisional |
 | Gemini 3.7 Flash | 300/300 final | 300/300 final | 442/450 final |
 | GPT-5 mini | 300/300 final | 300/300 final | 450/450 final |

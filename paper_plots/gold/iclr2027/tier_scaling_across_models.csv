@@ -26,7 +26,7 @@ rlm,full,3,0.5684865234091264,0.19370686582420563,0.09685343291210281,4,6,qwen3.
 llm,100,4,0.26089696993551553,0.29932625331171564,0.12219943120546113,6,6,qwen3.5;deepseek-v4-flash;glm-5.2;gemini-3.7-flash;gpt-5-mini;claude-haiku-4.5,,,True
 llm,500,4,0.15142286045379263,0.320982044086115,0.1310403707677528,6,6,qwen3.5;deepseek-v4-flash;glm-5.2;gemini-3.7-flash;gpt-5-mini;claude-haiku-4.5,,,True
 codeact,100,4,0.571657334241565,0.23662367169156476,0.11831183584578238,4,6,qwen3.5;gemini-3.7-flash;gpt-5-mini;claude-haiku-4.5,deepseek-v4-flash;glm-5.2,deepseek-v4-flash,False
-codeact,500,4,0.5691165178425682,0.15926910024451996,0.07963455012225998,4,6,qwen3.5;gemini-3.7-flash;gpt-5-mini;claude-haiku-4.5,deepseek-v4-flash;glm-5.2,deepseek-v4-flash,False
+codeact,500,4,0.5691165178425682,0.15926910024451996,0.07963455012225998,4,6,qwen3.5;gemini-3.7-flash;gpt-5-mini;claude-haiku-4.5,deepseek-v4-flash;glm-5.2,deepseek-v4-flash;glm-5.2,False
 codeact,1000,4,0.40645124716553294,0.2950190591783166,0.20860997732426304,2,3,deepseek-v4-flash;gemini-3.7-flash,gpt-5-mini,,False
 rlm,100,4,0.6161452277880849,0.21716243482842207,0.10858121741421103,4,6,qwen3.5;gemini-3.7-flash;gpt-5-mini;claude-haiku-4.5,deepseek-v4-flash;glm-5.2,deepseek-v4-flash;glm-5.2,False
 rlm,500,4,0.6068197278911566,0.21576159361999864,0.10788079680999932,4,6,qwen3.5;gemini-3.7-flash;gpt-5-mini;claude-haiku-4.5,deepseek-v4-flash;glm-5.2,deepseek-v4-flash;glm-5.2,False
