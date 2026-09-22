@@ -674,6 +674,8 @@ def write_readme(path: Path, arms: list[dict[str, Any]], *, as_of: str) -> None:
             "uv run --frozen python paper_plots/scripts/build_gold_results.py",
             "uv run --with-requirements paper_plots/requirements.txt \\",
             "  python paper_plots/scripts/plot_gold_scaling_by_tier.py",
+            "uv run --with-requirements paper_plots/requirements.txt \\",
+            "  python paper_plots/scripts/plot_gold_efficiency_by_tier.py",
             "```",
             "",
         ]
