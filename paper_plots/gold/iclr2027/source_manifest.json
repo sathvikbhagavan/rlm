@@ -22,12 +22,12 @@
       "definition_sha256": "07d10a000e115a60cc66011b2fea3503af2499aec1c5df40a441375abb804136"
     }
   },
-  "generated_at": "2026-09-22T15:38:18.255428+00:00",
+  "generated_at": "2026-09-22T15:46:00.740602+00:00",
   "gold_files": [
     {
-      "bytes": 2293,
+      "bytes": 2397,
       "path": "README.md",
-      "sha256": "24dce4313f2a5d27388bcb694a252eadef34f680f317f159c425bd0d02a46a63"
+      "sha256": "1dc5cd14cd81ce48621f05423ebe3f85f19cecaf3c0e3158e10e093d1b3a8308"
     },
     {
       "bytes": 2281,
@@ -55,9 +55,9 @@
       "sha256": "d801270c475cfeee7eff303688f1a080a7e6e343d9c17c7989c4a44301b4d97f"
     },
     {
-      "bytes": 7411,
+      "bytes": 9112,
       "path": "tier_efficiency_across_models.csv",
-      "sha256": "d64cd131cef7cfafb9c2062350d0c7a77bcad75b5dade1a667f2932afcf60773"
+      "sha256": "230bd6ccbc09912df9dc8dbfcae9cccac033c529b0ae691cdd5de5767acebce4"
     },
     {
       "bytes": 18984,
@@ -75,7 +75,7 @@
       "sha256": "5bf94d2aee22cc3475658f674614417e0a10d0ee56a25d7be07cc4762e1cca0e"
     }
   ],
-  "repository_commit": "304fd8608a67ed818f913e328e5c9c6bf42ef03f",
+  "repository_commit": "0ac1605070bec93fa37b79fdb803f7e02acd1a84",
   "result_packs": [
     {
       "bytes": 51628,
@@ -155,10 +155,10 @@
       "source_id": "jed-glm-codeact-v34"
     },
     {
-      "generated_at": "2026-09-22T15:01:29.729281+00:00",
+      "generated_at": "2026-09-22T15:32:05.435314+00:00",
       "path": "artifacts/control-room/shared/jed-glm-rlm-v34.json",
-      "sha256": "d06ee2a4f9452d87d7884d6af2ac7acc00ccc01edb80f0198dd52b6ea8d28b39",
-      "snapshot_id": "1b637ba6b61000ba311cf3c4bd285c19554ed5a58ec6b3ce8dd550edc9464db6",
+      "sha256": "1de5d9b36da4d7cf421b41851fa53e04ed79a501dec6d70c1988a39670d4b272",
+      "snapshot_id": "145b340bbb548eca9e381b1893eb6aa3b2750b457fd876b0866d45b70103efa6",
       "source_id": "jed-glm-rlm-v34"
     },
     {

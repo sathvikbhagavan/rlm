@@ -28,7 +28,7 @@ All plotting aggregates score terminal failed jobs as zero. Running, stale, and 
 - `tier_scaling.csv`: the faithful four-tier plotting aggregate.
 - `tier_scaling_across_models.csv`: unweighted means and standard errors across terminal model arms; terminal failed trajectories contribute zero.
 - `tier_efficiency_by_model.csv`: recorded cost, tokens, and wall time per successfully answered trajectory for each model.
-- `tier_efficiency_across_models.csv`: unweighted efficiency means and standard errors across terminal model arms.
+- `tier_efficiency_across_models.csv`: unweighted efficiency means and standard errors across terminal model arms. Cost averages include only paid Gemini, GPT-5-mini, and Claude models; free SwissAI access is excluded.
 - `source_manifest.json`: source snapshot and file checksums.
 
 Regenerate from the repository root:
