@@ -278,6 +278,109 @@ def combined_figure(
     return fig
 
 
+def model_average_figure(rows: list[dict[str, str]]) -> plt.Figure:
+    """Plot mean tier performance with standard errors across model-level means."""
+    contexts = ("100", "500", "1000", "full")
+    positions = {context: index for index, context in enumerate(contexts)}
+    fig, axes = plt.subplots(2, 2, figsize=(7.0, 4.9), sharex=True, sharey=True)
+    axes = axes.ravel()
+
+    for tier, axis in enumerate(axes, start=1):
+        axis.axvspan(2.72, 3.28, color="#F1F3F5", zorder=0)
+        for method in METHODS:
+            subset = [row for row in rows if row["method"] == method and int(row["tier"]) == tier]
+            subset.sort(key=lambda row: positions[row["context"]])
+            if not subset:
+                continue
+            x_values = [positions[row["context"]] for row in subset]
+            y_values = [float(row["mean_f1"]) for row in subset]
+            axis.plot(x_values, y_values, color=COLORS[method], linewidth=1.65, zorder=2)
+            for x_value, y_value, row in zip(x_values, y_values, subset, strict=True):
+                final = as_bool(row["is_final"])
+                sem = float(row["model_sem"]) if row["model_sem"] else 0.0
+                axis.errorbar(
+                    [x_value],
+                    [y_value],
+                    yerr=[sem],
+                    color=COLORS[method],
+                    marker=MARKERS[method],
+                    markerfacecolor=COLORS[method] if final else "white",
+                    markersize=5.0,
+                    markeredgewidth=1.0,
+                    capsize=2.5,
+                    elinewidth=0.9,
+                    zorder=3,
+                )
+                annotation = ""
+                if not final:
+                    annotation = "*"
+                if int(row["n_models"]) < 6:
+                    annotation += f" n={row['n_models']}"
+                if annotation:
+                    axis.annotate(
+                        annotation,
+                        (x_value, y_value + sem),
+                        xytext=(3, 4),
+                        textcoords="offset points",
+                        fontsize=6.5,
+                        color=COLORS[method],
+                    )
+        axis.set_title(
+            f"({chr(96 + tier)}) Tier {tier}: {TIER_NAMES[tier]} ($n={TIER_QUESTIONS[tier]}$)",
+            loc="left",
+            pad=5,
+        )
+        axis.set_xlim(-0.18, 3.2)
+        axis.set_ylim(-0.02, 1.08)
+        axis.set_yticks(np.linspace(0, 1, 6))
+        axis.grid(axis="y", color="#D8DDE2", linewidth=0.55)
+        axis.spines[["top", "right"]].set_visible(False)
+        axis.tick_params(length=2.5, width=0.6)
+
+    for axis in axes[2:]:
+        axis.set_xticks(range(len(contexts)), ("100", "500", "1000", "Full"))
+        axis.set_xlabel("Context size (reactions)")
+    for axis in axes[::2]:
+        axis.set_ylabel("Macro F1")
+
+    provisional_methods = {
+        method: any(row["method"] == method and not as_bool(row["is_final"]) for row in rows)
+        for method in METHODS
+    }
+    handles = [
+        Line2D(
+            [0],
+            [0],
+            color=COLORS[method],
+            marker=MARKERS[method],
+            markersize=5,
+            label=("*" if provisional_methods[method] else "") + METHOD_LABELS[method],
+        )
+        for method in METHODS
+    ]
+    fig.suptitle("Mean scaling across models", y=0.99, fontsize=10, fontweight="bold")
+    fig.legend(
+        handles=handles,
+        loc="upper center",
+        ncol=3,
+        frameon=False,
+        bbox_to_anchor=(0.5, 0.947),
+        handlelength=2.2,
+    )
+    fig.text(
+        0.5,
+        0.008,
+        "Unweighted mean ± SEM across model-level means. Hollow/* points are provisional; "
+        "labels report n when fewer than six models are available.",
+        ha="center",
+        va="bottom",
+        fontsize=6.7,
+        color="#555555",
+    )
+    fig.subplots_adjust(top=0.82, bottom=0.12, hspace=0.35, wspace=0.20)
+    return fig
+
+
 def save_figure(figure: plt.Figure, output: Path, name: str) -> None:
     metadata = {
         "Creator": "RxnHaystack gold plotting pipeline",
@@ -298,6 +401,7 @@ def parse_args() -> argparse.Namespace:
 def main() -> None:
     args = parse_args()
     rows = read_csv(args.gold / "tier_scaling.csv")
+    average_rows = read_csv(args.gold / "tier_scaling_across_models.csv")
     arms = {
         (row["model"], row["method"]): row
         for row in read_csv(args.gold / "arm_status.csv")
@@ -305,10 +409,16 @@ def main() -> None:
     }
     args.output.mkdir(parents=True, exist_ok=True)
     figure_files = []
-    combined = combined_figure(rows, arms)
-    save_figure(combined, args.output, "scaling_by_tier_all_models")
-    plt.close(combined)
+    averaged = model_average_figure(average_rows)
+    save_figure(averaged, args.output, "scaling_by_tier_all_models")
+    plt.close(averaged)
     figure_files.extend(["scaling_by_tier_all_models.pdf", "scaling_by_tier_all_models.png"])
+    combined = combined_figure(rows, arms)
+    save_figure(combined, args.output, "scaling_by_tier_all_model_curves")
+    plt.close(combined)
+    figure_files.extend(
+        ["scaling_by_tier_all_model_curves.pdf", "scaling_by_tier_all_model_curves.png"]
+    )
     with PdfPages(args.output / "scaling_by_tier_individual_models.pdf") as multipage:
         for model in MODEL_ORDER:
             figure = model_figure(model, rows, arms)

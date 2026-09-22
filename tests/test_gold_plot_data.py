@@ -9,6 +9,7 @@ import pytest
 from paper_plots.scripts.build_gold_results import (
     add_arm_finality,
     arm_summaries,
+    cross_model_scaling_summaries,
     load_result_pack,
     result_score,
     scaling_summaries,
@@ -145,3 +146,67 @@ def test_external_x1000_result_pack_is_validated_and_flattened(tmp_path) -> None
     assert rows[0]["score_name"] == "macro_reaction_f1"
     assert rows[0]["f1"] == 0.75
     assert rows[0]["total_tokens"] == 123
+
+
+def test_cross_model_summary_uses_model_mean_and_standard_error() -> None:
+    rows = [
+        {
+            "model": model,
+            "method": "llm",
+            "context": "100",
+            "tier": 1,
+            "f1": f1,
+            "arm_final": True,
+        }
+        for model, f1 in zip(
+            (
+                "qwen3.5",
+                "deepseek-v4-flash",
+                "glm-5.2",
+                "gemini-3.7-flash",
+                "gpt-5-mini",
+                "claude-haiku-4.5",
+            ),
+            (0.0, 0.0, 0.0, 1.0, 1.0, 1.0),
+            strict=True,
+        )
+    ]
+
+    summary = cross_model_scaling_summaries(rows)[0]
+
+    assert summary["mean_f1"] == pytest.approx(0.5)
+    assert summary["model_std"] == pytest.approx(0.5477225575)
+    assert summary["model_sem"] == pytest.approx(0.2236067977)
+    assert summary["n_models"] == 6
+    assert summary["is_final"] is True
+
+
+def test_cross_model_summary_records_missing_and_provisional_models() -> None:
+    rows = [
+        {
+            "model": "deepseek-v4-flash",
+            "method": "codeact",
+            "context": "1000",
+            "tier": 3,
+            "f1": 0.5,
+            "arm_final": True,
+        },
+        {
+            "model": "gemini-3.7-flash",
+            "method": "codeact",
+            "context": "1000",
+            "tier": 3,
+            "f1": 0.7,
+            "arm_final": False,
+        },
+    ]
+
+    summary = cross_model_scaling_summaries(rows)[0]
+
+    assert summary["mean_f1"] == pytest.approx(0.6)
+    assert summary["model_sem"] == pytest.approx(0.1)
+    assert summary["n_models"] == 2
+    assert summary["target_n_models"] == 3
+    assert summary["missing_models"] == "gpt-5-mini"
+    assert summary["provisional_models"] == "gemini-3.7-flash"
+    assert summary["is_final"] is False

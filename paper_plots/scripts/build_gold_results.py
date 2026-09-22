@@ -7,6 +7,7 @@ import argparse
 import csv
 import hashlib
 import json
+import math
 import statistics
 import subprocess
 import tarfile
@@ -51,6 +52,16 @@ MODEL_ALIASES = {
 METHOD_ORDER = ("llm", "codeact", "rlm")
 STATUS_ORDER = ("succeeded", "running", "stale", "failed", "pending")
 CONTEXT_ORDER = {"100": 0, "500": 1, "1000": 2, "full": 3}
+EXPECTED_MODELS_BY_METHOD_CONTEXT = {
+    ("llm", "100"): frozenset(MODEL_ORDER),
+    ("llm", "500"): frozenset(MODEL_ORDER),
+    ("codeact", "100"): frozenset(MODEL_ORDER),
+    ("codeact", "500"): frozenset(MODEL_ORDER),
+    ("codeact", "1000"): frozenset({"deepseek-v4-flash", "gemini-3.7-flash", "gpt-5-mini"}),
+    ("rlm", "100"): frozenset(MODEL_ORDER),
+    ("rlm", "500"): frozenset(MODEL_ORDER),
+    ("rlm", "full"): frozenset(MODEL_ORDER),
+}
 QUESTION_COUNTS = {
     "tier1/task1": 10,
     "tier2/task2": 6,
@@ -372,6 +383,57 @@ def scaling_summaries(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
     return output
 
 
+def cross_model_scaling_summaries(
+    scaling_rows: list[dict[str, Any]],
+) -> list[dict[str, Any]]:
+    """Average model-level tier scores and quantify variation across models."""
+    grouped: dict[tuple[str, str, int], list[dict[str, Any]]] = defaultdict(list)
+    for row in scaling_rows:
+        grouped[(str(row["method"]), str(row["context"]), int(row["tier"]))].append(row)
+
+    output: list[dict[str, Any]] = []
+    for (method, context, tier), group in sorted(
+        grouped.items(),
+        key=lambda item: (
+            item[0][2],
+            METHOD_ORDER.index(item[0][0]),
+            CONTEXT_ORDER[item[0][1]],
+        ),
+    ):
+        scored = [row for row in group if row["f1"] is not None]
+        if not scored:
+            continue
+        expected_models = EXPECTED_MODELS_BY_METHOD_CONTEXT[(method, context)]
+        observed_models = {str(row["model"]) for row in scored}
+        values = [float(row["f1"]) for row in scored]
+        model_std = statistics.stdev(values) if len(values) > 1 else None
+        provisional_models = sorted(
+            str(row["model"]) for row in scored if not bool(row["arm_final"])
+        )
+        is_final = observed_models == expected_models and not provisional_models
+        output.append(
+            {
+                "method": method,
+                "context": context,
+                "tier": tier,
+                "mean_f1": statistics.fmean(values),
+                "model_std": model_std,
+                "model_sem": None if model_std is None else model_std / math.sqrt(len(values)),
+                "n_models": len(values),
+                "target_n_models": len(expected_models),
+                "included_models": ";".join(
+                    model for model in MODEL_ORDER if model in observed_models
+                ),
+                "missing_models": ";".join(
+                    model for model in MODEL_ORDER if model in expected_models - observed_models
+                ),
+                "provisional_models": ";".join(provisional_models),
+                "is_final": is_final,
+            }
+        )
+    return output
+
+
 def write_csv(path: Path, rows: list[dict[str, Any]]) -> None:
     if not rows:
         raise ValueError(f"Refusing to write empty gold table {path}")
@@ -433,6 +495,8 @@ def write_readme(path: Path, arms: list[dict[str, Any]], *, as_of: str) -> None:
             "- `provisional_arm_records.csv`: records belonging to unfinished arms.",
             "- `arm_status.csv`: the finality decision used for legend asterisks.",
             "- `tier_scaling.csv`: the faithful four-tier plotting aggregate.",
+            "- `tier_scaling_across_models.csv`: unweighted model-level means and standard "
+            "errors across models.",
             "- `source_manifest.json`: source snapshot and file checksums.",
             "",
             "Regenerate from the repository root:",
@@ -487,6 +551,7 @@ def main() -> None:
     arms = arm_summaries(all_rows)
     add_arm_finality(all_rows, arms)
     scaling = scaling_summaries(all_rows)
+    cross_model_scaling = cross_model_scaling_summaries(scaling)
 
     output = args.output
     output.mkdir(parents=True, exist_ok=True)
@@ -498,6 +563,7 @@ def main() -> None:
     )
     write_csv(output / "arm_status.csv", arms)
     write_csv(output / "tier_scaling.csv", scaling)
+    write_csv(output / "tier_scaling_across_models.csv", cross_model_scaling)
 
     as_of = max(str(snapshot["generated_at"]) for snapshot in snapshots)
     write_readme(output / "README.md", arms, as_of=as_of)
