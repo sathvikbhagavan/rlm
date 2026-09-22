@@ -6,7 +6,7 @@ full_benchmark,qwen3.5,Qwen 3.5,codeact,300,300,0,0,0,0,300,0,True,Codeact,termi
 full_benchmark,qwen3.5,Qwen 3.5,rlm,450,449,0,0,1,0,449,0,True,Rlm,terminal and scored
 full_benchmark,deepseek-v4-flash,DeepSeek V4 Flash,llm,300,300,0,0,0,0,300,0,True,LLM,terminal and scored
 full_benchmark,deepseek-v4-flash,DeepSeek V4 Flash,codeact,300,268,3,0,29,0,267,1,False,Codeact,"4 running, stale, pending, or unscored"
-full_benchmark,deepseek-v4-flash,DeepSeek V4 Flash,rlm,450,407,4,0,18,21,407,0,False,Rlm,"25 running, stale, pending, or unscored"
+full_benchmark,deepseek-v4-flash,DeepSeek V4 Flash,rlm,450,408,4,0,17,21,408,0,False,Rlm,"25 running, stale, pending, or unscored"
 full_benchmark,glm-5.2,GLM 5.2,llm,300,300,0,0,0,0,300,0,True,LLM,terminal and scored
 full_benchmark,glm-5.2,GLM 5.2,codeact,300,0,0,0,1,299,0,0,False,Codeact,"299 running, stale, pending, or unscored"
 full_benchmark,glm-5.2,GLM 5.2,rlm,450,344,0,1,36,69,344,0,False,Rlm,"70 running, stale, pending, or unscored"
