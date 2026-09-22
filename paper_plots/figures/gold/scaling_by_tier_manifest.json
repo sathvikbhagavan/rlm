@@ -14,6 +14,6 @@
     "scaling_by_tier_claude-haiku-4_5.png",
     "scaling_by_tier_all_models.pdf"
   ],
-  "gold_manifest_sha256": "96c96050f85488764ea35977e2aff875bf15b6ce4c160d6ad97754aefa17b4bf",
+  "gold_manifest_sha256": "484a619d5129ec18826506e9fbdc02fb3f9acfb5c1c8daa833abc22a68b7f201",
   "note": "A leading asterisk marks an unfinished main-benchmark arm."
 }
