@@ -364,6 +364,12 @@ def test_paid_docker_repairs_fold_into_full_benchmark(
             "full-deepseek-v4-flash-tier3-task10-codeact-x500-r03",
             "credit-retry-paid-openrouter-repair-full-deepseek-v4-flash-tier3-task10-codeact-x500-r03",
         ),
+        (
+            control_room.FULL_CAMPAIGN,
+            "iclr2027-jed-deepseek-rlm-systemexit-repair-v1",
+            "full-deepseek-v4-flash-tier4-task11-rlm-x500-r03",
+            "infra-retry-full-deepseek-v4-flash-tier4-task11-rlm-x500-r03",
+        ),
     ],
 )
 def test_execution_shards_fold_into_scientific_parent(
@@ -406,6 +412,32 @@ def test_execution_shards_fold_into_scientific_parent(
     assert repaired["status"] == "succeeded"
     assert repaired["completion_run_ids"] == [continuation_id]
     assert folded[0]["continuation_campaigns"] == [shard_name]
+
+
+def test_deepseek_x1000_shards_fold_into_one_study(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    snapshot = populated_snapshot(tmp_path, monkeypatch)
+    first = merge_snapshots([snapshot], now=datetime(2026, 9, 17, 12, 10, tzinfo=UTC))[
+        "campaigns"
+    ][0]
+    second = deepcopy(first)
+    first["name"] = "iclr2027-jed-deepseek-codeact-x1000-s01-v1"
+    second["name"] = "iclr2027-jed-deepseek-codeact-x1000-s02-v1"
+    first["runs"] = [first["runs"][0]]
+    second["runs"] = [second["runs"][1]]
+    second["sources"][0]["id"] = "jed-x1000-s02"
+
+    folded = control_room.fold_sharded_campaigns([first, second])
+
+    assert len(folded) == 1
+    assert folded[0]["name"] == control_room.DEEPSEEK_CODEACT_X1000_CAMPAIGN
+    assert len(folded[0]["runs"]) == 2
+    assert len(folded[0]["sources"]) == 2
+    assert folded[0]["shard_campaigns"] == [
+        "iclr2027-jed-deepseek-codeact-x1000-s01-v1",
+        "iclr2027-jed-deepseek-codeact-x1000-s02-v1",
+    ]
 
 
 def test_execution_state_distinguishes_paused_from_fresh_data(

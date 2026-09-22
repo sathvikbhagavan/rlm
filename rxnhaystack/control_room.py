@@ -44,6 +44,7 @@ STATUS_ORDER = ("succeeded", "running", "stale", "failed", "pending")
 FULL_CAMPAIGN = "iclr2027-six-model-full-v34"
 MATCHED_CAMPAIGN = "iclr2027-matched-cardinality-v7"
 ORACLE_CAMPAIGN = "iclr2027-oracle-predicate-v1"
+DEEPSEEK_CODEACT_X1000_CAMPAIGN = "iclr2027-deepseek-codeact-x1000-v1"
 CONTINUATION_CAMPAIGNS = {
     "iclr2027-gpt5mini-direct-openai-docker-v1",
     "iclr2027-gpt5mini-direct-openai-recovery-v1",
@@ -60,10 +61,14 @@ CONTINUATION_CAMPAIGN_PREFIXES = (
     ("iclr2027-jed-credit-retry-deepseek-rlm-accelerated-", FULL_CAMPAIGN),
     ("iclr2027-jed-deepseek-codeact-repair-", FULL_CAMPAIGN),
     ("iclr2027-jed-deepseek-rlm-accelerated-", FULL_CAMPAIGN),
+    ("iclr2027-jed-deepseek-rlm-systemexit-repair-", FULL_CAMPAIGN),
     ("iclr2027-jed-glm-openrouter-rlm-", FULL_CAMPAIGN),
     ("iclr2027-jed-gpt-matched-direct-", MATCHED_CAMPAIGN),
     ("iclr2027-jed-qwen-matched-openrouter-", MATCHED_CAMPAIGN),
     ("iclr2027-jed-oracle-predicate-", ORACLE_CAMPAIGN),
+)
+SHARDED_CAMPAIGN_PREFIXES = (
+    ("iclr2027-jed-deepseek-codeact-x1000-", DEEPSEEK_CODEACT_X1000_CAMPAIGN),
 )
 
 
@@ -611,12 +616,14 @@ def merge_snapshots(
         merge_experiment(group, stale_after_seconds=stale_after_seconds, now=reference_time)
         for _, group in sorted(by_experiment.items())
     ]
+    campaigns = fold_sharded_campaigns(campaigns)
     campaigns = fold_scientific_continuations(campaigns)
     return {"generated_at": reference_time.isoformat(), "campaigns": campaigns}
 
 
 def continuation_target_run_id(run_id: str) -> str | None:
     prefixes = (
+        ("infra-retry-", ""),
         ("credit-retry-jed-accel-paid-openrouter-", ""),
         ("credit-retry-paid-openrouter-repair-", ""),
         ("jed-accel-paid-openrouter-", ""),
@@ -650,6 +657,51 @@ def continuation_parent_campaign(campaign_name: str) -> str | None:
         if campaign_name.startswith(prefix):
             return parent
     return None
+
+
+def fold_sharded_campaigns(campaigns: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Combine disjoint execution shards that constitute one scientific study."""
+
+    hidden_names: set[str] = set()
+    combined: list[dict[str, Any]] = []
+    for prefix, target_name in SHARDED_CAMPAIGN_PREFIXES:
+        shards = [campaign for campaign in campaigns if str(campaign["name"]).startswith(prefix)]
+        if not shards:
+            continue
+        runs: dict[str, dict[str, Any]] = {}
+        sources: dict[str, dict[str, Any]] = {}
+        for shard in shards:
+            hidden_names.add(str(shard["name"]))
+            sources.update({source["id"]: source for source in shard["sources"]})
+            for run in shard["runs"]:
+                run_id = str(run["run_id"])
+                if run_id in runs:
+                    raise ControlRoomError(
+                        f"Sharded campaign {target_name!r} repeats run {run_id!r}"
+                    )
+                runs[run_id] = run
+        merged_runs = sorted(runs.values(), key=lambda item: item["run_id"])
+        counts = Counter(run["status"] for run in merged_runs)
+        definition_material = "\0".join(
+            sorted(str(shard["definition_sha256"]) for shard in shards)
+        ).encode()
+        combined.append(
+            {
+                "name": target_name,
+                "definition_sha256": hashlib.sha256(definition_material).hexdigest(),
+                "expected_cost_chf": sum(
+                    float(shard["expected_cost_chf"]) for shard in shards
+                ),
+                "counts": {status: counts[status] for status in STATUS_ORDER},
+                "duplicate_runs": sum(int(shard["duplicate_runs"]) for shard in shards),
+                "sources": sorted(sources.values(), key=lambda item: item["id"]),
+                "cells": aggregate_cells(merged_runs),
+                "metrics": aggregate_attempt_metrics(merged_runs),
+                "runs": merged_runs,
+                "shard_campaigns": sorted(str(shard["name"]) for shard in shards),
+            }
+        )
+    return [campaign for campaign in campaigns if campaign["name"] not in hidden_names] + combined
 
 
 def fold_scientific_continuations(campaigns: list[dict[str, Any]]) -> list[dict[str, Any]]:
