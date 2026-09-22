@@ -32,6 +32,7 @@ MODEL_ORDER = (
     "gpt-5-mini",
     "claude-haiku-4.5",
 )
+PAID_MODELS = frozenset({"gemini-3.7-flash", "gpt-5-mini", "claude-haiku-4.5"})
 MODEL_LABELS = {
     "qwen3.5": "Qwen 3.5",
     "deepseek-v4-flash": "DeepSeek V4 Flash",
@@ -512,11 +513,7 @@ def cross_model_efficiency_summaries(
     grouped: dict[tuple[str, str, int], list[dict[str, Any]]] = defaultdict(list)
     for row in model_rows:
         grouped[(str(row["method"]), str(row["context"]), int(row["tier"]))].append(row)
-    metrics = (
-        "cost_chf_per_trajectory",
-        "tokens_per_trajectory",
-        "wall_time_seconds_per_trajectory",
-    )
+    metrics = ("tokens_per_trajectory", "wall_time_seconds_per_trajectory")
     output: list[dict[str, Any]] = []
     for (method, context, tier), group in sorted(
         grouped.items(),
@@ -557,6 +554,43 @@ def cross_model_efficiency_summaries(
             row_out[f"minimum_{metric}_coverage"] = min(
                 float(row[f"{metric}_coverage"]) for row in eligible
             )
+
+        expected_paid_models = expected_models & PAID_MODELS
+        paid_eligible = [
+            row
+            for row in group
+            if bool(row["arm_final"])
+            and str(row["model"]) in PAID_MODELS
+            and row["cost_chf_per_trajectory"] is not None
+        ]
+        observed_paid_models = {str(row["model"]) for row in paid_eligible}
+        paid_values = [float(row["cost_chf_per_trajectory"]) for row in paid_eligible]
+        paid_std = statistics.stdev(paid_values) if len(paid_values) > 1 else None
+        row_out.update(
+            {
+                "mean_cost_chf_per_trajectory": statistics.fmean(paid_values)
+                if paid_values
+                else None,
+                "sem_cost_chf_per_trajectory": None
+                if paid_std is None
+                else paid_std / math.sqrt(len(paid_values)),
+                "minimum_cost_chf_per_trajectory_coverage": min(
+                    (float(row["cost_chf_per_trajectory_coverage"]) for row in paid_eligible),
+                    default=0.0,
+                ),
+                "n_paid_models": len(paid_eligible),
+                "target_n_paid_models": len(expected_paid_models),
+                "included_paid_models": ";".join(
+                    model for model in MODEL_ORDER if model in observed_paid_models
+                ),
+                "missing_paid_models": ";".join(
+                    model
+                    for model in MODEL_ORDER
+                    if model in expected_paid_models - observed_paid_models
+                ),
+                "paid_cost_is_final": observed_paid_models == expected_paid_models,
+            }
+        )
         output.append(row_out)
     return output
 
@@ -629,7 +663,8 @@ def write_readme(path: Path, arms: list[dict[str, Any]], *, as_of: str) -> None:
             "- `tier_efficiency_by_model.csv`: recorded cost, tokens, and wall time per "
             "successfully answered trajectory for each model.",
             "- `tier_efficiency_across_models.csv`: unweighted efficiency means and standard "
-            "errors across terminal model arms.",
+            "errors across terminal model arms. Cost averages include only paid Gemini, "
+            "GPT-5-mini, and Claude models; free SwissAI access is excluded.",
             "- `source_manifest.json`: source snapshot and file checksums.",
             "",
             "Regenerate from the repository root:",

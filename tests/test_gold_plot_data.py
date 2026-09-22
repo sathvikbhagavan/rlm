@@ -9,6 +9,7 @@ import pytest
 from paper_plots.scripts.build_gold_results import (
     add_arm_finality,
     arm_summaries,
+    cross_model_efficiency_summaries,
     cross_model_scaling_summaries,
     load_result_pack,
     result_score,
@@ -300,3 +301,35 @@ def test_tier_efficiency_is_normalized_per_successful_trajectory() -> None:
     assert summary["wall_time_seconds_per_trajectory"] == 30.0
     assert summary["failed_jobs"] == 1
     assert summary["cost_chf_per_trajectory_coverage"] == 1.0
+
+
+def test_cross_model_cost_average_excludes_free_models() -> None:
+    rows = []
+    for model, cost in (
+        ("qwen3.5", 0.0),
+        ("gemini-3.7-flash", 2.0),
+        ("gpt-5-mini", 4.0),
+        ("claude-haiku-4.5", 6.0),
+    ):
+        rows.append(
+            {
+                "model": model,
+                "method": "llm",
+                "context": "100",
+                "tier": 1,
+                "arm_final": True,
+                "cost_chf_per_trajectory": cost,
+                "cost_chf_per_trajectory_coverage": 1.0,
+                "tokens_per_trajectory": 100.0,
+                "tokens_per_trajectory_coverage": 1.0,
+                "wall_time_seconds_per_trajectory": 10.0,
+                "wall_time_seconds_per_trajectory_coverage": 1.0,
+            }
+        )
+
+    summary = cross_model_efficiency_summaries(rows)[0]
+
+    assert summary["mean_cost_chf_per_trajectory"] == 4.0
+    assert summary["n_paid_models"] == 3
+    assert summary["included_paid_models"] == ("gemini-3.7-flash;gpt-5-mini;claude-haiku-4.5")
+    assert summary["n_models"] == 4

@@ -28,20 +28,32 @@ METRICS = {
     "cost": {
         "column": "cost_chf_per_trajectory",
         "ylabel": "Recorded cost per answered trajectory (CHF)",
-        "title": "Mean API cost across models",
+        "title": "Mean recorded billed cost across paid models",
         "filename": "cost_by_tier_across_models",
+        "n_column": "n_paid_models",
+        "final_column": "paid_cost_is_final",
+        "note": "Paid models only: Gemini, GPT-5 mini, and Claude. Free SwissAI models are "
+        "excluded; failed-attempt cost metadata are unavailable.",
     },
     "tokens": {
         "column": "tokens_per_trajectory",
         "ylabel": "Recorded tokens per answered trajectory",
         "title": "Mean token use across models",
         "filename": "tokens_by_tier_across_models",
+        "n_column": "n_models",
+        "final_column": "is_final",
+        "note": "Unweighted mean ± SEM across terminal model arms. Accounting covers answered "
+        "trajectories; failed-attempt token metadata are unavailable.",
     },
     "wall_time": {
         "column": "wall_time_seconds_per_trajectory",
         "ylabel": "Wall time per answered trajectory (s)",
         "title": "Mean answer time across models",
         "filename": "wall_time_by_tier_across_models",
+        "n_column": "n_models",
+        "final_column": "is_final",
+        "note": "Unweighted mean ± SEM across terminal model arms. Wall time covers answered "
+        "trajectories.",
     },
 }
 
@@ -75,7 +87,14 @@ def as_bool(value: str) -> bool:
 
 
 def efficiency_figure(
-    rows: list[dict[str, str]], *, column: str, ylabel: str, title: str
+    rows: list[dict[str, str]],
+    *,
+    column: str,
+    ylabel: str,
+    title: str,
+    n_column: str,
+    final_column: str,
+    note: str,
 ) -> plt.Figure:
     contexts = ("100", "500", "1000", "full")
     positions = {context: index for index, context in enumerate(contexts)}
@@ -104,7 +123,7 @@ def efficiency_figure(
             for x_value, y_value, row in zip(x_values, y_values, subset, strict=True):
                 sem = float(row[sem_column]) if row[sem_column] else 0.0
                 lower_error = min(sem, y_value * 0.95)
-                final = as_bool(row["is_final"])
+                final = as_bool(row[final_column])
                 axis.errorbar(
                     [x_value],
                     [y_value],
@@ -120,7 +139,7 @@ def efficiency_figure(
                 )
                 if not final:
                     axis.annotate(
-                        f"* n={row['n_models']}",
+                        f"* n={row[n_column]}",
                         (x_value, y_value + sem),
                         xytext=(3, 4),
                         textcoords="offset points",
@@ -144,7 +163,7 @@ def efficiency_figure(
     fig.supylabel(ylabel, x=0.012, fontsize=8)
 
     provisional_methods = {
-        method: any(row["method"] == method and not as_bool(row["is_final"]) for row in rows)
+        method: any(row["method"] == method and not as_bool(row[final_column]) for row in rows)
         for method in METHODS
     }
     handles = [
@@ -170,8 +189,7 @@ def efficiency_figure(
     fig.text(
         0.5,
         0.008,
-        "Unweighted mean ± SEM across terminal model arms. Resource accounting covers answered "
-        "trajectories; failed-attempt token/cost metadata are unavailable.",
+        note,
         ha="center",
         va="bottom",
         fontsize=6.6,
@@ -209,6 +227,9 @@ def main() -> None:
             column=specification["column"],
             ylabel=specification["ylabel"],
             title=specification["title"],
+            n_column=specification["n_column"],
+            final_column=specification["final_column"],
+            note=specification["note"],
         )
         save_figure(figure, args.output, specification["filename"])
         plt.close(figure)
