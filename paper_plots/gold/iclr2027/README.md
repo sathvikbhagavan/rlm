@@ -1,6 +1,6 @@
 # Gold ICLR 2027 plotting results
 
-Frozen from the shared experiment dashboard at `2026-09-22T15:33:54.045718+00:00`.
+Frozen from the shared experiment dashboard at `2026-09-22T15:47:58.269435+00:00`.
 
 Gold means that the plotting input is frozen, auditable, and provenance-recorded. It does not mean every experiment arm is finished. `arm_status.csv` and the `arm_final` columns distinguish terminal arms from provisional ones.
 
@@ -27,7 +27,7 @@ All plotting aggregates score terminal failed jobs as zero. Running, stale, and 
 - `arm_status.csv`: the finality decision used for legend asterisks.
 - `tier_scaling.csv`: the faithful four-tier plotting aggregate.
 - `tier_scaling_across_models.csv`: unweighted means and standard errors across terminal model arms; terminal failed trajectories contribute zero.
-- `tier_efficiency_by_model.csv`: recorded cost, tokens, and wall time per successfully answered trajectory for each model.
+- `tier_efficiency_by_model.csv`: recorded cost, tokens, and wall time per successfully answered trajectory for each model. Failed jobs do not enter resource averages.
 - `tier_efficiency_across_models.csv`: unweighted efficiency means and standard errors across terminal model arms. Cost averages include only paid Gemini, GPT-5-mini, and Claude models; free SwissAI access is excluded.
 - `source_manifest.json`: source snapshot and file checksums.
 

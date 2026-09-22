@@ -1,5 +1,5 @@
 {
-  "as_of": "2026-09-22T15:33:54.045718+00:00",
+  "as_of": "2026-09-22T15:47:58.269435+00:00",
   "campaigns": {
     "iclr2027-deepseek-codeact-x1000-v1": {
       "counts": {
@@ -22,12 +22,12 @@
       "definition_sha256": "07d10a000e115a60cc66011b2fea3503af2499aec1c5df40a441375abb804136"
     }
   },
-  "generated_at": "2026-09-22T15:46:00.740602+00:00",
+  "generated_at": "2026-09-22T15:49:51.448251+00:00",
   "gold_files": [
     {
-      "bytes": 2397,
+      "bytes": 2441,
       "path": "README.md",
-      "sha256": "1dc5cd14cd81ce48621f05423ebe3f85f19cecaf3c0e3158e10e093d1b3a8308"
+      "sha256": "30d8ade89c2d5200b4d276a658089bc2fb74a118f254a39ec2e7e505183e58b0"
     },
     {
       "bytes": 2281,
@@ -75,7 +75,7 @@
       "sha256": "5bf94d2aee22cc3475658f674614417e0a10d0ee56a25d7be07cc4762e1cca0e"
     }
   ],
-  "repository_commit": "0ac1605070bec93fa37b79fdb803f7e02acd1a84",
+  "repository_commit": "2d69912dbca2e5c9add7747378a7eb2ba2a087ee",
   "result_packs": [
     {
       "bytes": 51628,
@@ -190,10 +190,10 @@
       "source_id": "jed13-final-credit-deepseek-codeact-repair-r03"
     },
     {
-      "generated_at": "2026-09-22T15:13:07.062129+00:00",
+      "generated_at": "2026-09-22T15:43:15.983602+00:00",
       "path": "artifacts/control-room/shared/jed13-final-credit-deepseek-codeact-repair-r04.json",
-      "sha256": "101cd3d902ce6a6dabe850dd3ecdae5713edd9036a00cb4ac6c03848ba2c83db",
-      "snapshot_id": "7c26c920d6572bfad50d521b43fdc9566dc5503e6e57c1f3d77e65ef051dc0cb",
+      "sha256": "72e3bed037f19ed6bfab0e5fab2670f91cdbef6b1c08d98130c197afc1798c32",
+      "snapshot_id": "53633c24c0285a7c6346591386bfa73c9c85f2c7b0fd38d48f3c6faafebaafad",
       "source_id": "jed13-final-credit-deepseek-codeact-repair-r04"
     },
     {
@@ -204,10 +204,10 @@
       "source_id": "jed13-final-credit-deepseek-rlm-accelerated-r01"
     },
     {
-      "generated_at": "2026-09-22T15:13:04.611252+00:00",
+      "generated_at": "2026-09-22T15:43:15.981400+00:00",
       "path": "artifacts/control-room/shared/jed13-final-credit-deepseek-rlm-accelerated-r02.json",
-      "sha256": "d4f99e1c24068f8a2e60d2ba185faadf24b722a9737618e4d03dbec21d58121c",
-      "snapshot_id": "f53a9de067b5784167c6f4d84be69938963a49b0d1dec6efdf511e5dcfea5d31",
+      "sha256": "c008abe4196d3584fe228db7d631b3e2cbdbd3d1775a8843f5a2e2456f54dd19",
+      "snapshot_id": "f0bf828c0b38f0aefabd3109fdfa8b80fb34c16031b113467d00ce33dc20a5ad",
       "source_id": "jed13-final-credit-deepseek-rlm-accelerated-r02"
     },
     {
@@ -414,17 +414,17 @@
       "source_id": "jed19-credit-glm-openrouter-rlm-r01"
     },
     {
-      "generated_at": "2026-09-22T15:14:48.027505+00:00",
+      "generated_at": "2026-09-22T15:45:43.615376+00:00",
       "path": "artifacts/control-room/shared/jed19-credit-glm-openrouter-rlm-r02.json",
-      "sha256": "b2935b7613c90e22c0f46be574482af0eeb7838a2450e1009801f38752a49fef",
-      "snapshot_id": "257687260632ad1b74cd8d0b2f26632225c4090daca7fb09697e2ee2e6dddf63",
+      "sha256": "da225dba2a2e5dd86dc4bcb753bf224399a04723c641ac529b9fdea7804c142b",
+      "snapshot_id": "e093540bd98af381e8d47460ae2926c4b3ffb79d43eb7606d4f3f24d348847be",
       "source_id": "jed19-credit-glm-openrouter-rlm-r02"
     },
     {
-      "generated_at": "2026-09-22T15:15:59.606363+00:00",
+      "generated_at": "2026-09-22T15:46:32.241784+00:00",
       "path": "artifacts/control-room/shared/jed19-credit-glm-openrouter-rlm-r03.json",
-      "sha256": "1a782d830ea226c979dd0042e377d256d40d1a09cdae2ec50ed3b26fcf1eb499",
-      "snapshot_id": "cfbc916c10821c88e98947b83578e5cacb965f606a5f8b964a77abf1571de436",
+      "sha256": "6adf0ce370b32e2eae4316f16f2a86f975a7e61dae755d64eb2b3a1dea5e1442",
+      "snapshot_id": "80bc9c733b58fdcfdd637e197eedc391d24c279d55bc41ee40353ea9592fe6dd",
       "source_id": "jed19-credit-glm-openrouter-rlm-r03"
     },
     {
@@ -437,15 +437,15 @@
     {
       "generated_at": "2026-09-22T15:10:59.512467+00:00",
       "path": "artifacts/control-room/shared/jed19-credit2-glm-openrouter-rlm-r01.json",
-      "sha256": "51929dd0facf2545063e862003cc741b4cef900a6371f63c56a9d11543a99aec",
+      "sha256": "42f97b743af246c834e9d2d864b73dca31df00f68d477fc895c4a4f2d6788d4b",
       "snapshot_id": "a4973a87be7dd03c15f1b85f0f29ee7071dc4e08a96ae2178aad2f9c205ea11c",
       "source_id": "jed19-credit2-glm-openrouter-rlm-r01"
     },
     {
-      "generated_at": "2026-09-22T15:14:42.788141+00:00",
+      "generated_at": "2026-09-22T15:45:43.615652+00:00",
       "path": "artifacts/control-room/shared/jed19-credit2-glm-openrouter-rlm-r02.json",
-      "sha256": "77bfe21ee4d14aaf373ea3781324cc1c700df3d0761c58103e2fc6899081a284",
-      "snapshot_id": "191f9de3af6f278a80eb1ae38afa44339302f476a67537313dfb840c93434e04",
+      "sha256": "910355e0ffa7dead2ce7b70ef29517a4bb13b38d569e56564100ff50c59bc0f8",
+      "snapshot_id": "c7911655a1e3c897b0d9f2ff0b5b5763005fd44d8dcc3aa392850a078d84e54b",
       "source_id": "jed19-credit2-glm-openrouter-rlm-r02"
     },
     {
@@ -652,10 +652,10 @@
       "source_id": "jed4c-deepseek-codeact-x1000-s06"
     },
     {
-      "generated_at": "2026-09-22T15:13:10.878254+00:00",
+      "generated_at": "2026-09-22T15:44:31.101689+00:00",
       "path": "artifacts/control-room/shared/jed4c-deepseek-codeact-x1000-s07.json",
-      "sha256": "b7e732609beb9ee33f064ab5b058662f47cf7aaefd7c4d53a9a39bc0018c69f9",
-      "snapshot_id": "399a9661def2065931b8fb23b5dbf1c7308416a757f6f6fef4f9491a90b42792",
+      "sha256": "6381083c0f523db6d7f832b70a80e649699bb63683969e07aa43b9301aeca96a",
+      "snapshot_id": "a65fcc0b708366910e37188160b45f2c34acd81ca015e9094502d1537d3c03b1",
       "source_id": "jed4c-deepseek-codeact-x1000-s07"
     },
     {
@@ -855,24 +855,24 @@
       "source_id": "kuma-gpt-rlm-v34"
     },
     {
-      "generated_at": "2026-09-22T15:30:19.063283+00:00",
+      "generated_at": "2026-09-22T15:45:31.270596+00:00",
       "path": "artifacts/control-room/shared/liacpc14-deepseek-paid-continuation-v1-96702403.json",
-      "sha256": "b2115e0015519715c41dd4e9e809e1dde27f99549021bc35306f52e806f03172",
-      "snapshot_id": "db485967d905c17c2d61dbe5e64286ec500de682c978ecdbd20d10e9d7bd2527",
+      "sha256": "f5631c773c5d8e3d632a0accec73e9ec17d6abd4eb1294f24137e106b0b1ef15",
+      "snapshot_id": "77402d7ae23a50a6526855735f179d5d572f28710aa97194936b60076a0c9967",
       "source_id": "liacpc14-deepseek-paid-continuation-v1-96702403"
     },
     {
-      "generated_at": "2026-09-22T15:30:42.129509+00:00",
+      "generated_at": "2026-09-22T15:45:55.998660+00:00",
       "path": "artifacts/control-room/shared/liacpc14-full-v34-4bef4ccd.json",
-      "sha256": "864bbcbbd5bcf1d2032717e7369ac7406c4a034c3a683a9b41535018172e51c0",
-      "snapshot_id": "6a2caf00a84dc38db75efef4307c75afa4826af89b883f49dd724b4ae47faf18",
+      "sha256": "d2c24fdac30036ff57a707b8660658e1c4437163a1ef3340e183a6abb3a71fc1",
+      "snapshot_id": "4041dc0386bfb55f7d8d1e9da11e65ac45899dcfde765f3deddc6193b8539125",
       "source_id": "liacpc14-full-v34-4bef4ccd"
     },
     {
-      "generated_at": "2026-09-22T15:30:33.600820+00:00",
+      "generated_at": "2026-09-22T15:45:47.901616+00:00",
       "path": "artifacts/control-room/shared/liacpc14-full-v34-e3e3abcb.json",
-      "sha256": "aa1be55c58168f2d26326bd0778c3ebcd4ffdb512f3991410f903ae57b84aef8",
-      "snapshot_id": "c7262cd8c7f939189b2e031a8153a5aaec08f75fdd1b2915fb0e8806c1776806",
+      "sha256": "f504979ecb903e3243dd8df0e9b150912d9dcf647aedf93665e0a13a11a98f5e",
+      "snapshot_id": "85921d4f86366d906ec63320b43d169d70553fec3b6fd7ad5300b2266d228250",
       "source_id": "liacpc14-full-v34-e3e3abcb"
     },
     {
@@ -911,10 +911,10 @@
       "source_id": "liacpc14-gpt-direct-docker-v1-ae21fd78"
     },
     {
-      "generated_at": "2026-09-22T15:30:14.196468+00:00",
+      "generated_at": "2026-09-22T15:45:29.212477+00:00",
       "path": "artifacts/control-room/shared/liacpc14-gpt-direct-recovery-v1-ee6a971b.json",
-      "sha256": "01571eef95087c1e6fdad1a01afa082bd9b486902025a4f89656eb10b1d2cdb6",
-      "snapshot_id": "b5002f16989119f4241cc9e2d438415a68a23c4d5f956b2f3bf2261abba53a00",
+      "sha256": "83e1c0cd189b1c5d369f1d9a7b3862307b2e7029972f2560774556dccd2b554d",
+      "snapshot_id": "845b06c7356f708d6d20a23918ed10a00b001ecfae49330aaba4ff738f31228e",
       "source_id": "liacpc14-gpt-direct-recovery-v1-ee6a971b"
     },
     {
