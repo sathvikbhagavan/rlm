@@ -1,5 +1,5 @@
 {
-  "as_of": "2026-09-22T14:00:51.125349+00:00",
+  "as_of": "2026-09-22T14:52:24.223393+00:00",
   "campaigns": {
     "iclr2027-deepseek-codeact-x1000-v1": {
       "counts": {
@@ -15,24 +15,24 @@
       "counts": {
         "failed": 93,
         "pending": 389,
-        "running": 8,
+        "running": 7,
         "stale": 1,
-        "succeeded": 5809
+        "succeeded": 5810
       },
       "definition_sha256": "07d10a000e115a60cc66011b2fea3503af2499aec1c5df40a441375abb804136"
     }
   },
-  "generated_at": "2026-09-22T14:08:17.543515+00:00",
+  "generated_at": "2026-09-22T15:03:43.041086+00:00",
   "gold_files": [
     {
-      "bytes": 1746,
+      "bytes": 1846,
       "path": "README.md",
-      "sha256": "9c515893748bc47fcaeb74cfe41bc672e7f60c7a2a7718b095513d4b4f430c56"
+      "sha256": "a5bed284fe10af73ab9d30975cca85c69b3cc89b992d33c54ee991e772d02f7d"
     },
     {
       "bytes": 2281,
       "path": "arm_status.csv",
-      "sha256": "d1a16e27f87b27d51b4244e9c2d2c0ce3f2986f49b6679b3662c1ca7f6f7f8a1"
+      "sha256": "f930d449d6b48eda21f06e946f913baffe03b9b8669a1fbcb55c2e3aef758991"
     },
     {
       "bytes": 115122,
@@ -45,22 +45,27 @@
       "sha256": "2b836ace0724ef42ccb95b9cd985aff4fb960fe5024e2f9d2afdbbe98e7abcf3"
     },
     {
-      "bytes": 2257971,
+      "bytes": 2258490,
       "path": "full_benchmark_records.csv",
-      "sha256": "1acdf2f076506936582d18f90e2e1e6877b5d59cef2f2bafcd9c88178f71dc40"
+      "sha256": "841a4800113552e813b72846c4a132a0784f65c078f6fcd6096b6aa5bff00291"
     },
     {
-      "bytes": 480871,
+      "bytes": 481390,
       "path": "provisional_arm_records.csv",
-      "sha256": "2cc3a3d0f814086f149f19942cdc9836e1e4da96092bbc41de5acfdc716fbe36"
+      "sha256": "b3e35dcd021a745988be4a519ab145ad57b927e0175bba83ddf043148fae2d81"
     },
     {
       "bytes": 23725,
       "path": "tier_scaling.csv",
-      "sha256": "7a36afbc4b7891bc6a1550f90e8f4b1f3a78e64b751cc05a05418b0b6c2458d7"
+      "sha256": "7a6aaad3ff76c6ba0a0bf9df096e77b612e939ffc1cfab0d81a0dd6f5c54bc8e"
+    },
+    {
+      "bytes": 5524,
+      "path": "tier_scaling_across_models.csv",
+      "sha256": "f2499a0abb421e0607a811958f8744b017d74296dd21c159db9373cafa84d5cb"
     }
   ],
-  "repository_commit": "622c18a53aaabe76586844a17ff67c56bd51f579",
+  "repository_commit": "04c2930838de60f8dc56c63fe0e96a56d5a54092",
   "result_packs": [
     {
       "bytes": 51628,
@@ -140,10 +145,10 @@
       "source_id": "jed-glm-codeact-v34"
     },
     {
-      "generated_at": "2026-09-22T14:00:51.125349+00:00",
+      "generated_at": "2026-09-22T14:31:07.059365+00:00",
       "path": "artifacts/control-room/shared/jed-glm-rlm-v34.json",
-      "sha256": "4379e579e3adcd8a17d530f6e25e67c2cd9d70dce977e0597997fe7e5931bfb2",
-      "snapshot_id": "81ad989136b67cc461666a1d6df23f62ad8bff208e6f6dd200ee6349670a58dc",
+      "sha256": "6efceb6e6436aed620a73ac281c5e7c29ccdc5c54c0fba3748a5494488eac864",
+      "snapshot_id": "842970a3c3babfaf12744843299b5e1a94459483ae20afc83f1e63f5e3274a6c",
       "source_id": "jed-glm-rlm-v34"
     },
     {
@@ -154,59 +159,59 @@
       "source_id": "jed-preflight-v34"
     },
     {
-      "generated_at": "2026-09-22T13:52:15.788749+00:00",
+      "generated_at": "2026-09-22T14:48:01.941409+00:00",
       "path": "artifacts/control-room/shared/jed13-final-credit-deepseek-codeact-repair-r01.json",
-      "sha256": "080e985303c6c326e0d445f366884a91caf406876d8c3a40d9b92ba169fb91af",
-      "snapshot_id": "d0eb82effbb2afe945c3bc28cf243747ef137f0728f2c253619fea10714ec7c9",
+      "sha256": "be0d07d8dec1051ea74b3870acf54c2d9bf021155bd779d4d6774e67d29c4cb2",
+      "snapshot_id": "ef1e2f9cf0f57eda036eb9c34509b6e447ed2ad1d31135d045ff955a08ac22c4",
       "source_id": "jed13-final-credit-deepseek-codeact-repair-r01"
     },
     {
-      "generated_at": "2026-09-22T13:57:21.887472+00:00",
+      "generated_at": "2026-09-22T14:42:58.062442+00:00",
       "path": "artifacts/control-room/shared/jed13-final-credit-deepseek-codeact-repair-r02.json",
-      "sha256": "a8ce7931245359aeb5cd155449c715a92525594afcd4bbc67c80e0de1e1433bb",
-      "snapshot_id": "d0b4dcf4d741e1bb7e6e80d895c8b9bf44cd0f7ea6fe64348250d4a73e8e198c",
+      "sha256": "0c2f08b80b269226ac252a5aa51b30dda5f99f4d105adb18e583091eeb6d72f2",
+      "snapshot_id": "e640123d767395d7f458202fb4fa1750460369d944ddf015dff2f976eab3ccea",
       "source_id": "jed13-final-credit-deepseek-codeact-repair-r02"
     },
     {
-      "generated_at": "2026-09-22T13:52:17.390663+00:00",
+      "generated_at": "2026-09-22T14:38:01.364670+00:00",
       "path": "artifacts/control-room/shared/jed13-final-credit-deepseek-codeact-repair-r03.json",
-      "sha256": "57205938dc55e49f75bf5932c34081f19b66e84c48278e2e8986baecc080c4e8",
-      "snapshot_id": "ff0f41f97fed1a4a859edb1f39d40618105f46f15d0416e59e156cf0a65862b9",
+      "sha256": "9a1af87fcc1115daa5cce6af4f9ea883c4053f11875f1be9e97c341300609747",
+      "snapshot_id": "210abb9797b1b605cfb9f334090f4e7c22d432dbdc93042544ef46fd205cfc91",
       "source_id": "jed13-final-credit-deepseek-codeact-repair-r03"
     },
     {
-      "generated_at": "2026-09-22T13:42:15.104890+00:00",
+      "generated_at": "2026-09-22T14:43:01.523193+00:00",
       "path": "artifacts/control-room/shared/jed13-final-credit-deepseek-codeact-repair-r04.json",
-      "sha256": "ec5a62b83b9d58a88db2c0594b0ac4007bfbd71c14c04864fd907ff24a6cf1b0",
-      "snapshot_id": "af59882685ff0e75ba753290b459c060040de124ee235b90161a3b94afd99c10",
+      "sha256": "9b89b3703227ce732a6481b911177d9bc84c1dffb93f9d4056c54e2e0a5117bf",
+      "snapshot_id": "3a492cd6b2ed4df4faa2f5c1ea6582ac680458785ddfcd0b245589c0000a9ae8",
       "source_id": "jed13-final-credit-deepseek-codeact-repair-r04"
     },
     {
-      "generated_at": "2026-09-22T13:42:08.282704+00:00",
+      "generated_at": "2026-09-22T14:42:32.465727+00:00",
       "path": "artifacts/control-room/shared/jed13-final-credit-deepseek-rlm-accelerated-r01.json",
-      "sha256": "7747f281d7a3874018bacc70c70145a334e3c737b57b6fb5ce250ad1d90b96ba",
-      "snapshot_id": "cf737e38a1b6adb1c9b4109b2d8b1df1598f18bb56cc7b422f8248c160f7c08e",
+      "sha256": "7e61cef154f195d7e781d21009e5c70839aaaa63e271d720ac123b66088f505d",
+      "snapshot_id": "33eaddf1a0e293b0351d7d3e02378e243ecbaef209bc1e74a1999dc427e6df86",
       "source_id": "jed13-final-credit-deepseek-rlm-accelerated-r01"
     },
     {
-      "generated_at": "2026-09-22T13:42:08.282519+00:00",
+      "generated_at": "2026-09-22T14:42:32.464987+00:00",
       "path": "artifacts/control-room/shared/jed13-final-credit-deepseek-rlm-accelerated-r02.json",
-      "sha256": "72003b192418aa28c0e795f8b9dd4f246d270a102cfa4a77657d802dd0625725",
-      "snapshot_id": "88bd7c9b3da2a9fe903207af70db3fa81c388f80b8cc2ec35bd270f17fc77b92",
+      "sha256": "2e22930ca9e38d1aacfd3f99900076cbac6d9398124263bd41e42e51d8141b69",
+      "snapshot_id": "cfaf49eb74cd4cf12607f4fe0757acb2a7faaf5de1fdd6734c019085099727b1",
       "source_id": "jed13-final-credit-deepseek-rlm-accelerated-r02"
     },
     {
-      "generated_at": "2026-09-22T13:57:16.803483+00:00",
+      "generated_at": "2026-09-22T14:27:27.482189+00:00",
       "path": "artifacts/control-room/shared/jed13-final-credit-deepseek-rlm-accelerated-r03.json",
-      "sha256": "84f4b2ec58c2e459b911d31ea3045a7897eb86ad00a128ee10a0aeb6fb26ed76",
-      "snapshot_id": "7be7a7bb92ce28db79bcf1224b841b7f23110f824bbf3eede7d498588726978c",
+      "sha256": "9d4e3038fcb9989668ea6041c091b55a650b9e07633ceaf50fb522fa590e4c6f",
+      "snapshot_id": "d395979e995957a1a697847318bf4bb557a8a0f84a4b98bff971b2ed35531717",
       "source_id": "jed13-final-credit-deepseek-rlm-accelerated-r03"
     },
     {
-      "generated_at": "2026-09-22T13:52:15.656071+00:00",
+      "generated_at": "2026-09-22T14:22:26.280055+00:00",
       "path": "artifacts/control-room/shared/jed13-final-credit-deepseek-rlm-accelerated-r04.json",
-      "sha256": "28a2c8ad45784a364d041a178f5632eafdfe328e6e186aafa79993b6279b02ab",
-      "snapshot_id": "8f1be4d6ef4d165fad0ea97d3782345978f36f50edf51a68593363b8d49f48e3",
+      "sha256": "a05191f99b7243ffe9f7f336621156786a8b2049f0882b0666ac138ae40eb9f8",
+      "snapshot_id": "f7be2cd6f1c5fe49ed25fcac22601ea18c5cfb44f507c8ceac079171b8f982d6",
       "source_id": "jed13-final-credit-deepseek-rlm-accelerated-r04"
     },
     {
@@ -343,10 +348,10 @@
       "source_id": "jed19-credit-deepseek-codeact-repair-r01"
     },
     {
-      "generated_at": "2026-09-22T13:54:17.170172+00:00",
+      "generated_at": "2026-09-22T14:24:27.664251+00:00",
       "path": "artifacts/control-room/shared/jed19-credit-deepseek-codeact-repair-r02.json",
-      "sha256": "2bd58c440a8801cbc8af9f873f3ccf04952e8020ece5be1f8fc0fdb2d9486f44",
-      "snapshot_id": "d9391989608aaab533244b64cef0afabbef400b7412419d629666516b9ac9a6e",
+      "sha256": "68f53d4b4c8b742a1e40ce9fbd20be9f182fc214f6bc3216c61f757654c02183",
+      "snapshot_id": "4397237f5b1d8dfb047589cbbca6395e7d468af6b92032adea900fbe9bbb0672",
       "source_id": "jed19-credit-deepseek-codeact-repair-r02"
     },
     {
@@ -392,45 +397,45 @@
       "source_id": "jed19-credit-deepseek-rlm-accelerated-r06"
     },
     {
-      "generated_at": "2026-09-22T13:39:13.080854+00:00",
+      "generated_at": "2026-09-22T14:39:30.869226+00:00",
       "path": "artifacts/control-room/shared/jed19-credit-glm-openrouter-rlm-r01.json",
-      "sha256": "eb8e11d0af4bdaea4cd63e7de5e53fd09ab09753e10c2dc6dba9735d37c7d43a",
-      "snapshot_id": "4d4e0c623b01c9a7e964d81ea99765afb048b550e3845625445c5e965890d862",
+      "sha256": "451ec22d2065ccdbdd9aa56772a6511cd99c2abdaa0fa2113a1d40c0a50c5535",
+      "snapshot_id": "7dfd98589747d8ae5da878244a6b495022bff1de4356ba0a89ee49faa4c44a93",
       "source_id": "jed19-credit-glm-openrouter-rlm-r01"
     },
     {
-      "generated_at": "2026-09-22T13:44:12.295491+00:00",
+      "generated_at": "2026-09-22T14:44:32.058881+00:00",
       "path": "artifacts/control-room/shared/jed19-credit-glm-openrouter-rlm-r02.json",
-      "sha256": "d60663e064853d9a1a2aeb9e856f5b07601c382f0a2dcd6b3104d2041c671b79",
-      "snapshot_id": "1036be6a72c8838a647121df96da58e618152e7338ba194cf02691f4477c2fa7",
+      "sha256": "2f8f1f9923e9d38aeff65e84c7d405dfdfa40203a2f0d7b71b6b048eb9896248",
+      "snapshot_id": "abdbad198ad1b16d394b5afc4235f6dfd0204969283a7e97e633323bc7a8a2ce",
       "source_id": "jed19-credit-glm-openrouter-rlm-r02"
     },
     {
-      "generated_at": "2026-09-22T13:45:26.160893+00:00",
+      "generated_at": "2026-09-22T14:45:48.017455+00:00",
       "path": "artifacts/control-room/shared/jed19-credit-glm-openrouter-rlm-r03.json",
-      "sha256": "07235389b3a29b265c99d2935606948cfcff4ccda3fb292bf45c3b70e9831f7d",
-      "snapshot_id": "c9b78edf0d277e825c0906b4b1e7b92eb5000f6bef9806b7068761e8918c6c17",
+      "sha256": "3b8649e8bddd878a24d9ef440ec231ae49b331a11c9558de22dd4752034954b4",
+      "snapshot_id": "dc817d1388c9ebc38184744944ce0f17bb7df3728c0e98fd05b0d6382780bac6",
       "source_id": "jed19-credit-glm-openrouter-rlm-r03"
     },
     {
-      "generated_at": "2026-09-22T13:34:10.003641+00:00",
+      "generated_at": "2026-09-22T14:04:19.333064+00:00",
       "path": "artifacts/control-room/shared/jed19-credit-glm-openrouter-rlm-r04.json",
-      "sha256": "20a1de555d8156e625f7ba7e5bcfb3de3a679b5d5b417fc6c500036e13891390",
-      "snapshot_id": "0db0b5ae2ecb06cde005a462511b0109f68dbdd2c9ebdc9f4c3efb9a2b089c03",
+      "sha256": "3fcbc072e9032ba14a3be3f52f36b6b5ddf64c69b8e65e93a848571b729abade",
+      "snapshot_id": "79d7fb778607b0b683dc107b6ba5d82c843dd95c09c8139ddda36c19a40d51c2",
       "source_id": "jed19-credit-glm-openrouter-rlm-r04"
     },
     {
-      "generated_at": "2026-09-22T13:40:28.235706+00:00",
+      "generated_at": "2026-09-22T14:40:47.181271+00:00",
       "path": "artifacts/control-room/shared/jed19-credit2-glm-openrouter-rlm-r01.json",
-      "sha256": "00f607c0d9bdf4930cc5f1e21f427cf34670c09ec8165814ddc9cbc4c4c14475",
-      "snapshot_id": "a0dee5d7959413b581d81f5041e058fc4358fe7967af2416e3f85c46e1bbfd36",
+      "sha256": "53fb44e536dd958365aafd7cca48b239efb421a058026fb9dac52f79b4c5aae2",
+      "snapshot_id": "b68e1baf3d550fb41bba21fe482ee5246226aec313f839f8da440ca16b030bcc",
       "source_id": "jed19-credit2-glm-openrouter-rlm-r01"
     },
     {
-      "generated_at": "2026-09-22T13:44:13.936247+00:00",
+      "generated_at": "2026-09-22T14:44:32.058717+00:00",
       "path": "artifacts/control-room/shared/jed19-credit2-glm-openrouter-rlm-r02.json",
-      "sha256": "109959d10a8a391b24e26048f1e89e16cddc7a5280779ab0a660de3ad94fc96e",
-      "snapshot_id": "3b3d0ff2233d7b4e5289c134c1986adfede366e2a9a44d86be68066b1154a514",
+      "sha256": "120dcb72b75ac75b285b827853da96a498ade736e4edb79cb1b72c7cb71dcaa8",
+      "snapshot_id": "1f52afe08b22a8c3a9b49ff0d358ba36e2ce3411613fe8f354498efc48443c87",
       "source_id": "jed19-credit2-glm-openrouter-rlm-r02"
     },
     {
@@ -441,10 +446,10 @@
       "source_id": "jed19-credit2-glm-openrouter-rlm-r03"
     },
     {
-      "generated_at": "2026-09-22T13:35:24.486819+00:00",
+      "generated_at": "2026-09-22T14:35:46.840704+00:00",
       "path": "artifacts/control-room/shared/jed19-credit2-glm-openrouter-rlm-r04.json",
-      "sha256": "74a354a394ce253dff8c485067b7b129a76815236519f4526c86ceafb29a0480",
-      "snapshot_id": "bd660884435691ee42f999b28d8429c2b57d0f2a0c1ffa895a83abda044bed3c",
+      "sha256": "21eec9f719d2970b33b50825dea9034919f054a8b7f8bb6a0d062d4c252e26bc",
+      "snapshot_id": "dbeb74d0c9ef60dd1aa9f71bdf9e9ed46703f5959592f58c62e49ad7c4f6dfd3",
       "source_id": "jed19-credit2-glm-openrouter-rlm-r04"
     },
     {
@@ -455,31 +460,31 @@
       "source_id": "jed19-glm-swiss-s01"
     },
     {
-      "generated_at": "2026-09-22T13:51:07.616057+00:00",
+      "generated_at": "2026-09-22T14:51:35.647791+00:00",
       "path": "artifacts/control-room/shared/jed19-overnight-deepseek-codeact-repair-r01.json",
-      "sha256": "1732299e40117b3f1c3edf483420efa35c16252258b41ee2a3d44eca52fa5e3e",
-      "snapshot_id": "d32135013eb26d01e919f578e0d8cc3703bdb0e4f19b9234dabaa12c7da92b50",
+      "sha256": "8cd7ab884e9efed168a5985c94eb71422b13fecbeb0e4df85537af642b130463",
+      "snapshot_id": "6b7d9e16f6f6c03b4dc145f5afbf5913e6e6813e7469117aadea1dcf392919cf",
       "source_id": "jed19-overnight-deepseek-codeact-repair-r01"
     },
     {
-      "generated_at": "2026-09-22T13:52:37.234987+00:00",
+      "generated_at": "2026-09-22T14:22:44.528411+00:00",
       "path": "artifacts/control-room/shared/jed19-overnight-deepseek-codeact-repair-r02.json",
-      "sha256": "3f36cfa51d09a0441786c8af35d2cee68f2a5f45e5d6bbcdf9e24ccd697319e7",
-      "snapshot_id": "52236dd508b77b20c5718eb986ed3d20ea8fba3f0eeb520feec21e2d7cc32334",
+      "sha256": "8dc91ab4a248fe3b229a8a326f1d40f3436cef36d8a24cfe2e25ac49e9a4509d",
+      "snapshot_id": "3007bf1909b91271f5c746ae5e118fadf2bab4e1e1aaa47763ea9eb98e3b826e",
       "source_id": "jed19-overnight-deepseek-codeact-repair-r02"
     },
     {
-      "generated_at": "2026-09-22T13:59:25.738228+00:00",
+      "generated_at": "2026-09-22T14:29:33.459156+00:00",
       "path": "artifacts/control-room/shared/jed19-overnight-deepseek-rlm-accelerated-r01.json",
-      "sha256": "3fe136ccfa5e69ad9486b94f32b8e2573feb87ea69eedadeb5f6398d621ed2be",
-      "snapshot_id": "ac6e4739918beb3d7ee5958bc07490f58a205000686c56031cf7441ea05bce99",
+      "sha256": "51709bad0ffa58180509db3e4b3492ae997309ec4dc221ff65a06f584a1ba1ca",
+      "snapshot_id": "7d2abce09ec6de287b1e286b9eb61a108e11e1cafc31735df64757f49dda8023",
       "source_id": "jed19-overnight-deepseek-rlm-accelerated-r01"
     },
     {
-      "generated_at": "2026-09-22T13:52:23.299127+00:00",
+      "generated_at": "2026-09-22T14:22:36.632882+00:00",
       "path": "artifacts/control-room/shared/jed19-overnight-deepseek-rlm-accelerated-r03.json",
-      "sha256": "80893c6dfc39663e1a4990f856835dd5c91173918e7e78f899a753cf04ca133a",
-      "snapshot_id": "f40307c42a784f4831a14fdf65b0f1c7fc1bd373e4983027bf9239d21a12b912",
+      "sha256": "e5b90742cacc3a3056ecb180726044f5e09d59bb9bcf19dc49197b68402fb82a",
+      "snapshot_id": "124a6f8004680cbdcbeacf9cb84641c2d349456ecc9f262eb19f2bb63ce3a982",
       "source_id": "jed19-overnight-deepseek-rlm-accelerated-r03"
     },
     {
@@ -490,10 +495,10 @@
       "source_id": "jed19-overnight-deepseek-rlm-accelerated-r04"
     },
     {
-      "generated_at": "2026-09-22T13:35:42.902628+00:00",
+      "generated_at": "2026-09-22T14:36:07.633946+00:00",
       "path": "artifacts/control-room/shared/jed19-overnight-deepseek-rlm-accelerated-r06.json",
-      "sha256": "5afa365676ca417512c3cc37208bfef34e94ca9b7aa1bf7eeb34379bcbd4354c",
-      "snapshot_id": "be9473a0eb9a52bc861af6f5237c54f30d9d89d772941758bd7b9a01f8583f87",
+      "sha256": "c2930d8fcb9c8495ea7f4f55eada3833b90a5766d422c2b85bf720cf6863e885",
+      "snapshot_id": "ba978f6f3e1876008a2e9566e6b28ce1e985b8896a4c0360808c60d19e8401fb",
       "source_id": "jed19-overnight-deepseek-rlm-accelerated-r06"
     },
     {
@@ -595,31 +600,31 @@
       "source_id": "jed25-r2-glm-openrouter-rlm-repair4"
     },
     {
-      "generated_at": "2026-09-22T13:34:25.496973+00:00",
+      "generated_at": "2026-09-22T14:34:57.873420+00:00",
       "path": "artifacts/control-room/shared/jed4c-deepseek-codeact-x1000-s01.json",
-      "sha256": "ae774802f6e7c1a0158e3e6af725e57c6bcdde0dd6e1457bbb24ce65e63223a7",
-      "snapshot_id": "999884586bae1b0f61126950ec372ef4bc9f8d6df11f089f2aca96cff79c40ed",
+      "sha256": "f8cbc55bd1fef9cbb9db9aef5e66d574b9ddda3852bc04c2359d06e5aa1a6759",
+      "snapshot_id": "d543b0cad707e0697fb5262a97a92cddb6f7fb4b3b04b7a75a80476af8d38433",
       "source_id": "jed4c-deepseek-codeact-x1000-s01"
     },
     {
-      "generated_at": "2026-09-22T13:57:43.130992+00:00",
+      "generated_at": "2026-09-22T14:27:54.590551+00:00",
       "path": "artifacts/control-room/shared/jed4c-deepseek-codeact-x1000-s02.json",
-      "sha256": "f211cc5cffe1990188bb1205eca9e832b978fb22fca4e426b9aec7b7fe70e747",
-      "snapshot_id": "4929307023455ecf07147dd44690fcb54fed5a0ff3fc66fae78be9212f84dbf6",
+      "sha256": "0388f741ac300eb2c26a96797e61d7a3cd4de3d8c51dbbec1bec32d1bc168929",
+      "snapshot_id": "6a77c54886443f846acf80dcb48c7cd88b97c7330ea1b946b33f1276695ef6bf",
       "source_id": "jed4c-deepseek-codeact-x1000-s02"
     },
     {
-      "generated_at": "2026-09-22T13:37:40.142361+00:00",
+      "generated_at": "2026-09-22T14:37:58.470968+00:00",
       "path": "artifacts/control-room/shared/jed4c-deepseek-codeact-x1000-s03.json",
-      "sha256": "8aaf191e5d00796f4b666fb87ee7d888818d57f5cb2b86fd5125f0f4bb468c4c",
-      "snapshot_id": "469529dd4e1c51812968a4d0e3d003a063655757531efcce062e51a9c975ac71",
+      "sha256": "b5badc4410814af2d94bc27150d608ed2b9e83fb4dbad614a3fa3eeb17ecffd9",
+      "snapshot_id": "1c22ad556e12ffd1bb41a5f20f4445587dd9d146b4a0801a207e1bed26bc7c3f",
       "source_id": "jed4c-deepseek-codeact-x1000-s03"
     },
     {
-      "generated_at": "2026-09-22T13:57:43.131237+00:00",
+      "generated_at": "2026-09-22T14:27:54.591126+00:00",
       "path": "artifacts/control-room/shared/jed4c-deepseek-codeact-x1000-s04.json",
-      "sha256": "5b030463f81be63a159664e2416c3fdf50189667e38fc2224a0920e07d97a9b2",
-      "snapshot_id": "082ba959c112153ba3f6c9e8db3d840605cf752d6928617651ad9d7961e9dc14",
+      "sha256": "104a08fd3eda714e2c7b44b33c6463808900b858cc1eb924b7fa24d0d6e6618b",
+      "snapshot_id": "423a018773d169014f622e252d575062e99d839d7624479a8eea536d5eddb4be",
       "source_id": "jed4c-deepseek-codeact-x1000-s04"
     },
     {
@@ -637,10 +642,10 @@
       "source_id": "jed4c-deepseek-codeact-x1000-s06"
     },
     {
-      "generated_at": "2026-09-22T13:42:40.782919+00:00",
+      "generated_at": "2026-09-22T14:42:59.697493+00:00",
       "path": "artifacts/control-room/shared/jed4c-deepseek-codeact-x1000-s07.json",
-      "sha256": "227262eb984a63de0463118f03030cb553f35412d7142bf3fb4d7b0ce87be5ec",
-      "snapshot_id": "252837b9d239db02645d00343931750204e0bbe9016336cc18ba7bda76d02acf",
+      "sha256": "6b74992f9c8a7fdc5e88f989e8be0e0d54332a7964e40ba98b582d90fde54e72",
+      "snapshot_id": "d86e8f7b3e84428f14dfae45dfd6a3e4dcfb37c9c5af4a109e0357cd48228fa6",
       "source_id": "jed4c-deepseek-codeact-x1000-s07"
     },
     {
@@ -658,38 +663,38 @@
       "source_id": "jed4c-deepseek-codeact-x1000-s09"
     },
     {
-      "generated_at": "2026-09-22T13:54:33.495151+00:00",
+      "generated_at": "2026-09-22T14:24:55.817883+00:00",
       "path": "artifacts/control-room/shared/jed4c-deepseek-codeact-x1000-s10.json",
-      "sha256": "e2cf7c412240b7f0aee35e5c1883c435cf49dfe455dfe122a8f575cffec030de",
-      "snapshot_id": "9ff3cd440b24aa4d98e06e7f2eeb6e4a2589e6ec8bc328b713a06ccb58b2ef3e",
+      "sha256": "04951dfa870e7b360c019b96f976305258d452cf4050f8b4be0cd39e3176a751",
+      "snapshot_id": "7200661431d232becd3c199486a9b478ae038c77123f8eaa19252e87d5773bbd",
       "source_id": "jed4c-deepseek-codeact-x1000-s10"
     },
     {
-      "generated_at": "2026-09-22T13:52:50.513924+00:00",
+      "generated_at": "2026-09-22T14:23:01.143500+00:00",
       "path": "artifacts/control-room/shared/jed4c-deepseek-codeact-x1000-s11.json",
-      "sha256": "ad97ba97bc91da0c008e606f44655c6c67d4f9a4c12a7c3c4785b65c71f2ab78",
-      "snapshot_id": "d74d93d28db771936f25d2577ee70f664909202618445d8a7e21298e69522dfd",
+      "sha256": "62032807e868bc599ca936293c44f70f1ffaa29e4887b323496b5aecd888888c",
+      "snapshot_id": "ee264d256b8a65ff07975bbe55bfe2e1d6355aefb2ca41f0ca4949673431536a",
       "source_id": "jed4c-deepseek-codeact-x1000-s11"
     },
     {
-      "generated_at": "2026-09-22T13:34:25.495384+00:00",
+      "generated_at": "2026-09-22T14:34:57.873737+00:00",
       "path": "artifacts/control-room/shared/jed4c-deepseek-codeact-x1000-s12.json",
-      "sha256": "e0397c6f9fc424e875fab6212f917e609b26d4ddb3eb4de2409cdda0b001a08a",
-      "snapshot_id": "7822081d0153c41045af2a9382fd9bc9d32bdf5d4629c552c301ccc3d7088759",
+      "sha256": "7363ed5f6967cbf4ce01fa092fef732c9b57012ce48fc2e919ea4d13759dfe29",
+      "snapshot_id": "47f3b591fed8880172e41e0eede0062e8ed7a8ba44c9ccf3f758eb5d7471240b",
       "source_id": "jed4c-deepseek-codeact-x1000-s12"
     },
     {
-      "generated_at": "2026-09-22T13:34:25.495456+00:00",
+      "generated_at": "2026-09-22T14:04:35.900812+00:00",
       "path": "artifacts/control-room/shared/jed4c-deepseek-codeact-x1000-s13.json",
-      "sha256": "862a547eaa04b49cdf06864f75f17a0e5442b46466e2f8cce67e23717564eb1f",
-      "snapshot_id": "e95188183bed1fd52e8025c7f113d02c56e8d96717cf6503308fc2ff5be1fc51",
+      "sha256": "46ec6970a72427ee4bd9f2e76c2973650e1b504e68f7ca3f8a7415bf7fe47dce",
+      "snapshot_id": "0202e20b84d011281ce2146e50be8f99c8d62147de50bd268e4a6229bcab2a0a",
       "source_id": "jed4c-deepseek-codeact-x1000-s13"
     },
     {
-      "generated_at": "2026-09-22T13:54:33.495401+00:00",
+      "generated_at": "2026-09-22T14:24:55.818116+00:00",
       "path": "artifacts/control-room/shared/jed4c-deepseek-codeact-x1000-s14.json",
-      "sha256": "9f05fb27c2212be3e4dfff5f3b6e20b5ad2b5fb0053d17a805bb6ee3348a578f",
-      "snapshot_id": "53b89cad24a8dddf2aaa95dd3c53185244e7b2673b3746cb814fb221f8f5f08d",
+      "sha256": "337bd49338126a7ad270173ae947d60dc9d57cf09338bfe1ed408b535fb41f1a",
+      "snapshot_id": "138d10ee91a29c8a9c9960b625cc8e0501f1ff7810be070b76a939ce6256e8ee",
       "source_id": "jed4c-deepseek-codeact-x1000-s14"
     },
     {
@@ -700,24 +705,24 @@
       "source_id": "jed4c-deepseek-codeact-x1000-s15"
     },
     {
-      "generated_at": "2026-09-22T13:37:40.682564+00:00",
+      "generated_at": "2026-09-22T14:37:58.470673+00:00",
       "path": "artifacts/control-room/shared/jed4c-deepseek-codeact-x1000-s16.json",
-      "sha256": "8c6a812bd902f9ee647f7230b182e52963d3bbda1ccc1f4cf76eb6531bda6394",
-      "snapshot_id": "19831ed91a1c7b30f6f9bf00c66a7dabe4799a2e57698cc7df344a13dc77ab70",
+      "sha256": "b04ec21021612ec54ab79041449bbe96eee81baf8c9ca6cda6b830f95ad8035f",
+      "snapshot_id": "d4b00648b0dcbd90a9e06f108046f40e9cd576ff513ef72a8f4040461ec68add",
       "source_id": "jed4c-deepseek-codeact-x1000-s16"
     },
     {
-      "generated_at": "2026-09-22T13:52:42.292852+00:00",
+      "generated_at": "2026-09-22T14:22:53.359173+00:00",
       "path": "artifacts/control-room/shared/jed4c-deepseek-codeact-x1000-s17.json",
-      "sha256": "0825b83324811a79c73f2843bafbde567032b9e1ee253bcc35f59cf33f3c6587",
-      "snapshot_id": "db30e116963e923200eb0f1a8645b778838982f20ce6d6cbf95be86241df2b8e",
+      "sha256": "71ef405f5939484d6af3d1cc55ebcdb70b0007993d79e23cdcdaecf41bab4c35",
+      "snapshot_id": "9753a9da0f61c4191d9760ef42b8964fa9d825e6205c17c3613e35245043aa8b",
       "source_id": "jed4c-deepseek-codeact-x1000-s17"
     },
     {
-      "generated_at": "2026-09-22T13:57:44.797331+00:00",
+      "generated_at": "2026-09-22T14:27:54.591131+00:00",
       "path": "artifacts/control-room/shared/jed4c-deepseek-codeact-x1000-s18.json",
-      "sha256": "89313c85e9ebd71e6985cbde174f11bdbf09c6a9f9b5c12c3be8e4aae913c1ad",
-      "snapshot_id": "f97bcd1e0fb11108332955c41155c8ed30376c604828eef8cd5ee6ebc4ef42c2",
+      "sha256": "4cc043887bfed13142000ba130bedaba391241c0901bc0a7e43072139ec6366c",
+      "snapshot_id": "244903c5c56d807e0e935d4b323febe03876864995baa6ba99c83a6d05006147",
       "source_id": "jed4c-deepseek-codeact-x1000-s18"
     },
     {
@@ -728,17 +733,17 @@
       "source_id": "jed4c-deepseek-codeact-x1000-s19"
     },
     {
-      "generated_at": "2026-09-22T13:34:25.495394+00:00",
+      "generated_at": "2026-09-22T14:34:57.873469+00:00",
       "path": "artifacts/control-room/shared/jed4c-deepseek-codeact-x1000-s20.json",
-      "sha256": "c345aefee8687728c52b894035b3c051b8cc7d206379909a886a830a03dc4409",
-      "snapshot_id": "2f105e79736196dde5474487274bcbc3717d95d3b623d8a8f3da86dead71b595",
+      "sha256": "edd09f5261eed563b8ac746e394c65877cac71cb4f1b2678b069d56991e55c58",
+      "snapshot_id": "8dd1483593ca292613d719f0c05729f02a5913a2f4a082f8ad3ca5d35245c68b",
       "source_id": "jed4c-deepseek-codeact-x1000-s20"
     },
     {
-      "generated_at": "2026-09-22T13:51:43.906114+00:00",
+      "generated_at": "2026-09-22T14:52:15.533014+00:00",
       "path": "artifacts/control-room/shared/jed8705-deepseek-rlm-systemexit-repair-v1.json",
-      "sha256": "445af34f06d731b3f274b7d642977c20e53a7f10acfcc35b9ca52ecf3c8fb5be",
-      "snapshot_id": "dc243ea7d9b347d866f11f09aeb2f88137132d4625010355f9ca22ddca8ab0eb",
+      "sha256": "6a43e27ce73d03360031dd37edb5488a8cb6352e4f7a513f4f72d58562f946de",
+      "snapshot_id": "4467354c5f454698b1f1f857ef607c9baf713575fe3b86b6a36f0efb5d98c99d",
       "source_id": "jed8705-deepseek-rlm-systemexit-repair-v1"
     },
     {
@@ -756,66 +761,66 @@
       "source_id": "kuma-claude-llm-v34"
     },
     {
-      "generated_at": "2026-09-22T13:50:56.158433+00:00",
+      "generated_at": "2026-09-22T14:51:30.083433+00:00",
       "path": "artifacts/control-room/shared/kuma-claude-rlm-v34.json",
-      "sha256": "f507709ad9b13413fddaa9b1cc21eb458b248595d021a0e88c06d7f185f794e6",
-      "snapshot_id": "3cec68deb3fe719877f7457a9662280ad27895415e36f8d642d775895425b1f6",
+      "sha256": "6a637fb6eedc84a97467fe78adbb723791ffb9b6279c70f379b74c5d44fd9f3c",
+      "snapshot_id": "9da13713f291b52019d35e799e8df1a4fefa7c720bf8c1f3ff8f58de0c0d7d27",
       "source_id": "kuma-claude-rlm-v34"
     },
     {
-      "generated_at": "2026-09-22T13:48:56.165863+00:00",
+      "generated_at": "2026-09-22T14:49:27.346183+00:00",
       "path": "artifacts/control-room/shared/kuma-full-v34-0bd5bd3b.json",
-      "sha256": "f8e75eec4036370e895d273b200df49fab59378a4920680824ef2af611acab3a",
-      "snapshot_id": "6052a2dfeb45d0a08854fc2609c0cbf46652e44ba7fe707546b00ef5db3d190b",
+      "sha256": "f7ec422dfd7ac1b2b3b358123abbf7157a90c755b8d238d0b62f47e6ad154d42",
+      "snapshot_id": "34d644c7a83358836708320436b3949f7a55540f59ab24bc2eeebf8f250d07da",
       "source_id": "kuma-full-v34-0bd5bd3b"
     },
     {
-      "generated_at": "2026-09-22T13:54:17.513697+00:00",
+      "generated_at": "2026-09-22T14:24:31.428253+00:00",
       "path": "artifacts/control-room/shared/kuma-full-v34-4644942a.json",
-      "sha256": "57f9081a36141a3ddaaddb1024e8888519ff364d10b76d77564592a08856a973",
-      "snapshot_id": "b8d6d3d9379e3a408c3a6bbf870b5174576f8a2a00ef597829bd688204786e6a",
+      "sha256": "3d40d7738876cbb5aeb6b046964cc767838f8a5163842f73dc6226f21f52770d",
+      "snapshot_id": "521e4a98d2244ab706a52151f345ed7b91edc679e8117986c9cdf6cd2efa8c55",
       "source_id": "kuma-full-v34-4644942a"
     },
     {
-      "generated_at": "2026-09-22T13:54:18.410676+00:00",
+      "generated_at": "2026-09-22T14:24:32.151052+00:00",
       "path": "artifacts/control-room/shared/kuma-full-v34-5143aa8d.json",
-      "sha256": "16dd06690ecdee1f661ff5720d2c26cf48af5f28f761de478000ff4d1101ceca",
-      "snapshot_id": "7b60f18db79bc277f304bf18e93dc1e3caa1b907c6f6ec3de2645963fca74099",
+      "sha256": "e5e635527375c8563d297e86bcbd948cf46f2ea73c865b7b5ccf03460bb84aaa",
+      "snapshot_id": "61c955179f47d59c40ed9b0d18d6dbef68559b80837b0da22002076d322e1582",
       "source_id": "kuma-full-v34-5143aa8d"
     },
     {
-      "generated_at": "2026-09-22T13:54:11.520005+00:00",
+      "generated_at": "2026-09-22T14:24:23.696597+00:00",
       "path": "artifacts/control-room/shared/kuma-full-v34-7b0e2342.json",
-      "sha256": "43f7790ee29b877ed1b96334aadac5167cb1c8aee914055faffb8db601e89dff",
-      "snapshot_id": "f4b6684aa1140fb0e87fd4dde2bf23d58c9516be19e162ed107ede6e0af02c0b",
+      "sha256": "81953fb95e93801b7bdbbbcc840923f590b01b52bfd15bb5fc60cd0351bacb17",
+      "snapshot_id": "038992c0710353a6eb798e3961295dd6579cba4c4dcd8858b2dc79b5d2b67a0f",
       "source_id": "kuma-full-v34-7b0e2342"
     },
     {
-      "generated_at": "2026-09-22T13:54:15.505932+00:00",
+      "generated_at": "2026-09-22T14:24:29.511082+00:00",
       "path": "artifacts/control-room/shared/kuma-full-v34-bced0692.json",
-      "sha256": "4e8d692cba5ac58b377a157b4e14fe24e60b88e74fde733750e16c8178ed2e00",
-      "snapshot_id": "46422cdfec4d0cf45f57c4efb8a06c078299bd4db63d0e12bb1126d1c36d01ac",
+      "sha256": "5afcb02a20f4a1f3ef7cc5b3d96e80828c685ffaed4708ddc3e195d7109992df",
+      "snapshot_id": "70038357dda218625b94fed348dea45d826055d8988c7012782cb3f1db027486",
       "source_id": "kuma-full-v34-bced0692"
     },
     {
-      "generated_at": "2026-09-22T13:48:56.165832+00:00",
+      "generated_at": "2026-09-22T14:49:27.345164+00:00",
       "path": "artifacts/control-room/shared/kuma-full-v34-d50654b8.json",
-      "sha256": "67e7d84f2622dbc12d6e5f99dc8b085ae6897f80a65f672ce2fba5d959c5bbd9",
-      "snapshot_id": "b427d39a3834686c11b645131d582e1c779dde195ad18d30d620e7b613c18aeb",
+      "sha256": "fe76945338d0be59ca3a04e42f3c841c7521045ab64451b698e5ccc552af8409",
+      "snapshot_id": "1ce60c94d7b2728718b2391b90502f479598b24bc6f517dc31a41f59e304e059",
       "source_id": "kuma-full-v34-d50654b8"
     },
     {
-      "generated_at": "2026-09-22T13:54:15.816169+00:00",
+      "generated_at": "2026-09-22T14:24:29.032768+00:00",
       "path": "artifacts/control-room/shared/kuma-full-v34-dc2a28fe.json",
-      "sha256": "e0375e3d02904618d68ba729cb39cd496684a4647367521967a132122804038d",
-      "snapshot_id": "ff2b70b604b9f2e1f29ed79a2a3a89759d415c382859b767105b568ef4c799a2",
+      "sha256": "7f8dc27c40e6df1bef3cb54b97c5a4ade39ea3b94661027439e05dec7b91058c",
+      "snapshot_id": "d9fb2f71d89419ee9d3211c450c16060f5d5413e7b11f8c98269d6663d6541a6",
       "source_id": "kuma-full-v34-dc2a28fe"
     },
     {
-      "generated_at": "2026-09-22T13:53:58.079416+00:00",
+      "generated_at": "2026-09-22T14:24:12.982915+00:00",
       "path": "artifacts/control-room/shared/kuma-full-v34-f157c291.json",
-      "sha256": "da46da659f01edafa6148071519ed7328615d3fc43d0392766669df0da8fc87e",
-      "snapshot_id": "6b2215994bc7b24b14d862450fc2dd59451acce66628a9fe42f58c530fa745e5",
+      "sha256": "8db0690a1c8a25d818cd2c66d712c36ca8eec3fa279c5c72a9cbd2b041746b4e",
+      "snapshot_id": "35267c8b13c6b92fdc0de27e9d1a538676f6df0d4c632d9f9964a49f2c0634d9",
       "source_id": "kuma-full-v34-f157c291"
     },
     {
@@ -840,24 +845,24 @@
       "source_id": "kuma-gpt-rlm-v34"
     },
     {
-      "generated_at": "2026-09-22T13:54:23.158469+00:00",
+      "generated_at": "2026-09-22T14:49:48.621071+00:00",
       "path": "artifacts/control-room/shared/liacpc14-deepseek-paid-continuation-v1-96702403.json",
-      "sha256": "31015d64a20b2fb863f1aba877025ebab4bf5e69f08451134225be33042a8f6b",
-      "snapshot_id": "f31fda626984ca99a81569a95d4b422862643830abbe47133a53c04be5a9cd9c",
+      "sha256": "1784b8c0fc33b6e0a0c9558b7f13da2edba3b07ad21e645b37c2283732e81041",
+      "snapshot_id": "97c565870e57ba6974148da17d5ae1cf2742c07cd1a9933bf67fa25ac323b638",
       "source_id": "liacpc14-deepseek-paid-continuation-v1-96702403"
     },
     {
-      "generated_at": "2026-09-22T13:54:47.869048+00:00",
+      "generated_at": "2026-09-22T14:45:08.512609+00:00",
       "path": "artifacts/control-room/shared/liacpc14-full-v34-4bef4ccd.json",
-      "sha256": "12324103673a169801353d4979dd42573fd7dcc4fd4747464491cdd6e2426d64",
-      "snapshot_id": "3cf7cad714e92c3fa76ef5e9bc8d29770de81d3c45fe5816edd793685eeb0b94",
+      "sha256": "1da42ee10fd4251d71b8b69ddb0b88f29115168e51c36a6c04a92afe502a4316",
+      "snapshot_id": "49f09bf6b2c866285cc4c30d3ec6c386f1416469451f37b4bd1a7abecc0f716a",
       "source_id": "liacpc14-full-v34-4bef4ccd"
     },
     {
-      "generated_at": "2026-09-22T13:54:36.789541+00:00",
+      "generated_at": "2026-09-22T14:50:00.970407+00:00",
       "path": "artifacts/control-room/shared/liacpc14-full-v34-e3e3abcb.json",
-      "sha256": "38750310e78269f20bd1c822bf63a922a8225ce1790a7f17e4d1f9a98c0998b8",
-      "snapshot_id": "9e8c467690762aca1ac1a3d0ab76e2e75e12cdd030628485fe99a0073f4b3e7b",
+      "sha256": "c4b97a484aa57429e691e6a03124f7fe66c0e08820a9b3b8ae91e2b61a5737f9",
+      "snapshot_id": "dcad65c0425dbcab8afbbf708df5efd1c772494a5f39bbfa1334977be8d00ffc",
       "source_id": "liacpc14-full-v34-e3e3abcb"
     },
     {
@@ -868,10 +873,10 @@
       "source_id": "liacpc14-gemini-repair-queue-v1"
     },
     {
-      "generated_at": "2026-09-22T13:52:09.396641+00:00",
+      "generated_at": "2026-09-22T14:52:24.223393+00:00",
       "path": "artifacts/control-room/shared/liacpc14-glm-llm-v28-archive.json",
-      "sha256": "b070c4deabfd7d24508559188a47cac88e5b4d7e9916265d961b020a0db2ac7a",
-      "snapshot_id": "929387c952826b2d367f3f277b07f1aa32067af3c40c7645ef46bed29f6fdb7e",
+      "sha256": "ffa7dbcc8acdedf2e375510645625b04569b97e65466667449890e8ff21d4434",
+      "snapshot_id": "75d33d8446e522d2e25ce9d4a933812a0395e7172801239e80e464e6a24496b1",
       "source_id": "liacpc14-glm-llm-v28-archive"
     },
     {
@@ -882,10 +887,10 @@
       "source_id": "liacpc14-glm-llm-v28-archive-exact"
     },
     {
-      "generated_at": "2026-09-22T13:54:19.525705+00:00",
+      "generated_at": "2026-09-22T14:49:34.966426+00:00",
       "path": "artifacts/control-room/shared/liacpc14-gpt-direct-docker-v1-13b56467.json",
-      "sha256": "3c95b756030919c03e8f08df88a25b53bfc8dcae948b0231f29ef077279781e3",
-      "snapshot_id": "e7d9e56895540d9f3fdc936e58182d498e951c9b41bc19e579c5886b97cf2bca",
+      "sha256": "a2ed0a8afb38232a564040d831e8e71f42f75a0566e74493ed86ff432b092942",
+      "snapshot_id": "353238dcf8e98c1276c6c9da7ace256e9d90a45f5e3d6e4fe0bd29c2798f3870",
       "source_id": "liacpc14-gpt-direct-docker-v1-13b56467"
     },
     {
@@ -896,24 +901,24 @@
       "source_id": "liacpc14-gpt-direct-docker-v1-ae21fd78"
     },
     {
-      "generated_at": "2026-09-22T13:54:20.989562+00:00",
+      "generated_at": "2026-09-22T14:49:46.980096+00:00",
       "path": "artifacts/control-room/shared/liacpc14-gpt-direct-recovery-v1-ee6a971b.json",
-      "sha256": "b648de7e816c24cdcf06472c8765172f3aa6aeb953176535b8c49e3fcb79940d",
-      "snapshot_id": "0d5771227af984827412b9cee0ef1d2e6ae4065b726a6a47552606f53645e38e",
+      "sha256": "78b5ba7690d7db1335967bd85eb40e17a43af43ae247fa387da88a25c2982740",
+      "snapshot_id": "b5bbf8a5973a6301feb95e46e7a0f8839030023a574eb2feda01402064391039",
       "source_id": "liacpc14-gpt-direct-recovery-v1-ee6a971b"
     },
     {
-      "generated_at": "2026-09-22T13:34:00.503120+00:00",
+      "generated_at": "2026-09-22T14:34:11.298317+00:00",
       "path": "artifacts/control-room/shared/liacpc14-gpt-task15-highmem-v1.json",
-      "sha256": "a638b6eece511566de0d6e369e704f92e2f8eb469463c73db994cba33b68b80b",
-      "snapshot_id": "0ec8b25bc9ad4f1088f4efb2e872bbd2742ea9b438b15dcff00d3ced94bba4fa",
+      "sha256": "d702adc4029a320634678a52600d7402712719bad21ae840f4c869188dd0216b",
+      "snapshot_id": "cf57e8b0e84cc29de1ce3d51c406b6bc32bd0359dcd0f2b910f541a443a90b10",
       "source_id": "liacpc14-gpt-task15-highmem-v1"
     },
     {
-      "generated_at": "2026-09-22T13:32:52.090069+00:00",
+      "generated_at": "2026-09-22T14:33:02.266147+00:00",
       "path": "artifacts/control-room/shared/liacpc14-qwen-docker-repair-v1.json",
-      "sha256": "e19118014a59026c15a6d4cdb0b2b7fc390df803bd4d9bf8613e21ce5debd1d7",
-      "snapshot_id": "f421729a73b4a275f352da4f67cace8a47808a616253c194bf4da9cdcf871daa",
+      "sha256": "6f06c27c83f8ef789470672d725e57b05b1d783596ce69599a03633733894ca0",
+      "snapshot_id": "80fe5d4ac6ee12f8cfe76b0aff8b4f7c7afb22d4b7f1e84713e6eead8171659a",
       "source_id": "liacpc14-qwen-docker-repair-v1"
     },
     {

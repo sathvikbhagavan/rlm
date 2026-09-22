@@ -2,6 +2,8 @@
   "figures": [
     "scaling_by_tier_all_models.pdf",
     "scaling_by_tier_all_models.png",
+    "scaling_by_tier_all_model_curves.pdf",
+    "scaling_by_tier_all_model_curves.png",
     "scaling_by_tier_qwen3_5.pdf",
     "scaling_by_tier_qwen3_5.png",
     "scaling_by_tier_deepseek-v4-flash.pdf",
@@ -16,6 +18,6 @@
     "scaling_by_tier_claude-haiku-4_5.png",
     "scaling_by_tier_individual_models.pdf"
   ],
-  "gold_manifest_sha256": "484a619d5129ec18826506e9fbdc02fb3f9acfb5c1c8daa833abc22a68b7f201",
+  "gold_manifest_sha256": "a5029a0861930750789b8e06394f22db9fe698baccc64cfcc38ec48a69c2ec0f",
   "note": "A leading asterisk marks an unfinished main-benchmark arm."
 }
