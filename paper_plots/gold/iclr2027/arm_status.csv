@@ -1,0 +1,20 @@
+scope,model,model_label,method,expected_jobs,succeeded_jobs,running_jobs,stale_jobs,failed_jobs,pending_jobs,scored_success_jobs,unscored_success_jobs,is_final,legend_label,note
+codeact_x1000,deepseek-v4-flash,DeepSeek V4 Flash,codeact,150,85,0,0,65,0,85,0,True,Codeact,terminal and scored
+full_benchmark,qwen3.5,Qwen 3.5,llm,300,300,0,0,0,0,300,0,True,LLM,terminal and scored
+full_benchmark,qwen3.5,Qwen 3.5,codeact,300,300,0,0,0,0,300,0,True,Codeact,terminal and scored
+full_benchmark,qwen3.5,Qwen 3.5,rlm,450,449,0,0,1,0,449,0,True,Rlm,terminal and scored
+full_benchmark,deepseek-v4-flash,DeepSeek V4 Flash,llm,300,300,0,0,0,0,300,0,True,LLM,terminal and scored
+full_benchmark,deepseek-v4-flash,DeepSeek V4 Flash,codeact,300,268,4,0,28,0,267,1,False,Codeact,"5 running, stale, pending, or unscored"
+full_benchmark,deepseek-v4-flash,DeepSeek V4 Flash,rlm,450,404,4,0,21,21,404,0,False,Rlm,"25 running, stale, pending, or unscored"
+full_benchmark,glm-5.2,GLM 5.2,llm,300,300,0,0,0,0,300,0,True,LLM,terminal and scored
+full_benchmark,glm-5.2,GLM 5.2,codeact,300,0,0,0,1,299,0,0,False,Codeact,"299 running, stale, pending, or unscored"
+full_benchmark,glm-5.2,GLM 5.2,rlm,450,344,0,1,36,69,344,0,False,Rlm,"70 running, stale, pending, or unscored"
+full_benchmark,gemini-3.7-flash,Gemini 3.7 Flash,llm,300,300,0,0,0,0,300,0,True,LLM,terminal and scored
+full_benchmark,gemini-3.7-flash,Gemini 3.7 Flash,codeact,300,300,0,0,0,0,300,0,True,Codeact,terminal and scored
+full_benchmark,gemini-3.7-flash,Gemini 3.7 Flash,rlm,450,442,0,0,8,0,442,0,True,Rlm,terminal and scored
+full_benchmark,gpt-5-mini,GPT-5 mini,llm,300,300,0,0,0,0,300,0,True,LLM,terminal and scored
+full_benchmark,gpt-5-mini,GPT-5 mini,codeact,300,300,0,0,0,0,300,0,True,Codeact,terminal and scored
+full_benchmark,gpt-5-mini,GPT-5 mini,rlm,450,450,0,0,0,0,450,0,True,Rlm,terminal and scored
+full_benchmark,claude-haiku-4.5,Claude Haiku 4.5,llm,300,300,0,0,0,0,300,0,True,LLM,terminal and scored
+full_benchmark,claude-haiku-4.5,Claude Haiku 4.5,codeact,300,300,0,0,0,0,300,0,True,Codeact,terminal and scored
+full_benchmark,claude-haiku-4.5,Claude Haiku 4.5,rlm,450,450,0,0,0,0,450,0,True,Rlm,terminal and scored

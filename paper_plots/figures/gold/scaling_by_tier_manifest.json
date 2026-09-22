@@ -1,0 +1,19 @@
+{
+  "figures": [
+    "scaling_by_tier_qwen3_5.pdf",
+    "scaling_by_tier_qwen3_5.png",
+    "scaling_by_tier_deepseek-v4-flash.pdf",
+    "scaling_by_tier_deepseek-v4-flash.png",
+    "scaling_by_tier_glm-5_2.pdf",
+    "scaling_by_tier_glm-5_2.png",
+    "scaling_by_tier_gemini-3_7-flash.pdf",
+    "scaling_by_tier_gemini-3_7-flash.png",
+    "scaling_by_tier_gpt-5-mini.pdf",
+    "scaling_by_tier_gpt-5-mini.png",
+    "scaling_by_tier_claude-haiku-4_5.pdf",
+    "scaling_by_tier_claude-haiku-4_5.png",
+    "scaling_by_tier_all_models.pdf"
+  ],
+  "gold_manifest_sha256": "96c96050f85488764ea35977e2aff875bf15b6ce4c160d6ad97754aefa17b4bf",
+  "note": "A leading asterisk marks an unfinished main-benchmark arm."
+}
