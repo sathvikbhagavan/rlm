@@ -156,6 +156,7 @@ def test_cross_model_summary_uses_model_mean_and_standard_error() -> None:
             "context": "100",
             "tier": 1,
             "f1": f1,
+            "f1_zero_imputed": f1,
             "arm_final": True,
         }
         for model, f1 in zip(
@@ -189,6 +190,7 @@ def test_cross_model_summary_records_missing_and_provisional_models() -> None:
             "context": "1000",
             "tier": 3,
             "f1": 0.5,
+            "f1_zero_imputed": 0.25,
             "arm_final": True,
         },
         {
@@ -197,16 +199,17 @@ def test_cross_model_summary_records_missing_and_provisional_models() -> None:
             "context": "1000",
             "tier": 3,
             "f1": 0.7,
+            "f1_zero_imputed": 0.7,
             "arm_final": False,
         },
     ]
 
     summary = cross_model_scaling_summaries(rows)[0]
 
-    assert summary["mean_f1"] == pytest.approx(0.6)
-    assert summary["model_sem"] == pytest.approx(0.1)
-    assert summary["n_models"] == 2
+    assert summary["mean_f1"] == pytest.approx(0.25)
+    assert summary["model_sem"] is None
+    assert summary["n_models"] == 1
     assert summary["target_n_models"] == 3
-    assert summary["missing_models"] == "gpt-5-mini"
-    assert summary["provisional_models"] == "gemini-3.7-flash"
+    assert summary["missing_models"] == "gemini-3.7-flash;gpt-5-mini"
+    assert summary["excluded_provisional_models"] == "gemini-3.7-flash"
     assert summary["is_final"] is False

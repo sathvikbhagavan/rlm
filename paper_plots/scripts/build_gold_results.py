@@ -386,7 +386,7 @@ def scaling_summaries(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
 def cross_model_scaling_summaries(
     scaling_rows: list[dict[str, Any]],
 ) -> list[dict[str, Any]]:
-    """Average model-level tier scores and quantify variation across models."""
+    """Average terminal model arms, counting terminal failed trajectories as zero."""
     grouped: dict[tuple[str, str, int], list[dict[str, Any]]] = defaultdict(list)
     for row in scaling_rows:
         grouped[(str(row["method"]), str(row["context"]), int(row["tier"]))].append(row)
@@ -400,17 +400,19 @@ def cross_model_scaling_summaries(
             CONTEXT_ORDER[item[0][1]],
         ),
     ):
-        scored = [row for row in group if row["f1"] is not None]
-        if not scored:
+        eligible = [row for row in group if row["f1"] is not None and bool(row["arm_final"])]
+        if not eligible:
             continue
         expected_models = EXPECTED_MODELS_BY_METHOD_CONTEXT[(method, context)]
-        observed_models = {str(row["model"]) for row in scored}
-        values = [float(row["f1"]) for row in scored]
+        observed_models = {str(row["model"]) for row in eligible}
+        values = [float(row["f1_zero_imputed"]) for row in eligible]
         model_std = statistics.stdev(values) if len(values) > 1 else None
-        provisional_models = sorted(
-            str(row["model"]) for row in scored if not bool(row["arm_final"])
+        excluded_provisional_models = sorted(
+            str(row["model"])
+            for row in group
+            if row["f1"] is not None and not bool(row["arm_final"])
         )
-        is_final = observed_models == expected_models and not provisional_models
+        is_final = observed_models == expected_models
         output.append(
             {
                 "method": method,
@@ -427,7 +429,7 @@ def cross_model_scaling_summaries(
                 "missing_models": ";".join(
                     model for model in MODEL_ORDER if model in expected_models - observed_models
                 ),
-                "provisional_models": ";".join(provisional_models),
+                "excluded_provisional_models": ";".join(excluded_provisional_models),
                 "is_final": is_final,
             }
         )
@@ -495,8 +497,8 @@ def write_readme(path: Path, arms: list[dict[str, Any]], *, as_of: str) -> None:
             "- `provisional_arm_records.csv`: records belonging to unfinished arms.",
             "- `arm_status.csv`: the finality decision used for legend asterisks.",
             "- `tier_scaling.csv`: the faithful four-tier plotting aggregate.",
-            "- `tier_scaling_across_models.csv`: unweighted model-level means and standard "
-            "errors across models.",
+            "- `tier_scaling_across_models.csv`: unweighted means and standard errors across "
+            "terminal model arms; terminal failed trajectories contribute zero.",
             "- `source_manifest.json`: source snapshot and file checksums.",
             "",
             "Regenerate from the repository root:",

@@ -370,8 +370,8 @@ def model_average_figure(rows: list[dict[str, str]]) -> plt.Figure:
     fig.text(
         0.5,
         0.008,
-        "Unweighted mean ± SEM across model-level means. Hollow/* points are provisional; "
-        "labels report n when fewer than six models are available.",
+        "Unweighted mean ± SEM across terminal model arms; terminal failed trajectories score "
+        "zero. Hollow/* points have fewer than the planned models.",
         ha="center",
         va="bottom",
         fontsize=6.7,
