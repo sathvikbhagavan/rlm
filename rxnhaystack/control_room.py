@@ -44,7 +44,17 @@ STATUS_ORDER = ("succeeded", "running", "stale", "failed", "pending")
 FULL_CAMPAIGN = "iclr2027-six-model-full-v34"
 MATCHED_CAMPAIGN = "iclr2027-matched-cardinality-v7"
 ORACLE_CAMPAIGN = "iclr2027-oracle-predicate-v1"
+ORACLE_EXECUTOR_CAMPAIGN = "iclr2027-oracle-executor-v1"
+PROSPECTIVE_CAMPAIGN = "iclr2027-task16-prospective-decomposition-v1"
 DEEPSEEK_CODEACT_X1000_CAMPAIGN = "iclr2027-deepseek-codeact-x1000-v1"
+DASHBOARD_CAMPAIGN_ORDER = (
+    FULL_CAMPAIGN,
+    MATCHED_CAMPAIGN,
+    ORACLE_CAMPAIGN,
+    ORACLE_EXECUTOR_CAMPAIGN,
+    PROSPECTIVE_CAMPAIGN,
+    DEEPSEEK_CODEACT_X1000_CAMPAIGN,
+)
 CONTINUATION_CAMPAIGNS = {
     "iclr2027-gpt5mini-direct-openai-docker-v1",
     "iclr2027-gpt5mini-direct-openai-recovery-v1",
@@ -56,16 +66,22 @@ CONTINUATION_CAMPAIGNS = {
 }
 LEGACY_FULL_CAMPAIGNS = {"iclr2027-six-model-full-v28"}
 CONTINUATION_CAMPAIGN_PREFIXES = (
+    ("iclr2027-glm-rlm-swissai-", FULL_CAMPAIGN),
     ("iclr2027-jed-claude-rlm-repair-", FULL_CAMPAIGN),
     ("iclr2027-jed-credit-retry-deepseek-codeact-repair-", FULL_CAMPAIGN),
     ("iclr2027-jed-credit-retry-deepseek-rlm-accelerated-", FULL_CAMPAIGN),
+    ("iclr2027-jed-credit-retry-glm-openrouter-rlm-", FULL_CAMPAIGN),
+    ("iclr2027-jed-credit-retry-oracle-predicate-", ORACLE_CAMPAIGN),
+    ("iclr2027-jed-credit-retry-qwen-matched-accelerated-", MATCHED_CAMPAIGN),
     ("iclr2027-jed-deepseek-codeact-repair-", FULL_CAMPAIGN),
     ("iclr2027-jed-deepseek-rlm-accelerated-", FULL_CAMPAIGN),
     ("iclr2027-jed-deepseek-rlm-systemexit-repair-", FULL_CAMPAIGN),
     ("iclr2027-jed-glm-openrouter-rlm-", FULL_CAMPAIGN),
     ("iclr2027-jed-gpt-matched-direct-", MATCHED_CAMPAIGN),
+    ("iclr2027-jed-qwen-matched-accelerated-", MATCHED_CAMPAIGN),
     ("iclr2027-jed-qwen-matched-openrouter-", MATCHED_CAMPAIGN),
     ("iclr2027-jed-oracle-predicate-", ORACLE_CAMPAIGN),
+    ("iclr2027-qwen-matched-swissai-", MATCHED_CAMPAIGN),
 )
 SHARDED_CAMPAIGN_PREFIXES = (
     ("iclr2027-jed-deepseek-codeact-x1000-", DEEPSEEK_CODEACT_X1000_CAMPAIGN),
@@ -623,6 +639,11 @@ def merge_snapshots(
 
 def continuation_target_run_id(run_id: str) -> str | None:
     prefixes = (
+        ("credit-retry-repair3-openrouter-glm-recovery-", ""),
+        ("credit-retry-repair3-jed-oracle-recovery-", ""),
+        ("credit-retry-accel-openrouter-qwen-matched-", ""),
+        ("accel-openrouter-qwen-matched-", ""),
+        ("swiss-free-", ""),
         ("infra-retry-", ""),
         ("credit-retry-jed-accel-paid-openrouter-", ""),
         ("credit-retry-paid-openrouter-repair-", ""),
@@ -689,9 +710,7 @@ def fold_sharded_campaigns(campaigns: list[dict[str, Any]]) -> list[dict[str, An
             {
                 "name": target_name,
                 "definition_sha256": hashlib.sha256(definition_material).hexdigest(),
-                "expected_cost_chf": sum(
-                    float(shard["expected_cost_chf"]) for shard in shards
-                ),
+                "expected_cost_chf": sum(float(shard["expected_cost_chf"]) for shard in shards),
                 "counts": {status: counts[status] for status in STATUS_ORDER},
                 "duplicate_runs": sum(int(shard["duplicate_runs"]) for shard in shards),
                 "sources": sorted(sources.values(), key=lambda item: item["id"]),
@@ -752,6 +771,20 @@ def fold_full_benchmark_continuations(campaigns: list[dict[str, Any]]) -> list[d
     """Backward-compatible name for folding all scientific continuations."""
 
     return fold_scientific_continuations(campaigns)
+
+
+def scientific_dashboard_view(merged: Mapping[str, Any]) -> dict[str, Any]:
+    """Expose only the six approved scientific studies in a stable order.
+
+    Reporters may publish any number of machine shards, retries, pilots and
+    transport-specific continuations.  Those records remain available as
+    folded attempts inside their scientific parent, but they must never become
+    separate top-level dashboard sections.
+    """
+
+    by_name = {str(campaign["name"]): campaign for campaign in merged.get("campaigns", [])}
+    visible = [by_name[name] for name in DASHBOARD_CAMPAIGN_ORDER if name in by_name]
+    return {**merged, "campaigns": visible}
 
 
 def overlay_continuation(original: dict[str, Any], continuation: dict[str, Any]) -> dict[str, Any]:

@@ -286,6 +286,80 @@ def test_qwen_docker_repair_folds_into_full_benchmark() -> None:
 
 
 @pytest.mark.parametrize(
+    ("campaign", "parent"),
+    [
+        ("iclr2027-glm-rlm-swissai-s01", control_room.FULL_CAMPAIGN),
+        ("iclr2027-jed-credit-retry-glm-openrouter-rlm-r01", control_room.FULL_CAMPAIGN),
+        (
+            "iclr2027-jed-credit-retry-qwen-matched-accelerated-r01",
+            control_room.MATCHED_CAMPAIGN,
+        ),
+        ("iclr2027-jed-qwen-matched-accelerated-s01-19f4f69", control_room.MATCHED_CAMPAIGN),
+        ("iclr2027-qwen-matched-swissai-s01", control_room.MATCHED_CAMPAIGN),
+        (
+            "iclr2027-jed-credit-retry-oracle-predicate-r01",
+            control_room.ORACLE_CAMPAIGN,
+        ),
+    ],
+)
+def test_new_execution_shards_have_scientific_parents(campaign: str, parent: str) -> None:
+    assert control_room.continuation_parent_campaign(campaign) == parent
+
+
+@pytest.mark.parametrize(
+    ("run_id", "canonical"),
+    [
+        (
+            "swiss-free-full-glm-5.2-tier3-task10b-rlm-x500-r04",
+            "full-glm-5.2-tier3-task10b-rlm-x500-r04",
+        ),
+        (
+            "credit-retry-repair3-openrouter-glm-recovery-full-glm-5.2-tier3-task10-rlm-x500-r04",
+            "full-glm-5.2-tier3-task10-rlm-x500-r04",
+        ),
+        (
+            "credit-retry-repair3-jed-oracle-recovery-oracle-qwen3.5-397b-tier4-task13-xfull-r03",
+            "oracle-qwen3.5-397b-tier4-task13-xfull-r03",
+        ),
+        (
+            "credit-retry-accel-openrouter-qwen-matched-matched-qwen3.5-397b-tier3-task10-scale-x5000-k1-r02",
+            "matched-qwen3.5-397b-tier3-task10-scale-x5000-k1-r02",
+        ),
+        (
+            "accel-openrouter-qwen-matched-matched-qwen3.5-397b-tier3-task10-scale-x100-k1-r01",
+            "matched-qwen3.5-397b-tier3-task10-scale-x100-k1-r01",
+        ),
+        (
+            "swiss-free-matched-qwen3.5-397b-tier3-task10-scale-xfull-k1-r02",
+            "matched-qwen3.5-397b-tier3-task10-scale-xfull-k1-r02",
+        ),
+    ],
+)
+def test_new_execution_run_ids_map_to_canonical_runs(run_id: str, canonical: str) -> None:
+    assert control_room.continuation_target_run_id(run_id) == canonical
+
+
+def test_dashboard_view_has_only_six_approved_scientific_sections() -> None:
+    campaigns = [
+        {"name": name, "marker": name} for name in reversed(control_room.DASHBOARD_CAMPAIGN_ORDER)
+    ]
+    campaigns.extend(
+        [
+            {"name": "iclr2027-jed-random-retry-s99", "marker": "hidden"},
+            {"name": "some-new-pilot", "marker": "hidden"},
+        ]
+    )
+
+    view = control_room.scientific_dashboard_view(
+        {"generated_at": "2026-09-22T00:00:00+00:00", "campaigns": campaigns}
+    )
+
+    assert [campaign["name"] for campaign in view["campaigns"]] == list(
+        control_room.DASHBOARD_CAMPAIGN_ORDER
+    )
+
+
+@pytest.mark.parametrize(
     ("campaign", "run_id", "canonical"),
     [
         (
@@ -418,9 +492,9 @@ def test_deepseek_x1000_shards_fold_into_one_study(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     snapshot = populated_snapshot(tmp_path, monkeypatch)
-    first = merge_snapshots([snapshot], now=datetime(2026, 9, 17, 12, 10, tzinfo=UTC))[
-        "campaigns"
-    ][0]
+    first = merge_snapshots([snapshot], now=datetime(2026, 9, 17, 12, 10, tzinfo=UTC))["campaigns"][
+        0
+    ]
     second = deepcopy(first)
     first["name"] = "iclr2027-jed-deepseek-codeact-x1000-s01-v1"
     second["name"] = "iclr2027-jed-deepseek-codeact-x1000-s02-v1"

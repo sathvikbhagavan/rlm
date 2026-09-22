@@ -16,6 +16,7 @@ from rxnhaystack.control_room import (
     load_snapshot_directory,
     merge_snapshots,
     publish_snapshot,
+    scientific_dashboard_view,
     snapshot_state_digest,
     sync_snapshots,
     write_dashboard,
@@ -408,8 +409,9 @@ def render_cached_control_room(
 ) -> None:
     snapshots = load_snapshot_directory(cache_dir)
     merged = merge_snapshots(snapshots, stale_after_seconds=args.stale_after_hours * 3600)
-    write_dashboard(html_path, merged)
-    write_markdown(markdown_path, merged)
+    dashboard = scientific_dashboard_view(merged)
+    write_dashboard(html_path, dashboard)
+    write_markdown(markdown_path, dashboard)
 
 
 def dashboard_sources(args: argparse.Namespace) -> list[tuple[str, str]]:

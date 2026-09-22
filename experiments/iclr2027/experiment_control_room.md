@@ -102,12 +102,20 @@ sessions; it does not stop or alter experiments.
 
 ## 5. What is included
 
-The automatic reporter recognizes the current full six-model benchmark,
-matched-cardinality study, oracle-predicate study, deterministic oracle ceiling,
-prospective Task-16 study, direct-OpenAI GPT Docker completion and non-Docker
-recovery studies, and the paid DeepSeek continuation. It does not show
-infrastructure smoke tests. Old pilots and superseded experiment definitions
-are intentionally excluded from the main view.
+The dashboard has exactly six top-level scientific sections, in this order:
+
+1. the full six-model benchmark;
+2. the matched-cardinality study;
+3. the oracle-predicate study;
+4. the deterministic oracle executor;
+5. the prospective Task-16 decomposition; and
+6. the DeepSeek CodeAct x1000 study.
+
+Machine shards, retries, provider changes, pilots and repair experiments never
+appear as additional sections. Their individual attempts are folded into the
+corresponding canonical runs inside one of these six studies. Unknown future
+experiment names are hidden until they are deliberately approved as a new
+scientific study.
 
 Direct-OpenAI GPT completion/recovery records and paid-OpenRouter DeepSeek
 continuations are folded into the corresponding original run IDs in the full
