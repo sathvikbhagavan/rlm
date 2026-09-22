@@ -128,6 +128,27 @@ class TestDepth1CompletionLoop:
 
             mock_get_client.return_value.completion.assert_not_called()
 
+    def test_forced_final_answer_ends_with_user_instruction(self):
+        """The forced-final request must be valid for strict Gemini providers."""
+        rlm = RLM(
+            backend="openai",
+            backend_kwargs={"model_name": "test-model"},
+            max_depth=1,
+        )
+        handler = Mock()
+        handler.completion.return_value = "final response"
+        history = [{"role": "assistant", "content": "work in progress"}]
+
+        result = rlm._default_answer(history, handler)
+
+        assert result == "final response"
+        prompt = handler.completion.call_args.args[0]
+        assert prompt[-1] == {
+            "role": "user",
+            "content": "Please provide a final answer to the user's question based on the information provided.",
+        }
+        assert history == [{"role": "assistant", "content": "work in progress"}]
+
     def test_no_subcall_fn_at_depth_1(self):
         """depth=1 (max_depth=1) should NOT pass subcall_fn to environment."""
         with patch.object(rlm_module, "get_client") as mock_get_client:

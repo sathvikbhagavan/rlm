@@ -11,12 +11,12 @@ from rxnhaystack.manifest import load_manifest
 def test_local_docker_queue_has_exact_order_and_cardinalities() -> None:
     assert [phase.name for phase in PHASES] == [
         "qwen-repair",
-        "gemini-repair",
         "prospective-task16",
+        "gemini-repair",
         "deepseek-docker",
         "glm-docker",
     ]
-    assert [phase.expected_runs for phase in PHASES] == [6, 8, 30, 24, 45]
+    assert [phase.expected_runs for phase in PHASES] == [6, 30, 8, 24, 45]
 
 
 def test_local_docker_queue_selectors_are_disjoint_and_exact() -> None:

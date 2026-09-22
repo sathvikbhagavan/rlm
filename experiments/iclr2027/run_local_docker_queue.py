@@ -61,15 +61,6 @@ PHASES = (
         existing_watcher=True,
     ),
     Phase(
-        name="gemini-repair",
-        root=EXECUTION_ROOT,
-        manifest_relative=Path("experiments/iclr2027/gemini-paid-openrouter-docker-repair.toml"),
-        selections=(),
-        expected_runs=8,
-        title="Gemini 3.7 Flash · RLM · Docker repairs",
-        cost_ceiling_chf=25.0,
-    ),
-    Phase(
         name="prospective-task16",
         root=EXECUTION_ROOT,
         manifest_relative=Path("experiments/iclr2027/prospective-decomposition.toml"),
@@ -79,6 +70,15 @@ PHASES = (
         cost_ceiling_chf=30.0,
         needs_swissai=True,
         existing_dashboard_reporter=True,
+    ),
+    Phase(
+        name="gemini-repair",
+        root=EXECUTION_ROOT,
+        manifest_relative=Path("experiments/iclr2027/gemini-paid-openrouter-docker-repair.toml"),
+        selections=(),
+        expected_runs=8,
+        title="Gemini 3.7 Flash · RLM · five unresolved Docker cells",
+        cost_ceiling_chf=25.0,
     ),
     Phase(
         name="deepseek-docker",
@@ -433,6 +433,22 @@ def wait_for_existing_qwen(poll_seconds: int) -> None:
         time.sleep(poll_seconds)
 
 
+def wait_for_phase_terminal(phase: Phase, poll_seconds: int) -> None:
+    """Wait for an already-running phase without starting a duplicate runner."""
+    manifest = validate_phase(phase, allow_main_fallback=True)
+    while True:
+        counts = ledger_counts(phase, manifest)
+        if counts["running"] == 0 and counts["pending"] == 0:
+            log(f"Existing {phase.name} phase terminal: {dict(counts)}")
+            return
+        write_state(
+            status="waiting-for-existing-phase",
+            phase=phase.name,
+            counts=dict(counts),
+        )
+        time.sleep(poll_seconds)
+
+
 def check_configuration() -> None:
     verify_secret(OPENROUTER_KEY)
     verify_secret(SWISSAI_KEY)
@@ -447,6 +463,11 @@ def main() -> int:
     parser = argparse.ArgumentParser(description="Run the local Docker queue once per cell.")
     parser.add_argument("--commit", help="Exact repository commit used for queued phases")
     parser.add_argument("--check", action="store_true")
+    parser.add_argument(
+        "--wait-for-prospective-terminal",
+        action="store_true",
+        help="Adopt the active prospective runner and wait instead of launching a duplicate",
+    )
     parser.add_argument("--poll-seconds", type=int, default=60)
     args = parser.parse_args()
     if args.check:
@@ -464,6 +485,9 @@ def main() -> int:
     write_state(status="armed", commit=args.commit, phases=phase_state)
 
     wait_for_existing_qwen(args.poll_seconds)
+    if args.wait_for_prospective_terminal:
+        prospective = next(phase for phase in PHASES if phase.name == "prospective-task16")
+        wait_for_phase_terminal(prospective, args.poll_seconds)
     prepare_execution_root(args.commit)
     # The controller owns any still-pending Qwen cells exactly once. Existing
     # Existing successes and failures are skipped; only never-attempted cells run.

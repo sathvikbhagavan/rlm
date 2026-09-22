@@ -883,7 +883,11 @@ class RLM:
         """
         current_prompt = message_history + [
             {
-                "role": "assistant",
+                # This is a new instruction to the model, not a model-authored
+                # turn.  Gemini rejects chat histories that end in a model
+                # turn, and labelling this as assistant made the forced-final
+                # path invalid after iteration or timeout exhaustion.
+                "role": "user",
                 "content": "Please provide a final answer to the user's question based on the information provided.",
             }
         ]

@@ -4,7 +4,7 @@ This is the shared coordination record for the final benchmark. It says who
 owns each part, where it is running, what is complete, and what must happen
 next. Update this file whenever a phase starts, stops, or materially changes.
 
-Last consolidated: **2026-09-21 00:38 Europe/Zurich**
+Last consolidated: **2026-09-22 11:55 Europe/Zurich**
 
 Dashboard/assignment implementation at consolidation: `17cd68b`
 
@@ -20,26 +20,26 @@ Slurm shards and repairs are folded into their parent experiment.
 | GLM full RLM | Jed / paid OpenRouter plus earlier SwissAI results | Running. Folded dashboard: 317 succeeded, 61 failed, 1 running, 2 stale, 69 pending. | Let the disjoint Jed shards finish, then make a failed-only repair set. Keep 45 Docker cells for `liacpc14`. |
 | Qwen matched cardinality | Jed / paid OpenRouter | Running under Amin, not Sathvik: 169 succeeded, 4 running and 552 pending after folding the newest two-cell repair. | Stop the four launchers through their tested shutdown path, rebuild the exact unfinished set, and repartition it into about 20 disjoint one-worker shards for a sub-10-hour target. |
 | Oracle-predicate Qwen | Jed / paid OpenRouter | 70/75 succeeded. Five full-corpus cells failed in the latest repair. | Inspect their Jed stderr/artifacts, classify the common cause, then retry only the five failed cells. |
-| Task-16 prospective decomposition | `liacpc14` / Claude OpenRouter and Qwen | Pilot succeeded; 1/30 jobs complete. The remaining 29 Docker-required, 28--30 GiB jobs are in the explicit local queue. | Run locally one at a time after the 14 Qwen/Gemini repairs. |
-| Qwen/Gemini full RLM repair | `liacpc14` / OpenRouter | Qwen Task-16 r02 attempt 2 is the final attempt and has completed 6/10 questions. Its prediction artifact is advancing, so recent stall mail was false. The remaining five Qwen cells are scheduled for exactly one attempt each regardless of r02's outcome; Gemini's eight cells have not started. At 00:29 the shared account had `$408.63`, while this key had `$55.13` before its `$1,200` cap. | Do not retry r02 or any of the other five Qwen repairs after their scheduled attempt. Preserve failures as unsuccessful cells and continue. Revise the cost estimate before releasing Gemini. |
+| Task-16 prospective decomposition | `liacpc14` / Claude OpenRouter and Qwen SwissAI | Active: 8 succeeded, 1 running and 21 pending at the latest audit. | Continue locally one at a time, then release the five unresolved Gemini cells. |
+| Qwen/Gemini full RLM repair | `liacpc14` / OpenRouter | Qwen is terminal: 5 repairs succeeded and one cell is conservatively scored zero, yielding 449/450 canonical RLM successes. Three Gemini repair attempts exhausted the RLM iteration allowance and then exposed a forced-final-answer role bug. Five earlier Gemini failures ended after only 4--6 seconds with empty metrics and unknown causes; they were not shown to share that failure. | Keep the Qwen zero outcome. After the active prospective phase, retry exactly the five unresolved Gemini cells once using the corrected forced-final request; preserve every outcome. |
 | GLM Docker RLM | `liacpc14` / OpenRouter | 45 jobs held. | Run locally after the prospective and Qwen/Gemini Docker repairs, unless paper priority changes. |
 | DeepSeek CodeAct repair | Not launched | 57 failures: 48 timeouts, 6 context overflows, 2 interrupted attempts and 1 other provider error. | Retry transient/interrupted cells; first correct and pilot the six context-overflow configurations. |
 | GLM CodeAct | Jed, later | One pilot failed; 299 jobs held. | Diagnose/revise the release pilot before broad execution. |
 
 The recurring local Docker queue, which must appear in every execution-status
-handoff until empty, is: (1) six Qwen repairs (**r02 final attempt active; five
-scheduled once with no retries**), (2)
-eight Gemini repairs, (3) 29 prospective Task-16 jobs, (4) 24 remaining
-DeepSeek Docker jobs, and (5) 45 GLM Docker jobs. Only one large Docker RLM cell
-runs at a time.
+handoff until empty, is: (1) Qwen repairs **finished: 5 succeeded and 1 scored
+zero**, (2) prospective Task-16 **active: 8 succeeded, 1 running and 21 pending
+at the latest audit**, (3) exactly five unresolved Gemini cells queued once
+with the corrected forced-final request, (4) 24 remaining DeepSeek Docker jobs,
+and (5) 45 GLM Docker jobs. Only one large Docker RLM cell runs at a time.
 
-The durable controller `rxn-local-docker-queue-v1` is armed at Git `57e5bba`.
-It waits for the active Qwen attempt, then advances through those five phases
-in order. Every never-attempted cell receives at most one attempt; scientific
-failures are preserved and never selected for retry. Each phase receives a
-task-notify watcher and dashboard publication. The controller waits rather
-than spending if either the shared OpenRouter account or the API key has less
-than USD 20 available. Its durable state and log are
+The durable controller is being re-armed with an adoption gate: it waits for
+the already-running prospective launcher to become terminal without starting
+a duplicate, then advances through Gemini, DeepSeek and GLM. Scientific
+failures are preserved. Each phase receives a task-notify watcher and dashboard
+publication. The controller waits rather than starting a new paid phase if
+either the shared OpenRouter account or the API key has less than USD 20
+available. Its durable state and log are
 `~/.local/state/rxnhaystack/local-docker-queue.json` and
 `~/.local/state/rxnhaystack/local-docker-queue.log`.
 
