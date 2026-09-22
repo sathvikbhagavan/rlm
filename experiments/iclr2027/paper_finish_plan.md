@@ -1,5 +1,38 @@
 # RxnHaystack paper finish plan
 
+## Original list from Amin (verbatim)
+
+- We need to have a proper figure 1. It could be a cute llama with lab coat looking in a haystack for a reaction. Maybe we just need the schematic though, or a mix of two, not sure. But figure 1 is something we need.
+- We need to follow the assessment, and make sure if the claim of mechanical vs. reasoning is causally separated and has evidence? For that, which plot do we need?
+- The story should also emphasize the structured data aspect of this task in scientific discovery, something that might be more relevant when we step away from domains like math. Perhaps we could come up with more examples, like time-series (cite our adaptive time-series work), data in biology, I don't know, but make it make sense more and show the impact and need for it through some other examples.
+- The assessment has found the failures insightful, we should redo the failure analysis now that we have so many models and arms, either automatically, or having codex finding the root causes, writing code for it, and running it on the traces. Failure analysis is important.
+- We should properly and briefly explain RAG is superseded by our baselines constructions. Essentially at any context length we put the ground-truths in, so it's already a ceiling for what a RAG (e.g. based on DRFP) could achieve. Because in 100, 500 out of 120k, we're putting the answer reaction along with the others. So we don't try RAG since we think it's subsumed.
+- The assessment talks about the highest value move being oracle-predicate. Do we have results for that? What do those results tell us? We should add those results and the prose to overleaf to the proper location.
+- We should think about the presentation/framing as to what makes it a good benchmark, and show those qualities. I'm not sure what these qualities are, but I can think of:
+  - A benchmark should be able to separate models, otherwise, it's not a good benchmark
+  - It should show the existence of a gap (where we get from our human annotations)
+  - It'd be better if it's connected to real-world, and is actually useful for humans. So it'd be great if we could explain how some of the difficult questions of our benchmark are things that experimental chemists would benefit from if solved reliably.
+  - Any other suggestions are welcome!
+  - Lastly, this paper is not at all about the strength of RLMs or how they good they are, we don't care, we just adopted them as a recent attempt at very long-context task
+- The assessment writes "... the strongest evidence ..." right before section 3, does it still hold with our results?
+- Then moving to weaknesses:
+  - Has our experiment answered W1?
+  - W2 is an explanation I mentioned above
+  - W3 is addressed
+  - W4, do we need more clarification?
+  - W5, is it too important? Do any of our claims rest on it? I don't think so.
+  - W6, we could point to it as a limitation, and mention it in the paper (always appreciated)
+  - W7 W8 W9: to be ignored for now, and delegated to later
+  - W10: We should have plots of tool-call, tokens, latency, tool-time, all of it should enrich the appendix
+- Then moving to experiments:
+  - A: Do we have it? Is it in the paper? If not, we should.
+  - B: We have it, does it answer the question? Is it embedded in the paper?
+  - C: Explain why not (DRFP, etc.)
+  - D: Do we have it?
+  - E: I have it differently actually. We have human annotations for different chunks of the 100 questions, not their annotation for false positives..
+  - F: Do our results support that?
+- What should we release as artifact of this benchmark? Just the set of questions? The answers? Should we hold out anything for not being contaminated? The codes to obtain the ground-truth? The interface to obtain more human annotations?
+
 Updated September 22, 2026. This is the working document for turning the
 workshop paper into the ICLR submission. It should be updated whenever an
 analysis is accepted, a figure is frozen, or prose is pushed to Overleaf.
