@@ -34,6 +34,14 @@ MODEL_MARKERS = {
     "gpt-5-mini": "P",
     "claude-haiku-4.5": "X",
 }
+MODEL_COLORS = {
+    "qwen3.5": "#0072B2",
+    "deepseek-v4-flash": "#D55E00",
+    "glm-5.2": "#E69F00",
+    "gemini-3.7-flash": "#009E73",
+    "gpt-5-mini": "#CC79A7",
+    "claude-haiku-4.5": "#56B4E9",
+}
 TIER_NAMES = {
     1: "Structural lookup",
     2: "Property aggregation",
@@ -381,6 +389,108 @@ def model_average_figure(rows: list[dict[str, str]]) -> plt.Figure:
     return fig
 
 
+def rlm_tier_scaling_figure(
+    rows: list[dict[str, str]],
+    arms: dict[tuple[str, str], dict[str, str]],
+) -> plt.Figure:
+    """Rebuild the original RLM-by-tier scaling view from gold results."""
+    contexts = ("100", "500", "full")
+    positions = {context: index for index, context in enumerate(contexts)}
+    fig, axes = plt.subplots(2, 2, figsize=(7.2, 5.4), sharex=True, sharey=True)
+    axes = axes.ravel()
+
+    for tier, axis in enumerate(axes, start=1):
+        axis.axvspan(1.72, 2.28, color="#F1F3F5", zorder=0)
+        for model in MODEL_ORDER:
+            subset = [
+                row
+                for row in rows
+                if row["model"] == model
+                and row["method"] == "rlm"
+                and int(row["tier"]) == tier
+                and row["context"] in contexts
+                and row["f1"]
+            ]
+            subset.sort(key=lambda row: positions[row["context"]])
+            if not subset:
+                continue
+            provisional = not as_bool(arms[(model, "rlm")]["is_final"])
+            axis.errorbar(
+                [positions[row["context"]] for row in subset],
+                [float(row["f1"]) for row in subset],
+                yerr=[float(row["f1_std"]) for row in subset],
+                color=MODEL_COLORS[model],
+                linestyle="--" if provisional else "-",
+                marker="o",
+                markersize=4.2,
+                markeredgecolor="white",
+                markeredgewidth=0.45,
+                capsize=2.2,
+                elinewidth=0.9,
+                linewidth=1.5,
+                zorder=3,
+            )
+        axis.set_title(
+            f"({chr(96 + tier)}) Tier {tier}: {TIER_NAMES[tier]} ($n={TIER_QUESTIONS[tier]}$)",
+            loc="left",
+            pad=5,
+        )
+        axis.set_xlim(-0.18, 2.2)
+        axis.set_ylim(-0.02, 1.06)
+        axis.set_yticks(np.linspace(0, 1, 6))
+        axis.grid(axis="y", color="#D8DDE2", linewidth=0.55)
+        axis.spines[["top", "right"]].set_visible(False)
+        axis.tick_params(length=2.5, width=0.6)
+
+    for axis in axes[2:]:
+        axis.set_xticks(range(len(contexts)), ("100", "500", "Full"))
+        axis.set_xlabel("Accessible corpus size (reactions)")
+    for axis in axes[::2]:
+        axis.set_ylabel("Question-weighted macro F1")
+
+    handles = []
+    for model in MODEL_ORDER:
+        provisional = not as_bool(arms[(model, "rlm")]["is_final"])
+        handles.append(
+            Line2D(
+                [0],
+                [0],
+                color=MODEL_COLORS[model],
+                linestyle="--" if provisional else "-",
+                marker="o",
+                markersize=4.5,
+                label=("*" if provisional else "")
+                + next(row["model_label"] for row in rows if row["model"] == model),
+            )
+        )
+    fig.suptitle(
+        "RLM scaling across benchmark tiers",
+        y=0.995,
+        fontsize=10,
+        fontweight="bold",
+    )
+    fig.legend(
+        handles=handles,
+        loc="upper center",
+        ncol=3,
+        frameon=False,
+        bbox_to_anchor=(0.5, 0.955),
+        columnspacing=1.2,
+    )
+    fig.text(
+        0.5,
+        0.008,
+        "Terminal failed jobs score zero; unresolved jobs are excluded. Dashed curves and * "
+        "labels mark provisional arms.",
+        ha="center",
+        va="bottom",
+        fontsize=6.8,
+        color="#555555",
+    )
+    fig.subplots_adjust(top=0.82, bottom=0.12, hspace=0.35, wspace=0.20)
+    return fig
+
+
 def save_figure(figure: plt.Figure, output: Path, name: str) -> None:
     metadata = {
         "Creator": "RxnHaystack gold plotting pipeline",
@@ -419,6 +529,10 @@ def main() -> None:
     figure_files.extend(
         ["scaling_by_tier_all_model_curves.pdf", "scaling_by_tier_all_model_curves.png"]
     )
+    rlm_scaling = rlm_tier_scaling_figure(rows, arms)
+    save_figure(rlm_scaling, args.output, "rlm_tier_scaling_gold")
+    plt.close(rlm_scaling)
+    figure_files.extend(["rlm_tier_scaling_gold.pdf", "rlm_tier_scaling_gold.png"])
     with PdfPages(args.output / "scaling_by_tier_individual_models.pdf") as multipage:
         for model in MODEL_ORDER:
             figure = model_figure(model, rows, arms)

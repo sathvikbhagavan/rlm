@@ -450,6 +450,117 @@ def cross_model_scaling_summaries(
     return output
 
 
+def tier_efficiency_summaries(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """Compute recorded resource use per successfully answered trajectory."""
+    grouped: dict[tuple[str, str, str, int], list[dict[str, Any]]] = defaultdict(list)
+    for row in rows:
+        grouped[
+            (str(row["model"]), str(row["method"]), str(row["context"]), int(row["tier"]))
+        ].append(row)
+
+    output: list[dict[str, Any]] = []
+    resource_fields = {
+        "cost_chf_per_trajectory": "cost_chf",
+        "tokens_per_trajectory": "total_tokens",
+        "wall_time_seconds_per_trajectory": "process_wall_time_seconds",
+    }
+    for (model, method, context, tier), group in sorted(
+        grouped.items(),
+        key=lambda item: (
+            MODEL_ORDER.index(item[0][0]),
+            item[0][3],
+            METHOD_ORDER.index(item[0][1]),
+            CONTEXT_ORDER[item[0][2]],
+        ),
+    ):
+        successful = [
+            row for row in group if row["status"] == "succeeded" and bool(row["score_available"])
+        ]
+        row_out: dict[str, Any] = {
+            "model": model,
+            "model_label": MODEL_LABELS[model],
+            "method": method,
+            "context": context,
+            "tier": tier,
+            "successful_jobs": len(successful),
+            "failed_jobs": sum(row["status"] == "failed" for row in group),
+            "unresolved_jobs": sum(
+                row["status"] in {"running", "stale", "pending"} for row in group
+            ),
+            "arm_final": all(bool(row["arm_final"]) for row in group),
+        }
+        for output_name, source_name in resource_fields.items():
+            measured = [row for row in successful if row[source_name] is not None]
+            measured_trajectories = sum(int(row["question_count"]) for row in measured)
+            successful_trajectories = sum(int(row["question_count"]) for row in successful)
+            row_out[output_name] = (
+                sum(float(row[source_name]) for row in measured) / measured_trajectories
+                if measured_trajectories
+                else None
+            )
+            row_out[f"{output_name}_coverage"] = (
+                measured_trajectories / successful_trajectories if successful_trajectories else 0.0
+            )
+        output.append(row_out)
+    return output
+
+
+def cross_model_efficiency_summaries(
+    model_rows: list[dict[str, Any]],
+) -> list[dict[str, Any]]:
+    """Average recorded per-trajectory resource use across terminal model arms."""
+    grouped: dict[tuple[str, str, int], list[dict[str, Any]]] = defaultdict(list)
+    for row in model_rows:
+        grouped[(str(row["method"]), str(row["context"]), int(row["tier"]))].append(row)
+    metrics = (
+        "cost_chf_per_trajectory",
+        "tokens_per_trajectory",
+        "wall_time_seconds_per_trajectory",
+    )
+    output: list[dict[str, Any]] = []
+    for (method, context, tier), group in sorted(
+        grouped.items(),
+        key=lambda item: (
+            item[0][2],
+            METHOD_ORDER.index(item[0][0]),
+            CONTEXT_ORDER[item[0][1]],
+        ),
+    ):
+        eligible = [
+            row
+            for row in group
+            if bool(row["arm_final"]) and all(row[metric] is not None for metric in metrics)
+        ]
+        if not eligible:
+            continue
+        expected_models = EXPECTED_MODELS_BY_METHOD_CONTEXT[(method, context)]
+        observed_models = {str(row["model"]) for row in eligible}
+        row_out: dict[str, Any] = {
+            "method": method,
+            "context": context,
+            "tier": tier,
+            "n_models": len(eligible),
+            "target_n_models": len(expected_models),
+            "included_models": ";".join(model for model in MODEL_ORDER if model in observed_models),
+            "missing_models": ";".join(
+                model for model in MODEL_ORDER if model in expected_models - observed_models
+            ),
+            "is_final": observed_models == expected_models,
+        }
+        for metric in metrics:
+            values = [float(row[metric]) for row in eligible]
+            model_std = statistics.stdev(values) if len(values) > 1 else None
+            row_out[f"mean_{metric}"] = statistics.fmean(values)
+            row_out[f"sem_{metric}"] = (
+                None if model_std is None else model_std / math.sqrt(len(values))
+            )
+            row_out[f"minimum_{metric}_coverage"] = min(
+                float(row[f"{metric}_coverage"]) for row in eligible
+            )
+        output.append(row_out)
+    return output
+
+
 def write_csv(path: Path, rows: list[dict[str, Any]]) -> None:
     if not rows:
         raise ValueError(f"Refusing to write empty gold table {path}")
@@ -515,6 +626,10 @@ def write_readme(path: Path, arms: list[dict[str, Any]], *, as_of: str) -> None:
             "- `tier_scaling.csv`: the faithful four-tier plotting aggregate.",
             "- `tier_scaling_across_models.csv`: unweighted means and standard errors across "
             "terminal model arms; terminal failed trajectories contribute zero.",
+            "- `tier_efficiency_by_model.csv`: recorded cost, tokens, and wall time per "
+            "successfully answered trajectory for each model.",
+            "- `tier_efficiency_across_models.csv`: unweighted efficiency means and standard "
+            "errors across terminal model arms.",
             "- `source_manifest.json`: source snapshot and file checksums.",
             "",
             "Regenerate from the repository root:",
@@ -570,6 +685,8 @@ def main() -> None:
     add_arm_finality(all_rows, arms)
     scaling = scaling_summaries(all_rows)
     cross_model_scaling = cross_model_scaling_summaries(scaling)
+    efficiency = tier_efficiency_summaries(all_rows)
+    cross_model_efficiency = cross_model_efficiency_summaries(efficiency)
 
     output = args.output
     output.mkdir(parents=True, exist_ok=True)
@@ -582,6 +699,8 @@ def main() -> None:
     write_csv(output / "arm_status.csv", arms)
     write_csv(output / "tier_scaling.csv", scaling)
     write_csv(output / "tier_scaling_across_models.csv", cross_model_scaling)
+    write_csv(output / "tier_efficiency_by_model.csv", efficiency)
+    write_csv(output / "tier_efficiency_across_models.csv", cross_model_efficiency)
 
     as_of = max(str(snapshot["generated_at"]) for snapshot in snapshots)
     write_readme(output / "README.md", arms, as_of=as_of)

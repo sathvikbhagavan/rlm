@@ -13,6 +13,7 @@ from paper_plots.scripts.build_gold_results import (
     load_result_pack,
     result_score,
     scaling_summaries,
+    tier_efficiency_summaries,
 )
 
 
@@ -244,3 +245,58 @@ def test_cross_model_summary_records_missing_and_provisional_models() -> None:
     assert summary["missing_models"] == "gemini-3.7-flash;gpt-5-mini"
     assert summary["excluded_provisional_models"] == "gemini-3.7-flash"
     assert summary["is_final"] is False
+
+
+def test_tier_efficiency_is_normalized_per_successful_trajectory() -> None:
+    rows = [
+        {
+            "model": "gpt-5-mini",
+            "model_label": "GPT-5 mini",
+            "method": "rlm",
+            "context": "full",
+            "tier": 4,
+            "status": "succeeded",
+            "score_available": True,
+            "question_count": 2,
+            "cost_chf": 3.0,
+            "total_tokens": 300,
+            "process_wall_time_seconds": 30.0,
+            "arm_final": True,
+        },
+        {
+            "model": "gpt-5-mini",
+            "model_label": "GPT-5 mini",
+            "method": "rlm",
+            "context": "full",
+            "tier": 4,
+            "status": "succeeded",
+            "score_available": True,
+            "question_count": 1,
+            "cost_chf": 3.0,
+            "total_tokens": 600,
+            "process_wall_time_seconds": 60.0,
+            "arm_final": True,
+        },
+        {
+            "model": "gpt-5-mini",
+            "model_label": "GPT-5 mini",
+            "method": "rlm",
+            "context": "full",
+            "tier": 4,
+            "status": "failed",
+            "score_available": False,
+            "question_count": 5,
+            "cost_chf": None,
+            "total_tokens": None,
+            "process_wall_time_seconds": None,
+            "arm_final": True,
+        },
+    ]
+
+    summary = tier_efficiency_summaries(rows)[0]
+
+    assert summary["cost_chf_per_trajectory"] == 2.0
+    assert summary["tokens_per_trajectory"] == 300.0
+    assert summary["wall_time_seconds_per_trajectory"] == 30.0
+    assert summary["failed_jobs"] == 1
+    assert summary["cost_chf_per_trajectory_coverage"] == 1.0
