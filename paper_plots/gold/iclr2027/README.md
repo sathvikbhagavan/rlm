@@ -1,6 +1,6 @@
 # Gold ICLR 2027 plotting results
 
-Frozen from the shared experiment dashboard at `2026-09-22T15:19:52.014577+00:00`.
+Frozen from the shared experiment dashboard at `2026-09-22T15:33:54.045718+00:00`.
 
 Gold means that the plotting input is frozen, auditable, and provenance-recorded. It does not mean every experiment arm is finished. `arm_status.csv` and the `arm_final` columns distinguish terminal arms from provisional ones.
 
@@ -12,7 +12,7 @@ All plotting aggregates score terminal failed jobs as zero. Running, stale, and 
 | Model | LLM | CodeAct | RLM |
 | --- | ---: | ---: | ---: |
 | Qwen 3.5 | 300/300 final | 300/300 final | 449/450 final |
-| DeepSeek V4 Flash | 300/300 final | 269/300 provisional | 410/450 provisional |
+| DeepSeek V4 Flash | 300/300 final | 269/300 provisional | 411/450 provisional |
 | GLM 5.2 | 300/300 final | 0/300 provisional | 344/450 provisional |
 | Gemini 3.7 Flash | 300/300 final | 300/300 final | 442/450 final |
 | GPT-5 mini | 300/300 final | 300/300 final | 450/450 final |
@@ -27,6 +27,8 @@ All plotting aggregates score terminal failed jobs as zero. Running, stale, and 
 - `arm_status.csv`: the finality decision used for legend asterisks.
 - `tier_scaling.csv`: the faithful four-tier plotting aggregate.
 - `tier_scaling_across_models.csv`: unweighted means and standard errors across terminal model arms; terminal failed trajectories contribute zero.
+- `tier_efficiency_by_model.csv`: recorded cost, tokens, and wall time per successfully answered trajectory for each model.
+- `tier_efficiency_across_models.csv`: unweighted efficiency means and standard errors across terminal model arms.
 - `source_manifest.json`: source snapshot and file checksums.
 
 Regenerate from the repository root:

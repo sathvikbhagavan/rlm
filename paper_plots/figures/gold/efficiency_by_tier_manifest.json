@@ -1,0 +1,11 @@
+{
+  "figures": [
+    "cost_by_tier_across_models.pdf",
+    "cost_by_tier_across_models.png",
+    "tokens_by_tier_across_models.pdf",
+    "tokens_by_tier_across_models.png",
+    "wall_time_by_tier_across_models.pdf",
+    "wall_time_by_tier_across_models.png"
+  ],
+  "note": "Resource metrics describe answered trajectories; failed-attempt token and cost metadata are unavailable."
+}
