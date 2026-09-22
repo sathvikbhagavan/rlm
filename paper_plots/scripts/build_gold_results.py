@@ -661,7 +661,8 @@ def write_readme(path: Path, arms: list[dict[str, Any]], *, as_of: str) -> None:
             "- `tier_scaling_across_models.csv`: unweighted means and standard errors across "
             "terminal model arms; terminal failed trajectories contribute zero.",
             "- `tier_efficiency_by_model.csv`: recorded cost, tokens, and wall time per "
-            "successfully answered trajectory for each model.",
+            "successfully answered trajectory for each model. Failed jobs do not enter resource "
+            "averages.",
             "- `tier_efficiency_across_models.csv`: unweighted efficiency means and standard "
             "errors across terminal model arms. Cost averages include only paid Gemini, "
             "GPT-5-mini, and Claude models; free SwissAI access is excluded.",

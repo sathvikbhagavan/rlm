@@ -47,13 +47,13 @@ METRICS = {
     },
     "wall_time": {
         "column": "wall_time_seconds_per_trajectory",
-        "ylabel": "Wall time per answered trajectory (s)",
-        "title": "Mean answer time across models",
+        "ylabel": "Wall time per successful trajectory (s)",
+        "title": "Mean wall time for successful answers",
         "filename": "wall_time_by_tier_across_models",
         "n_column": "n_models",
         "final_column": "is_final",
-        "note": "Unweighted mean ± SEM across terminal model arms. Wall time covers answered "
-        "trajectories.",
+        "note": "Unweighted mean ± SEM across terminal model arms. Only successful jobs enter "
+        "the wall-time numerator and denominator; failed jobs are excluded.",
     },
 }
 
