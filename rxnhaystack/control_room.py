@@ -641,6 +641,7 @@ def continuation_target_run_id(run_id: str) -> str | None:
     prefixes = (
         ("credit-retry-repair3-openrouter-glm-recovery-", ""),
         ("credit-retry-repair3-jed-oracle-recovery-", ""),
+        ("repair3-jed-oracle-recovery-", ""),
         ("credit-retry-accel-openrouter-qwen-matched-", ""),
         ("accel-openrouter-qwen-matched-", ""),
         ("swiss-free-", ""),
@@ -790,12 +791,7 @@ def scientific_dashboard_view(merged: Mapping[str, Any]) -> dict[str, Any]:
 def overlay_continuation(original: dict[str, Any], continuation: dict[str, Any]) -> dict[str, Any]:
     attempts = {attempt["attempt_key"]: attempt for attempt in original["attempts"]}
     attempts.update({attempt["attempt_key"]: attempt for attempt in continuation["attempts"]})
-    status = original["status"]
-    if status != "succeeded":
-        if continuation["status"] == "succeeded":
-            status = "succeeded"
-        elif continuation["status"] in {"running", "stale", "failed"}:
-            status = continuation["status"]
+    status = continuation_overlay_status(original, continuation)
     failure_categories = Counter(original["failure_categories"])
     failure_categories.update(continuation["failure_categories"])
     result_updated_at = newest_timestamp(
@@ -827,6 +823,24 @@ def overlay_continuation(original: dict[str, Any], continuation: dict[str, Any])
             set(original.get("completion_run_ids", ())) | {continuation["run_id"]}
         ),
     }
+
+
+def continuation_overlay_status(
+    original: Mapping[str, Any], continuation: Mapping[str, Any]
+) -> str:
+    """Choose a retry status without depending on shard iteration order."""
+
+    if original["status"] == "succeeded" or continuation["status"] == "succeeded":
+        return "succeeded"
+    original_updated = original.get("result_updated_at")
+    continuation_updated = continuation.get("result_updated_at")
+    if not continuation_updated:
+        return str(original["status"])
+    if not original_updated or parse_timestamp(str(continuation_updated)) >= parse_timestamp(
+        str(original_updated)
+    ):
+        return str(continuation["status"])
+    return str(original["status"])
 
 
 def is_smoke_experiment(name: str) -> bool:

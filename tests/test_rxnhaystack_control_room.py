@@ -322,6 +322,10 @@ def test_new_execution_shards_have_scientific_parents(campaign: str, parent: str
             "oracle-qwen3.5-397b-tier4-task13-xfull-r03",
         ),
         (
+            "repair3-jed-oracle-recovery-oracle-qwen3.5-397b-tier3-task23-xfull-r04",
+            "oracle-qwen3.5-397b-tier3-task23-xfull-r04",
+        ),
+        (
             "credit-retry-accel-openrouter-qwen-matched-matched-qwen3.5-397b-tier3-task10-scale-x5000-k1-r02",
             "matched-qwen3.5-397b-tier3-task10-scale-x5000-k1-r02",
         ),
@@ -486,6 +490,51 @@ def test_execution_shards_fold_into_scientific_parent(
     assert repaired["status"] == "succeeded"
     assert repaired["completion_run_ids"] == [continuation_id]
     assert folded[0]["continuation_campaigns"] == [shard_name]
+
+
+def test_newer_running_retry_is_not_overwritten_by_older_failed_shard(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    snapshot = populated_snapshot(tmp_path, monkeypatch)
+    run = merge_snapshots([snapshot], now=datetime(2026, 9, 17, 12, 10, tzinfo=UTC))["campaigns"][
+        0
+    ]["runs"][1]
+    run["status"] = "failed"
+    run["result_updated_at"] = "2026-09-17T12:00:00+00:00"
+
+    older_failed = deepcopy(run)
+    older_failed["result_updated_at"] = "2026-09-17T12:05:00+00:00"
+    older_failed["attempts"][0].update(
+        {
+            "attempt_key": "e" * 64,
+            "started_at": "2026-09-17T12:04:00+00:00",
+            "finished_at": "2026-09-17T12:05:00+00:00",
+            "status": "failed",
+        }
+    )
+
+    newer_running = deepcopy(run)
+    newer_running["status"] = "running"
+    newer_running["result_updated_at"] = "2026-09-17T12:10:00+00:00"
+    newer_running["report_state"] = "current"
+    newer_running["attempts"][0].update(
+        {
+            "attempt_key": "f" * 64,
+            "started_at": "2026-09-17T12:10:00+00:00",
+            "finished_at": None,
+            "status": "running",
+        }
+    )
+
+    newest_then_oldest = control_room.overlay_continuation(
+        control_room.overlay_continuation(run, newer_running), older_failed
+    )
+    oldest_then_newest = control_room.overlay_continuation(
+        control_room.overlay_continuation(run, older_failed), newer_running
+    )
+
+    assert newest_then_oldest["status"] == "running"
+    assert oldest_then_newest["status"] == "running"
 
 
 def test_deepseek_x1000_shards_fold_into_one_study(
