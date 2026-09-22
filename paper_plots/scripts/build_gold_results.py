@@ -141,8 +141,6 @@ def flatten_run(run: dict[str, Any], *, scope: str) -> dict[str, Any]:
     attempt = successful_attempt(run)
     metrics = {} if attempt is None else attempt.get("metrics") or {}
     score_name, f1 = result_score(task, metrics)
-    if run["status"] == "succeeded" and f1 is None:
-        raise ValueError(f"Successful run {run['run_id']} has no {score_name}")
     resources = metrics.get("resources") or {}
     slug = model_slug(str(run["model"]))
     row: dict[str, Any] = {
@@ -163,6 +161,7 @@ def flatten_run(run: dict[str, Any], *, scope: str) -> dict[str, Any]:
         "sources": ";".join(run.get("sources", ())),
         "failure_categories": json.dumps(run.get("failure_categories", {}), sort_keys=True),
         "score_name": score_name,
+        "score_available": f1 is not None,
         "f1": f1,
     }
     row.update({field: metrics.get(field) for field in METRIC_FIELDS})
@@ -184,7 +183,10 @@ def arm_summaries(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
         ),
     ):
         counts = Counter(str(row["status"]) for row in group)
-        unfinished = counts["running"] + counts["stale"] + counts["pending"]
+        unscored_successes = sum(
+            row["status"] == "succeeded" and not bool(row["score_available"]) for row in group
+        )
+        unfinished = counts["running"] + counts["stale"] + counts["pending"] + unscored_successes
         is_final = unfinished == 0
         summaries.append(
             {
@@ -194,9 +196,13 @@ def arm_summaries(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
                 "method": method,
                 "expected_jobs": len(group),
                 **{f"{status}_jobs": counts[status] for status in STATUS_ORDER},
+                "scored_success_jobs": counts["succeeded"] - unscored_successes,
+                "unscored_success_jobs": unscored_successes,
                 "is_final": is_final,
                 "legend_label": method.upper() if method == "llm" else method.capitalize(),
-                "note": "terminal" if is_final else f"{unfinished} running, stale, or pending",
+                "note": "terminal and scored"
+                if is_final
+                else f"{unfinished} running, stale, pending, or unscored",
             }
         )
     return summaries
@@ -227,7 +233,9 @@ def scaling_summaries(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
             CONTEXT_ORDER[item[0][2]],
         ),
     ):
-        successful = [row for row in group if row["status"] == "succeeded"]
+        successful = [
+            row for row in group if row["status"] == "succeeded" and bool(row["score_available"])
+        ]
         expected_weight = sum(int(row["question_count"]) for row in group)
         successful_weight = sum(int(row["question_count"]) for row in successful)
         weighted_score = sum(float(row["f1"]) * int(row["question_count"]) for row in successful)

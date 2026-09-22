@@ -19,7 +19,13 @@ def test_task15_uses_reaction_f1() -> None:
 
 def test_terminal_failures_do_not_make_an_arm_provisional() -> None:
     rows = [
-        {"scope": "full_benchmark", "model": "qwen3.5", "method": "rlm", "status": status}
+        {
+            "scope": "full_benchmark",
+            "model": "qwen3.5",
+            "method": "rlm",
+            "status": status,
+            "score_available": status == "succeeded",
+        }
         for status in ("succeeded", "failed")
     ]
 
@@ -36,6 +42,7 @@ def test_pending_or_running_jobs_mark_an_arm_provisional() -> None:
             "model": "deepseek-v4-flash",
             "method": "codeact",
             "status": status,
+            "score_available": status == "succeeded",
         }
         for status in ("succeeded", "running", "pending")
     ]
@@ -56,6 +63,7 @@ def test_scaling_summary_matches_weighted_mean_and_repetition_std() -> None:
             "question_count": question_count,
             "repetition": repetition,
             "status": "succeeded",
+            "score_available": True,
             "f1": f1,
         }
         for repetition, f1 in ((1, 1.0), (2, 0.0))
@@ -70,3 +78,20 @@ def test_scaling_summary_matches_weighted_mean_and_repetition_std() -> None:
     assert summary["f1_std"] == pytest.approx(0.5)
     assert summary["coverage"] == 1.0
     assert summary["arm_final"] is True
+
+
+def test_success_without_a_scientific_score_is_provisional() -> None:
+    rows = [
+        {
+            "scope": "full_benchmark",
+            "model": "deepseek-v4-flash",
+            "method": "codeact",
+            "status": "succeeded",
+            "score_available": False,
+        }
+    ]
+
+    summary = arm_summaries(rows)[0]
+
+    assert summary["is_final"] is False
+    assert summary["unscored_success_jobs"] == 1
