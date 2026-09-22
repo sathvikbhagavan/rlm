@@ -343,18 +343,27 @@ def scaling_summaries(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
         successful = [
             row for row in group if row["status"] == "succeeded" and bool(row["score_available"])
         ]
+        failed = [row for row in group if row["status"] == "failed"]
+        resolved = successful + failed
         expected_weight = sum(int(row["question_count"]) for row in group)
         successful_weight = sum(int(row["question_count"]) for row in successful)
+        failed_weight = sum(int(row["question_count"]) for row in failed)
+        resolved_weight = successful_weight + failed_weight
         weighted_score = sum(float(row["f1"]) * int(row["question_count"]) for row in successful)
-        f1 = weighted_score / successful_weight if successful_weight else None
+        success_only_f1 = weighted_score / successful_weight if successful_weight else None
+        f1 = weighted_score / resolved_weight if resolved_weight else None
         repetition_groups: dict[int, list[dict[str, Any]]] = defaultdict(list)
-        for row in successful:
+        for row in resolved:
             repetition_groups[int(row["repetition"])].append(row)
         repetition_scores = []
         for repetition_rows in repetition_groups.values():
             weight = sum(int(row["question_count"]) for row in repetition_rows)
             repetition_scores.append(
-                sum(float(row["f1"]) * int(row["question_count"]) for row in repetition_rows)
+                sum(
+                    float(row["f1"]) * int(row["question_count"])
+                    for row in repetition_rows
+                    if row["status"] == "succeeded" and bool(row["score_available"])
+                )
                 / weight
             )
         f1_std = statistics.pstdev(repetition_scores) if repetition_scores else None
@@ -370,12 +379,17 @@ def scaling_summaries(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
                 **{f"{status}_jobs": counts[status] for status in STATUS_ORDER},
                 "expected_trajectories": expected_weight,
                 "successful_trajectories": successful_weight,
-                "coverage": successful_weight / expected_weight,
-                "successful_repetitions": len(repetition_scores),
+                "failed_trajectories": failed_weight,
+                "resolved_trajectories": resolved_weight,
+                "coverage": resolved_weight / expected_weight,
+                "successful_coverage": successful_weight / expected_weight,
+                "resolved_repetitions": len(repetition_scores),
                 "f1": f1,
+                "f1_success_only": success_only_f1,
                 "f1_std": f1_std,
-                "f1_zero_imputed": weighted_score / expected_weight,
-                "f1_best_case": (weighted_score + expected_weight - successful_weight)
+                "f1_zero_imputed": f1,
+                "f1_all_unresolved_zero": weighted_score / expected_weight,
+                "f1_best_case": (weighted_score + expected_weight - resolved_weight)
                 / expected_weight,
                 "arm_final": all(bool(row["arm_final"]) for row in group),
             }
@@ -468,6 +482,8 @@ def write_readme(path: Path, arms: list[dict[str, Any]], *, as_of: str) -> None:
         "",
         "The CSV files contain sanitized metrics sufficient to regenerate paper plots; "
         "bulky raw trajectories remain in their original experiment artifact stores.",
+        "All plotting aggregates score terminal failed jobs as zero. Running, stale, and "
+        "pending jobs are excluded from the current score and keep their arm provisional.",
         "",
         "## Main benchmark arms",
         "",

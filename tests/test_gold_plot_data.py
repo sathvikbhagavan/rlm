@@ -86,6 +86,37 @@ def test_scaling_summary_matches_weighted_mean_and_repetition_std() -> None:
     assert summary["arm_final"] is True
 
 
+def test_scaling_summary_scores_failures_zero_and_excludes_pending() -> None:
+    rows = [
+        {
+            "scope": "full_benchmark",
+            "model": "gpt-5-mini",
+            "method": "codeact",
+            "context": "100",
+            "tier": 3,
+            "question_count": 1,
+            "repetition": repetition,
+            "status": status,
+            "score_available": status == "succeeded",
+            "f1": 1.0 if status == "succeeded" else None,
+        }
+        for repetition, status in enumerate(("succeeded", "failed", "pending"), start=1)
+    ]
+    arms = arm_summaries(rows)
+    add_arm_finality(rows, arms)
+
+    summary = scaling_summaries(rows)[0]
+
+    assert summary["f1_success_only"] == 1.0
+    assert summary["f1"] == 0.5
+    assert summary["f1_std"] == 0.5
+    assert summary["coverage"] == pytest.approx(2 / 3)
+    assert summary["successful_coverage"] == pytest.approx(1 / 3)
+    assert summary["f1_all_unresolved_zero"] == pytest.approx(1 / 3)
+    assert summary["f1_best_case"] == pytest.approx(2 / 3)
+    assert summary["arm_final"] is False
+
+
 def test_success_without_a_scientific_score_is_provisional() -> None:
     rows = [
         {
