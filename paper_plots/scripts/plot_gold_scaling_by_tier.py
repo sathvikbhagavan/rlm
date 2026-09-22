@@ -151,7 +151,7 @@ def model_figure(
         bbox_to_anchor=(0.5, 0.955),
         handlelength=2.2,
     )
-    note = "Curves condition on successful runs."
+    note = "Terminal failed jobs score zero; unresolved jobs are excluded from the current curve."
     if any(incomplete.values()):
         note += "  * Arm has running, stale, pending, or unrun jobs in the gold snapshot."
     fig.text(0.5, 0.008, note, ha="center", va="bottom", fontsize=7, color="#555555")
@@ -267,8 +267,8 @@ def combined_figure(
     fig.text(
         0.5,
         0.008,
-        "Small horizontal offsets improve visibility. Dashed curves and * labels are provisional "
-        "(DeepSeek and GLM agentic arms).",
+        "Terminal failed jobs score zero; unresolved jobs are excluded. Small offsets improve "
+        "visibility; dashed curves and * labels are provisional.",
         ha="center",
         va="bottom",
         fontsize=6.8,
