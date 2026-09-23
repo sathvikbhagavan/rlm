@@ -16,7 +16,7 @@ from .dataset_browser import DatasetIndex
 from .db import Store
 from .exporting import export_filename, export_zip
 from .restoring import restore_export
-from .schema import normalize_structured_answer
+from .schema import exact_answer_match, normalize_structured_answer
 
 VALID_MODES = {"baseline", "audit", "prospective"}
 
@@ -36,6 +36,12 @@ def deterministic_audit_sample(
         ).digest(),
     )
     return ranked[:size]
+
+
+def reference_entries(value: Any, answer_type: str) -> list[Any]:
+    if answer_type == "single_chain" or not isinstance(value, list):
+        return [value]
+    return value
 
 
 def create_app(
@@ -61,9 +67,7 @@ def create_app(
     }
     # The protected component's digest identifies its revision without carrying
     # answer material or administrator-facing field names into annotator exports.
-    annotation_context["protected_answers_sha256"] = manifest.get(
-        "admin_ground_truth_sha256"
-    )
+    annotation_context["protected_answers_sha256"] = manifest.get("admin_ground_truth_sha256")
     questions_list = load_jsonl(bundle / "questions.jsonl")
     questions = {x["question_id"]: x for x in questions_list}
     ground_truth = {
@@ -306,17 +310,17 @@ def create_app(
             navigation.update(
                 {
                     "previous": ordered_ids[position - 1] if position else None,
-                    "next": ordered_ids[position + 1]
-                    if position + 1 < len(ordered_ids)
-                    else None,
+                    "next": ordered_ids[position + 1] if position + 1 < len(ordered_ids) else None,
                     "position": position + 1,
                 }
             )
         audit_truth = None
+        baseline_evaluation = None
         if mode == "audit":
             gt = ground_truth[question_id]
+            entries = reference_entries(gt["representation"], q["answer_type"])
             audit_truth = {
-                "total": len(gt["representation"]) if isinstance(gt["representation"], list) else 1,
+                "total": len(entries),
                 "sample": deterministic_audit_sample(gt["representation"], question_id=question_id),
                 "sample_seed": manifest["audit_sampling"]["seed"],
                 "sample_method": manifest["audit_sampling"]["method"],
@@ -325,11 +329,31 @@ def create_app(
         elif draft["submitted_at"]:
             # Feedback is only reachable after an independent baseline submission.
             gt = ground_truth[question_id]
+            entries = reference_entries(gt["representation"], q["answer_type"])
             audit_truth = {
-                "total": len(gt["representation"]) if isinstance(gt["representation"], list) else 1,
-                "sample": deterministic_audit_sample(gt["representation"], question_id=question_id),
+                "total": len(entries),
+                "sample": entries[:100],
+                "shown": min(len(entries), 100),
+                "truncated": len(entries) > 100,
                 "post_submission": True,
             }
+            if draft["payload"].get("abstention"):
+                baseline_evaluation = {"status": "abstained"}
+            else:
+                submitted_entries = draft["payload"].get("answer_entries")
+                if not isinstance(submitted_entries, list):
+                    _, submitted_entries = normalize_structured_answer(
+                        str(draft["payload"].get("answer_exact", ""))
+                    )
+                baseline_evaluation = {
+                    "status": (
+                        "correct"
+                        if exact_answer_match(
+                            submitted_entries, gt["representation"], q["answer_type"]
+                        )
+                        else "incorrect"
+                    )
+                }
         return templates.TemplateResponse(
             request,
             "question.html",
@@ -339,6 +363,7 @@ def create_app(
                 mode=mode,
                 draft=draft,
                 audit_truth=audit_truth,
+                baseline_evaluation=baseline_evaluation,
                 prefill=prefill,
                 navigation=navigation,
                 study_id=study_id,
@@ -420,7 +445,23 @@ def create_app(
             annotation_context=annotation_context,
         )
         store.timer(profile["annotator_id"], mode, item_id, "pause", elapsed_seconds=0)
-        return {"submitted": True}
+        result = {"submitted": True}
+        if mode == "baseline":
+            if payload.get("abstention"):
+                result["evaluation"] = {"status": "abstained"}
+            else:
+                result["evaluation"] = {
+                    "status": (
+                        "correct"
+                        if exact_answer_match(
+                            payload.get("answer_entries", []),
+                            ground_truth[item_id]["representation"],
+                            questions[item_id]["answer_type"],
+                        )
+                        else "incorrect"
+                    )
+                }
+        return result
 
     @app.post("/api/timer/{mode}/{item_id}/{action}")
     async def timer(mode: str, item_id: str, action: str, request: Request):

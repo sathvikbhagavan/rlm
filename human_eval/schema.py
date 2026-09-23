@@ -82,3 +82,48 @@ def normalize_structured_answer(raw: str) -> tuple[str, list[list[str]]]:
             continue
         entries.append([part.strip() for part in stripped.split(",") if part.strip()])
     return raw, entries
+
+
+def submitted_answer_set(entries: list[list[str]], answer_type: str) -> set[tuple[str, ...]]:
+    """Return the semantic set represented by structured annotator entries."""
+    if answer_type in {"index_set", "smiles_set"}:
+        return {(normalize_answer_token(part, answer_type),) for entry in entries for part in entry}
+    if answer_type == "single_chain":
+        return {
+            tuple(normalize_answer_token(part, answer_type) for entry in entries for part in entry)
+        }
+    return {tuple(normalize_answer_token(part, answer_type) for part in entry) for entry in entries}
+
+
+def ground_truth_answer_set(value: Any, answer_type: str) -> set[tuple[str, ...]]:
+    """Return ground truth in the same semantic form as an annotator answer."""
+    if answer_type in {"index_set", "smiles_set"}:
+        values = value if isinstance(value, (list, tuple, set)) else [value]
+        return {(normalize_answer_token(item, answer_type),) for item in values}
+    if answer_type == "single_chain":
+        values = value if isinstance(value, (list, tuple)) else [value]
+        return {tuple(normalize_answer_token(item, answer_type) for item in values)}
+    values = value if isinstance(value, (list, tuple)) else [value]
+    return {
+        tuple(
+            normalize_answer_token(item, answer_type)
+            for item in (entry if isinstance(entry, (list, tuple)) else [entry])
+        )
+        for entry in values
+    }
+
+
+def normalize_answer_token(value: Any, answer_type: str) -> str:
+    token = str(value).strip()
+    if answer_type == "index_set":
+        try:
+            return str(int(token))
+        except ValueError:
+            pass
+    return token
+
+
+def exact_answer_match(entries: list[list[str]], ground_truth: Any, answer_type: str) -> bool:
+    return submitted_answer_set(entries, answer_type) == ground_truth_answer_set(
+        ground_truth, answer_type
+    )

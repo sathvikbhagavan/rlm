@@ -23,16 +23,36 @@
   <p><a href="/dataset">Inspect dataset</a> · <a href="/download/dataset">Download clean dataset</a></p>
 </article>
 
-{% if audit_truth %}
-<section class="panel">
-  <h2>{% if audit_truth.post_submission %}Post-submission reference{% else %}Stored ground-truth audit material{% endif %}</h2>
-  <p>Total answer entries: {{ audit_truth.total }}. Deterministic sample shown below{% if audit_truth.sample_seed %}; seed {{ audit_truth.sample_seed }}{% endif %}.</p>
-  <pre class="prompt">{{ audit_truth.sample|tojson(indent=2) }}</pre>
-  {% if audit_truth.post_submission %}<p>If your answer differs and you believe it is right, use the disagreement flag and comments below; submitting a revision preserves history.</p>{% endif %}
+{% if baseline_evaluation %}
+<section id="answer-feedback" data-answer-feedback class="answer-feedback feedback-{{ baseline_evaluation.status }}" role="status" tabindex="-1">
+  {% if baseline_evaluation.status == 'correct' %}
+  <h2>Correct</h2>
+  <p>Your answer exactly matches the stored reference as a set. Entry order does not matter.</p>
+  {% elif baseline_evaluation.status == 'incorrect' %}
+  <h2>Not an exact match</h2>
+  <p>Your answer differs from the stored reference. Entries are compared as a set, so their order does not affect this result. Review the reference and flag a possible benchmark issue below if you believe your answer is right.</p>
+  {% else %}
+  <h2>Outcome recorded</h2>
+  <p>Your abstention or time-limit outcome was saved; it was not scored as a submitted answer.</p>
+  {% endif %}
 </section>
 {% endif %}
 
-<form class="panel" data-annotation-form data-mode="{{ mode }}" data-item="{{ question.question_id }}">
+{% if audit_truth %}
+<section class="panel">
+  <h2>{% if audit_truth.post_submission %}Post-submission reference{% else %}Stored ground-truth audit material{% endif %}</h2>
+  {% if audit_truth.post_submission %}
+    {% if audit_truth.truncated %}<p>Total answer entries: {{ audit_truth.total }}. Showing the first {{ audit_truth.shown }} entries in canonical order; the complete reference is still used for scoring.</p>
+    {% else %}<p>Complete reference answer shown below ({{ audit_truth.total }} entr{% if audit_truth.total == 1 %}y{% else %}ies{% endif %}).</p>{% endif %}
+  {% else %}
+  <p>Total answer entries: {{ audit_truth.total }}. Deterministic sample shown below{% if audit_truth.sample_seed %}; seed {{ audit_truth.sample_seed }}{% endif %}.</p>
+  {% endif %}
+  <pre class="prompt">{{ audit_truth.sample|tojson(indent=2) }}</pre>
+  {% if audit_truth.post_submission and baseline_evaluation.status == 'incorrect' %}<p>If your answer differs and you believe it is right, use the disagreement flag and comments below; submitting a revision preserves history.</p>{% endif %}
+</section>
+{% endif %}
+
+<form class="panel" data-annotation-form data-mode="{{ mode }}" data-item="{{ question.question_id }}" data-evaluation="{{ baseline_evaluation.status if baseline_evaluation else '' }}">
   <h2>{% if mode == 'baseline' %}Your independent answer{% else %}Your audit judgment{% endif %}</h2>
   {% set p = draft.payload %}
   {% if mode == 'baseline' %}
@@ -70,7 +90,7 @@
     {% endfor %}
   </fieldset>
   <label><input type="checkbox" name="verified_logic" {% if p.verified_logic %}checked{% endif %}> I inspected and checked the method or logic for this question; the final judgment is mine.</label>
-  <label><input type="checkbox" name="ground_truth_disagreement" {% if p.ground_truth_disagreement %}checked{% endif %}> I believe my answer may be right despite differing from stored ground truth; flag for author review.</label>
+  <label {% if not baseline_evaluation or baseline_evaluation.status != 'incorrect' %}hidden{% endif %}><input type="checkbox" name="ground_truth_disagreement" {% if p.ground_truth_disagreement %}checked{% endif %}> I believe my answer may be right despite differing from stored ground truth; flag for author review.</label>
   {% else %}
   <fieldset>
     <legend>Audit checks</legend>

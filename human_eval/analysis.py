@@ -7,9 +7,7 @@ from collections import Counter, defaultdict
 from pathlib import Path
 from typing import Any
 
-
-def parsed_set(raw: str) -> set[str]:
-    return {part.strip() for line in raw.splitlines() for part in line.split(",") if part.strip()}
+from .schema import ground_truth_answer_set, normalize_structured_answer, submitted_answer_set
 
 
 def set_scores(predicted: set[str], expected: set[str]) -> dict[str, float]:
@@ -129,13 +127,14 @@ def analyze(
             for issue in payload.get("issue_tags", []):
                 issue_counts[str(issue)] += 1
             if mode == "baseline" and item_id in truth and not payload.get("abstention"):
-                expected = truth[item_id]["representation"]
-                expected_set = expected_entries(expected, questions[item_id]["answer_type"])
-                predicted = (
-                    {",".join(parts) for parts in payload.get("answer_entries", [])}
-                    if any(len(x) > 1 for x in payload.get("answer_entries", []))
-                    else parsed_set(payload.get("answer_exact", ""))
+                answer_type = questions[item_id]["answer_type"]
+                expected_set = ground_truth_answer_set(
+                    truth[item_id]["representation"], answer_type
                 )
+                entries = payload.get("answer_entries")
+                if not isinstance(entries, list):
+                    _, entries = normalize_structured_answer(payload.get("answer_exact", ""))
+                predicted = submitted_answer_set(entries, answer_type)
                 base.update(set_scores(predicted, expected_set))
                 base.update(
                     {"tier": questions[item_id]["tier"], "category": questions[item_id]["category"]}
@@ -258,14 +257,6 @@ def administrator_reliability(
             else None
         ),
     }
-
-
-def expected_entries(expected: Any, answer_type: str) -> set[str]:
-    if answer_type == "index_set" or answer_type == "smiles_set":
-        return {str(value) for value in expected}
-    if answer_type == "single_chain":
-        return {",".join(map(str, expected))}
-    return {",".join(map(str, value)) for value in expected}
 
 
 def fractions(ratings: dict[str, list[str]]) -> dict[str, float]:

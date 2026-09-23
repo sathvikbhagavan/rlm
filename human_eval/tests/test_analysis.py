@@ -6,6 +6,7 @@ from pathlib import Path
 from human_eval.analysis import analyze, cohen_kappa, krippendorff_alpha_nominal, set_scores
 from human_eval.db import Store
 from human_eval.exporting import export_zip
+from human_eval.schema import ground_truth_answer_set, submitted_answer_set
 
 
 def test_known_analysis_values():
@@ -18,6 +19,13 @@ def test_known_analysis_values():
     assert cohen_kappa(["yes", "yes", "no", "no"], ["yes", "yes", "no", "no"]) == 1.0
     assert cohen_kappa(["yes", "yes", "no", "no"], ["no", "no", "yes", "yes"]) == -1.0
     assert krippendorff_alpha_nominal({"a": ["x", "x"], "b": ["y", "y"]}) == 1.0
+    assert (
+        set_scores(
+            submitted_answer_set([["2", "1"]], "index_set"),
+            ground_truth_answer_set([1, 2], "index_set"),
+        )["exact_match"]
+        == 1.0
+    )
 
 
 def test_export_analysis_round_trip(tmp_path: Path, tiny_bundle: Path):

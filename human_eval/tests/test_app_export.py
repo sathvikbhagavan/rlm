@@ -32,9 +32,7 @@ def test_question_filters_accept_empty_values_and_combine(
         assert "Case-insensitive substring search" in response.text
         assert 'role="tooltip"' in response.text
 
-    invalid = client.get(
-        "/questions?mode=invalid&tier=invalid&category=invalid&status=invalid"
-    )
+    invalid = client.get("/questions?mode=invalid&tier=invalid&category=invalid&status=invalid")
     assert invalid.status_code == 200
     assert "1 questions shown." in invalid.text
     assert "Some filter values were ignored." in invalid.text
@@ -55,20 +53,27 @@ def test_question_filters_accept_empty_values_and_combine(
         json={"answer_exact": "1"},
         headers=headers,
     )
-    assert "1 questions shown." in client.get(
-        "/questions?mode=baseline&tier=1&category=structural-lookup&status=started"
-    ).text
+    assert (
+        "1 questions shown."
+        in client.get(
+            "/questions?mode=baseline&tier=1&category=structural-lookup&status=started"
+        ).text
+    )
     client.post(
         "/api/submit/baseline/rxh-t1-fixture",
         json={"answer_exact": "1"},
         headers=headers,
     )
-    assert "1 questions shown." in client.get(
-        "/questions?mode=baseline&tier=1&category=structural-lookup&status=completed"
-    ).text
-    assert client.get(
-        "/api/annotation-version/baseline/rxh-t1-fixture"
-    ).json() == {"changed": False, "message": ""}
+    assert (
+        "1 questions shown."
+        in client.get(
+            "/questions?mode=baseline&tier=1&category=structural-lookup&status=completed"
+        ).text
+    )
+    assert client.get("/api/annotation-version/baseline/rxh-t1-fixture").json() == {
+        "changed": False,
+        "message": "",
+    }
     app.state.store.save_draft(
         app.state.profile["annotator_id"],
         "baseline",
@@ -101,6 +106,8 @@ def test_browser_smoke_leakage_autosave_and_export(
     application_js = client.get("/static/app.js").text
     assert "action-row" in application_js
     assert "Does your answer reveal a possible benchmark error?" in application_js
+    assert "form.dataset.evaluation==='incorrect'" in application_js
+    assert "scrollIntoView" in application_js
     baseline = client.get("/question/rxh-t1-fixture?mode=baseline")
     assert baseline.status_code == 200 and "987654321" not in baseline.text
     assert "Less repetition on similar questions" in baseline.text
@@ -125,17 +132,18 @@ def test_browser_smoke_leakage_autosave_and_export(
         headers=headers,
     )
     assert response.status_code == 422
-    assert (
-        client.post(
-            "/api/submit/baseline/rxh-t1-fixture",
-            json={"answer_exact": "1, 2", "tools": ["rdkit"], "verified_logic": True},
-            headers=headers,
-        ).status_code
-        == 200
+    submitted = client.post(
+        "/api/submit/baseline/rxh-t1-fixture",
+        json={"answer_exact": "1, 2", "tools": ["rdkit"], "verified_logic": True},
+        headers=headers,
     )
+    assert submitted.status_code == 200
+    assert submitted.json()["evaluation"]["status"] == "incorrect"
     submitted_page = client.get("/question/rxh-t1-fixture?mode=baseline")
     assert "987654321" in submitted_page.text
     assert "Post-submission reference" in submitted_page.text
+    assert "Not an exact match" in submitted_page.text
+    assert 'data-evaluation="incorrect"' in submitted_page.text
     assert "ground_truth_disagreement" in submitted_page.text
     assert (
         client.post(
@@ -149,9 +157,7 @@ def test_browser_smoke_leakage_autosave_and_export(
         ).status_code
         == 200
     )
-    revised = app.state.store.draft(
-        app.state.profile["annotator_id"], "baseline", "rxh-t1-fixture"
-    )
+    revised = app.state.store.draft(app.state.profile["annotator_id"], "baseline", "rxh-t1-fixture")
     assert revised["payload"]["ground_truth_disagreement"] is True
     assert revised["payload"]["post_ground_truth_reveal_revision"] is True
     assert client.get("/dataset?page=1").status_code == 200
@@ -193,6 +199,57 @@ def test_browser_smoke_leakage_autosave_and_export(
         assert b"fixture evidence" in all_text and b"must-be-dropped" not in all_text
         annotation = json.loads(archive.read("annotations.jsonl").splitlines()[0])
         assert annotation["annotation_context"]["questions_sha256"] == "q"
+
+
+def test_baseline_set_scoring_feedback_and_large_reference(
+    tmp_path: Path, tiny_bundle: Path, tiny_dataset: Path
+):
+    truth_path = tiny_bundle / "admin/ground_truth.jsonl"
+    truth = json.loads(truth_path.read_text())
+    truth["representation"] = list(range(150))
+    truth["relevant_reaction_indices"] = list(range(150))
+    truth_path.write_text(json.dumps(truth) + "\n")
+
+    app = create_app(
+        bundle_dir=tiny_bundle,
+        state_dir=tmp_path / "set-scoring-state",
+        dataset_path=tiny_dataset,
+    )
+    client = TestClient(app)
+    headers = {"X-RXH-CSRF": app.state.csrf}
+
+    before = client.get("/question/rxh-t1-fixture?mode=baseline")
+    assert "Post-submission reference" not in before.text
+    assert "Correct" not in before.text
+
+    reversed_answer = ",".join(str(value) for value in reversed(range(150)))
+    submitted = client.post(
+        "/api/submit/baseline/rxh-t1-fixture",
+        json={"answer_exact": reversed_answer},
+        headers=headers,
+    )
+    assert submitted.status_code == 200
+    assert submitted.json()["evaluation"] == {"status": "correct"}
+
+    correct_page = client.get("/question/rxh-t1-fixture?mode=baseline")
+    assert "Your answer exactly matches the stored reference as a set" in correct_page.text
+    assert 'class="answer-feedback feedback-correct"' in correct_page.text
+    assert 'data-evaluation="correct"' in correct_page.text
+    assert 'id="benchmark-disagreement"' not in correct_page.text
+    assert "Showing the first 100 entries in canonical order" in correct_page.text
+    reference = correct_page.text.split('<pre class="prompt">', 1)[1].split("</pre>", 1)[0]
+    assert "  0," in reference and "  99" in reference
+    assert "  100" not in reference
+
+    incorrect = client.post(
+        "/api/submit/baseline/rxh-t1-fixture",
+        json={"answer_exact": "0,1"},
+        headers=headers,
+    )
+    assert incorrect.json()["evaluation"] == {"status": "incorrect"}
+    incorrect_page = client.get("/question/rxh-t1-fixture?mode=baseline")
+    assert 'class="answer-feedback feedback-incorrect"' in incorrect_page.text
+    assert 'data-evaluation="incorrect"' in incorrect_page.text
 
 
 def test_same_type_prefill_and_direct_question_navigation(
@@ -251,16 +308,14 @@ def test_same_type_prefill_and_direct_question_navigation(
     assert 'name="verified_logic" checked' not in page.text
     assert "← Previous" in page.text
     assert "Question 2 of 2" in page.text
-    assert 'data-question-nav' in page.text
+    assert "data-question-nav" in page.text
 
     annotator_id = app.state.profile["annotator_id"]
     app.state.store.install_study(
         {"study_id": "navigation-study", "mode": "baseline"},
         {annotator_id: ["rxh-t1-fixture-2", "rxh-t1-fixture"]},
     )
-    assigned = client.get(
-        "/question/rxh-t1-fixture-2?mode=baseline&study_id=navigation-study"
-    )
+    assigned = client.get("/question/rxh-t1-fixture-2?mode=baseline&study_id=navigation-study")
     assert "Question 1 of 2 in this assignment" in assigned.text
     assert (
         'href="/question/rxh-t1-fixture?mode=baseline&amp;study_id=navigation-study"'
