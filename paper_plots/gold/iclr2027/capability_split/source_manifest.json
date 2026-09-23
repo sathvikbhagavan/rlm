@@ -1,0 +1,26 @@
+{
+  "aggregation": {
+    "across_models": "unweighted mean and observed model range",
+    "scope": "terminal full-corpus RLM arms",
+    "terminal_failures": "score zero",
+    "within_model": "question-weighted mean across task scripts and repetitions"
+  },
+  "generated_at": "2026-09-23T16:32:23.338940+00:00",
+  "outputs": [
+    {
+      "path": "per_model.csv",
+      "sha256": "2922a914cdd9c60952c0e505d7bbafb7935b0cdc0f2212d6f53de3c2831cad80"
+    },
+    {
+      "path": "across_models.csv",
+      "sha256": "168e3d7923439044df202400fbb4125a4af46856010d8adf3ac521094eb5b7eb"
+    }
+  ],
+  "schema_version": 1,
+  "source": {
+    "path": "paper_plots/gold/iclr2027/full_benchmark_records.csv",
+    "sha256": "67eca1cd678f70c8daaebe0441d8a35f6e153720833df52add929f32c42b77d6"
+  },
+  "source_repository_commit": "d6663ebea828a31f1619e13fe6cf6153ef20fbd4",
+  "source_snapshot_as_of": "2026-09-22T19:03:40.570724+00:00"
+}

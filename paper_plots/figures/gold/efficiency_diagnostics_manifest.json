@@ -1,0 +1,15 @@
+{
+  "data": "paper_plots/gold/iclr2027/efficiency_appendix/across_models.csv",
+  "figure_files": [
+    "efficiency_diagnostics.pdf",
+    "efficiency_diagnostics.png"
+  ],
+  "metrics": [
+    "calls_per_trajectory",
+    "tokens_per_trajectory",
+    "latency_seconds_per_trajectory",
+    "tool_time_seconds_per_trajectory",
+    "wall_time_seconds_per_trajectory",
+    "peak_memory_mib_per_job"
+  ]
+}

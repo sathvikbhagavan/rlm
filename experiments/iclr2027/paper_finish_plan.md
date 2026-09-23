@@ -14,16 +14,16 @@
   - It'd be better if it's connected to real-world, and is actually useful for humans. So it'd be great if we could explain how some of the difficult questions of our benchmark are things that experimental chemists would benefit from if solved reliably.
   - Any other suggestions are welcome!
   - Lastly, this paper is not at all about the strength of RLMs or how they good they are, we don't care, we just adopted them as a recent attempt at very long-context task
-- The assessment writes "... the strongest evidence ..." right before section 3, does it still hold with our results?
+- <span style="color: #1a7f37;">The assessment writes "... the strongest evidence ..." right before section 3, does it still hold with our results?</span> **✅ Completed with qualified wording**
 - Then moving to weaknesses:
-  - Has our experiment answered W1?
-  - W2 is an explanation I mentioned above
-  - W3 is addressed
-  - W4, do we need more clarification?
-  - W5, is it too important? Do any of our claims rest on it? I don't think so.
-  - W6, we could point to it as a limitation, and mention it in the paper (always appreciated)
+  - <span style="color: #1a7f37;">Has our experiment answered W1?</span> **✅ Key cardinality confound answered for GPT-5-mini Tier 1--3; scope stated**
+  - <span style="color: #1a7f37;">W2 is an explanation I mentioned above</span> **✅ Oracle-recall/RAG explanation added**
+  - <span style="color: #1a7f37;">W3 is addressed</span> **✅ Four terminal RLM model arms summarized; two provisional arms excluded**
+  - <span style="color: #1a7f37;">W4, do we need more clarification?</span> **✅ Replaced broad wording with operation-specific demands**
+  - <span style="color: #1a7f37;">W5, is it too important? Do any of our claims rest on it? I don't think so.</span> **✅ Central claims do not rely on it; legacy-condition confound stated**
+  - <span style="color: #1a7f37;">W6, we could point to it as a limitation, and mention it in the paper (always appreciated)</span> **✅ Added as a limitation**
   - W7 W8 W9: to be ignored for now, and delegated to later
-  - W10: We should have plots of tool-call, tokens, latency, tool-time, all of it should enrich the appendix
+  - <span style="color: #1a7f37;">W10: We should have plots of tool-call, tokens, latency, tool-time, all of it should enrich the appendix</span> **✅ Six-metric appendix figure added**
 - Then moving to experiments:
   - A: Do we have it? Is it in the paper? If not, we should.
   - B: We have it, does it answer the question? Is it embedded in the paper?
@@ -35,11 +35,12 @@
 
 ### Current focus
 
-**Just completed:** the chemistry-rule control is now reported both in the main
-causal-controls figure and Results text, with a task-level appendix table that
-shows where supplying the rule helps, has little effect, or hurts. The checked
-analysis, frozen figure, manuscript prose, and compiled Overleaf revision are
-all available.
+**Just completed:** the assessment's strongest-evidence claim and W1--W6/W10
+have been audited against the frozen results. The paper now uses the qualified
+multi-model claim, explains the oracle-recall/RAG scope, separates specific
+operation types, records the legacy route-task confounds as limitations, and
+includes calls, tokens, latency, tool time, wall time, and memory in the
+appendix. W7--W9 remain deliberately deferred as requested.
 
 Updated September 23, 2026. This is the working document for turning the
 workshop paper into the ICLR submission. It should be updated whenever an
@@ -370,16 +371,16 @@ Sample successes as controls, not only failures.
 
 | Assessment item | Current disposition | Paper action |
 | --- | --- | --- |
-| W1 scale/cardinality confound | Answered strongly for GPT-5 mini; Qwen incomplete | Central matched-cardinality panel and precise scope |
-| W2 missing RAG | Retrieval recall is intentionally elided, but RAG is not universally subsumed | Explain oracle-recall design and acknowledge no realistic retriever comparison |
-| W3 one model | Addressed by six-model matrix; two arms remain provisional | Lead with terminal arms and show coverage |
-| W4 broad "chemical reasoning" | Still needs correction | Use operation-specific terminology throughout |
-| W5 name-to-structure confound | Does not support the central paper claim; controlled study running | Present prospective decomposition as validity analysis |
-| W6 non-exhaustive prospective ground truth | Unresolved and real | Prominent limitation; distinguish exact-route from plausible-route validity |
+| W1 scale/cardinality confound | Key answer-count confound answered for GPT-5 mini Tier 1--3 | Central matched-cardinality panel and precise scope added |
+| W2 missing RAG | Retrieval recall is intentionally elided, but RAG is not universally subsumed | Oracle-recall design and realistic-retriever caveat added |
+| W3 one model | Addressed by six-model matrix; two full-corpus arms remain provisional | Four terminal RLM arms summarized with model ranges |
+| W4 broad "chemical reasoning" | Addressed in current prose | Operation-specific abstraction and orchestration terminology used |
+| W5 name-to-structure confound | Does not support the central paper claim; controlled study running | Legacy-condition confound stated; decomposition remains a validity analysis |
+| W6 non-exhaustive prospective ground truth | Unresolved and real | Limitation now distinguishes exact-route recovery from plausible-route validity |
 | W7 sparse families | Deferred | State scope; do not imply broad chemistry generalization |
 | W8 no negatives | Deferred | State scope and future extension |
 | W9 incomparable `x` axes | Deferred experimentally, cheap to clarify | Fix captions and methods language |
-| W10 cost-only efficiency | Addressed in logging; not yet in paper | Put calls/tokens/time/tool/memory plots in appendix |
+| W10 cost-only efficiency | Addressed | Six-panel calls/tokens/latency/tool/wall/memory figure added to appendix |
 
 ## Assessment experiments: current disposition
 
@@ -452,8 +453,9 @@ publication-quality plot/table, manuscript prose, and a compiled Overleaf push.
    study design.
 7. **Implement and run the multi-model failure analysis.** Freeze the taxonomy,
    audit labels, create the figure, and select trace examples.
-8. **Write the efficiency appendix.** Calls, tokens, latency, tool time, wall
-   time, memory, cost, accounting coverage, and early-failure caveats.
+8. **Completed: efficiency appendix.** Calls, tokens, latency, tool time, wall
+   time, memory, cost, accounting coverage, and early-failure caveats are
+   reported.
 9. **Rewrite framing and related work.** Structured scientific data, benchmark
    qualities, RAG/oracle-recall positioning, time-series and other scientific
    examples, and an explicit statement that this is not an RLM paper.

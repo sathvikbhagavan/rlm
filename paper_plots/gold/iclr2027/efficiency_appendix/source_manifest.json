@@ -1,0 +1,33 @@
+{
+  "aggregation": {
+    "additive_metrics": "sum per job divided by successful question trajectories",
+    "cross_model": "unweighted mean and SEM across terminal model arms",
+    "failed_jobs": "excluded from resource means and counted separately",
+    "included": "successful scored jobs from terminal model/method arms",
+    "peak_memory": "mean peak combined host-process-tree plus Docker memory per job"
+  },
+  "generated_at": "2026-09-23T16:30:44.206186+00:00",
+  "outputs": [
+    {
+      "path": "per_model.csv",
+      "sha256": "2622ed4fde81cd26be3bac47380ebc3eb0241cb0dc0e82f6d6a8a73725371e2a"
+    },
+    {
+      "path": "across_models.csv",
+      "sha256": "b40def0bf5ddb01e930853e8b8cd68b298ef5ec45ebfc79236f3eb2072fdb392"
+    }
+  ],
+  "schema_version": 1,
+  "source_repository_commit": "d6663ebea828a31f1619e13fe6cf6153ef20fbd4",
+  "source_snapshot_as_of": "2026-09-22T19:03:40.570724+00:00",
+  "sources": [
+    {
+      "path": "paper_plots/gold/iclr2027/full_benchmark_records.csv",
+      "sha256": "67eca1cd678f70c8daaebe0441d8a35f6e153720833df52add929f32c42b77d6"
+    },
+    {
+      "path": "paper_plots/gold/iclr2027/source_manifest.json",
+      "sha256": "31110111d30dac5c005fecb8d26ede9d99cd9cb80b5fd3531f20de758445e895"
+    }
+  ]
+}

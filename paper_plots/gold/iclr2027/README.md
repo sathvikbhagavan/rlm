@@ -29,6 +29,14 @@ All plotting aggregates score terminal failed jobs as zero. Running, stale, and 
 - `tier_scaling_across_models.csv`: unweighted means and standard errors across terminal model arms; terminal failed trajectories contribute zero.
 - `tier_efficiency_by_model.csv`: recorded cost, tokens, and wall time per successfully answered trajectory for each model. Failed jobs do not enter resource averages.
 - `tier_efficiency_across_models.csv`: unweighted efficiency means and standard errors across terminal model arms. Cost averages include only paid Gemini, GPT-5-mini, and Claude models; free SwissAI access is excluded.
+- `capability_split/`: checked per-model and across-model full-corpus RLM
+  summaries for the six operation-specific task groups used to reassess the
+  paper's original strongest claim.
+- `efficiency_appendix/`: checked calls, tokens, recorded latency, tool time,
+  process wall time, and peak-memory summaries for terminal arms. Additive
+  metrics are normalized per successful question trajectory; peak memory is
+  averaged per successful job. Terminal failures are counted but excluded from
+  resource means rather than treated as zero.
 - `source_manifest.json`: source snapshot and file checksums.
 
 ## Causal controls
@@ -55,6 +63,10 @@ uv run --with-requirements paper_plots/requirements.txt \
   python paper_plots/scripts/plot_gold_scaling_by_tier.py
 uv run --with-requirements paper_plots/requirements.txt \
   python paper_plots/scripts/plot_gold_efficiency_by_tier.py
+uv run --frozen python paper_plots/scripts/build_capability_split.py
+uv run --frozen python paper_plots/scripts/build_efficiency_appendix.py
+uv run --with-requirements paper_plots/requirements.txt \
+  python paper_plots/scripts/plot_efficiency_appendix.py
 
 uv run --frozen python paper_plots/scripts/build_causal_controls.py
 uv run --with-requirements paper_plots/requirements.txt \
