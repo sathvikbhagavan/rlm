@@ -3,7 +3,7 @@
 ## Original list from Amin (verbatim)
 
 - We need to have a proper figure 1. It could be a cute llama with lab coat looking in a haystack for a reaction. Maybe we just need the schematic though, or a mix of two, not sure. But figure 1 is something we need.
-- We need to follow the assessment, and make sure if the claim of mechanical vs. reasoning is causally separated and has evidence? For that, which plot do we need?
+- <span style="color: #1a7f37;">We need to follow the assessment, and make sure if the claim of mechanical vs. reasoning is causally separated and has evidence? For that, which plot do we need?</span> **✅ Completed**
 - The story should also emphasize the structured data aspect of this task in scientific discovery, something that might be more relevant when we step away from domains like math. Perhaps we could come up with more examples, like time-series (cite our adaptive time-series work), data in biology, I don't know, but make it make sense more and show the impact and need for it through some other examples.
 - The assessment has found the failures insightful, we should redo the failure analysis now that we have so many models and arms, either automatically, or having codex finding the root causes, writing code for it, and running it on the traces. Failure analysis is important.
 - We should properly and briefly explain RAG is superseded by our baselines constructions. Essentially at any context length we put the ground-truths in, so it's already a ceiling for what a RAG (e.g. based on DRFP) could achieve. Because in 100, 500 out of 120k, we're putting the answer reaction along with the others. So we don't try RAG since we think it's subsumed.
@@ -33,7 +33,15 @@
   - F: Do our results support that?
 - What should we release as artifact of this benchmark? Just the set of questions? The answers? Should we hold out anything for not being contaminated? The codes to obtain the ground-truth? The interface to obtain more human annotations?
 
-Updated September 22, 2026. This is the working document for turning the
+### Current focus
+
+**Next:** develop the structured-scientific-data framing from the third item
+above, including concrete examples beyond chemistry and the connection to our
+adaptive time-series work. The causal-controls item is complete: its checked
+analysis, frozen figure, explanatory Results subsection, and compiled Overleaf
+revision are all available.
+
+Updated September 23, 2026. This is the working document for turning the
 workshop paper into the ICLR submission. It should be updated whenever an
 analysis is accepted, a figure is frozen, or prose is pushed to Overleaf.
 
