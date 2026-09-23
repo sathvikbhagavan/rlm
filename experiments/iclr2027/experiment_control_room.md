@@ -109,7 +109,7 @@ The dashboard has exactly six top-level scientific sections, in this order:
 3. the oracle-predicate study;
 4. the deterministic oracle executor;
 5. the prospective Task-16 decomposition; and
-6. the DeepSeek CodeAct x1000 study.
+6. the combined x1000 extension studies (grouped by model and method).
 
 Machine shards, retries, provider changes, pilots and repair experiments never
 appear as additional sections. Their individual attempts are folded into the

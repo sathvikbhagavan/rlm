@@ -537,7 +537,7 @@ def test_newer_running_retry_is_not_overwritten_by_older_failed_shard(
     assert oldest_then_newest["status"] == "running"
 
 
-def test_deepseek_x1000_shards_fold_into_one_study(
+def test_x1000_shards_fold_into_one_study(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     snapshot = populated_snapshot(tmp_path, monkeypatch)
@@ -554,13 +554,32 @@ def test_deepseek_x1000_shards_fold_into_one_study(
     folded = control_room.fold_sharded_campaigns([first, second])
 
     assert len(folded) == 1
-    assert folded[0]["name"] == control_room.DEEPSEEK_CODEACT_X1000_CAMPAIGN
+    assert folded[0]["name"] == control_room.X1000_CAMPAIGN
     assert len(folded[0]["runs"]) == 2
     assert len(folded[0]["sources"]) == 2
     assert folded[0]["shard_campaigns"] == [
         "iclr2027-jed-deepseek-codeact-x1000-s01-v1",
         "iclr2027-jed-deepseek-codeact-x1000-s02-v1",
     ]
+
+
+def test_different_x1000_arms_fold_into_the_same_study(
+    tmp_path: Path, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    snapshot = populated_snapshot(tmp_path, monkeypatch)
+    deepseek = merge_snapshots([snapshot])["campaigns"][0]
+    gemini = deepcopy(deepseek)
+    deepseek["name"] = "iclr2027-jed-deepseek-codeact-x1000-s01-v1"
+    gemini["name"] = "iclr2027-jed-gemini-rlm-x1000-s01-v1"
+    deepseek["runs"] = [deepseek["runs"][0]]
+    gemini["runs"] = [gemini["runs"][1]]
+    gemini["sources"][0]["id"] = "jed-gemini-x1000-s01"
+
+    folded = control_room.fold_sharded_campaigns([deepseek, gemini])
+
+    assert len(folded) == 1
+    assert folded[0]["name"] == control_room.X1000_CAMPAIGN
+    assert len(folded[0]["runs"]) == 2
 
 
 def test_execution_state_distinguishes_paused_from_fresh_data(

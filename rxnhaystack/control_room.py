@@ -46,14 +46,17 @@ MATCHED_CAMPAIGN = "iclr2027-matched-cardinality-v7"
 ORACLE_CAMPAIGN = "iclr2027-oracle-predicate-v1"
 ORACLE_EXECUTOR_CAMPAIGN = "iclr2027-oracle-executor-v1"
 PROSPECTIVE_CAMPAIGN = "iclr2027-task16-prospective-decomposition-v1"
-DEEPSEEK_CODEACT_X1000_CAMPAIGN = "iclr2027-deepseek-codeact-x1000-v1"
+X1000_CAMPAIGN = "iclr2027-x1000-studies-v1"
+# Retained as an import-compatible alias for the plotting code.  The dashboard
+# section now contains every approved x1000 extension, not only DeepSeek.
+DEEPSEEK_CODEACT_X1000_CAMPAIGN = X1000_CAMPAIGN
 DASHBOARD_CAMPAIGN_ORDER = (
     FULL_CAMPAIGN,
     MATCHED_CAMPAIGN,
     ORACLE_CAMPAIGN,
     ORACLE_EXECUTOR_CAMPAIGN,
     PROSPECTIVE_CAMPAIGN,
-    DEEPSEEK_CODEACT_X1000_CAMPAIGN,
+    X1000_CAMPAIGN,
 )
 CONTINUATION_CAMPAIGNS = {
     "iclr2027-gpt5mini-direct-openai-docker-v1",
@@ -84,7 +87,11 @@ CONTINUATION_CAMPAIGN_PREFIXES = (
     ("iclr2027-qwen-matched-swissai-", MATCHED_CAMPAIGN),
 )
 SHARDED_CAMPAIGN_PREFIXES = (
-    ("iclr2027-jed-deepseek-codeact-x1000-", DEEPSEEK_CODEACT_X1000_CAMPAIGN),
+    ("iclr2027-jed-deepseek-codeact-x1000-", X1000_CAMPAIGN),
+    ("iclr2027-jed-gemini-rlm-x1000-", X1000_CAMPAIGN),
+    ("iclr2027-jed-gpt5mini-codeact-x1000-", X1000_CAMPAIGN),
+    ("iclr2027-jed-gpt5mini-rlm-x1000-", X1000_CAMPAIGN),
+    ("iclr2027-sathvik-x1000-succeeded-pack-", X1000_CAMPAIGN),
 )
 
 
@@ -686,8 +693,15 @@ def fold_sharded_campaigns(campaigns: list[dict[str, Any]]) -> list[dict[str, An
 
     hidden_names: set[str] = set()
     combined: list[dict[str, Any]] = []
+    prefixes_by_target: dict[str, list[str]] = defaultdict(list)
     for prefix, target_name in SHARDED_CAMPAIGN_PREFIXES:
-        shards = [campaign for campaign in campaigns if str(campaign["name"]).startswith(prefix)]
+        prefixes_by_target[target_name].append(prefix)
+    for target_name, prefixes in prefixes_by_target.items():
+        shards = [
+            campaign
+            for campaign in campaigns
+            if any(str(campaign["name"]).startswith(prefix) for prefix in prefixes)
+        ]
         if not shards:
             continue
         runs: dict[str, dict[str, Any]] = {}

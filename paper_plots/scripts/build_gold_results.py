@@ -704,7 +704,12 @@ def main() -> None:
     full = campaigns[FULL_CAMPAIGN]
     x1000 = campaigns[DEEPSEEK_CODEACT_X1000_CAMPAIGN]
     rows = [flatten_run(run, scope="full_benchmark") for run in full["runs"]]
-    deepseek_extension_rows = [flatten_run(run, scope="codeact_x1000") for run in x1000["runs"]]
+    deepseek_extension_rows = [
+        flattened
+        for run in x1000["runs"]
+        if (flattened := flatten_run(run, scope="codeact_x1000"))["model"] == "deepseek-v4-flash"
+        and flattened["method"] == "codeact"
+    ]
     expected_gemini_ids = {
         str(row["run_id"]).replace("-x500-", "-x1000-")
         for row in rows
