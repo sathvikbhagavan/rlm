@@ -34,10 +34,11 @@ All plotting aggregates score terminal failed jobs as zero. Running, stale, and 
 ## Causal controls
 
 The `causal_controls/` directory freezes only completed arms used to separate
-corpus scale, answer cardinality, predicate induction, and execution:
+corpus scale, answer cardinality, chemistry-rule inference, and execution:
 
 - all 725 successful GPT-5-mini matched-cardinality jobs;
-- all 150 successful Qwen/Claude oracle-predicate jobs;
+- all 150 successful Qwen/Claude chemistry-rule control jobs (internally named
+  `oracle-predicate`);
 - the corresponding 150 successful ordinary-RLM jobs from the main benchmark;
 - all 15 successful deterministic-executor jobs.
 

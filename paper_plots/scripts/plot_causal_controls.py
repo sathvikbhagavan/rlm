@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Plot controlled evidence separating scale, predicate induction, and execution."""
+"""Plot controlled evidence separating scale, chemistry-rule inference, and execution."""
 
 from __future__ import annotations
 
@@ -251,7 +251,7 @@ def plot_oracle(
             markeredgewidth=0.45,
             capsize=2.2,
             elinewidth=0.8,
-            label="Ordinary RLM" if arm == "ordinary" else "Predicate supplied",
+            label="Ordinary RLM" if arm == "ordinary" else "Chemistry rule supplied",
             zorder=3,
         )
     axis.axhline(
@@ -274,7 +274,7 @@ def plot_oracle(
     )
     axis.set_xticks(positions, ("100", "500", "Full"))
     axis.set_xlabel("Corpus size (reactions)")
-    axis.set_title(f"({panel}) Predicate intervention: {model_label}", loc="left", pad=5)
+    axis.set_title(f"({panel}) Supplying chemistry rules: {model_label}", loc="left", pad=5)
     style_axis(axis)
 
 
