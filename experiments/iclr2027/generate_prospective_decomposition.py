@@ -55,7 +55,7 @@ def render() -> str:
         'name = "iclr2027-task16-prospective-decomposition-v1"',
         'project_root = "../.."',
         'artifact_dir = "artifacts/iclr2027-task16-prospective-decomposition-v1"',
-        "budget_chf = 15.0",
+        "budget_chf = 25.0",
         "usd_to_chf = 0.80",
         "require_dataset = true",
         "require_clean_git = true",

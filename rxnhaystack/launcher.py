@@ -85,7 +85,17 @@ def select_runs(runs: tuple[PlannedRun, ...], patterns: list[str]) -> list[Plann
     return selected
 
 
-def enforce_remaining_budget(manifest: ExperimentManifest, ledger: RunLedger) -> float:
+def enforce_remaining_budget(
+    manifest: ExperimentManifest,
+    ledger: RunLedger,
+    *,
+    selected: list[PlannedRun] | None = None,
+) -> float:
+    selected_ids = (
+        {run.run_id for run in selected}
+        if selected is not None
+        else {run.run_id for run in manifest.runs}
+    )
     estimates = {run.run_id: run.estimated_cost_chf for run in manifest.runs}
     records = {
         record.run_id: record for record in ledger.list_runs(campaign=manifest.campaign.name)
@@ -99,6 +109,8 @@ def enforce_remaining_budget(manifest: ExperimentManifest, ledger: RunLedger) ->
         else:
             committed += estimates[attempt.run_id]
     for run in manifest.runs:
+        if run.run_id not in selected_ids:
+            continue
         record = records[run.run_id]
         if record.status in {"pending", "failed"}:
             committed += run.estimated_cost_chf
@@ -429,7 +441,7 @@ def run_selected(
         raise ManifestError("max_run_seconds must be greater than zero")
     ledger = RunLedger(manifest.campaign.artifact_dir / "ledger.sqlite3")
     ledger.sync_runs(manifest.runs, manifest_sha256=manifest.sha256)
-    enforce_remaining_budget(manifest, ledger)
+    enforce_remaining_budget(manifest, ledger, selected=selected)
     results: list[ExecutionResult] = []
     memory_budget = MemoryBudget(manifest.campaign.max_parallel_memory_mib)
     cancellation_event = threading.Event()
@@ -459,7 +471,7 @@ def run_selected(
                     "Not started because an earlier job exhausted the experiment budget",
                 )
             try:
-                enforce_remaining_budget(manifest, ledger)
+                enforce_remaining_budget(manifest, ledger, selected=selected)
             except ManifestError as error:
                 budget_stop_event.set()
                 return budget_stopped(run, str(error))

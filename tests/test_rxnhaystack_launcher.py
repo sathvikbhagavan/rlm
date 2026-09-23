@@ -289,6 +289,40 @@ def test_budget_includes_failed_attempt_before_retry(tmp_path: Path) -> None:
         enforce_remaining_budget(manifest, ledger)
 
 
+def test_selected_budget_does_not_reserve_unselected_pending_runs(tmp_path: Path) -> None:
+    project_root = tmp_path / "project"
+    project_root.mkdir()
+    initialize_git_repository(project_root)
+    worker = project_root / "worker.py"
+    write_worker(worker, cost_chf=1.5)
+    manifest = load_manifest(
+        write_campaign(
+            tmp_path,
+            project_root,
+            worker,
+            repetitions=3,
+            budget_chf=3.0,
+            estimated_cost_chf=1.0,
+        )
+    )
+    first, second, _third = manifest.runs
+    [result] = run_selected(
+        manifest,
+        preflight=perform_preflight(manifest),
+        selected=[first],
+        secrets={},
+        max_parallel=1,
+        retry_failed=False,
+        recover_running=False,
+    )
+    assert result.status == "succeeded"
+
+    ledger = RunLedger(manifest.campaign.artifact_dir / "ledger.sqlite3")
+    with pytest.raises(ManifestError, match="exceeds campaign budget"):
+        enforce_remaining_budget(manifest, ledger)
+    assert enforce_remaining_budget(manifest, ledger, selected=[second]) == 2.5
+
+
 def test_launcher_stops_queued_jobs_when_actual_cost_exhausts_budget(
     tmp_path: Path,
 ) -> None:
