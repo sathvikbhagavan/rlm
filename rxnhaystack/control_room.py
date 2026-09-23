@@ -88,10 +88,12 @@ CONTINUATION_CAMPAIGN_PREFIXES = (
 )
 SHARDED_CAMPAIGN_PREFIXES = (
     ("iclr2027-jed-deepseek-codeact-x1000-", X1000_CAMPAIGN),
+    ("iclr2027-jed-deepseek-rlm-x1000-", X1000_CAMPAIGN),
     ("iclr2027-jed-gemini-rlm-x1000-", X1000_CAMPAIGN),
     ("iclr2027-jed-gpt5mini-codeact-x1000-", X1000_CAMPAIGN),
     ("iclr2027-jed-gpt5mini-rlm-x1000-", X1000_CAMPAIGN),
     ("iclr2027-sathvik-x1000-succeeded-pack-", X1000_CAMPAIGN),
+    ("iclr2027-deepseek-rlm-x1000-", X1000_CAMPAIGN),
 )
 
 

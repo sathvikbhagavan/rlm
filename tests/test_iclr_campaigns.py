@@ -6,6 +6,7 @@ from pathlib import Path
 import pytest
 
 from experiments.iclr2027 import (
+    generate_deepseek_rlm_x1000,
     generate_full_campaign,
     generate_matched_cardinality_campaign,
 )
@@ -49,9 +50,9 @@ def test_full_campaign_is_generated_and_covers_six_models() -> None:
         for run in codeact_runs
         if run.model != "CSCS-Inference/zai-org/GLM-5.2"
     } == {"30000"}
-    assert {
-        run.env["RXNHAYSTACK_CODEACT_WORKFLOW_TIMEOUT_SECONDS"] for run in codeact_runs
-    } == {"1800"}
+    assert {run.env["RXNHAYSTACK_CODEACT_WORKFLOW_TIMEOUT_SECONDS"] for run in codeact_runs} == {
+        "1800"
+    }
     assert {
         run.question_parallelism
         for run in codeact_runs
@@ -73,6 +74,28 @@ def test_full_campaign_is_generated_and_covers_six_models() -> None:
             {},
             environ={"OPENROUTER_API_KEY": "x", "WANDB_API_KEY": "y"},
         )
+
+
+def test_deepseek_rlm_x1000_is_generated_and_partitionable() -> None:
+    path = CAMPAIGN_DIR / "deepseek-rlm-x1000.toml"
+    assert path.read_text(encoding="utf-8") == generate_deepseek_rlm_x1000.render()
+    manifest = load_manifest(path)
+
+    assert len(manifest.runs) == 150
+    assert manifest.estimated_cost_chf == pytest.approx(20.0)
+    assert {run.model for run in manifest.runs} == {"deepseek/deepseek-v4-flash-0731"}
+    assert {run.method for run in manifest.runs} == {"rlm"}
+    assert {run.corpus_size for run in manifest.runs} == {1000}
+    assert {run.env["RXNHAYSTACK_CONTEXT_SIZE"] for run in manifest.runs} == {"1000"}
+    assert {run.env["RXNHAYSTACK_PROVIDER"] for run in manifest.runs} == {"openrouter"}
+    assert {run.env["RXNHAYSTACK_RLM_OUTPUT_LIMIT"] for run in manifest.runs} == {"4096"}
+    docker = [
+        run
+        for run in manifest.runs
+        if run.task in {"tier4/task16", "tier4/task17", "tier4/task17b"}
+    ]
+    assert len(docker) == 15
+    assert len(manifest.runs) - len(docker) == 135
 
 
 def test_matched_cardinality_campaign_has_two_factor_design() -> None:

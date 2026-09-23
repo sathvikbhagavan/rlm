@@ -17,6 +17,7 @@ from typing import Any
 from rxnhaystack.manifest import ExperimentManifest, load_manifest
 
 MAIN_ROOT = Path("/home/amin/rlm")
+CODE_ROOT = Path(__file__).resolve().parents[2]
 EXECUTION_ROOT = Path("/home/amin/rlm-qwen-docker-repair-20260920")
 DEEPSEEK_ROOT = Path("/home/amin/rlm-deepseek-paid-20260919")
 DATA_DIR = Path("/home/amin/datasets/rxnhaystack")
@@ -95,6 +96,19 @@ PHASES = (
         existing_dashboard_reporter=True,
     ),
     Phase(
+        name="deepseek-rlm-x1000-docker",
+        root=EXECUTION_ROOT,
+        manifest_relative=Path("experiments/iclr2027/deepseek-rlm-x1000.toml"),
+        selections=(
+            "x1000-openrouter-full-deepseek-v4-flash-tier4-task16-rlm-*",
+            "x1000-openrouter-full-deepseek-v4-flash-tier4-task17-rlm-*",
+            "x1000-openrouter-full-deepseek-v4-flash-tier4-task17b-rlm-*",
+        ),
+        expected_runs=15,
+        title="DeepSeek V4 Flash · RLM x1000 · Docker tasks",
+        cost_ceiling_chf=10.0,
+    ),
+    Phase(
         name="glm-docker",
         root=EXECUTION_ROOT,
         manifest_relative=Path("experiments/iclr2027/glm-paid-openrouter-docker.toml"),
@@ -139,7 +153,7 @@ def selected_runs(phase: Phase, manifest: ExperimentManifest) -> list[Any]:
 def validate_phase(phase: Phase, *, allow_main_fallback: bool = False) -> ExperimentManifest:
     path = phase.manifest_path
     if allow_main_fallback and not path.is_file():
-        path = MAIN_ROOT / phase.manifest_relative
+        path = CODE_ROOT / phase.manifest_relative
     manifest = load_manifest(path)
     runs = selected_runs(phase, manifest)
     if len(runs) != phase.expected_runs:
