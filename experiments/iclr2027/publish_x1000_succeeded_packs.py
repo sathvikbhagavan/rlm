@@ -72,11 +72,12 @@ def load_pack(path: Path) -> tuple[dict[str, Any], list[dict[str, Any]]]:
     return manifest, rows
 
 
-def validate_rows(rows: list[dict[str, Any]], *, model: str) -> None:
-    expected_count = 150 if model == QWEN_MODEL else 15
+def validate_rows(
+    rows: list[dict[str, Any]], *, model: str, method: str, docker_only: bool
+) -> None:
+    expected_count = 15 if docker_only else 150
     if len(rows) != expected_count:
-        raise ValueError(f"Expected {expected_count} {model} rows, found {len(rows)}")
-    expected_method = "codeact" if model == QWEN_MODEL else "rlm"
+        raise ValueError(f"Expected {expected_count} {model} {method} rows, found {len(rows)}")
     identities: set[tuple[str, str, int]] = set()
     run_ids: set[str] = set()
     for row in rows:
@@ -84,28 +85,27 @@ def validate_rows(rows: list[dict[str, Any]], *, model: str) -> None:
         repetition = int(row.get("repetition", 0))
         tier = str(row.get("tier", ""))
         task = str(row.get("task", ""))
-        expected_id = (
-            f"full-{model}-tier{tier}-task{task}-{expected_method}-x1000-r{repetition:02d}"
-        )
+        expected_id = f"full-{model}-tier{tier}-task{task}-{method}-x1000-r{repetition:02d}"
         if run_id != expected_id:
             raise ValueError(f"Unexpected packed run identity: {run_id}")
-        if row.get("model") != model or row.get("method") != expected_method:
+        if row.get("model") != model or row.get("method") != method:
             raise ValueError(f"Unexpected model/method in {run_id}")
         if str(row.get("context")) != "1000" or row.get("status") != "succeeded":
             raise ValueError(f"Only successful x1000 records are accepted: {run_id}")
         if repetition not in range(1, 6):
             raise ValueError(f"Unexpected repetition in {run_id}")
-        if model == GEMINI_MODEL and (tier != "4" or task not in {"16", "17", "17b"}):
-            raise ValueError(f"Gemini pack contains a non-Docker task: {run_id}")
+        is_docker_task = tier == "4" and task in {"16", "17", "17b"}
+        if docker_only and not is_docker_task:
+            raise ValueError(f"Docker-only pack contains a non-Docker task: {run_id}")
         identities.add((tier, task, repetition))
         run_ids.add(run_id)
     if len(run_ids) != len(rows) or len(identities) != len(rows):
         raise ValueError(f"Duplicate run in the {model} pack")
-    if model == QWEN_MODEL:
+    if not docker_only:
         task_counts = Counter((tier, task) for tier, task, _ in identities)
         if len(task_counts) != 30 or set(task_counts.values()) != {5}:
             raise ValueError(
-                "Qwen pack must contain five repetitions of all 30 task configurations"
+                "Full x1000 pack must contain five repetitions of all 30 task configurations"
             )
     else:
         expected = {
@@ -120,15 +120,23 @@ def stable_hash(value: Any) -> str:
     return hashlib.sha256(serialized.encode()).hexdigest()
 
 
-def build_pack_snapshot(qwen_path: Path, gemini_path: Path) -> dict[str, Any]:
-    inputs = ((qwen_path, QWEN_MODEL), (gemini_path, GEMINI_MODEL))
+def build_pack_snapshot(
+    qwen_codeact_path: Path,
+    gemini_codeact_path: Path,
+    gemini_rlm_docker_path: Path,
+) -> dict[str, Any]:
+    inputs = (
+        (qwen_codeact_path, QWEN_MODEL, "codeact", False),
+        (gemini_codeact_path, GEMINI_MODEL, "codeact", False),
+        (gemini_rlm_docker_path, GEMINI_MODEL, "rlm", True),
+    )
     expected_runs: list[dict[str, Any]] = []
     observations: list[dict[str, Any]] = []
     packed_times: list[datetime] = []
     archive_hashes: list[str] = []
-    for path, model in inputs:
+    for path, model, method, docker_only in inputs:
         manifest, rows = load_pack(path)
-        validate_rows(rows, model=model)
+        validate_rows(rows, model=model, method=method, docker_only=docker_only)
         packed_at = datetime.fromisoformat(str(manifest["packed_at"]))
         if packed_at.tzinfo is None:
             packed_at = packed_at.replace(tzinfo=UTC)
@@ -225,14 +233,19 @@ def main() -> int:
     parser = argparse.ArgumentParser(
         description="Validate and publish Sathvik's successful x1000 result packs."
     )
-    parser.add_argument("--qwen-pack", type=Path, required=True)
-    parser.add_argument("--gemini-pack", type=Path, required=True)
+    parser.add_argument("--qwen-codeact-pack", type=Path, required=True)
+    parser.add_argument("--gemini-codeact-pack", type=Path, required=True)
+    parser.add_argument("--gemini-rlm-docker-pack", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--wandb-key-file", type=Path)
     parser.add_argument("--entity", default="liac")
     parser.add_argument("--project", default="rxnhaystack-dashboard")
     args = parser.parse_args()
-    snapshot = build_pack_snapshot(args.qwen_pack.resolve(), args.gemini_pack.resolve())
+    snapshot = build_pack_snapshot(
+        args.qwen_codeact_pack.resolve(),
+        args.gemini_codeact_pack.resolve(),
+        args.gemini_rlm_docker_pack.resolve(),
+    )
     write_snapshot(args.output.resolve(), snapshot)
     print(
         f"Validated {len(snapshot['observations'])} successful x1000 records; "

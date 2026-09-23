@@ -15,12 +15,11 @@ from experiments.iclr2027.publish_x1000_succeeded_packs import (
 from rxnhaystack.control_room import validate_snapshot
 
 
-def write_pack(path: Path, *, model: str) -> None:
-    method = "codeact" if model == QWEN_MODEL else "rlm"
+def write_pack(path: Path, *, model: str, method: str, docker_only: bool = False) -> None:
     tasks = (
-        [("1", str(index)) for index in range(1, 31)]
-        if model == QWEN_MODEL
-        else [("4", task) for task in ("16", "17", "17b")]
+        [("4", task) for task in ("16", "17", "17b")]
+        if docker_only
+        else [("1", str(index)) for index in range(1, 31)]
     )
     rows = []
     for tier, task in tasks:
@@ -60,28 +59,32 @@ def write_pack(path: Path, *, model: str) -> None:
 
 def test_build_pack_snapshot_validates_and_combines_both_packs(tmp_path: Path) -> None:
     qwen = tmp_path / "qwen.tgz"
-    gemini = tmp_path / "gemini.tgz"
-    write_pack(qwen, model=QWEN_MODEL)
-    write_pack(gemini, model=GEMINI_MODEL)
+    gemini_codeact = tmp_path / "gemini-codeact.tgz"
+    gemini_rlm = tmp_path / "gemini-rlm.tgz"
+    write_pack(qwen, model=QWEN_MODEL, method="codeact")
+    write_pack(gemini_codeact, model=GEMINI_MODEL, method="codeact")
+    write_pack(gemini_rlm, model=GEMINI_MODEL, method="rlm", docker_only=True)
 
-    snapshot = build_pack_snapshot(qwen, gemini)
+    snapshot = build_pack_snapshot(qwen, gemini_codeact, gemini_rlm)
 
     validate_snapshot(snapshot)
-    assert len(snapshot["experiment"]["expected_runs"]) == 165
-    assert len(snapshot["observations"]) == 165
+    assert len(snapshot["experiment"]["expected_runs"]) == 315
+    assert len(snapshot["observations"]) == 315
     assert {item["status"] for item in snapshot["observations"]} == {"succeeded"}
 
 
 def test_build_pack_snapshot_rejects_non_success(tmp_path: Path) -> None:
     qwen = tmp_path / "qwen.tgz"
-    gemini = tmp_path / "gemini.tgz"
-    write_pack(qwen, model=QWEN_MODEL)
-    write_pack(gemini, model=GEMINI_MODEL)
-    with tarfile.open(gemini, "r:gz") as archive:
+    gemini_codeact = tmp_path / "gemini-codeact.tgz"
+    gemini_rlm = tmp_path / "gemini-rlm.tgz"
+    write_pack(qwen, model=QWEN_MODEL, method="codeact")
+    write_pack(gemini_codeact, model=GEMINI_MODEL, method="codeact")
+    write_pack(gemini_rlm, model=GEMINI_MODEL, method="rlm", docker_only=True)
+    with tarfile.open(gemini_rlm, "r:gz") as archive:
         manifest = json.load(archive.extractfile("pack/manifest.json"))
         rows = json.load(archive.extractfile("pack/runs.json"))
     rows[0]["status"] = "failed"
-    with tarfile.open(gemini, "w:gz") as archive:
+    with tarfile.open(gemini_rlm, "w:gz") as archive:
         for name, payload in (("manifest.json", manifest), ("runs.json", rows)):
             data = json.dumps(payload).encode()
             info = tarfile.TarInfo(f"pack/{name}")
@@ -89,4 +92,4 @@ def test_build_pack_snapshot_rejects_non_success(tmp_path: Path) -> None:
             archive.addfile(info, io.BytesIO(data))
 
     with pytest.raises(ValueError, match="Only successful x1000"):
-        build_pack_snapshot(qwen, gemini)
+        build_pack_snapshot(qwen, gemini_codeact, gemini_rlm)
