@@ -31,6 +31,21 @@ All plotting aggregates score terminal failed jobs as zero. Running, stale, and 
 - `tier_efficiency_across_models.csv`: unweighted efficiency means and standard errors across terminal model arms. Cost averages include only paid Gemini, GPT-5-mini, and Claude models; free SwissAI access is excluded.
 - `source_manifest.json`: source snapshot and file checksums.
 
+## Causal controls
+
+The `causal_controls/` directory freezes only completed arms used to separate
+corpus scale, answer cardinality, predicate induction, and execution:
+
+- all 725 successful GPT-5-mini matched-cardinality jobs;
+- all 150 successful Qwen/Claude oracle-predicate jobs;
+- the corresponding 150 successful ordinary-RLM jobs from the main benchmark;
+- all 15 successful deterministic-executor jobs.
+
+The unfinished Qwen matched-cardinality arm is deliberately excluded. The
+record-level input, question-weighted five-repetition aggregates, and source
+snapshot checksums are stored in `records.csv`, `aggregates.csv`, and
+`source_manifest.json`, respectively.
+
 Regenerate from the repository root:
 
 ```bash
@@ -39,4 +54,8 @@ uv run --with-requirements paper_plots/requirements.txt \
   python paper_plots/scripts/plot_gold_scaling_by_tier.py
 uv run --with-requirements paper_plots/requirements.txt \
   python paper_plots/scripts/plot_gold_efficiency_by_tier.py
+
+uv run --frozen python paper_plots/scripts/build_causal_controls.py
+uv run --with-requirements paper_plots/requirements.txt \
+  python paper_plots/scripts/plot_causal_controls.py
 ```

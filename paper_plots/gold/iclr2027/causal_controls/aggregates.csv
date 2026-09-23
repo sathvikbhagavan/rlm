@@ -1,0 +1,32 @@
+study,model_label,arm,condition,context,tier,mean_f1,sd_f1,replications
+matched_cardinality,GPT-5 mini,matched,cardinality-x5000-k20,5000,2,0.981090909090909,0.025964056528303883,5
+matched_cardinality,GPT-5 mini,matched,cardinality-x5000-k20,5000,3,0.5248560335035126,0.029407467476120847,5
+matched_cardinality,GPT-5 mini,matched,cardinality-x5000-k5,5000,2,0.99,0.022360679774997918,5
+matched_cardinality,GPT-5 mini,matched,cardinality-x5000-k5,5000,3,0.4160840309397244,0.023640182055797508,5
+matched_cardinality,GPT-5 mini,matched,scale-x100-k1,100,1,1.0,0.0,5
+matched_cardinality,GPT-5 mini,matched,scale-x100-k1,100,2,0.97,0.02738612787525833,5
+matched_cardinality,GPT-5 mini,matched,scale-x100-k1,100,3,0.6714589294057732,0.02791557289750524,5
+matched_cardinality,GPT-5 mini,matched,scale-x500-k1,500,1,1.0,0.0,5
+matched_cardinality,GPT-5 mini,matched,scale-x500-k1,500,2,1.0,0.0,5
+matched_cardinality,GPT-5 mini,matched,scale-x500-k1,500,3,0.5575331340825602,0.024827189899959277,5
+matched_cardinality,GPT-5 mini,matched,scale-x5000-k1,5000,1,1.0,0.0,5
+matched_cardinality,GPT-5 mini,matched,scale-x5000-k1,5000,2,0.99,0.022360679774997918,5
+matched_cardinality,GPT-5 mini,matched,scale-x5000-k1,5000,3,0.3369212460015279,0.06017605306149626,5
+matched_cardinality,GPT-5 mini,matched,scale-x50000-k1,50000,1,1.0,0.0,5
+matched_cardinality,GPT-5 mini,matched,scale-x50000-k1,50000,2,0.961111111111111,0.03986861137335368,5
+matched_cardinality,GPT-5 mini,matched,scale-x50000-k1,50000,3,0.20556600182377321,0.03196244184823511,5
+matched_cardinality,GPT-5 mini,matched,scale-xfull-k1,full,1,1.0,0.0,5
+matched_cardinality,GPT-5 mini,matched,scale-xfull-k1,full,2,0.980042735042735,0.027327714928516423,5
+matched_cardinality,GPT-5 mini,matched,scale-xfull-k1,full,3,0.21239035333652262,0.026342669848502927,5
+oracle_predicate,Claude Haiku 4.5,ordinary,ordinary,100,,0.351841869323487,0.03169497557552528,5
+oracle_predicate,Claude Haiku 4.5,predicate,predicate,100,,0.4125,0.08385254915624211,5
+oracle_predicate,Claude Haiku 4.5,ordinary,ordinary,500,,0.3996453082348891,0.04085299739105896,5
+oracle_predicate,Claude Haiku 4.5,predicate,predicate,500,,0.425,0.12022115038544591,5
+oracle_predicate,Claude Haiku 4.5,ordinary,ordinary,full,,0.3069501090606928,0.049037945338822796,5
+oracle_predicate,Claude Haiku 4.5,predicate,predicate,full,,0.5721004849929956,0.08453023226427053,5
+oracle_predicate,Qwen 3.5,ordinary,ordinary,100,,0.7606263875013874,0.06828638505612478,5
+oracle_predicate,Qwen 3.5,predicate,predicate,100,,0.7125,0.12960275845829825,5
+oracle_predicate,Qwen 3.5,ordinary,ordinary,500,,0.7708796305340626,0.053441131759595806,5
+oracle_predicate,Qwen 3.5,predicate,predicate,500,,0.73,0.13422229695546117,5
+oracle_predicate,Qwen 3.5,ordinary,ordinary,full,,0.5512058866143146,0.07648189632157465,5
+oracle_predicate,Qwen 3.5,predicate,predicate,full,,0.755779958746172,0.08263807147566118,5
