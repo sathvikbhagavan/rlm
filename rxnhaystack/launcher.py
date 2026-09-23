@@ -90,6 +90,7 @@ def enforce_remaining_budget(
     ledger: RunLedger,
     *,
     selected: list[PlannedRun] | None = None,
+    retry_failed: bool = True,
 ) -> float:
     selected_ids = (
         {run.run_id for run in selected}
@@ -112,7 +113,7 @@ def enforce_remaining_budget(
         if run.run_id not in selected_ids:
             continue
         record = records[run.run_id]
-        if record.status in {"pending", "failed"}:
+        if record.status == "pending" or (record.status == "failed" and retry_failed):
             committed += run.estimated_cost_chf
     if committed > manifest.campaign.budget_chf:
         raise ManifestError(
@@ -441,7 +442,12 @@ def run_selected(
         raise ManifestError("max_run_seconds must be greater than zero")
     ledger = RunLedger(manifest.campaign.artifact_dir / "ledger.sqlite3")
     ledger.sync_runs(manifest.runs, manifest_sha256=manifest.sha256)
-    enforce_remaining_budget(manifest, ledger, selected=selected)
+    enforce_remaining_budget(
+        manifest,
+        ledger,
+        selected=selected,
+        retry_failed=retry_failed,
+    )
     results: list[ExecutionResult] = []
     memory_budget = MemoryBudget(manifest.campaign.max_parallel_memory_mib)
     cancellation_event = threading.Event()
@@ -471,7 +477,12 @@ def run_selected(
                     "Not started because an earlier job exhausted the experiment budget",
                 )
             try:
-                enforce_remaining_budget(manifest, ledger, selected=selected)
+                enforce_remaining_budget(
+                    manifest,
+                    ledger,
+                    selected=selected,
+                    retry_failed=retry_failed,
+                )
             except ManifestError as error:
                 budget_stop_event.set()
                 return budget_stopped(run, str(error))

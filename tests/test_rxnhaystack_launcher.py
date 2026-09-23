@@ -287,6 +287,7 @@ def test_budget_includes_failed_attempt_before_retry(tmp_path: Path) -> None:
     ledger = RunLedger(manifest.campaign.artifact_dir / "ledger.sqlite3")
     with pytest.raises(ManifestError, match="exceeds campaign budget"):
         enforce_remaining_budget(manifest, ledger)
+    assert enforce_remaining_budget(manifest, ledger, retry_failed=False) == 0.08
 
 
 def test_selected_budget_does_not_reserve_unselected_pending_runs(tmp_path: Path) -> None:
