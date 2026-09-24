@@ -2,6 +2,10 @@
 
 RxnHaystack uses the 2023 USPTO reaction-SMILES release on Figshare
 ([DOI 10.6084/m9.figshare.24921555.v1](https://doi.org/10.6084/m9.figshare.24921555.v1)).
+The upstream record is distributed under
+[CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) and should be cited as:
+Rik van der Lingen (2023), *Reaction SMILES USPTO year 2023*, Figshare,
+DOI 10.6084/m9.figshare.24921555.v1.
 Dataset files are stored outside Git by default under `~/datasets/rxnhaystack`.
 
 Reconstruct and verify the benchmark corpus without changing the project lockfile:

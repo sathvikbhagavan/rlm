@@ -6,6 +6,8 @@ The step-by-step launch instructions are in
 [`running_benchmark.md`](running_benchmark.md).
 The Task-16 target-name/structure control is documented in
 [`prospective_decomposition.md`](prospective_decomposition.md).
+The public artifact, licensing, and future contamination-resistant evaluation
+policy are specified in [`benchmark_release.md`](benchmark_release.md).
 Experiments split across several machines are tracked in the shared, read-only
 [`experiment control room`](experiment_control_room.md).
 

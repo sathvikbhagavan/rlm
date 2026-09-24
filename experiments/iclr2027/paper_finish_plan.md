@@ -31,7 +31,7 @@
   - <span style="color: #1a7f37;">D: Do we have it?</span> **✅ Completed: 30/30 jobs, 90 trajectories, and the controlled result is in Methods and Results**
   - E: I have it differently actually. We have human annotations for different chunks of the 100 questions, not their annotation for false positives.. **⏳ Not complete: one 20-question export is available locally; collaborator exports and expertise metadata still need consolidation**
   - <span style="color: #1a7f37;">F: Do our results support that?</span> **✅ Completed: the capability ordering is reported across Qwen, Gemini, GPT-5 mini, and Claude**
-- What should we release as artifact of this benchmark? Just the set of questions? The answers? Should we hold out anything for not being contaminated? The codes to obtain the ground-truth? The interface to obtain more human annotations?
+- 🟢 <span style="color: #1a7f37;">What should we release as artifact of this benchmark? Just the set of questions? The answers? Should we hold out anything for not being contaminated? The codes to obtain the ground-truth? The interface to obtain more human annotations?</span> **✅ Release policy completed: publish the current benchmark in full and build a separate private extension for future contamination-resistant evaluation**
 
 ### Current focus
 
@@ -394,6 +394,9 @@ Sample successes as controls, not only failures.
 | F. Multi-model replication | Complete for the four-model full-corpus comparison | Capability split reproduces, with important model heterogeneity |
 
 ## Artifact release plan
+
+The detailed public-facing policy and packaging checklist are maintained in
+[`benchmark_release.md`](benchmark_release.md).
 
 The current 100 questions are already part of the research process and should
 not be presented as a contamination-proof hidden test. Reproducibility is more

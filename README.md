@@ -130,6 +130,8 @@ for the reproducible runner, experiment descriptions, budget controls, and
 result-file contract. People launching experiments should follow the
 human-oriented
 [`experiments/iclr2027/running_benchmark.md`](experiments/iclr2027/running_benchmark.md).
+The benchmark artifact and contamination policy are documented in
+[`experiments/iclr2027/benchmark_release.md`](experiments/iclr2027/benchmark_release.md).
 For a plain-language summary of the code changes, see
 [`experiments/iclr2027/what_changed.md`](experiments/iclr2027/what_changed.md).
 
