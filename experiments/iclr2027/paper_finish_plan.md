@@ -116,6 +116,14 @@ queue for finishing the submission.
 - [ ] Generate and include the DeepSeek core-metrics, resource-diagnostics,
   and task-level heatmap pages after the main arm becomes terminal.
 
+#### Cost and resource disclosure
+
+- [x] Report recorded API cost in USD per successful trajectory alongside
+  calls, tokens, latency, tool time, wall time, and memory in the appendix.
+- [ ] After the final arms are frozen, add a compact replication-cost table by
+  model and interface. Distinguish paid API use from institutional inference
+  access, and exclude development/debugging spend from the benchmark total.
+
 ### 5. Complete the trace-based failure analysis
 
 - [ ] Classify failures across models and interfaces from the recorded traces,
