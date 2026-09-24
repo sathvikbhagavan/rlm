@@ -19,6 +19,7 @@ TIER_COLORS = {2: "#0072B2", 3: "#D55E00"}
 TIER_MARKERS = {2: "o", 3: "s"}
 ARM_COLORS = {"ordinary": "#4C566A", "predicate": "#009E73", "executor": "#8A8F98"}
 ARM_MARKERS = {"ordinary": "o", "predicate": "D"}
+MODEL_SHORT_NAMES = {"Qwen 3.5": "Qwen", "Claude Haiku 4.5": "Claude"}
 CONTEXTS = ("100", "500", "5000", "50000", "full")
 CONTEXT_LABELS = ("100", "500", "5k", "50k", "Full")
 
@@ -274,7 +275,8 @@ def plot_oracle(
     )
     axis.set_xticks(positions, ("100", "500", "Full"))
     axis.set_xlabel("Corpus size (reactions)")
-    axis.set_title(f"({panel}) Supplying chemistry rules: {model_label}", loc="left", pad=5)
+    short_name = MODEL_SHORT_NAMES.get(model_label, model_label)
+    axis.set_title(f"({panel}) Supplying chemistry rules: {short_name}", loc="left", pad=5)
     style_axis(axis)
 
 
