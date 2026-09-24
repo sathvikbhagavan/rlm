@@ -104,6 +104,7 @@ def build_question() -> str:
       - {TASK_DESCRIPTION}
 
     Guidance:
+    - Use RDKit 2025.09.6 bond perception, matching the benchmark environment and stored reference.
     - Ignore reagents in the middle field.
     - A C-O bond is any bond where one endpoint atom is carbon and the other is oxygen.
     - Bond type matters: single, double, triple, and aromatic C-O bonds are distinct types.

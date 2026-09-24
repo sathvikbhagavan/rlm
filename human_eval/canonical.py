@@ -447,13 +447,17 @@ class BundleBuilder:
                     subcategory="ring-chain",
                     key=f"task15-{q.ring_system}",
                     prompt=prompt,
-                    answer_type="reaction_chains",
+                    answer_type="one_of_reaction_chains",
                     answer=answer,
                     sources=[
                         "tier4/task15_ring_chain_graph.py",
                         "tier4/task15_ring_chain_ground_truth.py",
                         "tier4/task15_ring_hardcoded_chains.json",
                     ],
+                    evaluator={
+                        "method": "one submitted chain must equal one stored valid chain",
+                        "normalization": "trim whitespace; parse one comma-delimited reaction-index chain",
+                    },
                 )
             self.add_prospective()
 

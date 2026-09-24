@@ -49,9 +49,10 @@ def main() -> None:
     contents = f'''"""Hardcoded ground-truth indices for tier3 task23.
 Generated from reactionSmilesFigShareUSPTO2023_cleaned.txt with RDKit {rdkit_version}.
 Ground truth computed using Chem.FindMolChiralCenters(mol, includeUnassigned=False,
-useLegacyImplementation=False). A reaction is included if and only if every reactant SMILES
-has zero assigned stereocenters and at least one product SMILES has one or more assigned
-stereocenters. Reagents are not considered. Unparseable reactions are excluded.
+useLegacyImplementation=True), retaining only uppercase R/S descriptors. A reaction is included
+if and only if every reactant SMILES has zero assigned R/S stereocenters and at least one product
+SMILES has one or more assigned R/S stereocenters. Lowercase pseudoasymmetric r/s descriptors
+and reagents are not considered. Unparseable reactions are excluded.
 """
 
 TASK23_TOTAL_REACTIONS = {len(lines)}

@@ -3,10 +3,16 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from human_eval.analysis import analyze, cohen_kappa, krippendorff_alpha_nominal, set_scores
+from human_eval.analysis import (
+    analyze,
+    answer_scores,
+    cohen_kappa,
+    krippendorff_alpha_nominal,
+    set_scores,
+)
 from human_eval.db import Store
 from human_eval.exporting import export_zip
-from human_eval.schema import ground_truth_answer_set, submitted_answer_set
+from human_eval.schema import exact_answer_match, ground_truth_answer_set, submitted_answer_set
 
 
 def test_known_analysis_values():
@@ -26,6 +32,25 @@ def test_known_analysis_values():
         )["exact_match"]
         == 1.0
     )
+
+
+def test_one_of_reaction_chains_accepts_exactly_one_stored_alternative():
+    alternatives = [[1, 2, 3], [4, 5, 6]]
+    assert exact_answer_match([["4", "5", "6"]], alternatives, "one_of_reaction_chains")
+    assert not exact_answer_match([["9", "10", "11"]], alternatives, "one_of_reaction_chains")
+    assert not exact_answer_match(
+        [["1", "2", "3"], ["4", "5", "6"]],
+        alternatives,
+        "one_of_reaction_chains",
+    )
+    predicted = submitted_answer_set([["1", "2", "3"]], "one_of_reaction_chains")
+    expected = ground_truth_answer_set(alternatives, "one_of_reaction_chains")
+    assert answer_scores(predicted, expected, "one_of_reaction_chains") == {
+        "exact_match": 1.0,
+        "precision": 1.0,
+        "recall": 1.0,
+        "f1": 1.0,
+    }
 
 
 def test_export_analysis_round_trip(tmp_path: Path, tiny_bundle: Path):

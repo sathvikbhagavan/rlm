@@ -102,7 +102,10 @@ def build_question() -> str:
 
     Guidance:
     - Examine reactant and product molecules; ignore reagents.
-    - A stereocenter means an assigned tetrahedral (sp³) stereocenter with explicit R/S annotation in the SMILES.
+    - A stereocenter means an assigned tetrahedral (sp³) stereocenter whose CIP descriptor is
+      uppercase R or S after RDKit assignment.
+    - Do not count lowercase r/s pseudoasymmetric descriptors; those encode relative
+      pseudoasymmetry rather than the absolute R/S centers requested here.
     - Do not count unannotated potential stereocenters or double-bond E/Z geometry.
     - Count a reaction if at least one product contains a stereocenter and no reactant contains any stereocenter.
     - Multi-component reactant and product slots are separated by dots (.); check each component.

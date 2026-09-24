@@ -118,7 +118,7 @@ different suite versions remains distinguishable.
 
 Before changing a live study, archive the old canonical bundle—including its
 protected `admin/` component—and build the update in a new directory. The current
-corrected bundle is `human_eval/generated/canonical-v4`; do not overwrite an older
+corrected bundle is `human_eval/generated/canonical-v5`; do not overwrite an older
 bundle needed to
 score its submissions. Restart the application with both the new bundle and the
 unchanged state directory:
@@ -126,7 +126,7 @@ unchanged state directory:
 ```bash
 uv run --frozen --with-requirements human_eval/requirements.txt \
   python -m human_eval.cli serve \
-  --bundle human_eval/generated/canonical-v4 \
+  --bundle human_eval/generated/canonical-v5 \
   --state human_eval/local_state
 ```
 
@@ -137,7 +137,8 @@ same study.
 
 See [ANNOTATOR_INSTRUCTIONS.md](ANNOTATOR_INSTRUCTIONS.md),
 [STUDY_DESIGN.md](STUDY_DESIGN.md), [SCHEMA.md](SCHEMA.md),
-[CANDIDATE_PACK.md](CANDIDATE_PACK.md), [ANALYSIS.md](ANALYSIS.md), and the
+[CANDIDATE_PACK.md](CANDIDATE_PACK.md), [ANALYSIS.md](ANALYSIS.md), the
+[Tier-3/Tier-4 audit](TIER3_TIER4_AUDIT.md), and the
 ready-to-send [INVITATION.md](INVITATION.md). The separate
 [SPECIALIST_REVIEW_INSTRUCTIONS.md](SPECIALIST_REVIEW_INSTRUCTIONS.md) should only
 be sent to people explicitly assigned audit or candidate-route work.

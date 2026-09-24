@@ -71,7 +71,8 @@ TASK_DESCRIPTION = (
 )
 TASK_EVALUATION_GUIDANCE = """
     Stereocenter definition:
-    - For this task, a stereocenter means an assigned tetrahedral (sp³) stereocenter with explicit R/S annotation in the SMILES.
+    - For this task, a stereocenter means an assigned tetrahedral (sp³) stereocenter whose CIP descriptor is uppercase R or S after RDKit assignment.
+    - Do not count lowercase r/s pseudoasymmetric descriptors; those encode relative pseudoasymmetry rather than the absolute R/S centers requested here.
     - Do not count potential stereocenters that are not explicitly annotated.
     - Do not count double-bond E/Z geometry as a stereocenter.
 

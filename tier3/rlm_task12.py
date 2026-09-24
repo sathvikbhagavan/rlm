@@ -105,6 +105,7 @@ def build_question() -> str:
     - {TASK_DESCRIPTION}
 
     Guidance:
+    - Use RDKit 2025.09.6 bond perception, matching the benchmark environment and stored reference.
     - Use RDKit for all parsing and bond analysis.
     - Convert reactants and products to RDKit molecules; do not count by string matching.
     - Ignore reagents in the middle field.

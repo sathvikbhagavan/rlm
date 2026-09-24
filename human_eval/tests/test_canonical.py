@@ -27,8 +27,8 @@ def test_real_extraction_is_exact_and_deterministic(tmp_path: Path):
     manifest_a = build_bundle(ROOT, first, "dataset-checksum")
     manifest_b = build_bundle(ROOT, second, "dataset-checksum")
     assert manifest_a["question_count"] == 100
-    assert manifest_a["schema_version"] == "1.2.0"
-    assert manifest_a["bundle_version"] == "rxnhaystack-human-1.3.0"
+    assert manifest_a["schema_version"] == "1.3.0"
+    assert manifest_a["bundle_version"] == "rxnhaystack-human-1.4.0"
     assert manifest_a["taxonomy"] == EXPECTED
     assert manifest_a["questions_sha256"] == manifest_b["questions_sha256"]
     assert (first / "questions.jsonl").read_bytes() == (second / "questions.jsonl").read_bytes()
@@ -71,6 +71,10 @@ def test_schema_round_trip_and_stable_ids():
     assert {q.metadata["conceptual_family"] for q in sequential} == {
         "multi-constraint-sequential-template"
     }
+    task15 = [q for q in questions if q.tier == 4 and q.subcategory == "ring-chain"]
+    assert len(task15) == 4
+    assert {q.answer_type for q in task15} == {"one_of_reaction_chains"}
+    assert all(q.scoring["method"].startswith("one submitted chain") for q in task15)
 
 
 def test_task12b_frozen_answer_is_exhaustive_for_clean_dataset():

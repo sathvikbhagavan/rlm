@@ -11,7 +11,7 @@ from itertools import permutations
 from pathlib import Path
 from pprint import pformat
 
-from rdkit import Chem
+from rdkit import Chem, rdBase
 from rdkit.Chem import rdChemReactions
 
 
@@ -24,6 +24,11 @@ TASK17_RING_SYSTEMS: dict[str, str] = {
     "benzothiazole": "c1ccc2scnc2c1",
     "benzimidazole": "c1ccc2[nH]cnc2c1",
 }
+TASK18_GROUND_TRUTH_DEFINITION = (
+    "cluster SSSR rings that share atoms, then compare induced ring-atom graphs by exact "
+    "isomorphism of element/aromaticity atom labels and internal bond type/aromaticity labels; "
+    "ignore substituent-dependent atom properties"
+)
 TASK6_AMIDE_COUPLING_SMIRKS: dict[str, str] = {
     "acyl_chloride_with_primary_amine": "[*:1]-[C;H0;D3;+0:2](=[O;H0;D1;+0:3])-[Cl].[#7;H2;!$(N[O,N]);D1;+0:5]>>[*:1]-[C;H0;D3;+0:2](=[O;H0;D1;+0:3])-[#7;H1;D2;+0:5]",
     "acyl_chloride_with_secondary_amine": "[*:1]-[C;H0;D3;+0:2](=[O;H0;D1;+0:3])-[Cl].[#7;H1;D2;+0:5]>>[*:1]-[C;H0;D3;+0:2](=[O;H0;D1;+0:3])-[#7;H0;D3;+0:5]",
@@ -585,15 +590,37 @@ def cluster_ring_systems(mol: Chem.Mol) -> list[tuple[int, ...]]:
     return [tuple(sorted(system)) for system in systems]
 
 
-def ring_system_query(mol: Chem.Mol, atom_ids: tuple[int, ...]) -> Chem.Mol | None:
-    smiles = Chem.MolFragmentToSmiles(mol, atomsToUse=list(atom_ids), canonical=True)
-    if not smiles:
-        return None
-    query = Chem.MolFromSmiles(smiles)
-    if query is None:
-        return None
-    Chem.SanitizeMol(query)
-    return query
+def ring_system_graph(
+    mol: Chem.Mol, atom_ids: tuple[int, ...]
+) -> tuple[list[tuple[int, bool]], list[dict[int, tuple[bool, float]]]]:
+    """Return the labeled graph induced by a ring system.
+
+    Only properties intrinsic to the requested ring framework are retained.  In
+    particular, implicit-H counts, valence, radical state, and degree in the
+    *parent* molecule are deliberately excluded: retaining those properties
+    makes a substituted aromatic carbon differ from the same carbon before
+    substitution and incorrectly labels ordinary coupling/substitution reactions
+    as construction of a new ring system.
+    """
+
+    position = {atom_id: offset for offset, atom_id in enumerate(atom_ids)}
+    labels = [
+        (
+            mol.GetAtomWithIdx(atom_id).GetAtomicNum(),
+            bool(mol.GetAtomWithIdx(atom_id).GetIsAromatic()),
+        )
+        for atom_id in atom_ids
+    ]
+    adjacency: list[dict[int, tuple[bool, float]]] = [dict() for _ in atom_ids]
+    for bond in mol.GetBonds():
+        begin = position.get(bond.GetBeginAtomIdx())
+        end = position.get(bond.GetEndAtomIdx())
+        if begin is None or end is None:
+            continue
+        label = (bool(bond.GetIsAromatic()), float(bond.GetBondTypeAsDouble()))
+        adjacency[begin][end] = label
+        adjacency[end][begin] = label
+    return labels, adjacency
 
 
 def ring_systems_equivalent(
@@ -601,11 +628,66 @@ def ring_systems_equivalent(
 ) -> bool:
     if len(atoms_a) != len(atoms_b):
         return False
-    query_a = ring_system_query(mol_a, atoms_a)
-    query_b = ring_system_query(mol_b, atoms_b)
-    if query_a is None or query_b is None:
+
+    labels_a, adjacency_a = ring_system_graph(mol_a, atoms_a)
+    labels_b, adjacency_b = ring_system_graph(mol_b, atoms_b)
+    node_count = len(labels_a)
+
+    def node_signature(
+        labels: list[tuple[int, bool]],
+        adjacency: list[dict[int, tuple[bool, float]]],
+        node: int,
+    ) -> tuple[tuple[int, bool], int, tuple[tuple[bool, float], ...]]:
+        return labels[node], len(adjacency[node]), tuple(sorted(adjacency[node].values()))
+
+    signatures_a = sorted(
+        node_signature(labels_a, adjacency_a, node) for node in range(node_count)
+    )
+    signatures_b = sorted(
+        node_signature(labels_b, adjacency_b, node) for node in range(node_count)
+    )
+    if signatures_a != signatures_b:
         return False
-    return query_a.HasSubstructMatch(query_b) and query_b.HasSubstructMatch(query_a)
+
+    candidates = {
+        node_a: [
+            node_b
+            for node_b in range(node_count)
+            if node_signature(labels_a, adjacency_a, node_a)
+            == node_signature(labels_b, adjacency_b, node_b)
+        ]
+        for node_a in range(node_count)
+    }
+    order = sorted(
+        range(node_count),
+        key=lambda node: (len(candidates[node]), -len(adjacency_a[node]), node),
+    )
+    mapping: dict[int, int] = {}
+    used_b: set[int] = set()
+
+    def extend(offset: int) -> bool:
+        if offset == node_count:
+            return True
+        node_a = order[offset]
+        for node_b in candidates[node_a]:
+            if node_b in used_b:
+                continue
+            if any(
+                mapped_b not in adjacency_b[node_b]
+                or adjacency_a[node_a][mapped_a] != adjacency_b[node_b][mapped_b]
+                for mapped_a, mapped_b in mapping.items()
+                if mapped_a in adjacency_a[node_a]
+            ):
+                continue
+            mapping[node_a] = node_b
+            used_b.add(node_b)
+            if extend(offset + 1):
+                return True
+            used_b.remove(node_b)
+            del mapping[node_a]
+        return False
+
+    return extend(0)
 
 
 def reactant_has_equivalent_ring_system(
@@ -804,9 +886,10 @@ def write_task18_module(
         handle.write(f"TASK18_VALID_REACTIONS = {valid_reactions}\n")
         handle.write(f"TASK18_SKIPPED_REACTIONS = {skipped_reactions}\n")
         handle.write(f"TASK18_POSITIVE_REACTIONS = {len(indices)}\n")
+        handle.write(f"TASK18_RDKIT_VERSION = {rdBase.rdkitVersion!r}\n")
         handle.write(
             "TASK18_GROUND_TRUTH_DEFINITION = "
-            '"equal ring-atom count plus mutual sanitized substructure match on clustered ring systems"\n\n'
+            f"{TASK18_GROUND_TRUTH_DEFINITION!r}\n\n"
         )
         handle.write("TASK18_HARDCODED_GROUND_TRUTH_INDICES = ")
         handle.write(pformat(indices, width=100))
@@ -969,13 +1052,15 @@ def write_task12_module(
     with open(out_path, "w", encoding="utf-8") as handle:
         handle.write('"""Hardcoded ground-truth indices for tier3 task12.\n')
         handle.write(
-            "Generated from reactionSmilesFigShareUSPTO2023_cleaned.txt with RDKit extraction.\n"
+            "Generated from reactionSmilesFigShareUSPTO2023_cleaned.txt with "
+            f"RDKit {rdBase.rdkitVersion} extraction.\n"
         )
         handle.write('"""\n\n')
         handle.write(f"TASK12_TOTAL_REACTIONS = {total_reactions}\n")
         handle.write(f"TASK12_VALID_REACTIONS = {valid_reactions}\n")
         handle.write(f"TASK12_SKIPPED_REACTIONS = {skipped_reactions}\n")
         handle.write(f"TASK12_POSITIVE_REACTIONS = {len(indices)}\n\n")
+        handle.write(f"TASK12_RDKIT_VERSION = {rdBase.rdkitVersion!r}\n\n")
         handle.write("TASK12_HARDCODED_GROUND_TRUTH_INDICES = ")
         handle.write(pformat(indices, width=100))
         handle.write("\n")

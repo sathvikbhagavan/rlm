@@ -10,7 +10,7 @@ from typing import Any
 from .schema import ground_truth_answer_set, normalize_structured_answer, submitted_answer_set
 
 
-def set_scores(predicted: set[str], expected: set[str]) -> dict[str, float]:
+def set_scores(predicted: set[Any], expected: set[Any]) -> dict[str, float]:
     if not predicted and not expected:
         return {"exact_match": 1.0, "precision": 1.0, "recall": 1.0, "f1": 1.0}
     overlap = len(predicted & expected)
@@ -23,6 +23,19 @@ def set_scores(predicted: set[str], expected: set[str]) -> dict[str, float]:
         "recall": recall,
         "f1": f1,
     }
+
+
+def answer_scores(
+    predicted: set[tuple[str, ...]],
+    expected: set[tuple[str, ...]],
+    answer_type: str,
+) -> dict[str, float]:
+    """Score exhaustive sets or a single accepted alternative as declared by the task."""
+    if answer_type == "one_of_reaction_chains":
+        accepted = len(predicted) == 1 and predicted.issubset(expected)
+        score = float(accepted)
+        return {"exact_match": score, "precision": score, "recall": score, "f1": score}
+    return set_scores(predicted, expected)
 
 
 def cohen_kappa(labels_a: list[str], labels_b: list[str]) -> float | None:
@@ -135,7 +148,7 @@ def analyze(
                 if not isinstance(entries, list):
                     _, entries = normalize_structured_answer(payload.get("answer_exact", ""))
                 predicted = submitted_answer_set(entries, answer_type)
-                base.update(set_scores(predicted, expected_set))
+                base.update(answer_scores(predicted, expected_set, answer_type))
                 base.update(
                     {"tier": questions[item_id]["tier"], "category": questions[item_id]["category"]}
                 )

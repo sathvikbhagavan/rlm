@@ -11,24 +11,25 @@ rdBase.DisableLog("rdApp.*")
 REACTION_KEY = "stereocenter_from_achiral_reactants"
 
 TASK23_GROUND_TRUTH_DEFINITION = (
-    "at least one product SMILES has assigned tetrahedral stereocenter and every reactant "
-    "SMILES has zero assigned stereocenters; reagents are not considered"
+    "at least one product SMILES has an assigned tetrahedral center with uppercase CIP label "
+    "R or S and every reactant SMILES has zero such centers; lowercase pseudoasymmetric r/s "
+    "centers and reagents are not considered"
 )
 
 
 def count_assigned_stereocenters(mol: Chem.Mol | None) -> int:
     if mol is None:
-        return 0
-    try:
-        Chem.SanitizeMol(mol)
-    except Exception:
-        return 0
+        raise ValueError("Could not parse molecule")
+    Chem.SanitizeMol(mol)
     centers = Chem.FindMolChiralCenters(
         mol,
         includeUnassigned=False,
-        useLegacyImplementation=False,
+        # The legacy assignment API reports ordinary uppercase R/S centers and
+        # excludes the lowercase r/s pseudoasymmetric descriptors introduced by
+        # the newer implementation.  That is the contract stated in the prompt.
+        useLegacyImplementation=True,
     )
-    return len(centers)
+    return sum(label in {"R", "S"} for _, label in centers)
 
 
 def parse_reaction(reaction_smiles: str) -> tuple[list[str], list[str], list[str]] | tuple[None, None, None]:

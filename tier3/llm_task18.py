@@ -56,12 +56,16 @@ TASK_EVALUATION_GUIDANCE = """
     Ring systems:
     - Identify rings via the smallest-set-of-smallest-rings (SSSR), then group SSSR rings that share atoms into connected ring systems (fused, spiro, or bridged). Each such group is one ring system — not individual SSSR rings in isolation.
     - Each product molecule may contain multiple ring systems; evaluate each independently against all reactant ring systems.
-    - Extract each ring system as a fragment of its ring atoms and internal bonds before comparing.
+    - Compare the labeled graph induced by each ring system's ring atoms and internal bonds.
+      Retain atom element, atom aromaticity, and internal bond type/aromaticity, but ignore
+      implicit-H count, valence, radical state, and bonds from ring atoms to substituents outside
+      the ring system.
 
     Equivalence:
     - Two ring systems are equivalent (not new) only when they have the same number of ring atoms and are mutual substructures — each must match the other's ring topology bidirectionally, not merely contain it one way.
     - One-way substructure is insufficient: a smaller reactant ring embedded in a larger product ring system does not make the larger system old (e.g. benzene inside a newly formed fused bicyclic product is still new ring construction).
-    - Exact canonical SMILES string equality alone is not sufficient; use sanitized fragments and bidirectional substructure matching.
+    - Exact canonical SMILES string equality alone is not sufficient; compare the induced labeled
+      ring graphs for graph isomorphism.
     - Perceive aromaticity consistently so Kekulé and aromatic forms of the same ring are treated as equivalent.
 
     When two ring systems count as the same (not new):

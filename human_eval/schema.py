@@ -9,7 +9,14 @@ from typing import Any
 from . import SCHEMA_VERSION
 
 ID_RE = re.compile(r"^[a-z0-9][a-z0-9._-]+$")
-ANSWER_TYPES = {"index_set", "reaction_chains", "reaction_pair_set", "smiles_set", "single_chain"}
+ANSWER_TYPES = {
+    "index_set",
+    "reaction_chains",
+    "reaction_pair_set",
+    "smiles_set",
+    "single_chain",
+    "one_of_reaction_chains",
+}
 
 
 @dataclass(frozen=True)
@@ -124,6 +131,8 @@ def normalize_answer_token(value: Any, answer_type: str) -> str:
 
 
 def exact_answer_match(entries: list[list[str]], ground_truth: Any, answer_type: str) -> bool:
-    return submitted_answer_set(entries, answer_type) == ground_truth_answer_set(
-        ground_truth, answer_type
-    )
+    submitted = submitted_answer_set(entries, answer_type)
+    expected = ground_truth_answer_set(ground_truth, answer_type)
+    if answer_type == "one_of_reaction_chains":
+        return len(submitted) == 1 and submitted.issubset(expected)
+    return submitted == expected

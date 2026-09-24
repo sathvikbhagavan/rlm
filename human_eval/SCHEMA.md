@@ -13,8 +13,10 @@ occur once here. `manifest.json` freezes file checksums, taxonomy, audit samplin
 known source inconsistencies, and excluded historical modules.
 
 Answer types are `index_set`, `reaction_chains`, `reaction_pair_set`, `smiles_set`,
-and `single_chain`. Exact submitted text is retained in `answer_exact`; a conservative
-line/comma tokenization is also saved as `answer_entries`.
+`single_chain`, and `one_of_reaction_chains`. The last type is used when the canonical
+prompt explicitly accepts any one member of a protected set of valid chains; exactly one
+submitted chain must match a stored alternative. Exact submitted text is retained in
+`answer_exact`; a conservative line/comma tokenization is also saved as `answer_entries`.
 
 ## SQLite and exports
 

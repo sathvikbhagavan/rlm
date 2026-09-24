@@ -1,11 +1,13 @@
 """Hardcoded ground-truth indices for tier3 task12.
-Generated from reactionSmilesFigShareUSPTO2023_cleaned.txt with RDKit extraction.
+Generated from reactionSmilesFigShareUSPTO2023_cleaned.txt with RDKit 2025.09.6 extraction.
 """
 
 TASK12_TOTAL_REACTIONS = 122456
 TASK12_VALID_REACTIONS = 122456
 TASK12_SKIPPED_REACTIONS = 0
 TASK12_POSITIVE_REACTIONS = 62817
+
+TASK12_RDKIT_VERSION = '2025.09.6'
 
 TASK12_HARDCODED_GROUND_TRUTH_INDICES = [0,
  3,
