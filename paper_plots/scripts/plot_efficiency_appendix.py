@@ -94,10 +94,10 @@ def make_figure(rows: list[dict[str, str]]) -> plt.Figure:
     fig.text(
         0.5,
         0.005,
-        "RLM only; unweighted mean ± SEM across four terminal model arms. Resource means "
-        "include successful scored trajectories only;\nterminal failures do not enter these "
-        "means and are never assigned zero resource use. Recorded latency and process wall time are independent "
-        "elapsed-time measurements; peak memory is measured per job.",
+        "RLM only; unweighted mean ± SEM across Qwen, Gemini, GPT-5 mini, and Claude. "
+        "Additive metrics summarize 5,930 successful\nscored trajectories from 1,791 jobs; "
+        "peak memory is measured per successful job. Recorded latency and process wall time "
+        "are independent elapsed-time measurements.",
         ha="center",
         va="bottom",
         fontsize=6.6,
