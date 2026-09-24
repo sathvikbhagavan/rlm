@@ -221,6 +221,13 @@ def test_baseline_set_scoring_feedback_and_large_reference(
     before = client.get("/question/rxh-t1-fixture?mode=baseline")
     assert "Post-submission reference" not in before.text
     assert "Correct" not in before.text
+    audit_page = client.get("/question/rxh-t1-fixture?mode=audit")
+    assert "Complete stored reference shown below (150 entries)" in audit_page.text
+    assert "no answers are omitted or sampled" in audit_page.text
+    audit_reference = audit_page.text.split('<pre class="prompt reference-answer">', 1)[1].split(
+        "</pre>", 1
+    )[0]
+    assert "  0," in audit_reference and "  149" in audit_reference
 
     reversed_answer = ",".join(str(value) for value in reversed(range(150)))
     submitted = client.post(
@@ -236,10 +243,11 @@ def test_baseline_set_scoring_feedback_and_large_reference(
     assert 'class="answer-feedback feedback-correct"' in correct_page.text
     assert 'data-evaluation="correct"' in correct_page.text
     assert 'id="benchmark-disagreement"' not in correct_page.text
-    assert "Showing the first 100 entries in canonical order" in correct_page.text
-    reference = correct_page.text.split('<pre class="prompt">', 1)[1].split("</pre>", 1)[0]
-    assert "  0," in reference and "  99" in reference
-    assert "  100" not in reference
+    assert "Complete stored reference shown below (150 entries)" in correct_page.text
+    reference = correct_page.text.split('<pre class="prompt reference-answer">', 1)[1].split(
+        "</pre>", 1
+    )[0]
+    assert "  0," in reference and "  149" in reference
 
     incorrect = client.post(
         "/api/submit/baseline/rxh-t1-fixture",

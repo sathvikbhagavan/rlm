@@ -41,13 +41,8 @@
 {% if audit_truth %}
 <section class="panel">
   <h2>{% if audit_truth.post_submission %}Post-submission reference{% else %}Stored ground-truth audit material{% endif %}</h2>
-  {% if audit_truth.post_submission %}
-    {% if audit_truth.truncated %}<p>Total answer entries: {{ audit_truth.total }}. Showing the first {{ audit_truth.shown }} entries in canonical order; the complete reference is still used for scoring.</p>
-    {% else %}<p>Complete reference answer shown below ({{ audit_truth.total }} entr{% if audit_truth.total == 1 %}y{% else %}ies{% endif %}).</p>{% endif %}
-  {% else %}
-  <p>Total answer entries: {{ audit_truth.total }}. Deterministic sample shown below{% if audit_truth.sample_seed %}; seed {{ audit_truth.sample_seed }}{% endif %}.</p>
-  {% endif %}
-  <pre class="prompt">{{ audit_truth.sample|tojson(indent=2) }}</pre>
+  <p>Complete stored reference shown below ({{ audit_truth.total }} entr{% if audit_truth.total == 1 %}y{% else %}ies{% endif %}). The box is scrollable; no answers are omitted or sampled.</p>
+  <pre class="prompt reference-answer">{{ audit_truth.entries|tojson(indent=2) }}</pre>
   {% if audit_truth.post_submission and baseline_evaluation.status == 'incorrect' %}<p>If your answer differs and you believe it is right, use the disagreement flag and comments below; submitting a revision preserves history.</p>{% endif %}
 </section>
 {% endif %}

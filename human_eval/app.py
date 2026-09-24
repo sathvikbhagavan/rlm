@@ -321,9 +321,7 @@ def create_app(
             entries = reference_entries(gt["representation"], q["answer_type"])
             audit_truth = {
                 "total": len(entries),
-                "sample": deterministic_audit_sample(gt["representation"], question_id=question_id),
-                "sample_seed": manifest["audit_sampling"]["seed"],
-                "sample_method": manifest["audit_sampling"]["method"],
+                "entries": entries,
                 "relevant_reaction_indices": gt["relevant_reaction_indices"][:100],
             }
         elif draft["submitted_at"]:
@@ -332,9 +330,7 @@ def create_app(
             entries = reference_entries(gt["representation"], q["answer_type"])
             audit_truth = {
                 "total": len(entries),
-                "sample": entries[:100],
-                "shown": min(len(entries), 100),
-                "truncated": len(entries) > 100,
+                "entries": entries,
                 "post_submission": True,
             }
             if draft["payload"].get("abstention"):
