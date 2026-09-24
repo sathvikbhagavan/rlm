@@ -1,0 +1,31 @@
+{
+  "aggregation": {
+    "additive_resources": "sum divided by successful question trajectories",
+    "f1": "question-weighted within each repetition; terminal failures score zero",
+    "peak_memory": "mean combined process-tree plus Docker peak per successful job",
+    "variation": "population standard deviation across five repetitions"
+  },
+  "generated_at": "2026-09-24T23:09:16.891546+00:00",
+  "model": "gpt-5-mini",
+  "outputs": [
+    {
+      "path": "tier_metrics.csv",
+      "sha256": "86837d2f67c1da2a02d227833b89ec3d0fab901f3a120bdb0b36f6eedf21b58c"
+    },
+    {
+      "path": "task_f1.csv",
+      "sha256": "3be2dcd05755edb3d5a26436179bf3f5ea124ec62b8829150a77050fee0c6579"
+    }
+  ],
+  "schema_version": 1,
+  "sources": [
+    {
+      "path": "paper_plots/gold/iclr2027/full_benchmark_records.csv",
+      "sha256": "5f16166c847dfaa3394c352c1bdc35a5311a23de2fb41a0b94d4d7138aac3134"
+    },
+    {
+      "path": "paper_plots/gold/iclr2027/codeact_x1000_records.csv",
+      "sha256": "3eece9bf92764a54053a1bf4f1514ea8a4dc8e9d13ac029657529a337e4fa96a"
+    }
+  ]
+}

@@ -1,0 +1,42 @@
+{
+  "figures": [
+    {
+      "path": "gemini-3_7-flash_core_metrics.pdf",
+      "sha256": "e2bfeb51bed74fdb0a2cc402354bb0a0807aa45072c5235fcb7a47b09edd656d"
+    },
+    {
+      "path": "gemini-3_7-flash_core_metrics.png",
+      "sha256": "8d465aa690df6c1cd5b9bdfb8603f28d837c668b51d56c22a9584c7e0a7f2fd0"
+    },
+    {
+      "path": "gemini-3_7-flash_resource_diagnostics.pdf",
+      "sha256": "6b434090baa4ffef99c5e12399f7a4647d7abe87bcd89574e77bceb37d0ce049"
+    },
+    {
+      "path": "gemini-3_7-flash_resource_diagnostics.png",
+      "sha256": "a4594f3ed571e8e416f53362bd458d9093754ec071426013a6efa5547abc3661"
+    },
+    {
+      "path": "gemini-3_7-flash_task_heatmap.pdf",
+      "sha256": "2db12b706672a9db4cedaf1bfb22439a4cdcfbef0f23cad2a52078b701f5e16e"
+    },
+    {
+      "path": "gemini-3_7-flash_task_heatmap.png",
+      "sha256": "bbfdaed5aee58faa41da8ec13dc0ce3b1b0806678ca239bfb676a5cddd5733ed"
+    }
+  ],
+  "model": "gemini-3.7-flash",
+  "model_label": "Gemini 3.7 Flash",
+  "palette": "Plasma",
+  "schema_version": 1,
+  "sources": [
+    {
+      "path": "paper_plots/gold/iclr2027/model_appendix/gemini-3.7-flash/tier_metrics.csv",
+      "sha256": "f359c8485e6e33ad1943530bbd6869a2486b74383b1ee15120005b0f468b1057"
+    },
+    {
+      "path": "paper_plots/gold/iclr2027/model_appendix/gemini-3.7-flash/task_f1.csv",
+      "sha256": "902af7fcd69c4dcd84fdc747997d12ccd1d05883a715ab965a2c79c6f8ca255d"
+    }
+  ]
+}

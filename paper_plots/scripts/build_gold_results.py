@@ -43,6 +43,7 @@ MODEL_LABELS = {
 }
 MODEL_ALIASES = {
     "RCP-AIaaS/Qwen/Qwen3.5-397B-A17B": "qwen3.5",
+    "qwen3.5-397b": "qwen3.5",
     "RCP-AIaaS/deepseek-ai/DeepSeek-V4-Flash-0731": "deepseek-v4-flash",
     "deepseek/deepseek-v4-flash-0731": "deepseek-v4-flash",
     "CSCS-Inference/zai-org/GLM-5.2": "glm-5.2",
@@ -61,6 +62,7 @@ EXPECTED_MODELS_BY_METHOD_CONTEXT = {
     ("codeact", "1000"): frozenset({"deepseek-v4-flash", "gemini-3.7-flash", "gpt-5-mini"}),
     ("rlm", "100"): frozenset(MODEL_ORDER),
     ("rlm", "500"): frozenset(MODEL_ORDER),
+    ("rlm", "1000"): frozenset({"deepseek-v4-flash", "gemini-3.7-flash", "gpt-5-mini"}),
     ("rlm", "full"): frozenset(MODEL_ORDER),
 }
 QUESTION_COUNTS = {
@@ -115,6 +117,11 @@ METRIC_FIELDS = (
 DEFAULT_GEMINI_X1000_PACK = Path(
     "paper_plots/gold/source_packs/gemini-codeact-x1000-succeeded-pack.tgz"
 )
+DEFAULT_DEEPSEEK_RLM_X1000_PACK = Path(
+    "paper_plots/gold/source_packs/deepseek-rlm-x1000-docker-succeeded-pack.tgz"
+)
+DEFAULT_SCORE_RECOVERIES = Path("paper_plots/gold/source_packs/deepseek-score-recoveries.json")
+GPT_RLM_X1000_DOCKER_CAMPAIGN = "iclr2027-gpt5mini-rlm-x1000-docker-v1"
 
 
 def sha256_file(path: Path) -> str:
@@ -188,7 +195,9 @@ def flatten_run(run: dict[str, Any], *, scope: str) -> dict[str, Any]:
     return row
 
 
-def flatten_packed_run(run: dict[str, Any], *, packed_at: str, pack_name: str) -> dict[str, Any]:
+def flatten_packed_run(
+    run: dict[str, Any], *, packed_at: str, pack_name: str, scope: str = "codeact_x1000"
+) -> dict[str, Any]:
     """Convert one sanitized external result-pack row to the gold schema."""
     tier = int(run["tier"])
     task = f"tier{tier}/task{run['task']}"
@@ -196,7 +205,7 @@ def flatten_packed_run(run: dict[str, Any], *, packed_at: str, pack_name: str) -
     f1 = run.get(f"metrics.results.{score_name}")
     slug = model_slug(str(run["model"]))
     row: dict[str, Any] = {
-        "scope": "codeact_x1000",
+        "scope": scope,
         "run_id": run["run_id"],
         "model": slug,
         "model_label": MODEL_LABELS[slug],
@@ -222,7 +231,13 @@ def flatten_packed_run(run: dict[str, Any], *, packed_at: str, pack_name: str) -
 
 
 def load_result_pack(
-    path: Path, *, expected_model: str, expected_run_ids: set[str]
+    path: Path,
+    *,
+    expected_model: str,
+    expected_run_ids: set[str],
+    expected_method: str = "codeact",
+    scope: str = "codeact_x1000",
+    canonical_run_id_prefix: str = "",
 ) -> tuple[list[dict[str, Any]], dict[str, Any]]:
     """Read and strictly validate a sanitized result pack without extracting it."""
     with tarfile.open(path, "r:gz") as archive:
@@ -257,7 +272,7 @@ def load_result_pack(
     for run in packed_runs:
         if (
             run.get("model") != expected_model
-            or run.get("method") != "codeact"
+            or run.get("method") != expected_method
             or normalize_context(run.get("context")) != "1000"
             or run.get("status") != "succeeded"
         ):
@@ -268,13 +283,38 @@ def load_result_pack(
             run,
             packed_at=str(manifest["packed_at"]),
             pack_name=path.name,
+            scope=scope,
         )
         for run in packed_runs
     ]
+    if canonical_run_id_prefix:
+        for row in rows:
+            row["run_id"] = canonical_run_id_prefix + str(row["run_id"])
     unscored = [row["run_id"] for row in rows if not row["score_available"]]
     if unscored:
         raise ValueError(f"Result pack {path} has runs without plot scores: {unscored[:3]!r}")
     return rows, manifest
+
+
+def apply_score_recoveries(rows: list[dict[str, Any]], path: Path) -> dict[str, Any]:
+    """Apply narrowly scoped, provenance-recorded recoveries for legacy metrics."""
+    payload = json.loads(path.read_text())
+    by_id = {str(row["run_id"]): row for row in rows}
+    seen: set[str] = set()
+    for recovery in payload.get("recoveries", ()):
+        run_id = str(recovery["run_id"])
+        if run_id in seen or run_id not in by_id:
+            raise ValueError(f"Invalid or duplicate score recovery {run_id!r}")
+        seen.add(run_id)
+        row = by_id[run_id]
+        if row["status"] != "succeeded" or row["score_available"]:
+            raise ValueError(f"Score recovery does not target an unscored success: {run_id}")
+        if row["score_name"] != recovery["score_name"]:
+            raise ValueError(f"Score recovery metric mismatch for {run_id}")
+        row["f1"] = float(recovery["score_value"])
+        row["score_available"] = True
+        row["sources"] = f"{row['sources']};score-recovery:{path.name}"
+    return payload
 
 
 def arm_summaries(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
@@ -653,7 +693,8 @@ def write_readme(path: Path, arms: list[dict[str, Any]], *, as_of: str) -> None:
             "## Files",
             "",
             "- `full_benchmark_records.csv`: every one of the 6,300 expected main-benchmark jobs.",
-            "- `codeact_x1000_records.csv`: the final DeepSeek and Gemini CodeAct x1000 extensions.",
+            "- `codeact_x1000_records.csv`: the final DeepSeek, Gemini, and GPT-5-mini CodeAct x1000 extensions.",
+            "- `rlm_x1000_records.csv`: terminal RLM x1000 extensions available at the freeze time.",
             "- `final_arm_records.csv`: records belonging to terminal arms.",
             "- `provisional_arm_records.csv`: records belonging to unfinished arms.",
             "- `arm_status.csv`: the finality decision used for legend asterisks.",
@@ -666,7 +707,24 @@ def write_readme(path: Path, arms: list[dict[str, Any]], *, as_of: str) -> None:
             "- `tier_efficiency_across_models.csv`: unweighted efficiency means and standard "
             "errors across terminal model arms. Cost averages include only paid Gemini, "
             "GPT-5-mini, and Claude models; free SwissAI access is excluded.",
+            "- `capability_split/`: checked per-model and across-model full-corpus RLM "
+            "summaries for the six operation-specific task groups.",
+            "- `efficiency_appendix/`: checked calls, tokens, recorded latency, tool time, "
+            "process wall time, and peak-memory summaries for terminal arms.",
             "- `source_manifest.json`: source snapshot and file checksums.",
+            "",
+            "## Causal controls",
+            "",
+            "The `causal_controls/` directory freezes the completed GPT-5-mini "
+            "matched-cardinality arm, Qwen/Claude chemistry-rule controls and their ordinary "
+            "RLM counterparts, and the deterministic executor ceiling. Its record tables and "
+            "source manifest preserve the aggregation rules and contributing snapshots.",
+            "",
+            "## Prospective-route control",
+            "",
+            "The `prospective_decomposition/` directory freezes the completed Task-16 "
+            "control: two models, three target-information conditions, five repetitions, "
+            "and three targets per run (30 jobs and 90 trajectories).",
             "",
             "Regenerate from the repository root:",
             "",
@@ -676,6 +734,12 @@ def write_readme(path: Path, arms: list[dict[str, Any]], *, as_of: str) -> None:
             "  python paper_plots/scripts/plot_gold_scaling_by_tier.py",
             "uv run --with-requirements paper_plots/requirements.txt \\",
             "  python paper_plots/scripts/plot_gold_efficiency_by_tier.py",
+            "uv run --frozen python paper_plots/scripts/build_capability_split.py",
+            "uv run --frozen python paper_plots/scripts/build_efficiency_appendix.py",
+            "uv run --with-requirements paper_plots/requirements.txt \\",
+            "  python paper_plots/scripts/plot_efficiency_appendix.py",
+            "uv run --frozen python paper_plots/scripts/build_causal_controls.py",
+            "uv run --frozen python paper_plots/scripts/build_prospective_decomposition.py",
             "```",
             "",
         ]
@@ -693,6 +757,18 @@ def parse_args() -> argparse.Namespace:
         default=DEFAULT_GEMINI_X1000_PACK,
         help="Sanitized Gemini CodeAct x1000 result pack.",
     )
+    parser.add_argument(
+        "--deepseek-rlm-x1000-pack",
+        type=Path,
+        default=DEFAULT_DEEPSEEK_RLM_X1000_PACK,
+        help="Sanitized DeepSeek RLM x1000 Docker-result pack.",
+    )
+    parser.add_argument(
+        "--score-recoveries",
+        type=Path,
+        default=DEFAULT_SCORE_RECOVERIES,
+        help="Provenance-recorded score recoveries for legacy successful runs.",
+    )
     return parser.parse_args()
 
 
@@ -704,10 +780,17 @@ def main() -> None:
     full = campaigns[FULL_CAMPAIGN]
     x1000 = campaigns[DEEPSEEK_CODEACT_X1000_CAMPAIGN]
     rows = [flatten_run(run, scope="full_benchmark") for run in full["runs"]]
+    score_recovery_manifest = apply_score_recoveries(rows, args.score_recoveries)
     deepseek_extension_rows = [
         flattened
         for run in x1000["runs"]
         if (flattened := flatten_run(run, scope="codeact_x1000"))["model"] == "deepseek-v4-flash"
+        and flattened["method"] == "codeact"
+    ]
+    gpt_extension_rows = [
+        flattened
+        for run in x1000["runs"]
+        if (flattened := flatten_run(run, scope="codeact_x1000"))["model"] == "gpt-5-mini"
         and flattened["method"] == "codeact"
     ]
     expected_gemini_ids = {
@@ -722,8 +805,64 @@ def main() -> None:
         expected_model="gemini-3.7-flash",
         expected_run_ids=expected_gemini_ids,
     )
-    extension_rows = deepseek_extension_rows + gemini_extension_rows
-    all_rows = rows + extension_rows
+    extension_rows = deepseek_extension_rows + gemini_extension_rows + gpt_extension_rows
+    deepseek_rlm_rows = [
+        flattened
+        for run in x1000["runs"]
+        if (flattened := flatten_run(run, scope="rlm_x1000"))["model"] == "deepseek-v4-flash"
+        and flattened["method"] == "rlm"
+    ]
+    expected_docker_pack_ids = {
+        str(row["run_id"]).removeprefix("x1000-openrouter-")
+        for row in deepseek_rlm_rows
+        if row["task"] in {"tier4/task16", "tier4/task17", "tier4/task17b"}
+    }
+    docker_rlm_rows, deepseek_rlm_pack_manifest = load_result_pack(
+        args.deepseek_rlm_x1000_pack,
+        expected_model="deepseek-v4-flash",
+        expected_run_ids=expected_docker_pack_ids,
+        expected_method="rlm",
+        scope="rlm_x1000",
+        canonical_run_id_prefix="x1000-openrouter-",
+    )
+    deepseek_rlm_by_id = {str(row["run_id"]): row for row in deepseek_rlm_rows}
+    deepseek_rlm_by_id.update({str(row["run_id"]): row for row in docker_rlm_rows})
+    deepseek_rlm_rows = list(deepseek_rlm_by_id.values())
+    gemini_rlm_rows = [
+        flattened
+        for run in x1000["runs"]
+        if (flattened := flatten_run(run, scope="rlm_x1000"))["model"] == "gemini-3.7-flash"
+        and flattened["method"] == "rlm"
+    ]
+    if len(gemini_rlm_rows) != 150 or any(
+        row["status"] not in {"succeeded", "failed"} for row in gemini_rlm_rows
+    ):
+        raise ValueError("Gemini RLM x1000 arm must contain 150 terminal records")
+    gpt_rlm_rows: list[dict[str, Any]] = []
+    gpt_docker_campaign = campaigns.get(GPT_RLM_X1000_DOCKER_CAMPAIGN)
+    if gpt_docker_campaign is not None:
+        gpt_non_docker_rows = [
+            flattened
+            for run in x1000["runs"]
+            if (flattened := flatten_run(run, scope="rlm_x1000"))["model"] == "gpt-5-mini"
+            and flattened["method"] == "rlm"
+        ]
+        gpt_docker_rows = [
+            flatten_run(run, scope="rlm_x1000") for run in gpt_docker_campaign["runs"]
+        ]
+        gpt_rlm_rows = gpt_non_docker_rows + gpt_docker_rows
+        if len(gpt_non_docker_rows) != 135 or len(gpt_docker_rows) != 15:
+            raise ValueError(
+                "GPT-5-mini RLM x1000 cardinality mismatch: "
+                f"{len(gpt_non_docker_rows)} non-Docker and {len(gpt_docker_rows)} Docker"
+            )
+        unresolved_gpt = [
+            row["run_id"] for row in gpt_rlm_rows if row["status"] not in {"succeeded", "failed"}
+        ]
+        if unresolved_gpt:
+            raise ValueError(f"GPT-5-mini RLM x1000 arm is not terminal: {unresolved_gpt[:3]!r}")
+    rlm_x1000_rows = deepseek_rlm_rows + gemini_rlm_rows + gpt_rlm_rows
+    all_rows = rows + extension_rows + rlm_x1000_rows
     arms = arm_summaries(all_rows)
     add_arm_finality(all_rows, arms)
     scaling = scaling_summaries(all_rows)
@@ -735,6 +874,7 @@ def main() -> None:
     output.mkdir(parents=True, exist_ok=True)
     write_csv(output / "full_benchmark_records.csv", rows)
     write_csv(output / "codeact_x1000_records.csv", extension_rows)
+    write_csv(output / "rlm_x1000_records.csv", rlm_x1000_rows)
     write_csv(output / "final_arm_records.csv", [row for row in all_rows if row["arm_final"]])
     write_csv(
         output / "provisional_arm_records.csv", [row for row in all_rows if not row["arm_final"]]
@@ -750,7 +890,10 @@ def main() -> None:
     generated_files = sorted(
         path for path in output.iterdir() if path.is_file() and path.name != "source_manifest.json"
     )
-    source_ids = {str(source["id"]) for source in full["sources"] + x1000["sources"]}
+    campaign_sources = full["sources"] + x1000["sources"]
+    if gpt_docker_campaign is not None:
+        campaign_sources += gpt_docker_campaign["sources"]
+    source_ids = {str(source["id"]) for source in campaign_sources}
     latest_by_source = {str(snapshot["source"]["id"]): snapshot for snapshot in snapshots}
     snapshot_paths = {
         str(load["source"]["id"]): path
@@ -771,6 +914,16 @@ def main() -> None:
                 "definition_sha256": x1000["definition_sha256"],
                 "counts": x1000["counts"],
             },
+            **(
+                {
+                    GPT_RLM_X1000_DOCKER_CAMPAIGN: {
+                        "definition_sha256": gpt_docker_campaign["definition_sha256"],
+                        "counts": gpt_docker_campaign["counts"],
+                    }
+                }
+                if gpt_docker_campaign is not None
+                else {}
+            ),
         },
         "result_packs": [
             {
@@ -781,8 +934,22 @@ def main() -> None:
                 "models": gemini_pack_manifest["models"],
                 "n_runs": gemini_pack_manifest["n_runs"],
                 "rule": gemini_pack_manifest["rule"],
-            }
+            },
+            {
+                "path": str(args.deepseek_rlm_x1000_pack),
+                "sha256": sha256_file(args.deepseek_rlm_x1000_pack),
+                "bytes": args.deepseek_rlm_x1000_pack.stat().st_size,
+                "packed_at": deepseek_rlm_pack_manifest["packed_at"],
+                "models": deepseek_rlm_pack_manifest["models"],
+                "n_runs": deepseek_rlm_pack_manifest["n_runs"],
+                "rule": deepseek_rlm_pack_manifest["rule"],
+            },
         ],
+        "score_recoveries": {
+            "path": str(args.score_recoveries),
+            "sha256": sha256_file(args.score_recoveries),
+            "count": len(score_recovery_manifest["recoveries"]),
+        },
         "source_snapshots": [
             {
                 "source_id": source_id,
@@ -802,13 +969,28 @@ def main() -> None:
     (output / "source_manifest.json").write_text(
         json.dumps(manifest, indent=2, sort_keys=True) + "\n"
     )
-    if len(rows) != 6300 or len(deepseek_extension_rows) != 150 or len(extension_rows) != 300:
+    if (
+        len(rows) != 6300
+        or len(deepseek_extension_rows) != 150
+        or len(gpt_extension_rows) != 150
+        or len(extension_rows) != 450
+        or len(deepseek_rlm_rows) != 150
+        or len(gemini_rlm_rows) != 150
+        or len(gpt_rlm_rows) not in {0, 150}
+    ):
         raise ValueError(
             "Gold export cardinality mismatch: "
             f"{len(rows)} main, {len(deepseek_extension_rows)} DeepSeek x1000, "
-            f"and {len(gemini_extension_rows)} Gemini x1000"
+            f"{len(gemini_extension_rows)} Gemini x1000, "
+            f"{len(gpt_extension_rows)} GPT-5-mini x1000, and "
+            f"{len(deepseek_rlm_rows)} DeepSeek RLM x1000, "
+            f"{len(gemini_rlm_rows)} Gemini RLM x1000, plus "
+            f"{len(gpt_rlm_rows)} GPT-5-mini RLM x1000"
         )
-    print(f"Wrote {len(rows):,} main and {len(extension_rows):,} x1000 records to {output}")
+    print(
+        f"Wrote {len(rows):,} main, {len(extension_rows):,} CodeAct x1000, and "
+        f"{len(rlm_x1000_rows):,} RLM x1000 records to {output}"
+    )
 
 
 if __name__ == "__main__":

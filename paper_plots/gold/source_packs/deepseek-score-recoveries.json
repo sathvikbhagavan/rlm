@@ -1,0 +1,13 @@
+{
+  "schema_version": 1,
+  "recoveries": [
+    {
+      "run_id": "full-deepseek-v4-flash-tier3-task6-codeact-x500-r01",
+      "score_name": "macro_f1",
+      "score_value": 0.6287878787878788,
+      "wandb_run_id": "qhq7uce8",
+      "wandb_summary_sha256": "330575e0e3aa22d99dfab9030f827d0dce46d66fe217ed6a6063701b76a6e844",
+      "stdout_sha256": "58b0dbee651b019c4e22f30e69a786ed936e94d335a9996744d60fccf3961c6a"
+    }
+  ]
+}

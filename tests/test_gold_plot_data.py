@@ -8,6 +8,7 @@ import pytest
 
 from paper_plots.scripts.build_gold_results import (
     add_arm_finality,
+    apply_score_recoveries,
     arm_summaries,
     cross_model_efficiency_summaries,
     cross_model_scaling_summaries,
@@ -134,6 +135,39 @@ def test_success_without_a_scientific_score_is_provisional() -> None:
 
     assert summary["is_final"] is False
     assert summary["unscored_success_jobs"] == 1
+
+
+def test_score_recovery_only_fills_an_unscored_success(tmp_path) -> None:
+    rows = [
+        {
+            "run_id": "legacy-run",
+            "status": "succeeded",
+            "score_available": False,
+            "score_name": "macro_f1",
+            "f1": None,
+            "sources": "legacy-ledger",
+        }
+    ]
+    path = tmp_path / "recoveries.json"
+    path.write_text(
+        json.dumps(
+            {
+                "recoveries": [
+                    {
+                        "run_id": "legacy-run",
+                        "score_name": "macro_f1",
+                        "score_value": 0.625,
+                    }
+                ]
+            }
+        )
+    )
+
+    apply_score_recoveries(rows, path)
+
+    assert rows[0]["score_available"] is True
+    assert rows[0]["f1"] == 0.625
+    assert rows[0]["sources"].endswith("score-recovery:recoveries.json")
 
 
 def test_external_x1000_result_pack_is_validated_and_flattened(tmp_path) -> None:

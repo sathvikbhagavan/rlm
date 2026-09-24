@@ -1,0 +1,42 @@
+{
+  "figures": [
+    {
+      "path": "gpt-5-mini_core_metrics.pdf",
+      "sha256": "9ae00a38e54db0761cd92474cfcfdb20761c57830c2e55ed6e1cc2ca7b1c03bc"
+    },
+    {
+      "path": "gpt-5-mini_core_metrics.png",
+      "sha256": "48d698c7094f99ca136e1ca7e184a84f85440652a1be9097e16197f5286835d0"
+    },
+    {
+      "path": "gpt-5-mini_resource_diagnostics.pdf",
+      "sha256": "2ef8989cfdabaa19176f02170b21c20a614545b48c06c9e229bfb6f972062556"
+    },
+    {
+      "path": "gpt-5-mini_resource_diagnostics.png",
+      "sha256": "e5a0a6ac63a46bed16dbcaf15155b69b4174ef6d94e0774d90359100dc691e54"
+    },
+    {
+      "path": "gpt-5-mini_task_heatmap.pdf",
+      "sha256": "f63885a3c7ac203fef0279be2a2c03d269ba897d1b6392472ee91918588675d8"
+    },
+    {
+      "path": "gpt-5-mini_task_heatmap.png",
+      "sha256": "b1ca7f755bcb9ed5f175cab080b6eef0369bddd14870cd22644c6f316b4d4793"
+    }
+  ],
+  "model": "gpt-5-mini",
+  "model_label": "GPT-5 mini",
+  "palette": "Plasma",
+  "schema_version": 1,
+  "sources": [
+    {
+      "path": "paper_plots/gold/iclr2027/model_appendix/gpt-5-mini/tier_metrics.csv",
+      "sha256": "86837d2f67c1da2a02d227833b89ec3d0fab901f3a120bdb0b36f6eedf21b58c"
+    },
+    {
+      "path": "paper_plots/gold/iclr2027/model_appendix/gpt-5-mini/task_f1.csv",
+      "sha256": "3be2dcd05755edb3d5a26436179bf3f5ea124ec62b8829150a77050fee0c6579"
+    }
+  ]
+}

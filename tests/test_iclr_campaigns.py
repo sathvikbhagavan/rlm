@@ -8,6 +8,7 @@ import pytest
 from experiments.iclr2027 import (
     generate_deepseek_rlm_x1000,
     generate_full_campaign,
+    generate_gpt_rlm_x1000_docker,
     generate_matched_cardinality_campaign,
 )
 from rxnhaystack.manifest import ManifestError, load_manifest
@@ -96,6 +97,26 @@ def test_deepseek_rlm_x1000_is_generated_and_partitionable() -> None:
     ]
     assert len(docker) == 15
     assert len(manifest.runs) - len(docker) == 135
+
+
+def test_gpt_rlm_x1000_docker_completes_the_jed_arm() -> None:
+    path = CAMPAIGN_DIR / "gpt-rlm-x1000-docker.toml"
+    assert path.read_text(encoding="utf-8") == generate_gpt_rlm_x1000_docker.render()
+    manifest = load_manifest(path)
+
+    assert len(manifest.runs) == 15
+    assert manifest.estimated_cost_chf == pytest.approx(1.5)
+    assert {run.model for run in manifest.runs} == {"gpt-5-mini"}
+    assert {run.method for run in manifest.runs} == {"rlm"}
+    assert {run.corpus_size for run in manifest.runs} == {1000}
+    assert {run.task for run in manifest.runs} == {
+        "tier4/task16",
+        "tier4/task17",
+        "tier4/task17b",
+    }
+    assert {run.env["RXNHAYSTACK_PROVIDER"] for run in manifest.runs} == {"openai"}
+    assert {run.env["RXNHAYSTACK_CONTEXT_SIZE"] for run in manifest.runs} == {"1000"}
+    assert manifest.campaign.required_secrets == ("OPENAI_API_KEY", "WANDB_API_KEY")
 
 
 def test_matched_cardinality_campaign_has_two_factor_design() -> None:

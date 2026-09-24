@@ -1,0 +1,42 @@
+{
+  "figures": [
+    {
+      "path": "claude-haiku-4_5_core_metrics.pdf",
+      "sha256": "2d85e0d820eeb6cf6e40dec106cf04b6f95526339debc80c10ac66970ca6a815"
+    },
+    {
+      "path": "claude-haiku-4_5_core_metrics.png",
+      "sha256": "48953518d088b79530e42d44912e933f99383b7154d6ac58db8766a6435c1e4f"
+    },
+    {
+      "path": "claude-haiku-4_5_resource_diagnostics.pdf",
+      "sha256": "b694846e7bdae061c1a7683fc12775bf3cf01ebf4d44134a44f1f6add98b037c"
+    },
+    {
+      "path": "claude-haiku-4_5_resource_diagnostics.png",
+      "sha256": "a1804695be679d9c3397e21ecd11badd33f89ee1943cffc29402a256b7d2984d"
+    },
+    {
+      "path": "claude-haiku-4_5_task_heatmap.pdf",
+      "sha256": "aa8636ee79d49d913ea46ba6fbab07774a5c1f3df938f20e7ae3cf89718024a0"
+    },
+    {
+      "path": "claude-haiku-4_5_task_heatmap.png",
+      "sha256": "d5a02596b6ad27d3f2e047ce3993bfa93fd972f1967a05fc4a6aaea5df8a7020"
+    }
+  ],
+  "model": "claude-haiku-4.5",
+  "model_label": "Claude Haiku 4.5",
+  "palette": "Plasma",
+  "schema_version": 1,
+  "sources": [
+    {
+      "path": "paper_plots/gold/iclr2027/model_appendix/claude-haiku-4.5/tier_metrics.csv",
+      "sha256": "befdcfa633911843ee554b8832dcca18060f52b8ef0bb5b01c8d71c73b407580"
+    },
+    {
+      "path": "paper_plots/gold/iclr2027/model_appendix/claude-haiku-4.5/task_f1.csv",
+      "sha256": "4dc21060e3f5ec66c41a83fed962256ffe5ddb727857167c10f57baa878d4a49"
+    }
+  ]
+}

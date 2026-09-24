@@ -1,0 +1,27 @@
+{
+  "aggregation": {
+    "additive_resources": "sum divided by successful question trajectories",
+    "f1": "question-weighted within each repetition; terminal failures score zero",
+    "peak_memory": "mean combined process-tree plus Docker peak per successful job",
+    "variation": "population standard deviation across five repetitions"
+  },
+  "generated_at": "2026-09-24T22:50:59.877965+00:00",
+  "model": "claude-haiku-4.5",
+  "outputs": [
+    {
+      "path": "tier_metrics.csv",
+      "sha256": "befdcfa633911843ee554b8832dcca18060f52b8ef0bb5b01c8d71c73b407580"
+    },
+    {
+      "path": "task_f1.csv",
+      "sha256": "4dc21060e3f5ec66c41a83fed962256ffe5ddb727857167c10f57baa878d4a49"
+    }
+  ],
+  "schema_version": 1,
+  "sources": [
+    {
+      "path": "paper_plots/gold/iclr2027/full_benchmark_records.csv",
+      "sha256": "67eca1cd678f70c8daaebe0441d8a35f6e153720833df52add929f32c42b77d6"
+    }
+  ]
+}

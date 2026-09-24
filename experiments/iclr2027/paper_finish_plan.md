@@ -1,19 +1,175 @@
 # RxnHaystack paper finish plan
 
+## Active submission queue (reset September 24, 2026)
+
+This replaces the earlier carry-forward queue. The original author list below
+is retained as the historical record; this section is the single operational
+queue for finishing the submission.
+
+### 1. Audit every evaluator and freeze the scientific results
+
+- [ ] Enumerate every ground-truth, evaluator, and metric implementation that
+  changed after the benchmark runs were produced. Record the affected tasks,
+  run identities, old and new behavior, and the commit that introduced each
+  correction.
+- [ ] For each change, determine whether archived predictions can simply be
+  rescored or whether the model saw incorrect inputs and the run must be
+  repeated. Re-run API inference only when rescoring cannot recover the valid
+  result.
+- [ ] Apply the audit across LLM, CodeAct, and RLM for every model and control
+  experiment that contains an affected task. Verify Task 15's
+  `macro_reaction_f1`/`macro_f1` normalization explicitly.
+- [ ] Freeze corrected per-run results, checksums, exclusions, and a concise
+  correction record before regenerating any final figure or table.
+
+### 2. Consolidate the human annotations
+
+- [ ] Process the annotation export already available now; freeze its schema,
+  question assignment, annotator expertise, timing, and coverage.
+- [ ] Add the two expected exports when they arrive on September 25. Do not
+  hold the submission for the fourth response that is not expected.
+- [ ] Report only comparisons supported by the actual overlap and coverage.
+  Use the annotations to assess task interpretation, label validity, and
+  plausible alternative routes; avoid unsupported human-level or expert-level
+  performance claims.
+- [ ] Add the resulting analysis, figure or table, and exact sample sizes to
+  the paper and plotting record.
+
+### 3. Freeze one visual language for the paper
+
+- [x] Select Plasma as the paper palette. Per-model profiles assign fixed
+  purple, magenta, and orange samples to LLM, CodeAct, and RLM; continuous
+  Plasma encodes task-level F1. Green/red remain reserved for status or
+  correctness.
+- [ ] Store the palette in one shared plotting module and remove local color
+  choices from individual scripts. The shared module and new per-model figures
+  are complete; remaining legacy plotting scripts still need migration. Check
+  legibility in grayscale, print, and common color-vision-deficiency
+  simulations after that migration.
+- [ ] Regenerate all accepted plots with the frozen mapping and document it in
+  the plotting README.
+
+### 4. Reconcile the dashboard, per-run results, and paper figures
+
+- [ ] Build an inventory mapping every scientifically relevant dashboard arm
+  to its frozen result file and to a main-paper figure/table or an appendix
+  figure/table. Operational repair ledgers should contribute to the canonical
+  arm, not appear as separate scientific experiments.
+- [ ] Ensure that aggregate plots are accompanied by enough model-, task-, and
+  question-level views to expose heterogeneity. Keep the main paper selective;
+  place the complete individual breakdowns in the appendix.
+- [ ] Independently verify every displayed metric: averaging unit, weighting,
+  denominator, handling of retries, terminal failures scored as zero,
+  treatment of pending runs, confidence/variation summary, and aggregation
+  across questions, repetitions, tasks, contexts, methods, and models.
+- [ ] Check that every number in the manuscript can be regenerated from the
+  frozen per-run data, without reading values from the live dashboard.
+
+#### Six-model matrix audit: Claude Haiku 4.5
+
+- [x] Canonical gold records are complete: 1,050/1,050 successful jobs and
+  3,500 question-level trajectories. LLM and CodeAct each cover $x=100,500$;
+  RLM covers $x=100,500,\mathrm{full}$. All seven arms are terminal.
+- [x] Every Claude job has a selected F1 score, calls, CHF/USD cost, input,
+  output and total tokens, recorded model latency, tool time, process wall
+  time, and host/Docker/combined peak-memory measurements. Tier-4 Task 15 uses
+  `macro_reaction_f1`; the other jobs use `macro_f1`.
+- [x] Tier-level Claude performance and resource summaries are present in the
+  checked gold tables, and the Claude tier-scaling PDF is reproducibly
+  generated from them.
+- [x] Add Claude's tier-scaling results to the appendix in four horizontal tier
+  panels. They form the first row of the complete core-metrics page.
+- [x] Generate and include Claude-specific USD cost, model-call, token, latency,
+  tool-time, process-wall-time, and peak-memory trends across method, context,
+  and tier. Each metric is presented as one horizontal four-tier row.
+- [x] Generate and include the Claude task-level heatmap so the appendix
+  preserves all 30 task configurations as well as tier aggregates.
+
+#### Six-model matrix audit: Gemini 3.7 Flash
+
+- [x] Freeze all 1,050 main-matrix jobs: 1,047 succeeded and three terminal
+  failures across 3,500 question-level trajectories.
+- [x] Freeze the $x=1000$ extensions: CodeAct has 150 successes; RLM has 137
+  successes and 13 terminal failures. Both extensions contain 500 trajectories.
+- [x] Generate and include the Gemini core-metrics, resource-diagnostics, and
+  task-level heatmap pages. Terminal failures contribute zero to F1 and do not
+  enter successful-run resource averages.
+
+#### Six-model matrix audit: GPT-5 mini
+
+- [x] Freeze all 1,050 main-matrix jobs and 3,500 trajectories; every job
+  succeeded and carries the complete score and resource record.
+- [x] Freeze the $x=1000$ CodeAct extension: 89 successes and 61 terminal
+  failures across 150 jobs and 500 trajectories.
+- [ ] Complete the $x=1000$ RLM extension. The 135 non-Docker jobs succeeded;
+  the 15 Docker jobs for Tasks 16, 17, and 17b are queued on liacpc14. Regenerate
+  the GPT profile and add the RLM $x=1000$ column only after all 15 terminate.
+- [x] Generate and include the currently terminal GPT core-metrics,
+  resource-diagnostics, and task-level heatmap pages.
+
+#### Six-model matrix audit: DeepSeek V4 Flash
+
+- [ ] Freeze the main RLM arm after its final two Task-17b full-corpus jobs
+  terminate. Do not publish a provisional DeepSeek per-model profile.
+- [x] Freeze the terminal $x=1000$ CodeAct and RLM extensions, including the
+  local Docker result pack and the provenance-recorded recovered score.
+- [ ] Generate and include the DeepSeek core-metrics, resource-diagnostics,
+  and task-level heatmap pages after the main arm becomes terminal.
+
+### 5. Complete the trace-based failure analysis
+
+- [ ] Classify failures across models and interfaces from the recorded traces,
+  separating scientific errors from evaluator, provider, timeout, memory, and
+  transport failures.
+- [ ] Quantify the scientifically meaningful failure modes by task family and
+  method, inspect representative traces, and add the resulting plot and prose
+  to the main paper or appendix as appropriate.
+
+### 6. Iterate and finalize Figure 1
+
+- [ ] Refine the current llama/haystack concept into a publication-quality
+  opening figure that combines the visual metaphor with an informative
+  benchmark schematic.
+- [ ] Make the structured reaction records, three access modes, scale axis,
+  chemistry-operation axis, and scored output legible without relying on the
+  caption. Obtain author approval, then freeze the source asset and final PDF.
+
+### 7. Finish and verify the released artifact (delegated)
+
+- [ ] Verify that the submitted artifact matches the reproducibility claims:
+  questions, answers, generators, deterministic executor, fixed seeds,
+  environment lock, checksums, ledgers/traces, resource limits, reconstruction
+  instructions, and provenance/intended-use documentation.
+- [ ] Include a worked extensibility example and implement the documented
+  `RxnHaystack-Public-v1` release. Keep any future contamination-resistant
+  held-out stream separately versioned.
+
+### 8. Final manuscript audit
+
+- [ ] Revisit the title after the results are frozen and choose wording whose
+  scope matches the controlled evidence.
+- [ ] Perform a claim-by-claim, citation, terminology, and model-naming audit.
+  Verify especially that the paper does not imply laboratory validation,
+  unsupported human-level performance, cross-domain empirical generalization,
+  architectural superiority of RLM, or causal separation beyond the tested
+  controls.
+- [ ] Compile the paper, inspect every page visually, and check references,
+  captions, appendix pointers, anonymization, page limits, and artifact links.
+
 ## Original list from Amin (verbatim)
 
 - We need to have a proper figure 1. It could be a cute llama with lab coat looking in a haystack for a reaction. Maybe we just need the schematic though, or a mix of two, not sure. But figure 1 is something we need.
 - <span style="color: #1a7f37;">We need to follow the assessment, and make sure if the claim of mechanical vs. reasoning is causally separated and has evidence? For that, which plot do we need?</span> **✅ Completed**
-- The story should also emphasize the structured data aspect of this task in scientific discovery, something that might be more relevant when we step away from domains like math. Perhaps we could come up with more examples, like time-series (cite our adaptive time-series work), data in biology, I don't know, but make it make sense more and show the impact and need for it through some other examples.
+- <span style="color: #1a7f37;">The story should also emphasize the structured data aspect of this task in scientific discovery, something that might be more relevant when we step away from domains like math. Perhaps we could come up with more examples, like time-series (cite our adaptive time-series work), data in biology, I don't know, but make it make sense more and show the impact and need for it through some other examples.</span> **✅ Completed**
 - The assessment has found the failures insightful, we should redo the failure analysis now that we have so many models and arms, either automatically, or having codex finding the root causes, writing code for it, and running it on the traces. Failure analysis is important.
 - 🟢 <span style="color: #1a7f37;">We should properly and briefly explain RAG is superseded by our baselines constructions. Essentially at any context length we put the ground-truths in, so it's already a ceiling for what a RAG (e.g. based on DRFP) could achieve. Because in 100, 500 out of 120k, we're putting the answer reaction along with the others. So we don't try RAG since we think it's subsumed.</span> **✅ Completed with oracle-recall wording**
 - <span style="color: #1a7f37;">The assessment talks about the highest value move being oracle-predicate. Do we have results for that? What do those results tell us? We should add those results and the prose to overleaf to the proper location.</span> **✅ Completed**
-- We should think about the presentation/framing as to what makes it a good benchmark, and show those qualities. I'm not sure what these qualities are, but I can think of:
-  - A benchmark should be able to separate models, otherwise, it's not a good benchmark
-  - It should show the existence of a gap (where we get from our human annotations)
-  - It'd be better if it's connected to real-world, and is actually useful for humans. So it'd be great if we could explain how some of the difficult questions of our benchmark are things that experimental chemists would benefit from if solved reliably.
-  - Any other suggestions are welcome!
-  - Lastly, this paper is not at all about the strength of RLMs or how they good they are, we don't care, we just adopted them as a recent attempt at very long-context task
+- <span style="color: #1a7f37;">We should think about the presentation/framing as to what makes it a good benchmark, and show those qualities. I'm not sure what these qualities are, but I can think of:</span> **✅ Benchmark framing completed**
+  - <span style="color: #1a7f37;">A benchmark should be able to separate models, otherwise, it's not a good benchmark</span> **✅ Completed**
+  - <span style="color: #9a6700;">It should show the existence of a gap (where we get from our human annotations)</span> **⏳ Human-evaluation consolidation remains pending**
+  - <span style="color: #1a7f37;">It'd be better if it's connected to real-world, and is actually useful for humans. So it'd be great if we could explain how some of the difficult questions of our benchmark are things that experimental chemists would benefit from if solved reliably.</span> **✅ Completed**
+  - <span style="color: #1a7f37;">Any other suggestions are welcome!</span> **✅ Diagnosticity, construct validity, auditability, extensibility, and release design incorporated**
+  - <span style="color: #1a7f37;">Lastly, this paper is not at all about the strength of RLMs or how they good they are, we don't care, we just adopted them as a recent attempt at very long-context task</span> **✅ Completed**
 - <span style="color: #1a7f37;">The assessment writes "... the strongest evidence ..." right before section 3, does it still hold with our results?</span> **✅ Completed with qualified wording**
 - Then moving to weaknesses:
   - <span style="color: #1a7f37;">Has our experiment answered W1?</span> **✅ Key cardinality confound answered for GPT-5-mini Tier 1--3; scope stated**
@@ -31,18 +187,16 @@
   - <span style="color: #1a7f37;">D: Do we have it?</span> **✅ Completed: 30/30 jobs, 90 trajectories, and the controlled result is in Methods and Results**
   - E: I have it differently actually. We have human annotations for different chunks of the 100 questions, not their annotation for false positives.. **⏳ Not complete: one 20-question export is available locally; collaborator exports and expertise metadata still need consolidation**
   - <span style="color: #1a7f37;">F: Do our results support that?</span> **✅ Completed: the capability ordering is reported across Qwen, Gemini, GPT-5 mini, and Claude**
-- 🟢 <span style="color: #1a7f37;">What should we release as artifact of this benchmark? Just the set of questions? The answers? Should we hold out anything for not being contaminated? The codes to obtain the ground-truth? The interface to obtain more human annotations?</span> **✅ Release policy completed: publish the current benchmark in full and build a separate private extension for future contamination-resistant evaluation**
+- <span style="color: #1a7f37;">What should we release as artifact of this benchmark? Just the set of questions? The answers? Should we hold out anything for not being contaminated? The codes to obtain the ground-truth? The interface to obtain more human annotations?</span> **✅ Release policy completed: publish the current benchmark in full and build a separate private extension for future contamination-resistant evaluation**
 
 ### Current focus
 
-**Just completed:** the assessment's strongest-evidence claim and W1--W6/W10
-have been audited against the frozen results. The paper now uses the qualified
-multi-model claim, explains the oracle-recall/RAG scope, separates specific
-operation types, records the legacy route-task confounds as limitations, and
-includes calls, tokens, latency, tool time, wall time, and memory in the
-appendix. W7--W9 remain deliberately deferred as requested.
+**Next:** complete Queue Item 1, the evaluator and result-correction audit.
+Human-annotation preparation in Item 2 can proceed concurrently using the
+export already available. Freeze the visual palette before regenerating the
+complete plot suite in Items 3--4.
 
-Updated September 23, 2026. This is the working document for turning the
+Updated September 24, 2026. This is the working document for turning the
 workshop paper into the ICLR submission. It should be updated whenever an
 analysis is accepted, a figure is frozen, or prose is pushed to Overleaf.
 

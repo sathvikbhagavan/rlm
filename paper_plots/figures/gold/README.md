@@ -21,10 +21,17 @@ rerun the gold-data builder, and then regenerate the plots.
 | [`tokens_by_tier_across_models.pdf`](tokens_by_tier_across_models.pdf) | Recorded tokens per successful trajectory | [`plot_gold_efficiency_by_tier.py`](../../scripts/plot_gold_efficiency_by_tier.py) | [`tier_efficiency_across_models.csv`](../../gold/iclr2027/tier_efficiency_across_models.csv) |
 | [`wall_time_by_tier_across_models.pdf`](wall_time_by_tier_across_models.pdf) | Wall time per successful trajectory; failed jobs are excluded | [`plot_gold_efficiency_by_tier.py`](../../scripts/plot_gold_efficiency_by_tier.py) | [`tier_efficiency_across_models.csv`](../../gold/iclr2027/tier_efficiency_across_models.csv) |
 | `scaling_by_tier_<model>.pdf` | Individual Qwen, DeepSeek, GLM, Gemini, GPT, and Claude diagnostics | [`plot_gold_scaling_by_tier.py`](../../scripts/plot_gold_scaling_by_tier.py) | [`tier_scaling.csv`](../../gold/iclr2027/tier_scaling.csv) |
+| `model_appendix/<model>_core_metrics.pdf` | Four horizontal tier panels for F1, tokens, cost, and wall time | [`plot_model_appendix.py`](../../scripts/plot_model_appendix.py) | `model_appendix/<model>/tier_metrics.csv` |
+| `model_appendix/<model>_resource_diagnostics.pdf` | Four horizontal tier panels for calls, latency, tool time, and peak memory | [`plot_model_appendix.py`](../../scripts/plot_model_appendix.py) | `model_appendix/<model>/tier_metrics.csv` |
+| `model_appendix/<model>_task_heatmap.pdf` | All 30 task configurations across the seven benchmark arms | [`plot_model_appendix.py`](../../scripts/plot_model_appendix.py) | `model_appendix/<model>/task_f1.csv` |
 
 PNG previews accompany every PDF. The PDFs are the vector versions intended
 for manuscript use. The JSON files in this directory list the generated files
 and link them to the gold-data manifest.
+
+Paper plots use discrete samples from the perceptually uniform Plasma palette.
+LLM, CodeAct, and RLM retain the same purple, magenta, and orange identities in
+every per-model profile; task heatmaps use the continuous Plasma scale.
 
 ## Aggregation rules
 
@@ -132,4 +139,3 @@ uv run --frozen pytest -q
 
 The aggregate construction and failure/resource accounting tests live in
 [`tests/test_gold_plot_data.py`](../../../tests/test_gold_plot_data.py).
-
