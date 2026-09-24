@@ -35,9 +35,35 @@ RECORD_FIELDS = (
     "macro_precision",
     "macro_recall",
     "exact_match_accuracy",
+    "calls",
+    "cost_usd",
+    "input_tokens",
+    "output_tokens",
+    "total_tokens",
+    "latency_seconds",
+    "tool_time_seconds",
+    "process_wall_time_seconds",
+    "peak_combined_memory_mib",
     "run_id",
     "result_updated_at",
     "sources",
+)
+TARGET_FIELDS = (
+    "model",
+    "model_label",
+    "condition",
+    "repetition",
+    "target",
+    "canonical_question_id",
+    "f1",
+    "precision",
+    "recall",
+    "exact_match",
+    "ground_truth_chain_count",
+    "parsed_chain_count",
+    "valid_chain_count",
+    "false_positive_chain_count",
+    "run_id",
 )
 AGGREGATE_FIELDS = (
     "model_label",
@@ -75,6 +101,13 @@ def successful_metrics(run: dict[str, Any]) -> dict[str, float]:
     return {name: float(results[name]) for name in required}
 
 
+def successful_attempt(run: dict[str, Any]) -> dict[str, Any]:
+    attempts = [attempt for attempt in run["attempts"] if attempt["status"] == "succeeded"]
+    if run["status"] != "succeeded" or not attempts:
+        raise ValueError(f"Prospective record is not scientifically complete: {run['run_id']}")
+    return max(attempts, key=lambda item: item["started_at"])
+
+
 def build_rows(campaign: dict[str, Any]) -> list[dict[str, Any]]:
     runs = campaign["runs"]
     if len(runs) != 30 or any(run["status"] != "succeeded" for run in runs):
@@ -87,6 +120,8 @@ def build_rows(campaign: dict[str, Any]) -> list[dict[str, Any]]:
         if model not in MODEL_LABELS or condition not in CONDITIONS:
             raise ValueError(f"Unexpected prospective arm: {model}, {condition}")
         metrics = successful_metrics(run)
+        attempt_metrics = successful_attempt(run).get("metrics") or {}
+        resources = attempt_metrics.get("resources") or {}
         rows.append(
             {
                 "model": model,
@@ -95,6 +130,20 @@ def build_rows(campaign: dict[str, Any]) -> list[dict[str, Any]]:
                 "repetition": int(run["repetition"]),
                 "question_count": 3,
                 **metrics,
+                **{
+                    field: attempt_metrics.get(field)
+                    for field in (
+                        "calls",
+                        "cost_usd",
+                        "input_tokens",
+                        "output_tokens",
+                        "total_tokens",
+                        "latency_seconds",
+                        "tool_time_seconds",
+                    )
+                },
+                "process_wall_time_seconds": resources.get("process_wall_time_seconds"),
+                "peak_combined_memory_mib": resources.get("peak_combined_memory_mib"),
                 "run_id": run["run_id"],
                 "result_updated_at": run.get("result_updated_at") or "",
                 "sources": ";".join(run.get("sources", ())),
@@ -145,7 +194,7 @@ def aggregate_rows(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
 
 def write_csv(path: Path, fieldnames: tuple[str, ...], rows: list[dict[str, Any]]) -> None:
     with path.open("w", newline="", encoding="utf-8") as stream:
-        writer = csv.DictWriter(stream, fieldnames=fieldnames)
+        writer = csv.DictWriter(stream, fieldnames=fieldnames, lineterminator="\n")
         writer.writeheader()
         writer.writerows(rows)
 
@@ -157,6 +206,11 @@ def main() -> int:
         "--output-dir",
         type=Path,
         default=Path("paper_plots/gold/iclr2027/prospective_decomposition"),
+    )
+    parser.add_argument(
+        "--target-score-pack",
+        type=Path,
+        default=Path("paper_plots/gold/source_packs/task16-target-scores.json"),
     )
     args = parser.parse_args()
 
@@ -170,11 +224,24 @@ def main() -> int:
 
     rows = build_rows(campaigns[PROSPECTIVE_CAMPAIGN])
     aggregates = aggregate_rows(rows)
+    target_payload = json.loads(args.target_score_pack.read_text(encoding="utf-8"))
+    target_rows = target_payload.get("rows") or []
+    if len(target_rows) != 90:
+        raise ValueError("Task-16 target score pack must contain exactly 90 rows")
+    labels = {model: label for model, label in MODEL_LABELS.items()}
+    target_rows = [
+        {**target, "model_label": labels[str(target["model"])]} for target in target_rows
+    ]
+    expected_run_ids = {row["run_id"] for row in rows}
+    if {row["run_id"] for row in target_rows} != expected_run_ids:
+        raise ValueError("Task-16 target score pack run IDs do not match the frozen study")
     args.output_dir.mkdir(parents=True, exist_ok=True)
     records_path = args.output_dir / "records.csv"
     aggregates_path = args.output_dir / "aggregates.csv"
+    targets_path = args.output_dir / "target_records.csv"
     write_csv(records_path, RECORD_FIELDS, rows)
     write_csv(aggregates_path, AGGREGATE_FIELDS, aggregates)
+    write_csv(targets_path, TARGET_FIELDS, target_rows)
 
     source_ids = {source for row in rows for source in row["sources"].split(";") if source}
     snapshot_files = {}
@@ -191,6 +258,11 @@ def main() -> int:
         "trajectories": sum(int(row["question_count"]) for row in rows),
         "records_sha256": sha256_file(records_path),
         "aggregates_sha256": sha256_file(aggregates_path),
+        "target_records_sha256": sha256_file(targets_path),
+        "target_score_pack": {
+            "path": str(args.target_score_pack),
+            "sha256": sha256_file(args.target_score_pack),
+        },
         "snapshot_files": snapshot_files,
     }
     (args.output_dir / "source_manifest.json").write_text(

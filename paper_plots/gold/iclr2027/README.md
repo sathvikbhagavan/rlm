@@ -37,10 +37,11 @@ All plotting aggregates score terminal failed jobs as zero. Running, stale, and 
 ## Causal controls
 
 The `causal_controls/` directory freezes the completed GPT-5-mini matched-cardinality arm, Qwen/Claude chemistry-rule controls and their ordinary RLM counterparts, and the deterministic executor ceiling. Its record tables and source manifest preserve the aggregation rules and contributing snapshots.
+The directory also stores a status-explicit provisional Qwen matched-cardinality snapshot, which is excluded from final inference until all 725 cells terminate.
 
 ## Prospective-route control
 
-The `prospective_decomposition/` directory freezes the completed Task-16 control: two models, three target-information conditions, five repetitions, and three targets per run (30 jobs and 90 trajectories).
+The `prospective_decomposition/` directory freezes the completed Task-16 control: two models, three target-information conditions, five repetitions, and three targets per run (30 jobs and 90 trajectories). Aggregate, per-run, and per-target records are retained.
 
 Regenerate from the repository root:
 
@@ -55,5 +56,9 @@ uv run --frozen python paper_plots/scripts/build_efficiency_appendix.py
 uv run --with-requirements paper_plots/requirements.txt \
   python paper_plots/scripts/plot_efficiency_appendix.py
 uv run --frozen python paper_plots/scripts/build_causal_controls.py
+uv run --with-requirements paper_plots/requirements.txt \
+  python paper_plots/scripts/plot_control_appendix.py
 uv run --frozen python paper_plots/scripts/build_prospective_decomposition.py
+uv run --with-requirements paper_plots/requirements.txt \
+  python paper_plots/scripts/plot_prospective_appendix.py
 ```

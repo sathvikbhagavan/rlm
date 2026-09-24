@@ -8,6 +8,7 @@ import csv
 import hashlib
 import json
 import subprocess
+from collections import Counter
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
@@ -67,10 +68,20 @@ FIELDNAMES = (
     "repetition",
     "question_count",
     "f1",
+    "calls",
+    "cost_usd",
+    "input_tokens",
+    "output_tokens",
+    "total_tokens",
+    "latency_seconds",
+    "tool_time_seconds",
+    "process_wall_time_seconds",
+    "peak_combined_memory_mib",
     "run_id",
     "result_updated_at",
     "sources",
 )
+PROVISIONAL_FIELDNAMES = (*FIELDNAMES[:10], "status", *FIELDNAMES[10:])
 
 
 def sha256_file(path: Path) -> str:
@@ -81,11 +92,15 @@ def sha256_file(path: Path) -> str:
     return digest.hexdigest()
 
 
-def successful_score(run: dict[str, Any]) -> float:
+def successful_attempt(run: dict[str, Any]) -> dict[str, Any]:
     attempts = [attempt for attempt in run["attempts"] if attempt["status"] == "succeeded"]
     if run["status"] != "succeeded" or not attempts:
         raise ValueError(f"Control record is not scientifically complete: {run['run_id']}")
-    attempt = max(attempts, key=lambda item: item["started_at"])
+    return max(attempts, key=lambda item: item["started_at"])
+
+
+def successful_score(run: dict[str, Any]) -> float:
+    attempt = successful_attempt(run)
     results = (attempt.get("metrics") or {}).get("results") or {}
     value = results.get("macro_f1")
     if value is None:
@@ -101,6 +116,9 @@ def row(
     run: dict[str, Any], *, study: str, arm: str, model_label: str | None = None
 ) -> dict[str, Any]:
     task = str(run["task"])
+    attempt = successful_attempt(run)
+    metrics = attempt.get("metrics") or {}
+    resources = metrics.get("resources") or {}
     return {
         "study": study,
         "arm": arm,
@@ -113,10 +131,61 @@ def row(
         "repetition": int(run["repetition"]),
         "question_count": QUESTION_COUNTS[task],
         "f1": successful_score(run),
+        **{
+            field: metrics.get(field)
+            for field in (
+                "calls",
+                "cost_usd",
+                "input_tokens",
+                "output_tokens",
+                "total_tokens",
+                "latency_seconds",
+                "tool_time_seconds",
+            )
+        },
+        "process_wall_time_seconds": resources.get("process_wall_time_seconds"),
+        "peak_combined_memory_mib": resources.get("peak_combined_memory_mib"),
         "run_id": run["run_id"],
         "result_updated_at": run.get("result_updated_at") or "",
         "sources": ";".join(run.get("sources", ())),
     }
+
+
+def provisional_matched_row(run: dict[str, Any]) -> dict[str, Any]:
+    """Preserve an unfinished Qwen cell without treating it as final evidence."""
+    task = str(run["task"])
+    status = str(run["status"])
+    output: dict[str, Any] = {
+        "study": "matched_cardinality",
+        "arm": "matched-provisional",
+        "model": run["model"],
+        "model_label": MODEL_LABELS[str(run["model"])],
+        "context": context_label(run["corpus_size"]),
+        "condition": run["condition"],
+        "tier": int(task.removeprefix("tier").split("/", 1)[0]),
+        "task": task,
+        "repetition": int(run["repetition"]),
+        "question_count": QUESTION_COUNTS[task],
+        "status": status,
+        "f1": "",
+        "calls": "",
+        "cost_usd": "",
+        "input_tokens": "",
+        "output_tokens": "",
+        "total_tokens": "",
+        "latency_seconds": "",
+        "tool_time_seconds": "",
+        "process_wall_time_seconds": "",
+        "peak_combined_memory_mib": "",
+        "run_id": run["run_id"],
+        "result_updated_at": run.get("result_updated_at") or "",
+        "sources": ";".join(run.get("sources", ())),
+    }
+    if status == "succeeded":
+        completed = row(run, study="matched_cardinality", arm="matched-provisional")
+        output.update(completed)
+        output["status"] = status
+    return output
 
 
 def build_rows(campaigns: dict[str, dict[str, Any]]) -> list[dict[str, Any]]:
@@ -173,12 +242,25 @@ def main() -> int:
         raise ValueError(f"Missing dashboard studies: {sorted(missing)}")
 
     rows = build_rows(campaigns)
+    qwen_matched = [run for run in campaigns[MATCHED_CAMPAIGN]["runs"] if run["model"] == QWEN]
+    if len(qwen_matched) != 725:
+        raise ValueError(
+            f"Qwen matched-cardinality grid must contain 725 jobs, got {len(qwen_matched)}"
+        )
+    qwen_rows = sorted(
+        (provisional_matched_row(run) for run in qwen_matched), key=lambda item: item["run_id"]
+    )
     args.output_dir.mkdir(parents=True, exist_ok=True)
     records_path = args.output_dir / "records.csv"
     with records_path.open("w", newline="", encoding="utf-8") as stream:
-        writer = csv.DictWriter(stream, fieldnames=FIELDNAMES)
+        writer = csv.DictWriter(stream, fieldnames=FIELDNAMES, lineterminator="\n")
         writer.writeheader()
         writer.writerows(rows)
+    provisional_path = args.output_dir / "matched_qwen_provisional.csv"
+    with provisional_path.open("w", newline="", encoding="utf-8") as stream:
+        writer = csv.DictWriter(stream, fieldnames=PROVISIONAL_FIELDNAMES, lineterminator="\n")
+        writer.writeheader()
+        writer.writerows(qwen_rows)
 
     source_ids = sorted(
         {source for record in rows for source in record["sources"].split(";") if source}
@@ -193,12 +275,14 @@ def main() -> int:
         "git_commit": subprocess.check_output(["git", "rev-parse", "HEAD"], text=True).strip(),
         "record_count": len(rows),
         "records_sha256": sha256_file(records_path),
+        "matched_qwen_provisional_sha256": sha256_file(provisional_path),
         "selection": {
             "matched_cardinality": "GPT-5 mini only; 725/725 succeeded",
             "oracle_predicate": "Qwen 3.5 and Claude Haiku 4.5; 150/150 succeeded",
             "ordinary_comparison": "same models, tasks, contexts, and repetitions; 150/150 succeeded",
             "deterministic_executor": "15/15 succeeded",
-            "excluded": "unfinished Qwen matched-cardinality arm",
+            "matched_qwen_provisional": dict(Counter(row["status"] for row in qwen_rows)),
+            "excluded_from_final_inference": "unfinished Qwen matched-cardinality arm",
         },
         "snapshot_files": snapshot_files,
     }

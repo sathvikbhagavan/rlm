@@ -133,6 +133,20 @@ queue for finishing the submission.
   is an artifact-completeness follow-up and is outside the frozen submission
   analysis.
 
+#### Control-study appendix audit
+
+- [x] Add the complete GPT-5 mini matched-cardinality task heatmap and resource
+  profile to the appendix (725 jobs; 2,175 trajectories).
+- [ ] Replace the provisional Qwen matched-cardinality coverage and success-only
+  diagnostic when all 725 jobs terminate. Until then, exclude it from causal
+  claims and cross-model comparisons.
+- [x] Add task/context heatmaps and complete performance/resource profiles for
+  the Qwen and Claude chemistry-rule controls.
+- [x] Add the deterministic executor runtime/memory profile and document its
+  15/15 perfect-score, zero-model-call ceiling.
+- [x] Add aggregate, per-target, and resource views for the complete Task-16
+  decomposition (30 jobs; 90 target-level trajectories).
+
 #### Cost and resource disclosure
 
 - [x] Report recorded API cost in USD per successful trajectory alongside

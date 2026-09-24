@@ -293,7 +293,7 @@ def write_aggregates(path: Path, rows: list[dict[str, Any]]) -> None:
         "replications",
     )
     with path.open("w", newline="", encoding="utf-8") as stream:
-        writer = csv.DictWriter(stream, fieldnames=fieldnames)
+        writer = csv.DictWriter(stream, fieldnames=fieldnames, lineterminator="\n")
         writer.writeheader()
         writer.writerows(rows)
 

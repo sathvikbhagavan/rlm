@@ -1,13 +1,18 @@
 {
-  "aggregates_sha256": "081e08bfdcd521dac5123fe50552e2151a5391e8034160f688e9d7e4dd3def31",
+  "aggregates_sha256": "23d900211dcefe7938ca6e20f6c0a402cb107c110ee5ecf308172432f361fd7c",
   "campaign": "iclr2027-task16-prospective-decomposition-v1",
-  "generated_at": "2026-09-24T12:09:51.516101+00:00",
-  "git_commit": "d170d5b5f4b5007f002a362abdf1674875a6dafd",
+  "generated_at": "2026-09-24T23:51:12.006927+00:00",
+  "git_commit": "edc2d28f5dc766e356e64dca084815e980d4c881",
   "jobs": 30,
-  "records_sha256": "aae6566f027794bb9841ecce9bf7db7ca7148a74f945f348f1eae799841861b7",
+  "records_sha256": "7190b810c8f073e1d1eb0085c1207fee48eb3d8d63a71334fd1da37fb5e1b6a3",
   "selection": "Qwen and Claude; three conditions; five repetitions; three targets",
   "snapshot_files": {
-    "artifacts/control-room/shared/liacpc14-prospective-v1-e1cb6c67.json": "55cc3cfad6f30cda3c57e142d9694543e30a10fb838013d3dedd03e94e8c94cc"
+    "artifacts/control-room/shared/liacpc14-prospective-v1-e1cb6c67.json": "ae0ef9cd895500b4e1ebacca4ed8f16df122db604498c693323d5212226b40f7"
+  },
+  "target_records_sha256": "33b5ccbaaf88932267edebe7b15ade9d5604cbf387423001ead2520137e2e0df",
+  "target_score_pack": {
+    "path": "paper_plots/gold/source_packs/task16-target-scores.json",
+    "sha256": "04ad8142b60991784058937b64a717935988f6c4afcb9af15fbc4c5956300945"
   },
   "trajectories": 90
 }
