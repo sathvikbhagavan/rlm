@@ -6,7 +6,7 @@
 - <span style="color: #1a7f37;">We need to follow the assessment, and make sure if the claim of mechanical vs. reasoning is causally separated and has evidence? For that, which plot do we need?</span> **✅ Completed**
 - The story should also emphasize the structured data aspect of this task in scientific discovery, something that might be more relevant when we step away from domains like math. Perhaps we could come up with more examples, like time-series (cite our adaptive time-series work), data in biology, I don't know, but make it make sense more and show the impact and need for it through some other examples.
 - The assessment has found the failures insightful, we should redo the failure analysis now that we have so many models and arms, either automatically, or having codex finding the root causes, writing code for it, and running it on the traces. Failure analysis is important.
-- We should properly and briefly explain RAG is superseded by our baselines constructions. Essentially at any context length we put the ground-truths in, so it's already a ceiling for what a RAG (e.g. based on DRFP) could achieve. Because in 100, 500 out of 120k, we're putting the answer reaction along with the others. So we don't try RAG since we think it's subsumed.
+- <span style="color: #1a7f37;">We should properly and briefly explain RAG is superseded by our baselines constructions. Essentially at any context length we put the ground-truths in, so it's already a ceiling for what a RAG (e.g. based on DRFP) could achieve. Because in 100, 500 out of 120k, we're putting the answer reaction along with the others. So we don't try RAG since we think it's subsumed.</span> **✅ Completed with oracle-recall wording**
 - <span style="color: #1a7f37;">The assessment talks about the highest value move being oracle-predicate. Do we have results for that? What do those results tell us? We should add those results and the prose to overleaf to the proper location.</span> **✅ Completed**
 - We should think about the presentation/framing as to what makes it a good benchmark, and show those qualities. I'm not sure what these qualities are, but I can think of:
   - A benchmark should be able to separate models, otherwise, it's not a good benchmark
@@ -27,7 +27,7 @@
 - Then moving to experiments:
   - A: Do we have it? Is it in the paper? If not, we should.
   - B: We have it, does it answer the question? Is it embedded in the paper?
-  - C: Explain why not (DRFP, etc.)
+  - <span style="color: #1a7f37;">C: Explain why not (DRFP, etc.)</span> **✅ Completed with oracle-recall wording**
   - D: Do we have it?
   - E: I have it differently actually. We have human annotations for different chunks of the 100 questions, not their annotation for false positives..
   - F: Do our results support that?
