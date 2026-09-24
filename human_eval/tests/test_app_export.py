@@ -105,8 +105,7 @@ def test_browser_smoke_leakage_autosave_and_export(
     assert "rxh-theme" in client.get("/static/theme.js").text
     application_js = client.get("/static/app.js").text
     assert "action-row" in application_js
-    assert "Does your answer reveal a possible benchmark error?" in application_js
-    assert "form.dataset.evaluation==='incorrect'" in application_js
+    assert "submittedStatus==='incorrect'" in application_js
     assert "scrollIntoView" in application_js
     baseline = client.get("/question/rxh-t1-fixture?mode=baseline")
     assert baseline.status_code == 200 and "987654321" not in baseline.text
@@ -144,6 +143,8 @@ def test_browser_smoke_leakage_autosave_and_export(
     assert "Post-submission reference" in submitted_page.text
     assert "Not an exact match" in submitted_page.text
     assert 'data-evaluation="incorrect"' in submitted_page.text
+    assert 'id="benchmark-disagreement"' in submitted_page.text
+    assert "Incorrect: your answer is not an exact match" in submitted_page.text
     assert "ground_truth_disagreement" in submitted_page.text
     assert (
         client.post(
@@ -258,6 +259,8 @@ def test_baseline_set_scoring_feedback_and_large_reference(
     incorrect_page = client.get("/question/rxh-t1-fixture?mode=baseline")
     assert 'class="answer-feedback feedback-incorrect"' in incorrect_page.text
     assert 'data-evaluation="incorrect"' in incorrect_page.text
+    assert 'id="benchmark-disagreement"' in incorrect_page.text
+    assert "ordering does not affect this result" in incorrect_page.text
 
 
 def test_same_type_prefill_and_direct_question_navigation(

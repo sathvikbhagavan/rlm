@@ -50,6 +50,14 @@
 <form class="panel" data-annotation-form data-mode="{{ mode }}" data-item="{{ question.question_id }}" data-evaluation="{{ baseline_evaluation.status if baseline_evaluation else '' }}">
   <h2>{% if mode == 'baseline' %}Your independent answer{% else %}Your audit judgment{% endif %}</h2>
   {% set p = draft.payload %}
+  {% if mode == 'baseline' and baseline_evaluation and baseline_evaluation.status == 'incorrect' %}
+  <section id="benchmark-disagreement" class="disagreement-callout" role="alert" tabindex="-1">
+    <h3>Incorrect: your answer is not an exact match</h3>
+    <p>Your entries were compared with the complete stored reference as a set, so ordering does not affect this result. If you believe your independently derived answer is right, flag it for author review and briefly explain why. Your original submission remains preserved.</p>
+    <label><input type="checkbox" name="ground_truth_disagreement" {% if p.ground_truth_disagreement %}checked{% endif %}> I believe my answer may be right despite differing from stored ground truth; flag for author review.</label>
+    <label>Rationale / comments<textarea name="rationale">{{ p.rationale or '' }}</textarea></label>
+  </section>
+  {% endif %}
   {% if mode == 'baseline' %}
   <label>Structured answer <small>(one set entry or reaction chain per line; comma-separate indices in a chain)</small>
     <textarea name="answer_exact">{{ p.answer_exact or '' }}</textarea>
@@ -85,7 +93,6 @@
     {% endfor %}
   </fieldset>
   <label><input type="checkbox" name="verified_logic" {% if p.verified_logic %}checked{% endif %}> I inspected and checked the method or logic for this question; the final judgment is mine.</label>
-  <label {% if not baseline_evaluation or baseline_evaluation.status != 'incorrect' %}hidden{% endif %}><input type="checkbox" name="ground_truth_disagreement" {% if p.ground_truth_disagreement %}checked{% endif %}> I believe my answer may be right despite differing from stored ground truth; flag for author review.</label>
   {% else %}
   <fieldset>
     <legend>Audit checks</legend>
@@ -108,7 +115,9 @@
   {% endif %}
 
   <label>Confidence (1–5)<input type="number" min="1" max="5" name="confidence" value="{{ p.confidence or '' }}"></label>
+  {% if mode != 'baseline' or not baseline_evaluation or baseline_evaluation.status != 'incorrect' %}
   <label>Rationale / comments<textarea name="rationale">{{ p.rationale or '' }}</textarea></label>
+  {% endif %}
   <p id="save-status" role="status" tabindex="-1">{% if draft.submitted_at %}Submitted {{ draft.submitted_at }}; revisions remain allowed and are preserved.{% elif draft.updated_at %}Resumed autosave from {{ draft.updated_at }}.{% endif %}</p>
   <button type="submit">{% if draft.submitted_at %}Submit revision{% else %}Submit{% endif %}</button>
 </form>
