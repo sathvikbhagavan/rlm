@@ -1,4 +1,5 @@
 scope,model,model_label,method,expected_jobs,succeeded_jobs,running_jobs,stale_jobs,failed_jobs,pending_jobs,scored_success_jobs,unscored_success_jobs,is_final,legend_label,note
+codeact_x1000,qwen3.5,Qwen 3.5,codeact,150,150,0,0,0,0,150,0,True,Codeact,terminal and scored
 codeact_x1000,deepseek-v4-flash,DeepSeek V4 Flash,codeact,150,85,0,0,65,0,85,0,True,Codeact,terminal and scored
 codeact_x1000,gemini-3.7-flash,Gemini 3.7 Flash,codeact,150,150,0,0,0,0,150,0,True,Codeact,terminal and scored
 codeact_x1000,gpt-5-mini,GPT-5 mini,codeact,150,89,0,0,61,0,89,0,True,Codeact,terminal and scored

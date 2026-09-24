@@ -116,6 +116,23 @@ queue for finishing the submission.
 - [ ] Generate and include the DeepSeek core-metrics, resource-diagnostics,
   and task-level heatmap pages after the main arm becomes terminal.
 
+#### Six-model matrix audit: Qwen 3.5
+
+- [x] Freeze the 1,050 main-matrix jobs and 3,500 trajectories: 1,049 jobs
+  succeeded and one terminal failure contributes zero to macro-F1.
+- [x] Freeze the $x=1000$ CodeAct extension: 150 successful jobs and 500
+  question-level trajectories, with complete score and resource records.
+- [ ] Add the $x=1000$ RLM extension when Sathvik's run is terminal, then
+  regenerate this profile without changing the completed main or CodeAct arms.
+- [x] Generate and include the Qwen core-metrics, resource-diagnostics, and
+  task-level heatmap pages from the currently frozen arms.
+
+#### Post-deadline completion queue
+
+- [ ] Complete the GLM 5.2 CodeAct arm and regenerate its model profile. This
+  is an artifact-completeness follow-up and is outside the frozen submission
+  analysis.
+
 #### Cost and resource disclosure
 
 - [x] Report recorded API cost in USD per successful trajectory alongside

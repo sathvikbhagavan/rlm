@@ -1,0 +1,42 @@
+{
+  "figures": [
+    {
+      "path": "qwen3_5_core_metrics.pdf",
+      "sha256": "14c4a842cb2c2779bb852aa4036c87b78547044d79e87663b4479e1a4e7155d6"
+    },
+    {
+      "path": "qwen3_5_core_metrics.png",
+      "sha256": "ec68566388d8669d9951a373fb9e1803c9cf4b18b73634fc1d17a4cdd202a10c"
+    },
+    {
+      "path": "qwen3_5_resource_diagnostics.pdf",
+      "sha256": "48213985a118e0d1ba7a3babf49d54b53dc61605ad91046ca72b814f5819310e"
+    },
+    {
+      "path": "qwen3_5_resource_diagnostics.png",
+      "sha256": "bef73ab9900aaa99acd0d85b9ce90fea450849dd45e7731bdcb33d18031d3b33"
+    },
+    {
+      "path": "qwen3_5_task_heatmap.pdf",
+      "sha256": "95a3c38e7f66591c38498ea7933dd7c97b90f7abd21782e7f6ef979854432ebc"
+    },
+    {
+      "path": "qwen3_5_task_heatmap.png",
+      "sha256": "a8cf20742b70fb85ba76fe427ceb260903692fcc1ed3114c4aca8f19eb17df74"
+    }
+  ],
+  "model": "qwen3.5",
+  "model_label": "Qwen 3.5",
+  "palette": "Plasma",
+  "schema_version": 1,
+  "sources": [
+    {
+      "path": "paper_plots/gold/iclr2027/model_appendix/qwen3.5/tier_metrics.csv",
+      "sha256": "ed71538d6640589a4746928b96c45de362469f7ae930bcc3db12656673058fcf"
+    },
+    {
+      "path": "paper_plots/gold/iclr2027/model_appendix/qwen3.5/task_f1.csv",
+      "sha256": "ceb375ca1e19a5073982f044f04cd751937f2eb2207d5905435752c0891c4167"
+    }
+  ]
+}

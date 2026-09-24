@@ -21,7 +21,7 @@ All plotting aggregates score terminal failed jobs as zero. Running, stale, and 
 ## Files
 
 - `full_benchmark_records.csv`: every one of the 6,300 expected main-benchmark jobs.
-- `codeact_x1000_records.csv`: the final DeepSeek, Gemini, and GPT-5-mini CodeAct x1000 extensions.
+- `codeact_x1000_records.csv`: the final Qwen, DeepSeek, Gemini, and GPT-5-mini CodeAct x1000 extensions.
 - `rlm_x1000_records.csv`: terminal RLM x1000 extensions available at the freeze time.
 - `final_arm_records.csv`: records belonging to terminal arms.
 - `provisional_arm_records.csv`: records belonging to unfinished arms.

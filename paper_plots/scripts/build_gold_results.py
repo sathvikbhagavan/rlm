@@ -59,7 +59,9 @@ EXPECTED_MODELS_BY_METHOD_CONTEXT = {
     ("llm", "500"): frozenset(MODEL_ORDER),
     ("codeact", "100"): frozenset(MODEL_ORDER),
     ("codeact", "500"): frozenset(MODEL_ORDER),
-    ("codeact", "1000"): frozenset({"deepseek-v4-flash", "gemini-3.7-flash", "gpt-5-mini"}),
+    ("codeact", "1000"): frozenset(
+        {"qwen3.5", "deepseek-v4-flash", "gemini-3.7-flash", "gpt-5-mini"}
+    ),
     ("rlm", "100"): frozenset(MODEL_ORDER),
     ("rlm", "500"): frozenset(MODEL_ORDER),
     ("rlm", "1000"): frozenset({"deepseek-v4-flash", "gemini-3.7-flash", "gpt-5-mini"}),
@@ -116,6 +118,9 @@ METRIC_FIELDS = (
 
 DEFAULT_GEMINI_X1000_PACK = Path(
     "paper_plots/gold/source_packs/gemini-codeact-x1000-succeeded-pack.tgz"
+)
+DEFAULT_QWEN_X1000_PACK = Path(
+    "paper_plots/gold/source_packs/qwen-codeact-x1000-succeeded-pack.tgz"
 )
 DEFAULT_DEEPSEEK_RLM_X1000_PACK = Path(
     "paper_plots/gold/source_packs/deepseek-rlm-x1000-docker-succeeded-pack.tgz"
@@ -693,7 +698,7 @@ def write_readme(path: Path, arms: list[dict[str, Any]], *, as_of: str) -> None:
             "## Files",
             "",
             "- `full_benchmark_records.csv`: every one of the 6,300 expected main-benchmark jobs.",
-            "- `codeact_x1000_records.csv`: the final DeepSeek, Gemini, and GPT-5-mini CodeAct x1000 extensions.",
+            "- `codeact_x1000_records.csv`: the final Qwen, DeepSeek, Gemini, and GPT-5-mini CodeAct x1000 extensions.",
             "- `rlm_x1000_records.csv`: terminal RLM x1000 extensions available at the freeze time.",
             "- `final_arm_records.csv`: records belonging to terminal arms.",
             "- `provisional_arm_records.csv`: records belonging to unfinished arms.",
@@ -758,6 +763,12 @@ def parse_args() -> argparse.Namespace:
         help="Sanitized Gemini CodeAct x1000 result pack.",
     )
     parser.add_argument(
+        "--qwen-x1000-pack",
+        type=Path,
+        default=DEFAULT_QWEN_X1000_PACK,
+        help="Sanitized Qwen CodeAct x1000 result pack.",
+    )
+    parser.add_argument(
         "--deepseek-rlm-x1000-pack",
         type=Path,
         default=DEFAULT_DEEPSEEK_RLM_X1000_PACK,
@@ -793,6 +804,18 @@ def main() -> None:
         if (flattened := flatten_run(run, scope="codeact_x1000"))["model"] == "gpt-5-mini"
         and flattened["method"] == "codeact"
     ]
+    expected_qwen_ids = {
+        str(row["run_id"]).replace("-x500-", "-x1000-")
+        for row in rows
+        if row["model"] == "qwen3.5"
+        and row["method"] == "codeact"
+        and row["context"] == "500"
+    }
+    qwen_extension_rows, qwen_pack_manifest = load_result_pack(
+        args.qwen_x1000_pack,
+        expected_model="qwen3.5-397b",
+        expected_run_ids=expected_qwen_ids,
+    )
     expected_gemini_ids = {
         str(row["run_id"]).replace("-x500-", "-x1000-")
         for row in rows
@@ -805,7 +828,12 @@ def main() -> None:
         expected_model="gemini-3.7-flash",
         expected_run_ids=expected_gemini_ids,
     )
-    extension_rows = deepseek_extension_rows + gemini_extension_rows + gpt_extension_rows
+    extension_rows = (
+        qwen_extension_rows
+        + deepseek_extension_rows
+        + gemini_extension_rows
+        + gpt_extension_rows
+    )
     deepseek_rlm_rows = [
         flattened
         for run in x1000["runs"]
@@ -927,6 +955,15 @@ def main() -> None:
         },
         "result_packs": [
             {
+                "path": str(args.qwen_x1000_pack),
+                "sha256": sha256_file(args.qwen_x1000_pack),
+                "bytes": args.qwen_x1000_pack.stat().st_size,
+                "packed_at": qwen_pack_manifest["packed_at"],
+                "models": qwen_pack_manifest["models"],
+                "n_runs": qwen_pack_manifest["n_runs"],
+                "rule": qwen_pack_manifest["rule"],
+            },
+            {
                 "path": str(args.gemini_x1000_pack),
                 "sha256": sha256_file(args.gemini_x1000_pack),
                 "bytes": args.gemini_x1000_pack.stat().st_size,
@@ -971,16 +1008,18 @@ def main() -> None:
     )
     if (
         len(rows) != 6300
+        or len(qwen_extension_rows) != 150
         or len(deepseek_extension_rows) != 150
         or len(gpt_extension_rows) != 150
-        or len(extension_rows) != 450
+        or len(extension_rows) != 600
         or len(deepseek_rlm_rows) != 150
         or len(gemini_rlm_rows) != 150
         or len(gpt_rlm_rows) not in {0, 150}
     ):
         raise ValueError(
             "Gold export cardinality mismatch: "
-            f"{len(rows)} main, {len(deepseek_extension_rows)} DeepSeek x1000, "
+            f"{len(rows)} main, {len(qwen_extension_rows)} Qwen x1000, "
+            f"{len(deepseek_extension_rows)} DeepSeek x1000, "
             f"{len(gemini_extension_rows)} Gemini x1000, "
             f"{len(gpt_extension_rows)} GPT-5-mini x1000, and "
             f"{len(deepseek_rlm_rows)} DeepSeek RLM x1000, "

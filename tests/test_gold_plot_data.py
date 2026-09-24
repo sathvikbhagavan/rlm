@@ -276,8 +276,8 @@ def test_cross_model_summary_records_missing_and_provisional_models() -> None:
     assert summary["mean_f1"] == pytest.approx(0.25)
     assert summary["model_sem"] is None
     assert summary["n_models"] == 1
-    assert summary["target_n_models"] == 3
-    assert summary["missing_models"] == "gemini-3.7-flash;gpt-5-mini"
+    assert summary["target_n_models"] == 4
+    assert summary["missing_models"] == "qwen3.5;gemini-3.7-flash;gpt-5-mini"
     assert summary["excluded_provisional_models"] == "gemini-3.7-flash"
     assert summary["is_final"] is False
 

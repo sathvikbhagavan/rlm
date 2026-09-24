@@ -32,7 +32,7 @@ TIER_NAMES = {
 CORE_METRICS = (
     ("f1", "Macro F1", "linear"),
     ("total_tokens", "Total tokens / trajectory", "log"),
-    ("cost_usd", "Recorded cost (USD) / trajectory", "log"),
+    ("cost_usd", "Recorded cost (USD) / trajectory", "symlog"),
     ("process_wall_time_seconds", "Process wall time (s) / trajectory", "log"),
 )
 DIAGNOSTIC_METRICS = (
@@ -84,6 +84,10 @@ def metric_page(
         sorted({row["context"] for row in rows}, key=CONTEXT_ORDER.__getitem__)
     )
     context_positions = {context: index for index, context in enumerate(contexts)}
+    has_positive = {
+        metric: any(float(row[f"{metric}_mean"] or 0.0) > 0 for row in rows)
+        for metric, _, _ in metrics
+    }
     figure, axes = plt.subplots(4, 4, figsize=(7.25, 9.0), squeeze=False)
     for column, tier in enumerate(range(1, 5)):
         axes[0, column].set_title(
@@ -125,8 +129,11 @@ def metric_page(
                     elinewidth=0.75,
                     zorder=3,
                 )
-            if scale == "log":
+            if scale == "log" and has_positive[metric]:
                 axis.set_yscale("log")
+            elif scale == "log":
+                axis.set_ylim(-0.05, 1.05)
+                axis.set_yticks((0, 0.5, 1.0))
             elif scale == "symlog":
                 axis.set_yscale("symlog", linthresh=1e-3)
             else:

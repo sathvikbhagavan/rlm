@@ -1,0 +1,31 @@
+{
+  "aggregation": {
+    "additive_resources": "sum divided by successful question trajectories",
+    "f1": "question-weighted within each repetition; terminal failures score zero",
+    "peak_memory": "mean combined process-tree plus Docker peak per successful job",
+    "variation": "population standard deviation across five repetitions"
+  },
+  "generated_at": "2026-09-24T23:39:01.476809+00:00",
+  "model": "qwen3.5",
+  "outputs": [
+    {
+      "path": "tier_metrics.csv",
+      "sha256": "ed71538d6640589a4746928b96c45de362469f7ae930bcc3db12656673058fcf"
+    },
+    {
+      "path": "task_f1.csv",
+      "sha256": "ceb375ca1e19a5073982f044f04cd751937f2eb2207d5905435752c0891c4167"
+    }
+  ],
+  "schema_version": 1,
+  "sources": [
+    {
+      "path": "paper_plots/gold/iclr2027/full_benchmark_records.csv",
+      "sha256": "5f16166c847dfaa3394c352c1bdc35a5311a23de2fb41a0b94d4d7138aac3134"
+    },
+    {
+      "path": "paper_plots/gold/iclr2027/codeact_x1000_records.csv",
+      "sha256": "52b76824c624aeaa913833ba742089da2806672bb9d9d16de345713752bf702d"
+    }
+  ]
+}
