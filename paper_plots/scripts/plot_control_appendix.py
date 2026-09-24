@@ -145,13 +145,15 @@ def matched_resource_page(rows: list[dict[str, str]]) -> plt.Figure:
     rows = [row for row in rows if row["study"] == "matched_cardinality"]
     metrics = (
         ("calls", "Model calls / trajectory", "log"),
-        ("total_tokens", "Total tokens / trajectory", "log"),
+        ("input_tokens", "Input tokens / trajectory", "log"),
+        ("output_tokens", "Output tokens / trajectory", "log"),
         ("cost_usd", "Recorded cost (USD) / trajectory", "symlog"),
         ("latency_seconds", "Model latency (s) / trajectory", "log"),
+        ("tool_time_seconds", "Tool time (s) / trajectory", "symlog"),
         ("process_wall_time_seconds", "Process wall time (s) / trajectory", "log"),
         ("peak_combined_memory_mib", "Peak memory (MiB) / job", "log"),
     )
-    figure, axes = plt.subplots(3, 2, figsize=(7.25, 7.8), squeeze=False)
+    figure, axes = plt.subplots(4, 2, figsize=(7.25, 9.0), squeeze=False)
     x = np.arange(len(CONDITIONS))
     for axis, (metric, label, scale) in zip(axes.ravel(), metrics, strict=True):
         for tier in (1, 2, 3):
@@ -173,6 +175,7 @@ def matched_resource_page(rows: list[dict[str, str]]) -> plt.Figure:
             axis.set_yscale("log")
         else:
             axis.set_yscale("symlog", linthresh=1e-4)
+            axis.set_ylim(bottom=0)
         axis.grid(axis="y", which="both", color="#D8DDE2", linewidth=0.45)
         axis.spines[["top", "right"]].set_visible(False)
     axes[0, 0].legend(frameon=False, ncol=3)
@@ -298,16 +301,19 @@ def oracle_model_page(rows: list[dict[str, str]], model: str) -> plt.Figure:
     metrics = (
         ("f1", "Macro F1", "linear", True),
         ("calls", "Model calls / trajectory", "log", False),
-        ("total_tokens", "Total tokens / trajectory", "log", False),
+        ("input_tokens", "Input tokens / trajectory", "log", False),
+        ("output_tokens", "Output tokens / trajectory", "log", False),
         ("cost_usd", "Recorded cost (USD) / trajectory", "symlog", False),
         ("latency_seconds", "Model latency (s) / trajectory", "log", False),
         ("tool_time_seconds", "Tool time (s) / trajectory", "symlog", False),
         ("process_wall_time_seconds", "Process wall time (s) / trajectory", "log", False),
         ("peak_combined_memory_mib", "Peak memory (MiB) / job", "log", False),
     )
-    figure, axes = plt.subplots(4, 2, figsize=(7.25, 9.0), squeeze=False)
+    figure, axes = plt.subplots(5, 2, figsize=(7.25, 9.8), squeeze=False)
     x = np.arange(3)
-    for axis, (metric, label, scale, is_score) in zip(axes.ravel(), metrics, strict=True):
+    for axis, (metric, label, scale, is_score) in zip(
+        axes.ravel()[: len(metrics)], metrics, strict=True
+    ):
         for arm in ("ordinary", "predicate"):
             values = []
             for context in CONTEXTS:
@@ -339,10 +345,12 @@ def oracle_model_page(rows: list[dict[str, str]], model: str) -> plt.Figure:
             axis.set_yscale("log")
         elif scale == "symlog":
             axis.set_yscale("symlog", linthresh=1e-4)
+            axis.set_ylim(bottom=0)
         else:
             axis.set_ylim(-0.03, 1.03)
         axis.grid(axis="y", which="both", color="#D8DDE2", linewidth=0.45)
         axis.spines[["top", "right"]].set_visible(False)
+    axes[-1, -1].axis("off")
     axes[0, 0].legend(frameon=False)
     figure.supxlabel("Context size (reactions)", y=0.01)
     figure.subplots_adjust(left=0.105, right=0.995, top=0.99, bottom=0.06, hspace=0.43, wspace=0.34)

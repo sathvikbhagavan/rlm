@@ -129,7 +129,8 @@ def target_heatmaps(rows: list[dict[str, str]]) -> plt.Figure:
 def resource_page(rows: list[dict[str, str]]) -> plt.Figure:
     metrics = (
         ("calls", "Model calls / trajectory", "log"),
-        ("total_tokens", "Total tokens / trajectory", "log"),
+        ("input_tokens", "Input tokens / trajectory", "log"),
+        ("output_tokens", "Output tokens / trajectory", "log"),
         ("cost_usd", "Recorded cost (USD) / trajectory", "symlog"),
         ("latency_seconds", "Model latency (s) / trajectory", "log"),
         ("tool_time_seconds", "Tool time (s) / trajectory", "symlog"),
@@ -173,10 +174,10 @@ def resource_page(rows: list[dict[str, str]]) -> plt.Figure:
             axis.set_yscale("log")
         else:
             axis.set_yscale("symlog", linthresh=1e-4)
+            axis.set_ylim(bottom=0)
         axis.grid(axis="y", which="both", color="#D8DDE2", linewidth=0.45)
         axis.spines[["top", "right"]].set_visible(False)
     axes.ravel()[0].legend(frameon=False)
-    axes.ravel()[-1].axis("off")
     figure.subplots_adjust(left=0.11, right=0.99, top=0.99, bottom=0.055, hspace=0.48, wspace=0.35)
     return figure
 
