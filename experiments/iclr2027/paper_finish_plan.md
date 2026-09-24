@@ -70,7 +70,7 @@ queue for finishing the submission.
 - [x] Canonical gold records are complete: 1,050/1,050 successful jobs and
   3,500 question-level trajectories. LLM and CodeAct each cover $x=100,500$;
   RLM covers $x=100,500,\mathrm{full}$. All seven arms are terminal.
-- [x] Every Claude job has a selected F1 score, calls, CHF/USD cost, input,
+- [x] Every Claude job has a selected F1 score, calls, USD cost, input,
   output and total tokens, recorded model latency, tool time, process wall
   time, and host/Docker/combined peak-memory measurements. Tier-4 Task 15 uses
   `macro_reaction_f1`; the other jobs use `macro_f1`.
