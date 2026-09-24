@@ -43,6 +43,14 @@ uv run --frozen --with-requirements human_eval/requirements.txt \
   python -m human_eval.cli serve
 ```
 
+The exhaustive Tier-4 Task 12b mapping can be regenerated independently with:
+
+```bash
+uv run --frozen --with-requirements human_eval/requirements.txt \
+  python tier4/generate_task12b_full_ground_truth.py \
+  --dataset human_eval/data/reactionSmilesFigShareUSPTO2023_cleaned.txt
+```
+
 Generated bundles and local state are ignored. `questions.jsonl` contains no
 answer values or evidence indices. Protected values are under the bundle's
 `admin/` directory and are never sent by baseline routes before submission.
@@ -109,8 +117,9 @@ with the active public-question, ground-truth, and dataset checksums, so work fr
 different suite versions remains distinguishable.
 
 Before changing a live study, archive the old canonical bundle—including its
-protected `admin/` component—and build the update to a new directory such as
-`human_eval/generated/canonical-v4`. Do not overwrite the old bundle needed to
+protected `admin/` component—and build the update in a new directory. The current
+corrected bundle is `human_eval/generated/canonical-v4`; do not overwrite an older
+bundle needed to
 score its submissions. Restart the application with both the new bundle and the
 unchanged state directory:
 

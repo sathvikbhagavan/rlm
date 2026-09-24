@@ -12,7 +12,7 @@ from contextlib import contextmanager
 from pathlib import Path
 from typing import Any
 
-from . import SCHEMA_VERSION
+from . import BUNDLE_VERSION, SCHEMA_VERSION
 from .schema import GroundTruth, Question, content_sha256
 
 EXPECTED = {
@@ -352,20 +352,43 @@ class BundleBuilder:
                     sources=["tier4/rlm_task12.py", "tier4/task12_longest_chain_ground_truth.py"],
                 )
             t12b = imported("tier4", "task12b_hub_molecule_ground_truth", self.root)
+            t12b_full = imported("tier4", "task12b_full_dataset_ground_truth", self.root)
             prompt12b = source_function(
                 self.root / "tier4/rlm_task12b.py",
                 "build_question",
                 {"TASK12B_MIN_DOWNSTREAM": t12b.TASK12B_MIN_DOWNSTREAM},
+            )
+            task12b_prompt = (
+                prompt12b()
+                + f"""
+
+            Canonicalization contract for this full-dataset human-evaluation question:
+            - The provided context is the complete {t12b_full.TASK12B_FULL_DATASET_RECORDS}-reaction
+              clean dataset available through this application.
+            - Use RDKit {t12b_full.TASK12B_FULL_DATASET_RDKIT_VERSION} Chem.CanonSmiles on each
+              nonempty dot-separated component (isomeric canonical SMILES).
+            - Return every matching molecule in the complete dataset, not only selected support hubs.
+            """
             )
             self.add(
                 tier=4,
                 category="mechanical-graph",
                 subcategory="hub-molecule",
                 key="task12b",
-                prompt=prompt12b(),
+                prompt=task12b_prompt,
                 answer_type="smiles_set",
-                answer=list(t12b.HARDCODED_GT_HUB_MOLECULES),
-                sources=["tier4/rlm_task12b.py", "tier4/task12b_hub_molecule_ground_truth.py"],
+                answer=list(t12b_full.TASK12B_FULL_DATASET_HUB_MOLECULES),
+                sources=[
+                    "tier4/rlm_task12b.py",
+                    "tier4/task12b_hub_molecule_graph.py",
+                    "tier4/task12b_hub_molecule_ground_truth.py",
+                    "tier4/task12b_full_dataset_ground_truth.py",
+                ],
+                metadata={
+                    "context_scope": "complete-clean-dataset",
+                    "rdkit_version": t12b_full.TASK12B_FULL_DATASET_RDKIT_VERSION,
+                    "canonicalization": t12b_full.TASK12B_FULL_DATASET_CANONICALIZATION,
+                },
             )
 
             t13g = imported("tier4", "task13_fg_chain_graph", self.root)
@@ -519,7 +542,7 @@ def build_bundle(root: Path, output: Path, dataset_sha256: str) -> dict[str, Any
     }
     manifest = {
         "schema_version": SCHEMA_VERSION,
-        "bundle_version": f"rxnhaystack-human-{SCHEMA_VERSION}",
+        "bundle_version": BUNDLE_VERSION,
         "question_count": len(questions),
         "dataset_sha256": dataset_sha256,
         "dataset": {
@@ -534,7 +557,8 @@ def build_bundle(root: Path, output: Path, dataset_sha256: str) -> dict[str, Any
         "source_root": ".",
         "excluded_historical_tier3_modules": ["task9", "task13", "task14", "task16", "task17"],
         "source_inconsistencies": [
-            "Four Tier-3 functional-group definitions have stored ground truth but are commented out in current runner label/description maps; prompts are mechanically derived from key and stored SMIRKS."
+            "Four Tier-3 functional-group definitions have stored ground truth but are commented out in current runner label/description maps; prompts are mechanically derived from key and stored SMIRKS.",
+            "Historical Task 12b stored eight selected support hubs for sampled model contexts; this bundle instead uses the exhaustive full-dataset predicate and pins RDKit canonicalization.",
         ],
         "audit_sampling": {
             "method": "SHA-256 rank without replacement over canonical JSON entries",

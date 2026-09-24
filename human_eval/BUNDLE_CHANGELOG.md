@@ -1,5 +1,13 @@
 # Canonical bundle changelog
 
+## rxnhaystack-human-1.3.0 — September 24, 2026
+
+- Corrects Tier-4 Task 12b for the full clean dataset: the protected answer is the
+  exhaustive hub set, not the eight support hubs selected for sampled model contexts.
+- Pins the human-facing Task 12b canonicalization contract to RDKit 2026.03.6
+  `Chem.CanonSmiles` with isomeric canonical SMILES.
+- Preserves prior annotations and their 1.2.0 bundle/checksum stamps.
+
 ## rxnhaystack-human-1.2.0 — September 14, 2026
 
 Updated the empirically informed suggested stopping limits to 5 minutes for Tier 1,
