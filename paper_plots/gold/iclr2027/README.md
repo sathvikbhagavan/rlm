@@ -36,7 +36,7 @@ All plotting aggregates score terminal failed jobs as zero. Running, stale, and 
   process wall time, and peak-memory summaries for terminal arms. Additive
   metrics are normalized per successful question trajectory; peak memory is
   averaged per successful job. Terminal failures are counted but excluded from
-  resource means rather than treated as zero.
+  resource means and are never treated as zero.
 - `source_manifest.json`: source snapshot and file checksums.
 
 ## Causal controls
