@@ -25,12 +25,12 @@
   - W7 W8 W9: to be ignored for now, and delegated to later
   - <span style="color: #1a7f37;">W10: We should have plots of tool-call, tokens, latency, tool-time, all of it should enrich the appendix</span> **✅ Six-metric appendix figure added**
 - Then moving to experiments:
-  - A: Do we have it? Is it in the paper? If not, we should.
-  - B: We have it, does it answer the question? Is it embedded in the paper?
+  - <span style="color: #1a7f37;">A: Do we have it? Is it in the paper? If not, we should.</span> **✅ Completed: chemistry-rule control and deterministic ceiling are in the main results and appendix**
+  - <span style="color: #1a7f37;">B: We have it, does it answer the question? Is it embedded in the paper?</span> **✅ Completed: the GPT-5-mini two-factor control is central to the causal-controls result**
   - <span style="color: #1a7f37;">C: Explain why not (DRFP, etc.)</span> **✅ Completed with oracle-recall wording**
-  - D: Do we have it?
-  - E: I have it differently actually. We have human annotations for different chunks of the 100 questions, not their annotation for false positives..
-  - F: Do our results support that?
+  - <span style="color: #1a7f37;">D: Do we have it?</span> **✅ Completed: 30/30 jobs, 90 trajectories, and the controlled result is in Methods and Results**
+  - E: I have it differently actually. We have human annotations for different chunks of the 100 questions, not their annotation for false positives.. **⏳ Not complete: one 20-question export is available locally; collaborator exports and expertise metadata still need consolidation**
+  - <span style="color: #1a7f37;">F: Do our results support that?</span> **✅ Completed: the capability ordering is reported across Qwen, Gemini, GPT-5 mini, and Claude**
 - What should we release as artifact of this benchmark? Just the set of questions? The answers? Should we hold out anything for not being contaminated? The codes to obtain the ground-truth? The interface to obtain more human annotations?
 
 ### Current focus
@@ -387,11 +387,11 @@ Sample successes as controls, not only failures.
 | Experiment | Status | What it currently says |
 | --- | --- | --- |
 | A. Oracle predicate | 150/150 model jobs and 15/15 deterministic jobs complete | Predicate supply helps at full scale, but orchestration remains imperfect |
-| B. Matched cardinality | GPT 725/725 complete; Qwen arm incomplete/needs failure audit | GPT causally separates corpus scale from answer cardinality |
+| B. Matched cardinality | GPT 725/725 complete; Qwen excluded from this paper analysis | GPT causally separates corpus scale from answer cardinality |
 | C. Retrieval and map-reduce | Not run; map-and-union deliberately shelved | Explain oracle-recall setting and narrow claims about recursion |
-| D. Prospective decomposition | Running | Separates target interpretation, final-step abstraction, and route construction |
-| E. Human validation | Question-chunk baseline exists; not a false-positive study | Report only the study actually conducted |
-| F. Multi-model replication | Broadly addressed; DeepSeek/GLM completion still active | Capability split reproduces, with important model heterogeneity |
+| D. Prospective decomposition | 30/30 jobs complete; 90 trajectories | Final-step information helps, while structure alone does not; route recovery remains difficult |
+| E. Human validation | One 20-question baseline export is local; consolidation pending | Report only after exports, expertise, and assignments are verified |
+| F. Multi-model replication | Complete for the four-model full-corpus comparison | Capability split reproduces, with important model heterogeneity |
 
 ## Artifact release plan
 
@@ -445,9 +445,8 @@ publication-quality plot/table, manuscript prose, and a compiled Overleaf push.
 4. **Completed: causal-controls figure and section.** Matched cardinality and
    executable chemistry-rule controls directly answer W1 and separate
    chemistry-rule inference from execution.
-5. **Finish prospective decomposition.** Analyze the three information
-   conditions after all jobs terminate; write it as a validity analysis with W6
-   limitations.
+5. **Completed: prospective decomposition.** The three information conditions
+   are analyzed over 90 trajectories and reported in Methods and Results.
 6. **Consolidate human annotations.** Import all collaborator exports, verify
    expertise and assignments, run the existing analysis, and report the actual
    study design.

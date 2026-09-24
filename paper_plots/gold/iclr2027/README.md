@@ -1,6 +1,8 @@
 # Gold ICLR 2027 plotting results
 
-Frozen from the shared experiment dashboard at `2026-09-22T19:03:40.570724+00:00`.
+The main benchmark tables were frozen from the shared experiment dashboard at
+`2026-09-22T19:03:40.570724+00:00`; each subsequently completed control records
+its own contributing snapshot and checksum in its local `source_manifest.json`.
 
 Gold means that the plotting input is frozen, auditable, and provenance-recorded. It does not mean every experiment arm is finished. `arm_status.csv` and the `arm_final` columns distinguish terminal arms from provisional ones.
 
@@ -55,6 +57,15 @@ record-level input, question-weighted five-repetition aggregates, and source
 snapshot checksums are stored in `records.csv`, `aggregates.csv`, and
 `source_manifest.json`, respectively.
 
+## Prospective-route control
+
+The `prospective_decomposition/` directory freezes the completed Task-16
+control: Qwen and Claude, three target-information conditions, five
+repetitions, and three targets per run. All 30 jobs succeeded, providing 90
+question-level trajectories. `records.csv` contains the run-level measurements,
+`aggregates.csv` contains the six model-by-condition summaries reported in the
+paper, and `source_manifest.json` records the contributing dashboard snapshot.
+
 Regenerate from the repository root:
 
 ```bash
@@ -71,4 +82,5 @@ uv run --with-requirements paper_plots/requirements.txt \
 uv run --frozen python paper_plots/scripts/build_causal_controls.py
 uv run --with-requirements paper_plots/requirements.txt \
   python paper_plots/scripts/plot_causal_controls.py
+uv run --frozen python paper_plots/scripts/build_prospective_decomposition.py
 ```
