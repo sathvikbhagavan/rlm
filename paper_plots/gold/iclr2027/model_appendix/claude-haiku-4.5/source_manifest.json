@@ -1,27 +1,27 @@
 {
   "aggregation": {
-    "additive_resources": "sum divided by successful question trajectories",
-    "f1": "question-weighted within each repetition; terminal failures score zero",
+    "additive_resources": "sum divided by all successful question trajectories, including runs whose historical scores were invalidated",
+    "f1": "question-weighted within each repetition; terminal failures score zero; ground-truth-invalidated successes are excluded and reduce score coverage",
     "peak_memory": "mean combined process-tree plus Docker peak per successful job",
     "variation": "population standard deviation across five repetitions"
   },
-  "generated_at": "2026-09-24T22:50:59.877965+00:00",
+  "generated_at": "2026-09-25T14:44:55.273295+00:00",
   "model": "claude-haiku-4.5",
   "outputs": [
     {
       "path": "tier_metrics.csv",
-      "sha256": "befdcfa633911843ee554b8832dcca18060f52b8ef0bb5b01c8d71c73b407580"
+      "sha256": "8de169faa47e87b40309630a74116b4da78b3331607192903547db55bfaa6bf3"
     },
     {
       "path": "task_f1.csv",
-      "sha256": "4dc21060e3f5ec66c41a83fed962256ffe5ddb727857167c10f57baa878d4a49"
+      "sha256": "ce8d42618fbe157bf45d5fc8968e6182ff57527ceaf1a17ff49f58b195c681d0"
     }
   ],
   "schema_version": 1,
   "sources": [
     {
       "path": "paper_plots/gold/iclr2027/full_benchmark_records.csv",
-      "sha256": "67eca1cd678f70c8daaebe0441d8a35f6e153720833df52add929f32c42b77d6"
+      "sha256": "599dddce39dff4afe404e59e0204bb0ffd45aa8f98657a409d10d46144bfae15"
     }
   ]
 }

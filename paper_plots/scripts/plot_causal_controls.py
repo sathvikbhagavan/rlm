@@ -29,6 +29,10 @@ CONTEXT_LABELS = ("100", "500", "5k", "50k", "Full")
 apply_paper_style()
 
 
+def as_bool(value: Any) -> bool:
+    return str(value).strip().lower() in {"1", "true", "yes"}
+
+
 def read_records(path: Path) -> list[dict[str, Any]]:
     rows: list[dict[str, Any]] = []
     with path.open(newline="", encoding="utf-8") as stream:
@@ -39,7 +43,8 @@ def read_records(path: Path) -> list[dict[str, Any]]:
                     "tier": int(row["tier"]),
                     "repetition": int(row["repetition"]),
                     "question_count": int(row["question_count"]),
-                    "f1": float(row["f1"]),
+                    "score_available": as_bool(row["score_available"]),
+                    "f1": float(row["f1"]) if row["f1"] else None,
                 }
             )
     return rows
@@ -51,6 +56,8 @@ def weighted_replication_means(
 ) -> dict[tuple[Any, ...], list[float]]:
     accum: dict[tuple[Any, ...], list[float]] = defaultdict(lambda: [0.0, 0.0])
     for row in rows:
+        if not row["score_available"] or row["f1"] is None:
+            continue
         key = tuple(row[field] for field in key_fields) + (row["repetition"],)
         weight = row["question_count"]
         accum[key][0] += row["f1"] * weight
@@ -81,9 +88,26 @@ def aggregate_rows(records: list[dict[str, Any]]) -> list[dict[str, Any]]:
     ]
     oracle_reps = weighted_replication_means(oracle, ("model_label", "context", "arm"))
 
+    def coverage(group: list[dict[str, Any]]) -> tuple[int, int, float]:
+        total = sum(int(row["question_count"]) for row in group)
+        scored = sum(
+            int(row["question_count"])
+            for row in group
+            if row["score_available"] and row["f1"] is not None
+        )
+        return scored, total, scored / total if total else 0.0
+
     aggregates: list[dict[str, Any]] = []
     for (condition, context, tier), values in sorted(matched_reps.items()):
         mean, sd = mean_sd(values)
+        group = [
+            row
+            for row in matched
+            if row["condition"] == condition
+            and row["context"] == context
+            and row["tier"] == tier
+        ]
+        scored, total, fraction = coverage(group)
         aggregates.append(
             {
                 "study": "matched_cardinality",
@@ -95,10 +119,21 @@ def aggregate_rows(records: list[dict[str, Any]]) -> list[dict[str, Any]]:
                 "mean_f1": mean,
                 "sd_f1": sd,
                 "replications": len(values),
+                "scored_question_trajectories": scored,
+                "total_question_trajectories": total,
+                "score_coverage": fraction,
             }
         )
     for (model_label, context, arm), values in sorted(oracle_reps.items()):
         mean, sd = mean_sd(values)
+        group = [
+            row
+            for row in oracle
+            if row["model_label"] == model_label
+            and row["context"] == context
+            and row["arm"] == arm
+        ]
+        scored, total, fraction = coverage(group)
         aggregates.append(
             {
                 "study": "oracle_predicate",
@@ -110,6 +145,9 @@ def aggregate_rows(records: list[dict[str, Any]]) -> list[dict[str, Any]]:
                 "mean_f1": mean,
                 "sd_f1": sd,
                 "replications": len(values),
+                "scored_question_trajectories": scored,
+                "total_question_trajectories": total,
+                "score_coverage": fraction,
             }
         )
     return aggregates
@@ -281,6 +319,9 @@ def write_aggregates(path: Path, rows: list[dict[str, Any]]) -> None:
         "mean_f1",
         "sd_f1",
         "replications",
+        "scored_question_trajectories",
+        "total_question_trajectories",
+        "score_coverage",
     )
     with path.open("w", newline="", encoding="utf-8") as stream:
         writer = csv.DictWriter(stream, fieldnames=fieldnames, lineterminator="\n")

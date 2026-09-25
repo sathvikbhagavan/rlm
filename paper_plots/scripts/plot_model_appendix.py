@@ -104,7 +104,13 @@ def metric_page(
                 )
             for method in METHODS:
                 subset = sorted(
-                    (row for row in rows if int(row["tier"]) == tier and row["method"] == method),
+                    (
+                        row
+                        for row in rows
+                        if int(row["tier"]) == tier
+                        and row["method"] == method
+                        and row[f"{metric}_mean"] != ""
+                    ),
                     key=lambda row: context_positions[row["context"]],
                 )
                 if not subset:
@@ -178,7 +184,11 @@ def metric_page(
 def task_heatmap(rows: list[dict[str, str]]) -> plt.Figure:
     tasks = list(dict.fromkeys(row["task"] for row in rows))
     labels = {row["task"]: row["task_label"] for row in rows}
-    lookup = {(row["task"], row["method"], row["context"]): float(row["f1_mean"]) for row in rows}
+    lookup = {
+        (row["task"], row["method"], row["context"]): float(row["f1_mean"])
+        for row in rows
+        if row["f1_mean"] != ""
+    }
     available_keys = {(row["method"], row["context"]) for row in rows}
     column_keys = tuple(key for key in COLUMN_ORDER if key in available_keys)
     column_labels = tuple(

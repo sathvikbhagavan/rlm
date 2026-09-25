@@ -25,8 +25,8 @@ canonical questions are outside its scope.
 
 | Canonical family | Questions | Result |
 | --- | ---: | --- |
-| T3 Tasks 6, 7, 8 | 15 | Tasks 6 and 8 exact; Task 7 corrected as described below |
-| T3 Tasks 10 and 10b | 10 | Exact regeneration for every subquestion |
+| T3 Tasks 6, 7, 8 | 15 | Task 8 exact; Tasks 6 and 7 corrected as described below |
+| T3 Tasks 10 and 10b | 10 | Task 10 Wittig corrected below; the other nine subquestions regenerate exactly |
 | T3 Tasks 11, 12, 15 | 3 | Tasks 11 and 15 exact in both checked environments; Task 12 exact under its benchmark RDKit 2025.09.6 contract |
 | T3 Tasks 18, 19, 20 | 3 | Tasks 19 and 20 exact; Task 18 corrected as described below |
 | T3 Tasks 21 and 22 | 2 | Exact regeneration |
@@ -38,22 +38,44 @@ canonical questions are outside its scope.
 
 ## Corrections
 
+### Tier 3 Task 6
+
+The old acyl-chloride SMIRKS began with a wildcard `[*]-C(=O)Cl`. That admitted
+chloroformates and carbamoyl chlorides, whose products are carbamates and ureas,
+despite the prompt specifying amide formation from an acyl chloride. The corrected
+predicate requires a carbon substituent, `[#6]-C(=O)Cl`. The primary-amine answer
+changes from 1,347 to 942 reactions (the disabled secondary-amine definition changes
+from 833 to 633). Reviewer 1 returned 935 of the 942 corrected primary-amine records
+with no false positives.
+
 ### Tier 3 Task 7
 
-The old reaction-template matcher applied a single-reactant transformation only
-once. It therefore omitted records in which the same requested transformation
-occurred at multiple sites and the stored product contained the fully
-transformed molecule. Reaction 3907, where both primary alcohols are oxidized
-to a dicarboxylic acid, is the reported example. The matcher now follows
-successive single-reactant template applications up to the number of matching
-sites and accepts the recorded final product. Four subquestions gain records:
+Two independent defects were corrected. First, the old reaction-template matcher
+applied a single-reactant transformation only once. It therefore omitted records in
+which the same requested transformation occurred at multiple sites and the stored
+product contained the fully transformed molecule. Reaction 3907, where both primary
+alcohols are oxidized to a dicarboxylic acid, is the reported example. Second, the
+templates define connectivity but the matcher compared isomeric SMILES, rejecting
+valid products whose newly formed stereocenter was recorded explicitly. Reviewer 1
+identified seven such Grignard examples; exhaustive regeneration found ten.
 
-- nitrile to amine: 274 to 275 (adds 43529);
-- nitro groups to amines: 2,053 to 2,064 (adds 11 records);
-- alcohol to azide: 120 to 121 (adds 9683);
-- alcohol to carboxylic acid: 63 to 64 (adds 3907).
+The final bundle-1.6 counts are:
 
-Both Grignard subquestions are unchanged.
+- Grignard ketone to tertiary alcohol: 33 to 43;
+- Grignard aldehyde to secondary alcohol: 73 to 78;
+- nitrile to amine: 274 to 275;
+- nitro groups to amines: 2,053 to 2,067;
+- alcohol to azide: 120 to 133;
+- alcohol to carboxylic acid: 63 to 64.
+
+### Tier 3 Task 10 (Wittig)
+
+The first-stage Wittig templates used a wildcard for the atom bound to phosphorus.
+Consequently `P=S` thionating reagents matched the supposed ylide/phosphorane and the
+cascade mislabeled carbonyl-to-thiocarbonyl conversions as Wittig olefinations. The
+atom is now restricted to carbon in both charge-separated and double-bonded forms.
+The answer changes from 99 to 45 reactions. Reviewer 1 returned 42 of the corrected
+45 with no false positives.
 
 ### Tier 3 Task 18
 
@@ -111,6 +133,50 @@ or prompt version.
 | Gabriel | T3 Task 7 | Rescore all model outputs for nitrile-to-amine, nitro-to-amine, alcohol-to-azide, and alcohol-to-carboxylic-acid. The two Grignard questions need no score change. | Corrected multi-site matching adds 14 records across four answer sets. |
 | Gabriel | T4 Task 13 | No score-only correction. Preserve old results as the original-prompt condition; rerun the primary-alcohol-to-carboxylic-acid question if results under the clarified definition are needed. | Ground truth is unchanged; only the neutral-acid contract is now explicit. |
 | Gabriel | T4 Task 15 | Rescore Task 15 raw outputs, at minimum the quinoline and indole questions. Report the corrected `macro_reaction_f1` and index-match fields; valid-path/objective-length correctness is unchanged. | The accepted alternative sets expand from 199 to 299 and from 184 to 241. |
+
+The Task-7 entry above is superseded by bundle 1.6.0: connectivity-only comparison
+also changes both Grignard answers and adds further nitro/azide records. Two additional
+entries apply:
+
+| Feedback source | Task | Required action for historical model results | Reason |
+| --- | --- | --- | --- |
+| Reviewer 1 | T3 Task 6 | Rescore the acyl-chloride/primary-amine subquestion in every historical arm. | Corrected membership changes from 1,347 to 942. |
+| Reviewer 1 | T3 Task 10 | Rescore the Wittig subquestion in every historical arm. | Corrected membership changes from 99 to 45. |
+
+### Applied historical-score policy
+
+The sanitized experiment records retain counts and aggregate metrics but do not
+consistently retain the predicted index sets required for exact rescoring. Old
+precision/recall/counts cannot identify which removed or added members a model
+predicted. The paper gold build therefore applies
+`paper_plots/gold/ground_truth_corrections.json`: historical scores for Tasks 6, 7,
+10, 18, 23, and Tier-4 Task 15 are marked unavailable, their values are preserved in
+`original_f1`, and aggregate tables report reduced score coverage without imputation.
+It invalidated 1,183 scored main-benchmark runs, 79 CodeAct-x1000 runs, and 57
+RLM-x1000 runs. The same overlay invalidated 364 of the 1,040 completed
+causal-control records; 676 remain scoreable. The provisional Qwen matched-cardinality
+table contains 150 invalidated completed scores and 25 affected jobs without a
+historical score. Status, cost, token, timing, and memory evidence is unchanged. Exact
+scores can be restored only from preserved raw predictions or corrected reruns.
+
+## Reviewer-source audit
+
+Theo's supplied archive is preserved as a sanitized, checksummed source tree at
+`human_eval/reviewer_code/rxh-e39c32021e72`; the embedded dataset, pickle caches,
+bytecode, and cache directories are excluded. Twelve of his thirteen submitted
+answers exactly match bundle 1.6.0. The Tier-4 Task-13 mismatch is not a benchmark
+defect: his code includes alkyl fluorides although the contract uses Cl/Br/I and joins
+successive reactions whenever any product is consumed later, allowing molecule
+identity to switch between steps instead of following one coherent molecule chain.
+His saved Tier-2 molecular-weight script also contains a debug `exit()` before its
+calculation, so that archived file alone cannot reproduce the submitted answer. His
+Task-23 source calls `FindMolChiralCenters(..., includeUnassigned=False)` without the
+uppercase-CIP filter used for the corrected R/S contract; the submitted answer was
+manually corrected and does match the canonical set, but the saved script by itself
+does not document that last filtering step. Several unattempted assigned-question
+files are empty placeholders. None of these source-archive limitations changes the
+scored first submissions. The complete adjudication of all reviewer claims is in
+`REVIEWER_FEEDBACK_AUDIT.csv`.
 
 ## Version-sensitive record
 

@@ -2,11 +2,11 @@
   "figures": [
     {
       "path": "deepseek-v4-flash_core_metrics.pdf",
-      "sha256": "faa22465dfd8e3a2cec458e23956a92118c0c5b920302a7c47d411c9160c65b3"
+      "sha256": "acb06b4989095a1cfe1949f68a9d308b793db439b9b5d9e97e43448369c0c4f0"
     },
     {
       "path": "deepseek-v4-flash_core_metrics.png",
-      "sha256": "9adbc8aaf36dae9426d75c6eb61ab8122edcfc55d0a1dc6aba573c70091d8b56"
+      "sha256": "ceaca1eb778c9ea5870e65e457b9064d3f8debce8ec36846f03a8da0f3dfe220"
     },
     {
       "path": "deepseek-v4-flash_resource_diagnostics.pdf",
@@ -18,25 +18,25 @@
     },
     {
       "path": "deepseek-v4-flash_task_heatmap.pdf",
-      "sha256": "e017eb0060d1ce16e603ed833c3aef4b609338c12faf9302a864ea9a2c874462"
+      "sha256": "45718da3dce288bfb6707372c56b2ee5689d6d34f2715a9d94c4c903eb304bb8"
     },
     {
       "path": "deepseek-v4-flash_task_heatmap.png",
-      "sha256": "77f17808c1cba4d23191f6ac2b058f12fe4959ec4c8b49a3a2d8a3292577f869"
+      "sha256": "26369d661e1a35d13d9788789d76a06f70c6e0576f4ec35b2607fc72d3163cb9"
     }
   ],
   "model": "deepseek-v4-flash",
-  "model_label": "DeepSeek V4 Flash",
+  "model_label": "DeepSeek-V4-Flash",
   "palette": "Plasma",
   "schema_version": 1,
   "sources": [
     {
       "path": "paper_plots/gold/iclr2027/model_appendix/deepseek-v4-flash/tier_metrics.csv",
-      "sha256": "c5dab5d56bc99bfe363b8dd078f21fc177ceca66682f2d1da58b1382a96200e5"
+      "sha256": "9ef614750e82886191a0c8b7c5ef24f30c0343940e9ec163c717984625f7225a"
     },
     {
       "path": "paper_plots/gold/iclr2027/model_appendix/deepseek-v4-flash/task_f1.csv",
-      "sha256": "8b351e3d8078ec5e30306c076e6c93323c0a539a3fb4b8948a9a7e595feeb388"
+      "sha256": "32bfcb8caa70ad037b11e248714e9775ff0fb3095f5fd4485b34980405f67462"
     }
   ]
 }

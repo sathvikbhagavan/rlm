@@ -6,8 +6,12 @@ import tarfile
 
 import pytest
 
+from paper_plots.scripts.build_causal_controls import (
+    apply_ground_truth_corrections as apply_control_ground_truth_corrections,
+)
 from paper_plots.scripts.build_gold_results import (
     add_arm_finality,
+    apply_ground_truth_corrections,
     apply_score_recoveries,
     arm_summaries,
     cross_model_efficiency_summaries,
@@ -265,6 +269,75 @@ def test_score_recovery_only_fills_an_unscored_success(tmp_path) -> None:
     assert rows[0]["score_available"] is True
     assert rows[0]["f1"] == 0.625
     assert rows[0]["sources"].endswith("score-recovery:recoveries.json")
+
+
+def test_ground_truth_correction_invalidates_score_but_preserves_provenance(tmp_path) -> None:
+    rows = [
+        {
+            "scope": "full_benchmark",
+            "run_id": "old-run",
+            "model": "gpt-5-mini",
+            "method": "llm",
+            "task": "tier3/task10",
+            "status": "succeeded",
+            "score_available": True,
+            "f1": 0.75,
+            "sources": "immutable-ledger",
+        }
+    ]
+    path = tmp_path / "corrections.json"
+    path.write_text(
+        json.dumps(
+            {
+                "correction_id": "test-correction",
+                "corrected_bundle": "test-bundle",
+                "affected_tasks": {"tier3/task10": "test reason"},
+            }
+        )
+    )
+
+    apply_ground_truth_corrections(rows, path)
+
+    assert rows[0]["original_f1"] == 0.75
+    assert rows[0]["f1"] is None
+    assert rows[0]["score_available"] is False
+    assert rows[0]["score_correction_status"] == "historical_score_invalidated"
+    summary = arm_summaries(rows)[0]
+    assert summary["is_final"] is True
+    assert summary["scored_success_jobs"] == 0
+    assert summary["ground_truth_invalidated_jobs"] == 1
+
+
+def test_control_ground_truth_correction_invalidates_only_affected_scores(tmp_path) -> None:
+    rows = [
+        {
+            "task": task,
+            "f1": 0.75,
+            "score_available": True,
+            "sources": "immutable-control-ledger",
+        }
+        for task in ("tier3/task10", "tier2/task2")
+    ]
+    path = tmp_path / "corrections.json"
+    path.write_text(
+        json.dumps(
+            {
+                "correction_id": "test-correction",
+                "corrected_bundle": "test-bundle",
+                "affected_tasks": {"tier3/task10": "test reason"},
+            }
+        )
+    )
+
+    apply_control_ground_truth_corrections(rows, path)
+
+    assert rows[0]["original_f1"] == 0.75
+    assert rows[0]["f1"] == ""
+    assert rows[0]["score_available"] is False
+    assert rows[0]["score_correction_status"] == "historical_score_invalidated"
+    assert rows[1]["f1"] == 0.75
+    assert rows[1]["score_available"] is True
+    assert rows[1]["score_correction_status"] == "not_affected"
 
 
 def test_external_x1000_result_pack_is_validated_and_flattened(tmp_path) -> None:

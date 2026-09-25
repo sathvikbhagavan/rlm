@@ -1,211 +1,211 @@
-model,tier,task,task_label,method,context,repetitions,successful_jobs,failed_jobs,f1_mean,f1_std
-claude-haiku-4.5,1,tier1/task1,T1.1 Exact product lookup (10Q),llm,100,5,5,0,0.8966666666666667,0.0
-claude-haiku-4.5,1,tier1/task1,T1.1 Exact product lookup (10Q),llm,500,5,5,0,0.6698888888888889,0.040353989201124194
-claude-haiku-4.5,1,tier1/task1,T1.1 Exact product lookup (10Q),codeact,100,5,5,0,0.9513333333333334,0.04074855143982964
-claude-haiku-4.5,1,tier1/task1,T1.1 Exact product lookup (10Q),codeact,500,5,5,0,0.9493333333333334,0.02831568077546038
-claude-haiku-4.5,1,tier1/task1,T1.1 Exact product lookup (10Q),rlm,100,5,5,0,0.64,0.13564659966250536
-claude-haiku-4.5,1,tier1/task1,T1.1 Exact product lookup (10Q),rlm,500,5,5,0,0.6733333333333333,0.18306040290327974
-claude-haiku-4.5,1,tier1/task1,T1.1 Exact product lookup (10Q),rlm,full,5,5,0,0.6599999999999999,0.13564659966250536
-claude-haiku-4.5,2,tier2/task2,T2.1 Molecular-weight change (6Q),llm,100,5,5,0,0.05106834324542166,0.012394659533076518
-claude-haiku-4.5,2,tier2/task2,T2.1 Molecular-weight change (6Q),llm,500,5,5,0,0.036159288193657255,0.012389729893153095
-claude-haiku-4.5,2,tier2/task2,T2.1 Molecular-weight change (6Q),codeact,100,5,5,0,0.17245515057571795,0.03349399461572673
-claude-haiku-4.5,2,tier2/task2,T2.1 Molecular-weight change (6Q),codeact,500,5,5,0,0.8500405345933801,0.09600784689702552
-claude-haiku-4.5,2,tier2/task2,T2.1 Molecular-weight change (6Q),rlm,100,5,5,0,0.8333333333333334,0.14907119849998599
-claude-haiku-4.5,2,tier2/task2,T2.1 Molecular-weight change (6Q),rlm,500,5,5,0,0.8701550387596899,0.12398254867302175
-claude-haiku-4.5,2,tier2/task2,T2.1 Molecular-weight change (6Q),rlm,full,5,5,0,0.7345329851007054,0.08067575240016302
-claude-haiku-4.5,2,tier2/task3,T2.2 Ring-count change (5Q),llm,100,5,5,0,0.15873135031012733,0.015608545116658145
-claude-haiku-4.5,2,tier2/task3,T2.2 Ring-count change (5Q),llm,500,5,5,0,0.04994448678365646,0.03660281347776422
-claude-haiku-4.5,2,tier2/task3,T2.2 Ring-count change (5Q),codeact,100,5,5,0,0.1253596463288116,0.06937659783089355
-claude-haiku-4.5,2,tier2/task3,T2.2 Ring-count change (5Q),codeact,500,5,5,0,0.5444547337416503,0.07708170870511184
-claude-haiku-4.5,2,tier2/task3,T2.2 Ring-count change (5Q),rlm,100,5,5,0,0.64,0.14966629547095767
-claude-haiku-4.5,2,tier2/task3,T2.2 Ring-count change (5Q),rlm,500,5,5,0,0.64,0.08000000000000003
-claude-haiku-4.5,2,tier2/task3,T2.2 Ring-count change (5Q),rlm,full,5,5,0,0.6395530383212975,0.19651096617223782
-claude-haiku-4.5,2,tier2/task4,T2.3 Aromatic-ring formation (5Q),llm,100,5,5,0,0.03457365746423522,0.002327547232116417
-claude-haiku-4.5,2,tier2/task4,T2.3 Aromatic-ring formation (5Q),llm,500,5,5,0,0.016975852647512994,0.008684630082008845
-claude-haiku-4.5,2,tier2/task4,T2.3 Aromatic-ring formation (5Q),codeact,100,5,5,0,0.023330598851517635,0.0013781788351107465
-claude-haiku-4.5,2,tier2/task4,T2.3 Aromatic-ring formation (5Q),codeact,500,5,5,0,0.5391906654955132,0.1615009651596827
-claude-haiku-4.5,2,tier2/task4,T2.3 Aromatic-ring formation (5Q),rlm,100,5,5,0,0.72,0.2039607805437114
-claude-haiku-4.5,2,tier2/task4,T2.3 Aromatic-ring formation (5Q),rlm,500,5,5,0,0.6533333333333333,0.14847371634213394
-claude-haiku-4.5,2,tier2/task4,T2.3 Aromatic-ring formation (5Q),rlm,full,5,5,0,0.6004998969735191,0.252208889866308
-claude-haiku-4.5,2,tier2/task5,T2.4 Combined weight + rings (4Q),llm,100,5,5,0,0.06547082444502889,0.022542084868531802
-claude-haiku-4.5,2,tier2/task5,T2.4 Combined weight + rings (4Q),llm,500,5,5,0,0.01420291458701787,0.017801607270415597
-claude-haiku-4.5,2,tier2/task5,T2.4 Combined weight + rings (4Q),codeact,100,5,5,0,0.31,0.09695359714832658
-claude-haiku-4.5,2,tier2/task5,T2.4 Combined weight + rings (4Q),codeact,500,5,5,0,0.46479474309310387,0.07621950421802119
-claude-haiku-4.5,2,tier2/task5,T2.4 Combined weight + rings (4Q),rlm,100,5,5,0,0.4,0.1224744871391589
-claude-haiku-4.5,2,tier2/task5,T2.4 Combined weight + rings (4Q),rlm,500,5,5,0,0.55,0.18708286933869708
-claude-haiku-4.5,2,tier2/task5,T2.4 Combined weight + rings (4Q),rlm,full,5,5,0,0.796184926454709,0.1879107826088826
-claude-haiku-4.5,3,tier3/task13,T3.1 New nitrogen atom (1Q),llm,100,5,5,0,0.1129032258064516,0.0
-claude-haiku-4.5,3,tier3/task13,T3.1 New nitrogen atom (1Q),llm,500,5,5,0,0.07596855203823505,0.03663968154044349
-claude-haiku-4.5,3,tier3/task13,T3.1 New nitrogen atom (1Q),codeact,100,5,5,0,0.13596713118063664,0.028653973431722286
-claude-haiku-4.5,3,tier3/task13,T3.1 New nitrogen atom (1Q),codeact,500,5,5,0,0.13873994104511916,0.002089362587774322
-claude-haiku-4.5,3,tier3/task13,T3.1 New nitrogen atom (1Q),rlm,100,5,5,0,0.8,0.4
-claude-haiku-4.5,3,tier3/task13,T3.1 New nitrogen atom (1Q),rlm,500,5,5,0,0.8,0.4
-claude-haiku-4.5,3,tier3/task13,T3.1 New nitrogen atom (1Q),rlm,full,5,5,0,0.6031375322830111,0.48606201705188806
-claude-haiku-4.5,3,tier3/task14,T3.2 C-N formed / C-O broken (1Q),llm,100,5,5,0,0.3,0.0
-claude-haiku-4.5,3,tier3/task14,T3.2 C-N formed / C-O broken (1Q),llm,500,5,5,0,0.032774134507312,0.024013459293505113
-claude-haiku-4.5,3,tier3/task14,T3.2 C-N formed / C-O broken (1Q),codeact,100,5,5,0,0.8640000000000001,0.272
-claude-haiku-4.5,3,tier3/task14,T3.2 C-N formed / C-O broken (1Q),codeact,500,5,5,0,1.0,0.0
-claude-haiku-4.5,3,tier3/task14,T3.2 C-N formed / C-O broken (1Q),rlm,100,5,5,0,0.8,0.4
-claude-haiku-4.5,3,tier3/task14,T3.2 C-N formed / C-O broken (1Q),rlm,500,5,5,0,0.4,0.4898979485566356
-claude-haiku-4.5,3,tier3/task14,T3.2 C-N formed / C-O broken (1Q),rlm,full,5,5,0,0.43004593447899325,0.4669991785492255
-claude-haiku-4.5,3,tier3/task15,T3.3 Single C-C bond formation (1Q),llm,100,5,5,0,0.16364718346369722,0.0013306738154172236
-claude-haiku-4.5,3,tier3/task15,T3.3 Single C-C bond formation (1Q),llm,500,5,5,0,0.20863595693845455,0.07639088188059749
-claude-haiku-4.5,3,tier3/task15,T3.3 Single C-C bond formation (1Q),codeact,100,5,5,0,0.1173304560812141,0.062138208012336014
-claude-haiku-4.5,3,tier3/task15,T3.3 Single C-C bond formation (1Q),codeact,500,5,5,0,0.657,0.42023326855450177
-claude-haiku-4.5,3,tier3/task15,T3.3 Single C-C bond formation (1Q),rlm,100,5,5,0,0.2,0.4
-claude-haiku-4.5,3,tier3/task15,T3.3 Single C-C bond formation (1Q),rlm,500,5,5,0,0.6,0.4898979485566356
-claude-haiku-4.5,3,tier3/task15,T3.3 Single C-C bond formation (1Q),rlm,full,5,5,0,0.8,0.4
-claude-haiku-4.5,3,tier3/task17,T3.4 Fused heterocycle (1Q),llm,100,5,5,0,0.07176064087019295,0.0022815565828226826
-claude-haiku-4.5,3,tier3/task17,T3.4 Fused heterocycle (1Q),llm,500,5,5,0,0.2566002827570558,0.08660791283871198
-claude-haiku-4.5,3,tier3/task17,T3.4 Fused heterocycle (1Q),codeact,100,5,5,0,0.46792540792540793,0.28439900596641104
-claude-haiku-4.5,3,tier3/task17,T3.4 Fused heterocycle (1Q),codeact,500,5,5,0,0.49499759677598254,0.39084559646488926
-claude-haiku-4.5,3,tier3/task17,T3.4 Fused heterocycle (1Q),rlm,100,5,5,0,0.7133333333333333,0.24908722256359206
-claude-haiku-4.5,3,tier3/task17,T3.4 Fused heterocycle (1Q),rlm,500,5,5,0,0.4,0.4898979485566356
-claude-haiku-4.5,3,tier3/task17,T3.4 Fused heterocycle (1Q),rlm,full,5,5,0,0.5516249184478501,0.29953721068575007
-claude-haiku-4.5,3,tier3/task18,T3.5 New ring system (1Q),llm,100,5,5,0,0.5301300333542805,0.020031904094358753
-claude-haiku-4.5,3,tier3/task18,T3.5 New ring system (1Q),llm,500,5,5,0,0.19316536454559693,0.16759540609591034
-claude-haiku-4.5,3,tier3/task18,T3.5 New ring system (1Q),codeact,100,5,5,0,0.4773506611947105,0.2453851680765089
-claude-haiku-4.5,3,tier3/task18,T3.5 New ring system (1Q),codeact,500,5,5,0,0.6668372212535608,0.160151721842988
-claude-haiku-4.5,3,tier3/task18,T3.5 New ring system (1Q),rlm,100,5,5,0,0.25190225796473864,0.30895331092005895
-claude-haiku-4.5,3,tier3/task18,T3.5 New ring system (1Q),rlm,500,5,5,0,0.09802370864399926,0.1889008602756226
-claude-haiku-4.5,3,tier3/task18,T3.5 New ring system (1Q),rlm,full,5,5,0,0.5514864308857488,0.45734632072136877
-claude-haiku-4.5,3,tier3/task20,T3.6 Fused-ring construction (1Q),llm,100,5,5,0,0.09523809523809523,0.0
-claude-haiku-4.5,3,tier3/task20,T3.6 Fused-ring construction (1Q),llm,500,5,5,0,0.06555007019403304,0.03957338575865492
-claude-haiku-4.5,3,tier3/task20,T3.6 Fused-ring construction (1Q),codeact,100,5,5,0,0.3748199303245175,0.3387406968431394
-claude-haiku-4.5,3,tier3/task20,T3.6 Fused-ring construction (1Q),codeact,500,5,5,0,1.0,0.0
-claude-haiku-4.5,3,tier3/task20,T3.6 Fused-ring construction (1Q),rlm,100,5,5,0,0.6,0.4898979485566356
-claude-haiku-4.5,3,tier3/task20,T3.6 Fused-ring construction (1Q),rlm,500,5,5,0,0.6,0.4898979485566356
-claude-haiku-4.5,3,tier3/task20,T3.6 Fused-ring construction (1Q),rlm,full,5,5,0,0.4009246773261414,0.4891458660274221
-claude-haiku-4.5,3,tier3/task21,T3.7 Transition-metal reagent (1Q),llm,100,5,5,0,0.31155407899593945,0.0029531192321890164
-claude-haiku-4.5,3,tier3/task21,T3.7 Transition-metal reagent (1Q),llm,500,5,5,0,0.33621048528136027,0.002479645549786118
-claude-haiku-4.5,3,tier3/task21,T3.7 Transition-metal reagent (1Q),codeact,100,5,5,0,0.3394693323460447,0.1023989238856513
-claude-haiku-4.5,3,tier3/task21,T3.7 Transition-metal reagent (1Q),codeact,500,5,5,0,0.2267580680721014,0.13595391278326935
-claude-haiku-4.5,3,tier3/task21,T3.7 Transition-metal reagent (1Q),rlm,100,5,5,0,0.8,0.4
-claude-haiku-4.5,3,tier3/task21,T3.7 Transition-metal reagent (1Q),rlm,500,5,5,0,0.4,0.4898979485566356
-claude-haiku-4.5,3,tier3/task21,T3.7 Transition-metal reagent (1Q),rlm,full,5,5,0,0.20327075853094553,0.3983831575776403
-claude-haiku-4.5,3,tier3/task22,T3.8 HATU / T3P reagent (1Q),llm,100,5,5,0,0.04878048780487806,0.0
-claude-haiku-4.5,3,tier3/task22,T3.8 HATU / T3P reagent (1Q),llm,500,5,5,0,0.5140909090909092,0.06145868060321184
-claude-haiku-4.5,3,tier3/task22,T3.8 HATU / T3P reagent (1Q),codeact,100,5,5,0,0.8133333333333335,0.10666666666666666
-claude-haiku-4.5,3,tier3/task22,T3.8 HATU / T3P reagent (1Q),codeact,500,5,5,0,0.08,0.16
-claude-haiku-4.5,3,tier3/task22,T3.8 HATU / T3P reagent (1Q),rlm,100,5,5,0,0.0,0.0
-claude-haiku-4.5,3,tier3/task22,T3.8 HATU / T3P reagent (1Q),rlm,500,5,5,0,0.0,0.0
-claude-haiku-4.5,3,tier3/task22,T3.8 HATU / T3P reagent (1Q),rlm,full,5,5,0,0.0,0.0
-claude-haiku-4.5,3,tier3/task23,T3.9 New stereocenter (1Q),llm,100,5,5,0,0.08620689655172413,0.0
-claude-haiku-4.5,3,tier3/task23,T3.9 New stereocenter (1Q),llm,500,5,5,0,0.019954458046637265,0.000461184337850469
-claude-haiku-4.5,3,tier3/task23,T3.9 New stereocenter (1Q),codeact,100,5,5,0,1.0,0.0
-claude-haiku-4.5,3,tier3/task23,T3.9 New stereocenter (1Q),codeact,500,5,5,0,1.0,0.0
-claude-haiku-4.5,3,tier3/task23,T3.9 New stereocenter (1Q),rlm,100,5,5,0,0.8,0.4
-claude-haiku-4.5,3,tier3/task23,T3.9 New stereocenter (1Q),rlm,500,5,5,0,1.0,0.0
-claude-haiku-4.5,3,tier3/task23,T3.9 New stereocenter (1Q),rlm,full,5,5,0,0.5988483346827141,0.47583206000089123
-claude-haiku-4.5,3,tier3/task24,T3.10 E-alkene formation (1Q),llm,100,5,5,0,0.04878048780487806,0.0
-claude-haiku-4.5,3,tier3/task24,T3.10 E-alkene formation (1Q),llm,500,5,5,0,0.13569369161573058,0.04807945078014983
-claude-haiku-4.5,3,tier3/task24,T3.10 E-alkene formation (1Q),codeact,100,5,5,0,0.5199999999999999,0.2612789058968723
-claude-haiku-4.5,3,tier3/task24,T3.10 E-alkene formation (1Q),codeact,500,5,5,0,0.5489787745294353,0.4410806895161726
-claude-haiku-4.5,3,tier3/task24,T3.10 E-alkene formation (1Q),rlm,100,5,5,0,0.4,0.4898979485566356
-claude-haiku-4.5,3,tier3/task24,T3.10 E-alkene formation (1Q),rlm,500,5,5,0,0.7818181818181819,0.39249151172587093
-claude-haiku-4.5,3,tier3/task24,T3.10 E-alkene formation (1Q),rlm,full,5,5,0,0.7220156774916013,0.35969479131864185
-claude-haiku-4.5,3,tier3/task6,T3.11-14 Amide couplings (4Q),llm,100,5,5,0,0.02840292110644993,0.00021973983685689305
-claude-haiku-4.5,3,tier3/task6,T3.11-14 Amide couplings (4Q),llm,500,5,5,0,0.09944604454685099,0.03059727289141203
-claude-haiku-4.5,3,tier3/task6,T3.11-14 Amide couplings (4Q),codeact,100,5,5,0,0.414253173297291,0.10503215197802583
-claude-haiku-4.5,3,tier3/task6,T3.11-14 Amide couplings (4Q),codeact,500,5,5,0,0.4008217705845487,0.06946876116106755
-claude-haiku-4.5,3,tier3/task6,T3.11-14 Amide couplings (4Q),rlm,100,5,5,0,0.3093516042780749,0.1114093388087927
-claude-haiku-4.5,3,tier3/task6,T3.11-14 Amide couplings (4Q),rlm,500,5,5,0,0.25974571185723055,0.13268675519213324
-claude-haiku-4.5,3,tier3/task6,T3.11-14 Amide couplings (4Q),rlm,full,5,5,0,0.2972435226513568,0.10538790411301172
-claude-haiku-4.5,3,tier3/task7,T3.15-19 Group transformations (5Q),llm,100,5,5,0,0.24356816867732886,0.04449461467523273
-claude-haiku-4.5,3,tier3/task7,T3.15-19 Group transformations (5Q),llm,500,5,5,0,0.3675122763378518,0.03847903388126315
-claude-haiku-4.5,3,tier3/task7,T3.15-19 Group transformations (5Q),codeact,100,5,5,0,0.7021414141414141,0.08352921941984173
-claude-haiku-4.5,3,tier3/task7,T3.15-19 Group transformations (5Q),codeact,500,5,5,0,0.8128989898989898,0.0767127767541689
-claude-haiku-4.5,3,tier3/task7,T3.15-19 Group transformations (5Q),rlm,100,5,5,0,0.42683982683982685,0.23162916049092425
-claude-haiku-4.5,3,tier3/task7,T3.15-19 Group transformations (5Q),rlm,500,5,5,0,0.46419104470540856,0.11703953757845335
-claude-haiku-4.5,3,tier3/task7,T3.15-19 Group transformations (5Q),rlm,full,5,5,0,0.35435259003124947,0.06901100483243859
-claude-haiku-4.5,3,tier3/task8,T3.20-21 Protecting groups (2Q),llm,100,5,5,0,0.2012982010354159,0.11572582072662427
-claude-haiku-4.5,3,tier3/task8,T3.20-21 Protecting groups (2Q),llm,500,5,5,0,0.12621054677980675,0.020786730031989567
-claude-haiku-4.5,3,tier3/task8,T3.20-21 Protecting groups (2Q),codeact,100,5,5,0,0.8396581196581197,0.05779598155551322
-claude-haiku-4.5,3,tier3/task8,T3.20-21 Protecting groups (2Q),codeact,500,5,5,0,0.4266709440542412,0.17210385083470803
-claude-haiku-4.5,3,tier3/task8,T3.20-21 Protecting groups (2Q),rlm,100,5,5,0,0.4174825174825175,0.30938504499855257
-claude-haiku-4.5,3,tier3/task8,T3.20-21 Protecting groups (2Q),rlm,500,5,5,0,0.37163209813248266,0.16533771810621262
-claude-haiku-4.5,3,tier3/task8,T3.20-21 Protecting groups (2Q),rlm,full,5,5,0,0.25178490228218137,0.21714714373446053
-claude-haiku-4.5,3,tier3/task9,T3.22-25 Named reactions (4Q),llm,100,5,5,0,0.25771137011033113,0.078431986737284
-claude-haiku-4.5,3,tier3/task9,T3.22-25 Named reactions (4Q),llm,500,5,5,0,0.1728429783950956,0.015146125750364364
-claude-haiku-4.5,3,tier3/task9,T3.22-25 Named reactions (4Q),codeact,100,5,5,0,0.5531062646503824,0.09116220437801979
-claude-haiku-4.5,3,tier3/task9,T3.22-25 Named reactions (4Q),codeact,500,5,5,0,0.6559423616491362,0.09274924251383752
-claude-haiku-4.5,3,tier3/task9,T3.22-25 Named reactions (4Q),rlm,100,5,5,0,0.4997174531694656,0.2698579734175773
-claude-haiku-4.5,3,tier3/task9,T3.22-25 Named reactions (4Q),rlm,500,5,5,0,0.3992897485617405,0.17026535130455667
-claude-haiku-4.5,3,tier3/task9,T3.22-25 Named reactions (4Q),rlm,full,5,5,0,0.29023926609225864,0.10649133486720791
-claude-haiku-4.5,3,tier3/task10,T3.26-30 Mechanisms I (5Q),llm,100,5,5,0,0.18766991585636114,0.032605635749850835
-claude-haiku-4.5,3,tier3/task10,T3.26-30 Mechanisms I (5Q),llm,500,5,5,0,0.436825566933926,0.016657733483242107
-claude-haiku-4.5,3,tier3/task10,T3.26-30 Mechanisms I (5Q),codeact,100,5,5,0,0.5052139886257534,0.09902830601381116
-claude-haiku-4.5,3,tier3/task10,T3.26-30 Mechanisms I (5Q),codeact,500,5,5,0,0.6842161239726456,0.08803015826022094
-claude-haiku-4.5,3,tier3/task10,T3.26-30 Mechanisms I (5Q),rlm,100,5,5,0,0.3584126984126984,0.1105901619739388
-claude-haiku-4.5,3,tier3/task10,T3.26-30 Mechanisms I (5Q),rlm,500,5,5,0,0.3910684168658606,0.17081221230435034
-claude-haiku-4.5,3,tier3/task10,T3.26-30 Mechanisms I (5Q),rlm,full,5,5,0,0.3317499635839866,0.087614251422617
-claude-haiku-4.5,3,tier3/task10b,T3.31-35 Mechanisms II (5Q),llm,100,5,5,0,0.10839369053529346,0.06512872653120727
-claude-haiku-4.5,3,tier3/task10b,T3.31-35 Mechanisms II (5Q),llm,500,5,5,0,0.2188532182170217,0.028780825240063215
-claude-haiku-4.5,3,tier3/task10b,T3.31-35 Mechanisms II (5Q),codeact,100,5,5,0,0.5653968253968253,0.05066601025950261
-claude-haiku-4.5,3,tier3/task10b,T3.31-35 Mechanisms II (5Q),codeact,500,5,5,0,0.5477463040391366,0.04996086828128721
-claude-haiku-4.5,3,tier3/task10b,T3.31-35 Mechanisms II (5Q),rlm,100,5,5,0,0.2509906127325482,0.12151357075750537
-claude-haiku-4.5,3,tier3/task10b,T3.31-35 Mechanisms II (5Q),rlm,500,5,5,0,0.24415268127156123,0.13344035029782028
-claude-haiku-4.5,3,tier3/task10b,T3.31-35 Mechanisms II (5Q),rlm,full,5,5,0,0.08191206561122644,0.059141553338866386
-claude-haiku-4.5,4,tier4/task11,T4.1-2 Fixed-length chains (2Q),llm,100,5,5,0,0.0,0.0
-claude-haiku-4.5,4,tier4/task11,T4.1-2 Fixed-length chains (2Q),llm,500,5,5,0,0.0,0.0
-claude-haiku-4.5,4,tier4/task11,T4.1-2 Fixed-length chains (2Q),codeact,100,5,5,0,0.12605042016806722,0.18927160711847502
-claude-haiku-4.5,4,tier4/task11,T4.1-2 Fixed-length chains (2Q),codeact,500,5,5,0,0.5,0.31622776601683794
-claude-haiku-4.5,4,tier4/task11,T4.1-2 Fixed-length chains (2Q),rlm,100,5,5,0,0.6,0.2
-claude-haiku-4.5,4,tier4/task11,T4.1-2 Fixed-length chains (2Q),rlm,500,5,5,0,0.5,0.4472135954999579
-claude-haiku-4.5,4,tier4/task11,T4.1-2 Fixed-length chains (2Q),rlm,full,5,5,0,0.3869565217391305,0.35359348889299935
-claude-haiku-4.5,4,tier4/task12,T4.3-4 Longest chains (2Q),llm,100,5,5,0,0.0,0.0
-claude-haiku-4.5,4,tier4/task12,T4.3-4 Longest chains (2Q),llm,500,5,5,0,0.0,0.0
-claude-haiku-4.5,4,tier4/task12,T4.3-4 Longest chains (2Q),codeact,100,5,5,0,0.2,0.2449489742783178
-claude-haiku-4.5,4,tier4/task12,T4.3-4 Longest chains (2Q),codeact,500,5,5,0,0.6045751633986928,0.18671545105002482
-claude-haiku-4.5,4,tier4/task12,T4.3-4 Longest chains (2Q),rlm,100,5,5,0,0.7222222222222222,0.23040490392586355
-claude-haiku-4.5,4,tier4/task12,T4.3-4 Longest chains (2Q),rlm,500,5,5,0,0.6,0.37416573867739417
-claude-haiku-4.5,4,tier4/task12,T4.3-4 Longest chains (2Q),rlm,full,5,5,0,0.4,0.37416573867739417
-claude-haiku-4.5,4,tier4/task12b,T4.5 Hub molecules (1Q),llm,100,5,5,0,0.3,0.2449489742783178
-claude-haiku-4.5,4,tier4/task12b,T4.5 Hub molecules (1Q),llm,500,5,5,0,0.0,0.0
-claude-haiku-4.5,4,tier4/task12b,T4.5 Hub molecules (1Q),codeact,100,5,5,0,0.6,0.4898979485566356
-claude-haiku-4.5,4,tier4/task12b,T4.5 Hub molecules (1Q),codeact,500,5,5,0,0.8,0.4
-claude-haiku-4.5,4,tier4/task12b,T4.5 Hub molecules (1Q),rlm,100,5,5,0,0.4,0.4898979485566356
-claude-haiku-4.5,4,tier4/task12b,T4.5 Hub molecules (1Q),rlm,500,5,5,0,0.8,0.4
-claude-haiku-4.5,4,tier4/task12b,T4.5 Hub molecules (1Q),rlm,full,5,5,0,0.39975743462520696,0.4896008738596543
-claude-haiku-4.5,4,tier4/task13,T4.6-9 Group-constrained chains (4Q),llm,100,5,5,0,0.1,0.1224744871391589
-claude-haiku-4.5,4,tier4/task13,T4.6-9 Group-constrained chains (4Q),llm,500,5,5,0,0.0,0.0
-claude-haiku-4.5,4,tier4/task13,T4.6-9 Group-constrained chains (4Q),codeact,100,5,5,0,0.25,0.15811388300841897
-claude-haiku-4.5,4,tier4/task13,T4.6-9 Group-constrained chains (4Q),codeact,500,5,5,0,0.3,0.18708286933869708
-claude-haiku-4.5,4,tier4/task13,T4.6-9 Group-constrained chains (4Q),rlm,100,5,5,0,0.2,0.1
-claude-haiku-4.5,4,tier4/task13,T4.6-9 Group-constrained chains (4Q),rlm,500,5,5,0,0.25,0.15811388300841897
-claude-haiku-4.5,4,tier4/task13,T4.6-9 Group-constrained chains (4Q),rlm,full,5,5,0,0.24267177464631376,0.18677390080108183
-claude-haiku-4.5,4,tier4/task14,T4.10-11 Protecting-group pairs (2Q),llm,100,5,5,0,0.25547619047619047,0.13635105418486598
-claude-haiku-4.5,4,tier4/task14,T4.10-11 Protecting-group pairs (2Q),llm,500,5,5,0,0.0,0.0
-claude-haiku-4.5,4,tier4/task14,T4.10-11 Protecting-group pairs (2Q),codeact,100,5,5,0,0.0,0.0
-claude-haiku-4.5,4,tier4/task14,T4.10-11 Protecting-group pairs (2Q),codeact,500,5,5,0,0.5666666666666667,0.2260776661041756
-claude-haiku-4.5,4,tier4/task14,T4.10-11 Protecting-group pairs (2Q),rlm,100,5,5,0,0.5,0.31622776601683794
-claude-haiku-4.5,4,tier4/task14,T4.10-11 Protecting-group pairs (2Q),rlm,500,5,5,0,0.7,0.2449489742783178
-claude-haiku-4.5,4,tier4/task14,T4.10-11 Protecting-group pairs (2Q),rlm,full,5,5,0,0.24697120158887786,0.21761310415258367
-claude-haiku-4.5,4,tier4/task15,T4.12-15 Ring-construction chains (4Q),llm,100,5,5,0,0.21135012046776752,0.02770069244537244
-claude-haiku-4.5,4,tier4/task15,T4.12-15 Ring-construction chains (4Q),llm,500,5,5,0,0.0,0.0
-claude-haiku-4.5,4,tier4/task15,T4.12-15 Ring-construction chains (4Q),codeact,100,5,5,0,0.2630250305250305,0.12902272931760636
-claude-haiku-4.5,4,tier4/task15,T4.12-15 Ring-construction chains (4Q),codeact,500,5,5,0,0.6284340659340659,0.09528255161335392
-claude-haiku-4.5,4,tier4/task15,T4.12-15 Ring-construction chains (4Q),rlm,100,5,5,0,0.4,0.2
-claude-haiku-4.5,4,tier4/task15,T4.12-15 Ring-construction chains (4Q),rlm,500,5,5,0,0.35,0.25495097567963926
-claude-haiku-4.5,4,tier4/task15,T4.12-15 Ring-construction chains (4Q),rlm,full,5,5,0,0.36666666666666664,0.3358240279934981
-claude-haiku-4.5,4,tier4/task16,T4.16-25 Truncated routes (10Q),llm,100,5,5,0,0.05333333333333333,0.026666666666666665
-claude-haiku-4.5,4,tier4/task16,T4.16-25 Truncated routes (10Q),llm,500,5,5,0,0.0,0.0
-claude-haiku-4.5,4,tier4/task16,T4.16-25 Truncated routes (10Q),codeact,100,5,5,0,0.13555555555555557,0.15160051467387145
-claude-haiku-4.5,4,tier4/task16,T4.16-25 Truncated routes (10Q),codeact,500,5,5,0,0.2844285714285714,0.13325776770252917
-claude-haiku-4.5,4,tier4/task16,T4.16-25 Truncated routes (10Q),rlm,100,5,5,0,0.42387301587301585,0.14979019845280972
-claude-haiku-4.5,4,tier4/task16,T4.16-25 Truncated routes (10Q),rlm,500,5,5,0,0.390984126984127,0.13261827913867383
-claude-haiku-4.5,4,tier4/task16,T4.16-25 Truncated routes (10Q),rlm,full,5,5,0,0.02,0.04
-claude-haiku-4.5,4,tier4/task17,T4.26-30 SMIRKS chains I (5Q),llm,100,5,5,0,0.143455852937971,0.02375764784747228
-claude-haiku-4.5,4,tier4/task17,T4.26-30 SMIRKS chains I (5Q),llm,500,5,5,0,0.04494353472614342,0.013099548569325329
-claude-haiku-4.5,4,tier4/task17,T4.26-30 SMIRKS chains I (5Q),codeact,100,5,5,0,0.30066413919906987,0.10625006505059091
-claude-haiku-4.5,4,tier4/task17,T4.26-30 SMIRKS chains I (5Q),codeact,500,5,5,0,0.2394759462759463,0.084206335835442
-claude-haiku-4.5,4,tier4/task17,T4.26-30 SMIRKS chains I (5Q),rlm,100,5,5,0,0.09333333333333334,0.08
-claude-haiku-4.5,4,tier4/task17,T4.26-30 SMIRKS chains I (5Q),rlm,500,5,5,0,0.04666666666666667,0.07774602526460402
-claude-haiku-4.5,4,tier4/task17,T4.26-30 SMIRKS chains I (5Q),rlm,full,5,5,0,0.017495327102803736,0.0313861999179225
-claude-haiku-4.5,4,tier4/task17b,T4.31-35 SMIRKS chains II (5Q),llm,100,5,5,0,0.06551262291200372,0.026298010480262046
-claude-haiku-4.5,4,tier4/task17b,T4.31-35 SMIRKS chains II (5Q),llm,500,5,5,0,0.044444444444444446,0.00486864495560148
-claude-haiku-4.5,4,tier4/task17b,T4.31-35 SMIRKS chains II (5Q),codeact,100,5,5,0,0.4189379509379509,0.17728444358742518
-claude-haiku-4.5,4,tier4/task17b,T4.31-35 SMIRKS chains II (5Q),codeact,500,5,5,0,0.17066666666666666,0.1307482738360668
-claude-haiku-4.5,4,tier4/task17b,T4.31-35 SMIRKS chains II (5Q),rlm,100,5,5,0,0.14666666666666667,0.12927146286443544
-claude-haiku-4.5,4,tier4/task17b,T4.31-35 SMIRKS chains II (5Q),rlm,500,5,5,0,0.2,0.18378731669453627
-claude-haiku-4.5,4,tier4/task17b,T4.31-35 SMIRKS chains II (5Q),rlm,full,5,5,0,0.021960146793791886,0.0268035557996538
+model,tier,task,task_label,method,context,repetitions,successful_jobs,failed_jobs,scoreable_jobs,score_coverage,f1_mean,f1_std
+claude-haiku-4.5,1,tier1/task1,T1.1 Exact product lookup (10Q),llm,100,5,5,0,5,1.0,0.8966666666666667,0.0
+claude-haiku-4.5,1,tier1/task1,T1.1 Exact product lookup (10Q),llm,500,5,5,0,5,1.0,0.6698888888888889,0.040353989201124194
+claude-haiku-4.5,1,tier1/task1,T1.1 Exact product lookup (10Q),codeact,100,5,5,0,5,1.0,0.9513333333333334,0.04074855143982964
+claude-haiku-4.5,1,tier1/task1,T1.1 Exact product lookup (10Q),codeact,500,5,5,0,5,1.0,0.9493333333333334,0.02831568077546038
+claude-haiku-4.5,1,tier1/task1,T1.1 Exact product lookup (10Q),rlm,100,5,5,0,5,1.0,0.64,0.13564659966250536
+claude-haiku-4.5,1,tier1/task1,T1.1 Exact product lookup (10Q),rlm,500,5,5,0,5,1.0,0.6733333333333333,0.18306040290327974
+claude-haiku-4.5,1,tier1/task1,T1.1 Exact product lookup (10Q),rlm,full,5,5,0,5,1.0,0.6599999999999999,0.13564659966250536
+claude-haiku-4.5,2,tier2/task2,T2.1 Molecular-weight change (6Q),llm,100,5,5,0,5,1.0,0.05106834324542166,0.012394659533076518
+claude-haiku-4.5,2,tier2/task2,T2.1 Molecular-weight change (6Q),llm,500,5,5,0,5,1.0,0.036159288193657255,0.012389729893153095
+claude-haiku-4.5,2,tier2/task2,T2.1 Molecular-weight change (6Q),codeact,100,5,5,0,5,1.0,0.17245515057571795,0.03349399461572673
+claude-haiku-4.5,2,tier2/task2,T2.1 Molecular-weight change (6Q),codeact,500,5,5,0,5,1.0,0.8500405345933801,0.09600784689702552
+claude-haiku-4.5,2,tier2/task2,T2.1 Molecular-weight change (6Q),rlm,100,5,5,0,5,1.0,0.8333333333333334,0.14907119849998599
+claude-haiku-4.5,2,tier2/task2,T2.1 Molecular-weight change (6Q),rlm,500,5,5,0,5,1.0,0.8701550387596899,0.12398254867302175
+claude-haiku-4.5,2,tier2/task2,T2.1 Molecular-weight change (6Q),rlm,full,5,5,0,5,1.0,0.7345329851007054,0.08067575240016302
+claude-haiku-4.5,2,tier2/task3,T2.2 Ring-count change (5Q),llm,100,5,5,0,5,1.0,0.15873135031012733,0.015608545116658145
+claude-haiku-4.5,2,tier2/task3,T2.2 Ring-count change (5Q),llm,500,5,5,0,5,1.0,0.04994448678365646,0.03660281347776422
+claude-haiku-4.5,2,tier2/task3,T2.2 Ring-count change (5Q),codeact,100,5,5,0,5,1.0,0.1253596463288116,0.06937659783089355
+claude-haiku-4.5,2,tier2/task3,T2.2 Ring-count change (5Q),codeact,500,5,5,0,5,1.0,0.5444547337416503,0.07708170870511184
+claude-haiku-4.5,2,tier2/task3,T2.2 Ring-count change (5Q),rlm,100,5,5,0,5,1.0,0.64,0.14966629547095767
+claude-haiku-4.5,2,tier2/task3,T2.2 Ring-count change (5Q),rlm,500,5,5,0,5,1.0,0.64,0.08000000000000003
+claude-haiku-4.5,2,tier2/task3,T2.2 Ring-count change (5Q),rlm,full,5,5,0,5,1.0,0.6395530383212975,0.19651096617223782
+claude-haiku-4.5,2,tier2/task4,T2.3 Aromatic-ring formation (5Q),llm,100,5,5,0,5,1.0,0.03457365746423522,0.002327547232116417
+claude-haiku-4.5,2,tier2/task4,T2.3 Aromatic-ring formation (5Q),llm,500,5,5,0,5,1.0,0.016975852647512994,0.008684630082008845
+claude-haiku-4.5,2,tier2/task4,T2.3 Aromatic-ring formation (5Q),codeact,100,5,5,0,5,1.0,0.023330598851517635,0.0013781788351107465
+claude-haiku-4.5,2,tier2/task4,T2.3 Aromatic-ring formation (5Q),codeact,500,5,5,0,5,1.0,0.5391906654955132,0.1615009651596827
+claude-haiku-4.5,2,tier2/task4,T2.3 Aromatic-ring formation (5Q),rlm,100,5,5,0,5,1.0,0.72,0.2039607805437114
+claude-haiku-4.5,2,tier2/task4,T2.3 Aromatic-ring formation (5Q),rlm,500,5,5,0,5,1.0,0.6533333333333333,0.14847371634213394
+claude-haiku-4.5,2,tier2/task4,T2.3 Aromatic-ring formation (5Q),rlm,full,5,5,0,5,1.0,0.6004998969735191,0.252208889866308
+claude-haiku-4.5,2,tier2/task5,T2.4 Combined weight + rings (4Q),llm,100,5,5,0,5,1.0,0.06547082444502889,0.022542084868531802
+claude-haiku-4.5,2,tier2/task5,T2.4 Combined weight + rings (4Q),llm,500,5,5,0,5,1.0,0.01420291458701787,0.017801607270415597
+claude-haiku-4.5,2,tier2/task5,T2.4 Combined weight + rings (4Q),codeact,100,5,5,0,5,1.0,0.31,0.09695359714832658
+claude-haiku-4.5,2,tier2/task5,T2.4 Combined weight + rings (4Q),codeact,500,5,5,0,5,1.0,0.46479474309310387,0.07621950421802119
+claude-haiku-4.5,2,tier2/task5,T2.4 Combined weight + rings (4Q),rlm,100,5,5,0,5,1.0,0.4,0.1224744871391589
+claude-haiku-4.5,2,tier2/task5,T2.4 Combined weight + rings (4Q),rlm,500,5,5,0,5,1.0,0.55,0.18708286933869708
+claude-haiku-4.5,2,tier2/task5,T2.4 Combined weight + rings (4Q),rlm,full,5,5,0,5,1.0,0.796184926454709,0.1879107826088826
+claude-haiku-4.5,3,tier3/task13,T3.1 New nitrogen atom (1Q),llm,100,5,5,0,5,1.0,0.1129032258064516,0.0
+claude-haiku-4.5,3,tier3/task13,T3.1 New nitrogen atom (1Q),llm,500,5,5,0,5,1.0,0.07596855203823505,0.03663968154044349
+claude-haiku-4.5,3,tier3/task13,T3.1 New nitrogen atom (1Q),codeact,100,5,5,0,5,1.0,0.13596713118063664,0.028653973431722286
+claude-haiku-4.5,3,tier3/task13,T3.1 New nitrogen atom (1Q),codeact,500,5,5,0,5,1.0,0.13873994104511916,0.002089362587774322
+claude-haiku-4.5,3,tier3/task13,T3.1 New nitrogen atom (1Q),rlm,100,5,5,0,5,1.0,0.8,0.4
+claude-haiku-4.5,3,tier3/task13,T3.1 New nitrogen atom (1Q),rlm,500,5,5,0,5,1.0,0.8,0.4
+claude-haiku-4.5,3,tier3/task13,T3.1 New nitrogen atom (1Q),rlm,full,5,5,0,5,1.0,0.6031375322830111,0.48606201705188806
+claude-haiku-4.5,3,tier3/task14,T3.2 C-N formed / C-O broken (1Q),llm,100,5,5,0,5,1.0,0.3,0.0
+claude-haiku-4.5,3,tier3/task14,T3.2 C-N formed / C-O broken (1Q),llm,500,5,5,0,5,1.0,0.032774134507312,0.024013459293505113
+claude-haiku-4.5,3,tier3/task14,T3.2 C-N formed / C-O broken (1Q),codeact,100,5,5,0,5,1.0,0.8640000000000001,0.272
+claude-haiku-4.5,3,tier3/task14,T3.2 C-N formed / C-O broken (1Q),codeact,500,5,5,0,5,1.0,1.0,0.0
+claude-haiku-4.5,3,tier3/task14,T3.2 C-N formed / C-O broken (1Q),rlm,100,5,5,0,5,1.0,0.8,0.4
+claude-haiku-4.5,3,tier3/task14,T3.2 C-N formed / C-O broken (1Q),rlm,500,5,5,0,5,1.0,0.4,0.4898979485566356
+claude-haiku-4.5,3,tier3/task14,T3.2 C-N formed / C-O broken (1Q),rlm,full,5,5,0,5,1.0,0.43004593447899325,0.4669991785492255
+claude-haiku-4.5,3,tier3/task15,T3.3 Single C-C bond formation (1Q),llm,100,5,5,0,5,1.0,0.16364718346369722,0.0013306738154172236
+claude-haiku-4.5,3,tier3/task15,T3.3 Single C-C bond formation (1Q),llm,500,5,5,0,5,1.0,0.20863595693845455,0.07639088188059749
+claude-haiku-4.5,3,tier3/task15,T3.3 Single C-C bond formation (1Q),codeact,100,5,5,0,5,1.0,0.1173304560812141,0.062138208012336014
+claude-haiku-4.5,3,tier3/task15,T3.3 Single C-C bond formation (1Q),codeact,500,5,5,0,5,1.0,0.657,0.42023326855450177
+claude-haiku-4.5,3,tier3/task15,T3.3 Single C-C bond formation (1Q),rlm,100,5,5,0,5,1.0,0.2,0.4
+claude-haiku-4.5,3,tier3/task15,T3.3 Single C-C bond formation (1Q),rlm,500,5,5,0,5,1.0,0.6,0.4898979485566356
+claude-haiku-4.5,3,tier3/task15,T3.3 Single C-C bond formation (1Q),rlm,full,5,5,0,5,1.0,0.8,0.4
+claude-haiku-4.5,3,tier3/task17,T3.4 Fused heterocycle (1Q),llm,100,5,5,0,5,1.0,0.07176064087019295,0.0022815565828226826
+claude-haiku-4.5,3,tier3/task17,T3.4 Fused heterocycle (1Q),llm,500,5,5,0,5,1.0,0.2566002827570558,0.08660791283871198
+claude-haiku-4.5,3,tier3/task17,T3.4 Fused heterocycle (1Q),codeact,100,5,5,0,5,1.0,0.46792540792540793,0.28439900596641104
+claude-haiku-4.5,3,tier3/task17,T3.4 Fused heterocycle (1Q),codeact,500,5,5,0,5,1.0,0.49499759677598254,0.39084559646488926
+claude-haiku-4.5,3,tier3/task17,T3.4 Fused heterocycle (1Q),rlm,100,5,5,0,5,1.0,0.7133333333333333,0.24908722256359206
+claude-haiku-4.5,3,tier3/task17,T3.4 Fused heterocycle (1Q),rlm,500,5,5,0,5,1.0,0.4,0.4898979485566356
+claude-haiku-4.5,3,tier3/task17,T3.4 Fused heterocycle (1Q),rlm,full,5,5,0,5,1.0,0.5516249184478501,0.29953721068575007
+claude-haiku-4.5,3,tier3/task18,T3.5 New ring system (1Q),llm,100,5,5,0,0,0.0,,
+claude-haiku-4.5,3,tier3/task18,T3.5 New ring system (1Q),llm,500,5,5,0,0,0.0,,
+claude-haiku-4.5,3,tier3/task18,T3.5 New ring system (1Q),codeact,100,5,5,0,0,0.0,,
+claude-haiku-4.5,3,tier3/task18,T3.5 New ring system (1Q),codeact,500,5,5,0,0,0.0,,
+claude-haiku-4.5,3,tier3/task18,T3.5 New ring system (1Q),rlm,100,5,5,0,0,0.0,,
+claude-haiku-4.5,3,tier3/task18,T3.5 New ring system (1Q),rlm,500,5,5,0,0,0.0,,
+claude-haiku-4.5,3,tier3/task18,T3.5 New ring system (1Q),rlm,full,5,5,0,0,0.0,,
+claude-haiku-4.5,3,tier3/task20,T3.6 Fused-ring construction (1Q),llm,100,5,5,0,5,1.0,0.09523809523809523,0.0
+claude-haiku-4.5,3,tier3/task20,T3.6 Fused-ring construction (1Q),llm,500,5,5,0,5,1.0,0.06555007019403304,0.03957338575865492
+claude-haiku-4.5,3,tier3/task20,T3.6 Fused-ring construction (1Q),codeact,100,5,5,0,5,1.0,0.3748199303245175,0.3387406968431394
+claude-haiku-4.5,3,tier3/task20,T3.6 Fused-ring construction (1Q),codeact,500,5,5,0,5,1.0,1.0,0.0
+claude-haiku-4.5,3,tier3/task20,T3.6 Fused-ring construction (1Q),rlm,100,5,5,0,5,1.0,0.6,0.4898979485566356
+claude-haiku-4.5,3,tier3/task20,T3.6 Fused-ring construction (1Q),rlm,500,5,5,0,5,1.0,0.6,0.4898979485566356
+claude-haiku-4.5,3,tier3/task20,T3.6 Fused-ring construction (1Q),rlm,full,5,5,0,5,1.0,0.4009246773261414,0.4891458660274221
+claude-haiku-4.5,3,tier3/task21,T3.7 Transition-metal reagent (1Q),llm,100,5,5,0,5,1.0,0.31155407899593945,0.0029531192321890164
+claude-haiku-4.5,3,tier3/task21,T3.7 Transition-metal reagent (1Q),llm,500,5,5,0,5,1.0,0.33621048528136027,0.002479645549786118
+claude-haiku-4.5,3,tier3/task21,T3.7 Transition-metal reagent (1Q),codeact,100,5,5,0,5,1.0,0.3394693323460447,0.1023989238856513
+claude-haiku-4.5,3,tier3/task21,T3.7 Transition-metal reagent (1Q),codeact,500,5,5,0,5,1.0,0.2267580680721014,0.13595391278326935
+claude-haiku-4.5,3,tier3/task21,T3.7 Transition-metal reagent (1Q),rlm,100,5,5,0,5,1.0,0.8,0.4
+claude-haiku-4.5,3,tier3/task21,T3.7 Transition-metal reagent (1Q),rlm,500,5,5,0,5,1.0,0.4,0.4898979485566356
+claude-haiku-4.5,3,tier3/task21,T3.7 Transition-metal reagent (1Q),rlm,full,5,5,0,5,1.0,0.20327075853094553,0.3983831575776403
+claude-haiku-4.5,3,tier3/task22,T3.8 HATU / T3P reagent (1Q),llm,100,5,5,0,5,1.0,0.04878048780487806,0.0
+claude-haiku-4.5,3,tier3/task22,T3.8 HATU / T3P reagent (1Q),llm,500,5,5,0,5,1.0,0.5140909090909092,0.06145868060321184
+claude-haiku-4.5,3,tier3/task22,T3.8 HATU / T3P reagent (1Q),codeact,100,5,5,0,5,1.0,0.8133333333333335,0.10666666666666666
+claude-haiku-4.5,3,tier3/task22,T3.8 HATU / T3P reagent (1Q),codeact,500,5,5,0,5,1.0,0.08,0.16
+claude-haiku-4.5,3,tier3/task22,T3.8 HATU / T3P reagent (1Q),rlm,100,5,5,0,5,1.0,0.0,0.0
+claude-haiku-4.5,3,tier3/task22,T3.8 HATU / T3P reagent (1Q),rlm,500,5,5,0,5,1.0,0.0,0.0
+claude-haiku-4.5,3,tier3/task22,T3.8 HATU / T3P reagent (1Q),rlm,full,5,5,0,5,1.0,0.0,0.0
+claude-haiku-4.5,3,tier3/task23,T3.9 New stereocenter (1Q),llm,100,5,5,0,0,0.0,,
+claude-haiku-4.5,3,tier3/task23,T3.9 New stereocenter (1Q),llm,500,5,5,0,0,0.0,,
+claude-haiku-4.5,3,tier3/task23,T3.9 New stereocenter (1Q),codeact,100,5,5,0,0,0.0,,
+claude-haiku-4.5,3,tier3/task23,T3.9 New stereocenter (1Q),codeact,500,5,5,0,0,0.0,,
+claude-haiku-4.5,3,tier3/task23,T3.9 New stereocenter (1Q),rlm,100,5,5,0,0,0.0,,
+claude-haiku-4.5,3,tier3/task23,T3.9 New stereocenter (1Q),rlm,500,5,5,0,0,0.0,,
+claude-haiku-4.5,3,tier3/task23,T3.9 New stereocenter (1Q),rlm,full,5,5,0,0,0.0,,
+claude-haiku-4.5,3,tier3/task24,T3.10 E-alkene formation (1Q),llm,100,5,5,0,5,1.0,0.04878048780487806,0.0
+claude-haiku-4.5,3,tier3/task24,T3.10 E-alkene formation (1Q),llm,500,5,5,0,5,1.0,0.13569369161573058,0.04807945078014983
+claude-haiku-4.5,3,tier3/task24,T3.10 E-alkene formation (1Q),codeact,100,5,5,0,5,1.0,0.5199999999999999,0.2612789058968723
+claude-haiku-4.5,3,tier3/task24,T3.10 E-alkene formation (1Q),codeact,500,5,5,0,5,1.0,0.5489787745294353,0.4410806895161726
+claude-haiku-4.5,3,tier3/task24,T3.10 E-alkene formation (1Q),rlm,100,5,5,0,5,1.0,0.4,0.4898979485566356
+claude-haiku-4.5,3,tier3/task24,T3.10 E-alkene formation (1Q),rlm,500,5,5,0,5,1.0,0.7818181818181819,0.39249151172587093
+claude-haiku-4.5,3,tier3/task24,T3.10 E-alkene formation (1Q),rlm,full,5,5,0,5,1.0,0.7220156774916013,0.35969479131864185
+claude-haiku-4.5,3,tier3/task6,T3.11-14 Amide couplings (4Q),llm,100,5,5,0,0,0.0,,
+claude-haiku-4.5,3,tier3/task6,T3.11-14 Amide couplings (4Q),llm,500,5,5,0,0,0.0,,
+claude-haiku-4.5,3,tier3/task6,T3.11-14 Amide couplings (4Q),codeact,100,5,5,0,0,0.0,,
+claude-haiku-4.5,3,tier3/task6,T3.11-14 Amide couplings (4Q),codeact,500,5,5,0,0,0.0,,
+claude-haiku-4.5,3,tier3/task6,T3.11-14 Amide couplings (4Q),rlm,100,5,5,0,0,0.0,,
+claude-haiku-4.5,3,tier3/task6,T3.11-14 Amide couplings (4Q),rlm,500,5,5,0,0,0.0,,
+claude-haiku-4.5,3,tier3/task6,T3.11-14 Amide couplings (4Q),rlm,full,5,5,0,0,0.0,,
+claude-haiku-4.5,3,tier3/task7,T3.15-19 Group transformations (5Q),llm,100,5,5,0,0,0.0,,
+claude-haiku-4.5,3,tier3/task7,T3.15-19 Group transformations (5Q),llm,500,5,5,0,0,0.0,,
+claude-haiku-4.5,3,tier3/task7,T3.15-19 Group transformations (5Q),codeact,100,5,5,0,0,0.0,,
+claude-haiku-4.5,3,tier3/task7,T3.15-19 Group transformations (5Q),codeact,500,5,5,0,0,0.0,,
+claude-haiku-4.5,3,tier3/task7,T3.15-19 Group transformations (5Q),rlm,100,5,5,0,0,0.0,,
+claude-haiku-4.5,3,tier3/task7,T3.15-19 Group transformations (5Q),rlm,500,5,5,0,0,0.0,,
+claude-haiku-4.5,3,tier3/task7,T3.15-19 Group transformations (5Q),rlm,full,5,5,0,0,0.0,,
+claude-haiku-4.5,3,tier3/task8,T3.20-21 Protecting groups (2Q),llm,100,5,5,0,5,1.0,0.2012982010354159,0.11572582072662427
+claude-haiku-4.5,3,tier3/task8,T3.20-21 Protecting groups (2Q),llm,500,5,5,0,5,1.0,0.12621054677980675,0.020786730031989567
+claude-haiku-4.5,3,tier3/task8,T3.20-21 Protecting groups (2Q),codeact,100,5,5,0,5,1.0,0.8396581196581197,0.05779598155551322
+claude-haiku-4.5,3,tier3/task8,T3.20-21 Protecting groups (2Q),codeact,500,5,5,0,5,1.0,0.4266709440542412,0.17210385083470803
+claude-haiku-4.5,3,tier3/task8,T3.20-21 Protecting groups (2Q),rlm,100,5,5,0,5,1.0,0.4174825174825175,0.30938504499855257
+claude-haiku-4.5,3,tier3/task8,T3.20-21 Protecting groups (2Q),rlm,500,5,5,0,5,1.0,0.37163209813248266,0.16533771810621262
+claude-haiku-4.5,3,tier3/task8,T3.20-21 Protecting groups (2Q),rlm,full,5,5,0,5,1.0,0.25178490228218137,0.21714714373446053
+claude-haiku-4.5,3,tier3/task9,T3.22-25 Named reactions (4Q),llm,100,5,5,0,5,1.0,0.25771137011033113,0.078431986737284
+claude-haiku-4.5,3,tier3/task9,T3.22-25 Named reactions (4Q),llm,500,5,5,0,5,1.0,0.1728429783950956,0.015146125750364364
+claude-haiku-4.5,3,tier3/task9,T3.22-25 Named reactions (4Q),codeact,100,5,5,0,5,1.0,0.5531062646503824,0.09116220437801979
+claude-haiku-4.5,3,tier3/task9,T3.22-25 Named reactions (4Q),codeact,500,5,5,0,5,1.0,0.6559423616491362,0.09274924251383752
+claude-haiku-4.5,3,tier3/task9,T3.22-25 Named reactions (4Q),rlm,100,5,5,0,5,1.0,0.4997174531694656,0.2698579734175773
+claude-haiku-4.5,3,tier3/task9,T3.22-25 Named reactions (4Q),rlm,500,5,5,0,5,1.0,0.3992897485617405,0.17026535130455667
+claude-haiku-4.5,3,tier3/task9,T3.22-25 Named reactions (4Q),rlm,full,5,5,0,5,1.0,0.29023926609225864,0.10649133486720791
+claude-haiku-4.5,3,tier3/task10,T3.26-30 Mechanisms I (5Q),llm,100,5,5,0,0,0.0,,
+claude-haiku-4.5,3,tier3/task10,T3.26-30 Mechanisms I (5Q),llm,500,5,5,0,0,0.0,,
+claude-haiku-4.5,3,tier3/task10,T3.26-30 Mechanisms I (5Q),codeact,100,5,5,0,0,0.0,,
+claude-haiku-4.5,3,tier3/task10,T3.26-30 Mechanisms I (5Q),codeact,500,5,5,0,0,0.0,,
+claude-haiku-4.5,3,tier3/task10,T3.26-30 Mechanisms I (5Q),rlm,100,5,5,0,0,0.0,,
+claude-haiku-4.5,3,tier3/task10,T3.26-30 Mechanisms I (5Q),rlm,500,5,5,0,0,0.0,,
+claude-haiku-4.5,3,tier3/task10,T3.26-30 Mechanisms I (5Q),rlm,full,5,5,0,0,0.0,,
+claude-haiku-4.5,3,tier3/task10b,T3.31-35 Mechanisms II (5Q),llm,100,5,5,0,5,1.0,0.10839369053529346,0.06512872653120727
+claude-haiku-4.5,3,tier3/task10b,T3.31-35 Mechanisms II (5Q),llm,500,5,5,0,5,1.0,0.2188532182170217,0.028780825240063215
+claude-haiku-4.5,3,tier3/task10b,T3.31-35 Mechanisms II (5Q),codeact,100,5,5,0,5,1.0,0.5653968253968253,0.05066601025950261
+claude-haiku-4.5,3,tier3/task10b,T3.31-35 Mechanisms II (5Q),codeact,500,5,5,0,5,1.0,0.5477463040391366,0.04996086828128721
+claude-haiku-4.5,3,tier3/task10b,T3.31-35 Mechanisms II (5Q),rlm,100,5,5,0,5,1.0,0.2509906127325482,0.12151357075750537
+claude-haiku-4.5,3,tier3/task10b,T3.31-35 Mechanisms II (5Q),rlm,500,5,5,0,5,1.0,0.24415268127156123,0.13344035029782028
+claude-haiku-4.5,3,tier3/task10b,T3.31-35 Mechanisms II (5Q),rlm,full,5,5,0,5,1.0,0.08191206561122644,0.059141553338866386
+claude-haiku-4.5,4,tier4/task11,T4.1-2 Fixed-length chains (2Q),llm,100,5,5,0,5,1.0,0.0,0.0
+claude-haiku-4.5,4,tier4/task11,T4.1-2 Fixed-length chains (2Q),llm,500,5,5,0,5,1.0,0.0,0.0
+claude-haiku-4.5,4,tier4/task11,T4.1-2 Fixed-length chains (2Q),codeact,100,5,5,0,5,1.0,0.12605042016806722,0.18927160711847502
+claude-haiku-4.5,4,tier4/task11,T4.1-2 Fixed-length chains (2Q),codeact,500,5,5,0,5,1.0,0.5,0.31622776601683794
+claude-haiku-4.5,4,tier4/task11,T4.1-2 Fixed-length chains (2Q),rlm,100,5,5,0,5,1.0,0.6,0.2
+claude-haiku-4.5,4,tier4/task11,T4.1-2 Fixed-length chains (2Q),rlm,500,5,5,0,5,1.0,0.5,0.4472135954999579
+claude-haiku-4.5,4,tier4/task11,T4.1-2 Fixed-length chains (2Q),rlm,full,5,5,0,5,1.0,0.3869565217391305,0.35359348889299935
+claude-haiku-4.5,4,tier4/task12,T4.3-4 Longest chains (2Q),llm,100,5,5,0,5,1.0,0.0,0.0
+claude-haiku-4.5,4,tier4/task12,T4.3-4 Longest chains (2Q),llm,500,5,5,0,5,1.0,0.0,0.0
+claude-haiku-4.5,4,tier4/task12,T4.3-4 Longest chains (2Q),codeact,100,5,5,0,5,1.0,0.2,0.2449489742783178
+claude-haiku-4.5,4,tier4/task12,T4.3-4 Longest chains (2Q),codeact,500,5,5,0,5,1.0,0.6045751633986928,0.18671545105002482
+claude-haiku-4.5,4,tier4/task12,T4.3-4 Longest chains (2Q),rlm,100,5,5,0,5,1.0,0.7222222222222222,0.23040490392586355
+claude-haiku-4.5,4,tier4/task12,T4.3-4 Longest chains (2Q),rlm,500,5,5,0,5,1.0,0.6,0.37416573867739417
+claude-haiku-4.5,4,tier4/task12,T4.3-4 Longest chains (2Q),rlm,full,5,5,0,5,1.0,0.4,0.37416573867739417
+claude-haiku-4.5,4,tier4/task12b,T4.5 Hub molecules (1Q),llm,100,5,5,0,5,1.0,0.3,0.2449489742783178
+claude-haiku-4.5,4,tier4/task12b,T4.5 Hub molecules (1Q),llm,500,5,5,0,5,1.0,0.0,0.0
+claude-haiku-4.5,4,tier4/task12b,T4.5 Hub molecules (1Q),codeact,100,5,5,0,5,1.0,0.6,0.4898979485566356
+claude-haiku-4.5,4,tier4/task12b,T4.5 Hub molecules (1Q),codeact,500,5,5,0,5,1.0,0.8,0.4
+claude-haiku-4.5,4,tier4/task12b,T4.5 Hub molecules (1Q),rlm,100,5,5,0,5,1.0,0.4,0.4898979485566356
+claude-haiku-4.5,4,tier4/task12b,T4.5 Hub molecules (1Q),rlm,500,5,5,0,5,1.0,0.8,0.4
+claude-haiku-4.5,4,tier4/task12b,T4.5 Hub molecules (1Q),rlm,full,5,5,0,5,1.0,0.39975743462520696,0.4896008738596543
+claude-haiku-4.5,4,tier4/task13,T4.6-9 Group-constrained chains (4Q),llm,100,5,5,0,5,1.0,0.1,0.1224744871391589
+claude-haiku-4.5,4,tier4/task13,T4.6-9 Group-constrained chains (4Q),llm,500,5,5,0,5,1.0,0.0,0.0
+claude-haiku-4.5,4,tier4/task13,T4.6-9 Group-constrained chains (4Q),codeact,100,5,5,0,5,1.0,0.25,0.15811388300841897
+claude-haiku-4.5,4,tier4/task13,T4.6-9 Group-constrained chains (4Q),codeact,500,5,5,0,5,1.0,0.3,0.18708286933869708
+claude-haiku-4.5,4,tier4/task13,T4.6-9 Group-constrained chains (4Q),rlm,100,5,5,0,5,1.0,0.2,0.1
+claude-haiku-4.5,4,tier4/task13,T4.6-9 Group-constrained chains (4Q),rlm,500,5,5,0,5,1.0,0.25,0.15811388300841897
+claude-haiku-4.5,4,tier4/task13,T4.6-9 Group-constrained chains (4Q),rlm,full,5,5,0,5,1.0,0.24267177464631376,0.18677390080108183
+claude-haiku-4.5,4,tier4/task14,T4.10-11 Protecting-group pairs (2Q),llm,100,5,5,0,5,1.0,0.25547619047619047,0.13635105418486598
+claude-haiku-4.5,4,tier4/task14,T4.10-11 Protecting-group pairs (2Q),llm,500,5,5,0,5,1.0,0.0,0.0
+claude-haiku-4.5,4,tier4/task14,T4.10-11 Protecting-group pairs (2Q),codeact,100,5,5,0,5,1.0,0.0,0.0
+claude-haiku-4.5,4,tier4/task14,T4.10-11 Protecting-group pairs (2Q),codeact,500,5,5,0,5,1.0,0.5666666666666667,0.2260776661041756
+claude-haiku-4.5,4,tier4/task14,T4.10-11 Protecting-group pairs (2Q),rlm,100,5,5,0,5,1.0,0.5,0.31622776601683794
+claude-haiku-4.5,4,tier4/task14,T4.10-11 Protecting-group pairs (2Q),rlm,500,5,5,0,5,1.0,0.7,0.2449489742783178
+claude-haiku-4.5,4,tier4/task14,T4.10-11 Protecting-group pairs (2Q),rlm,full,5,5,0,5,1.0,0.24697120158887786,0.21761310415258367
+claude-haiku-4.5,4,tier4/task15,T4.12-15 Ring-construction chains (4Q),llm,100,5,5,0,0,0.0,,
+claude-haiku-4.5,4,tier4/task15,T4.12-15 Ring-construction chains (4Q),llm,500,5,5,0,0,0.0,,
+claude-haiku-4.5,4,tier4/task15,T4.12-15 Ring-construction chains (4Q),codeact,100,5,5,0,0,0.0,,
+claude-haiku-4.5,4,tier4/task15,T4.12-15 Ring-construction chains (4Q),codeact,500,5,5,0,0,0.0,,
+claude-haiku-4.5,4,tier4/task15,T4.12-15 Ring-construction chains (4Q),rlm,100,5,5,0,0,0.0,,
+claude-haiku-4.5,4,tier4/task15,T4.12-15 Ring-construction chains (4Q),rlm,500,5,5,0,0,0.0,,
+claude-haiku-4.5,4,tier4/task15,T4.12-15 Ring-construction chains (4Q),rlm,full,5,5,0,0,0.0,,
+claude-haiku-4.5,4,tier4/task16,T4.16-25 Truncated routes (10Q),llm,100,5,5,0,5,1.0,0.05333333333333333,0.026666666666666665
+claude-haiku-4.5,4,tier4/task16,T4.16-25 Truncated routes (10Q),llm,500,5,5,0,5,1.0,0.0,0.0
+claude-haiku-4.5,4,tier4/task16,T4.16-25 Truncated routes (10Q),codeact,100,5,5,0,5,1.0,0.13555555555555557,0.15160051467387145
+claude-haiku-4.5,4,tier4/task16,T4.16-25 Truncated routes (10Q),codeact,500,5,5,0,5,1.0,0.2844285714285714,0.13325776770252917
+claude-haiku-4.5,4,tier4/task16,T4.16-25 Truncated routes (10Q),rlm,100,5,5,0,5,1.0,0.42387301587301585,0.14979019845280972
+claude-haiku-4.5,4,tier4/task16,T4.16-25 Truncated routes (10Q),rlm,500,5,5,0,5,1.0,0.390984126984127,0.13261827913867383
+claude-haiku-4.5,4,tier4/task16,T4.16-25 Truncated routes (10Q),rlm,full,5,5,0,5,1.0,0.02,0.04
+claude-haiku-4.5,4,tier4/task17,T4.26-30 SMIRKS chains I (5Q),llm,100,5,5,0,5,1.0,0.143455852937971,0.02375764784747228
+claude-haiku-4.5,4,tier4/task17,T4.26-30 SMIRKS chains I (5Q),llm,500,5,5,0,5,1.0,0.04494353472614342,0.013099548569325329
+claude-haiku-4.5,4,tier4/task17,T4.26-30 SMIRKS chains I (5Q),codeact,100,5,5,0,5,1.0,0.30066413919906987,0.10625006505059091
+claude-haiku-4.5,4,tier4/task17,T4.26-30 SMIRKS chains I (5Q),codeact,500,5,5,0,5,1.0,0.2394759462759463,0.084206335835442
+claude-haiku-4.5,4,tier4/task17,T4.26-30 SMIRKS chains I (5Q),rlm,100,5,5,0,5,1.0,0.09333333333333334,0.08
+claude-haiku-4.5,4,tier4/task17,T4.26-30 SMIRKS chains I (5Q),rlm,500,5,5,0,5,1.0,0.04666666666666667,0.07774602526460402
+claude-haiku-4.5,4,tier4/task17,T4.26-30 SMIRKS chains I (5Q),rlm,full,5,5,0,5,1.0,0.017495327102803736,0.0313861999179225
+claude-haiku-4.5,4,tier4/task17b,T4.31-35 SMIRKS chains II (5Q),llm,100,5,5,0,5,1.0,0.06551262291200372,0.026298010480262046
+claude-haiku-4.5,4,tier4/task17b,T4.31-35 SMIRKS chains II (5Q),llm,500,5,5,0,5,1.0,0.044444444444444446,0.00486864495560148
+claude-haiku-4.5,4,tier4/task17b,T4.31-35 SMIRKS chains II (5Q),codeact,100,5,5,0,5,1.0,0.4189379509379509,0.17728444358742518
+claude-haiku-4.5,4,tier4/task17b,T4.31-35 SMIRKS chains II (5Q),codeact,500,5,5,0,5,1.0,0.17066666666666666,0.1307482738360668
+claude-haiku-4.5,4,tier4/task17b,T4.31-35 SMIRKS chains II (5Q),rlm,100,5,5,0,5,1.0,0.14666666666666667,0.12927146286443544
+claude-haiku-4.5,4,tier4/task17b,T4.31-35 SMIRKS chains II (5Q),rlm,500,5,5,0,5,1.0,0.2,0.18378731669453627
+claude-haiku-4.5,4,tier4/task17b,T4.31-35 SMIRKS chains II (5Q),rlm,full,5,5,0,5,1.0,0.021960146793791886,0.0268035557996538

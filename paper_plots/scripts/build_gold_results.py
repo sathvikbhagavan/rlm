@@ -126,6 +126,7 @@ DEFAULT_DEEPSEEK_RLM_X1000_PACK = Path(
     "paper_plots/gold/source_packs/deepseek-rlm-x1000-docker-succeeded-pack.tgz"
 )
 DEFAULT_SCORE_RECOVERIES = Path("paper_plots/gold/source_packs/deepseek-score-recoveries.json")
+DEFAULT_GROUND_TRUTH_CORRECTIONS = Path("paper_plots/gold/ground_truth_corrections.json")
 GPT_RLM_X1000_DOCKER_CAMPAIGN = "iclr2027-gpt5mini-rlm-x1000-docker-v1"
 
 
@@ -322,6 +323,28 @@ def apply_score_recoveries(rows: list[dict[str, Any]], path: Path) -> dict[str, 
     return payload
 
 
+def apply_ground_truth_corrections(
+    rows: list[dict[str, Any]], path: Path
+) -> dict[str, Any]:
+    """Invalidate stale scores without altering immutable model-run evidence."""
+    payload = json.loads(path.read_text())
+    affected = {str(task) for task in payload["affected_tasks"]}
+    for row in rows:
+        row["ground_truth_version"] = str(payload["corrected_bundle"])
+        row["original_f1"] = row.get("f1")
+        if str(row["task"]) not in affected:
+            row["score_correction_status"] = "not_affected"
+            continue
+        if row["status"] == "succeeded" and bool(row["score_available"]):
+            row["score_available"] = False
+            row["f1"] = None
+            row["score_correction_status"] = "historical_score_invalidated"
+            row["sources"] = f"{row['sources']};ground-truth:{payload['correction_id']}"
+        else:
+            row["score_correction_status"] = "affected_without_historical_score"
+    return payload
+
+
 def arm_summaries(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
     grouped: dict[tuple[str, str, str], list[dict[str, Any]]] = defaultdict(list)
     for row in rows:
@@ -336,8 +359,16 @@ def arm_summaries(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
         ),
     ):
         counts = Counter(str(row["status"]) for row in group)
+        invalidated_successes = sum(
+            row["status"] == "succeeded"
+            and row.get("score_correction_status") == "historical_score_invalidated"
+            for row in group
+        )
         unscored_successes = sum(
-            row["status"] == "succeeded" and not bool(row["score_available"]) for row in group
+            row["status"] == "succeeded"
+            and not bool(row["score_available"])
+            and row.get("score_correction_status") != "historical_score_invalidated"
+            for row in group
         )
         unfinished = counts["running"] + counts["stale"] + counts["pending"] + unscored_successes
         is_final = unfinished == 0
@@ -349,8 +380,11 @@ def arm_summaries(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
                 "method": method,
                 "expected_jobs": len(group),
                 **{f"{status}_jobs": counts[status] for status in STATUS_ORDER},
-                "scored_success_jobs": counts["succeeded"] - unscored_successes,
+                "scored_success_jobs": (
+                    counts["succeeded"] - unscored_successes - invalidated_successes
+                ),
                 "unscored_success_jobs": unscored_successes,
+                "ground_truth_invalidated_jobs": invalidated_successes,
                 "is_final": is_final,
                 "legend_label": method.upper() if method == "llm" else method.capitalize(),
                 "note": "terminal and scored"
@@ -519,9 +553,9 @@ def tier_efficiency_summaries(rows: list[dict[str, Any]]) -> list[dict[str, Any]
             CONTEXT_ORDER[item[0][2]],
         ),
     ):
-        successful = [
-            row for row in group if row["status"] == "succeeded" and bool(row["score_available"])
-        ]
+        # Ground-truth corrections can invalidate scientific scores without
+        # invalidating observed cost, token, timing, or memory measurements.
+        successful = [row for row in group if row["status"] == "succeeded"]
         row_out: dict[str, Any] = {
             "model": model,
             "model_label": MODEL_LABELS[model],
@@ -673,7 +707,10 @@ def write_readme(path: Path, arms: list[dict[str, Any]], *, as_of: str) -> None:
         "The CSV files contain sanitized metrics sufficient to regenerate paper plots; "
         "bulky raw trajectories remain in their original experiment artifact stores.",
         "All plotting aggregates score terminal failed jobs as zero. Running, stale, and "
-        "pending jobs are excluded from the current score and keep their arm provisional.",
+        "pending jobs are excluded from the current score and keep their arm provisional. "
+        "Scores invalidated by a versioned ground-truth correction are also excluded, keep "
+        "their original value in `original_f1`, and reduce the reported score coverage; "
+        "resource measurements from those successful runs remain valid.",
         "",
         "## Main benchmark arms",
         "",
@@ -726,6 +763,9 @@ def write_readme(path: Path, arms: list[dict[str, Any]], *, as_of: str) -> None:
             "source manifest preserve the aggregation rules and contributing snapshots. The "
             "directory also stores a status-explicit provisional Qwen matched-cardinality "
             "snapshot, which is excluded from final inference until all 725 cells terminate.",
+            "Ground-truth-invalidated control scores are excluded exactly as in the main "
+            "benchmark tables; the causal-control aggregates report their score coverage, "
+            "while retaining all measured resource fields.",
             "",
             "## Prospective-route control",
             "",
@@ -788,6 +828,12 @@ def parse_args() -> argparse.Namespace:
         type=Path,
         default=DEFAULT_SCORE_RECOVERIES,
         help="Provenance-recorded score recoveries for legacy successful runs.",
+    )
+    parser.add_argument(
+        "--ground-truth-corrections",
+        type=Path,
+        default=DEFAULT_GROUND_TRUTH_CORRECTIONS,
+        help="Versioned corrections applied after legacy score recoveries.",
     )
     return parser.parse_args()
 
@@ -895,6 +941,9 @@ def main() -> None:
             raise ValueError(f"GPT-5-mini RLM x1000 arm is not terminal: {unresolved_gpt[:3]!r}")
     rlm_x1000_rows = deepseek_rlm_rows + gemini_rlm_rows + gpt_rlm_rows
     all_rows = rows + extension_rows + rlm_x1000_rows
+    ground_truth_correction_manifest = apply_ground_truth_corrections(
+        all_rows, args.ground_truth_corrections
+    )
     arms = arm_summaries(all_rows)
     add_arm_finality(all_rows, arms)
     scaling = scaling_summaries(all_rows)
@@ -990,6 +1039,13 @@ def main() -> None:
             "path": str(args.score_recoveries),
             "sha256": sha256_file(args.score_recoveries),
             "count": len(score_recovery_manifest["recoveries"]),
+        },
+        "ground_truth_corrections": {
+            "path": str(args.ground_truth_corrections),
+            "sha256": sha256_file(args.ground_truth_corrections),
+            "correction_id": ground_truth_correction_manifest["correction_id"],
+            "corrected_bundle": ground_truth_correction_manifest["corrected_bundle"],
+            "affected_tasks": ground_truth_correction_manifest["affected_tasks"],
         },
         "source_snapshots": [
             {

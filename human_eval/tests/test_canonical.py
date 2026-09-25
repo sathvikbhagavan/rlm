@@ -35,7 +35,7 @@ def test_real_extraction_is_exact_and_deterministic(tmp_path: Path):
     manifest_b = build_bundle(ROOT, second, "dataset-checksum")
     assert manifest_a["question_count"] == 100
     assert manifest_a["schema_version"] == "1.3.0"
-    assert manifest_a["bundle_version"] == "rxnhaystack-human-1.5.0"
+    assert manifest_a["bundle_version"] == "rxnhaystack-human-1.6.0"
     assert manifest_a["taxonomy"] == EXPECTED
     assert manifest_a["questions_sha256"] == manifest_b["questions_sha256"]
     assert (first / "questions.jsonl").read_bytes() == (second / "questions.jsonl").read_bytes()

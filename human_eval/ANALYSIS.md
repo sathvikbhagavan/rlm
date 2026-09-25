@@ -3,14 +3,18 @@
 ```bash
 uv run --frozen --with-requirements human_eval/requirements.txt \
   python -m human_eval.cli analyze collaborator-*.zip \
-  --bundle human_eval/generated/canonical-v6 --output analysis/human-v6
+  --bundle human_eval/generated/canonical-v7 --output analysis/human-v7
 ```
 
-Outputs are `summary.json`, `item_metrics.csv`, and `disagreements.csv`. They report
+Outputs are `summary.json`, `item_metrics.csv`, `disagreements.csv`, and
+`baseline_pairwise_agreement.csv`. They report
 completion by tier/category, exact match, set precision/recall/F1, abstentions,
 time-limit outcomes, active/wall/offline time, tool use, confidence-ready item rows,
 audit issues, prospective fractions, Cohen's kappa for two annotators, nominal
-Krippendorff alpha for multiple annotators, and adjudication candidates.
+Krippendorff alpha for multiple annotators, baseline answer/correctness agreement,
+pairwise overlap counts and Cohen's kappa, and adjudication candidates. Export
+members are verified against the embedded checksums before analysis. Both ordinary
+exports and a single enclosing directory added by Finder are accepted.
 
 Scoring uses the first submitted, non-abstained baseline answer only; post-reveal
 revisions never replace it. Set-valued chain entries

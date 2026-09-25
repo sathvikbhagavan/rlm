@@ -1,5 +1,19 @@
 # Canonical bundle changelog
 
+## rxnhaystack-human-1.6.0 — September 25, 2026
+
+- Restricts Tier-3 Task 6 acyl-chloride amide formation to carbon-substituted
+  R-C(=O)Cl. Chloroformates and carbamoyl chlorides no longer enter the answer as
+  carbamates or ureas; the primary-amine answer changes from 1,347 to 942 records.
+- Scores Tier-3 Task 7 transformation membership by connectivity because its reaction
+  templates do not specify the configuration of newly formed stereocenters.
+- Restricts the Tier-3 Task 10 Wittig ylide/phosphorane atom to carbon. The prior
+  wildcard also matched P=S thionating reagents and mislabeled carbonyl thionations;
+  the protected Wittig answer changes from 99 to 45 reactions.
+- Adds checksum verification and baseline overlap/reliability tables to export
+  analysis. Existing annotations remain immutable and are rescored against this
+  version only in derived analysis outputs.
+
 ## rxnhaystack-human-1.5.0 — September 25, 2026
 
 - Corrects Tier-3 Task 7 multi-site transformations. Successive applications of a

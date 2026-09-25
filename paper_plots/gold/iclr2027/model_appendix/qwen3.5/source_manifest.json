@@ -1,31 +1,31 @@
 {
   "aggregation": {
-    "additive_resources": "sum divided by successful question trajectories",
-    "f1": "question-weighted within each repetition; terminal failures score zero",
+    "additive_resources": "sum divided by all successful question trajectories, including runs whose historical scores were invalidated",
+    "f1": "question-weighted within each repetition; terminal failures score zero; ground-truth-invalidated successes are excluded and reduce score coverage",
     "peak_memory": "mean combined process-tree plus Docker peak per successful job",
     "variation": "population standard deviation across five repetitions"
   },
-  "generated_at": "2026-09-24T23:39:01.476809+00:00",
+  "generated_at": "2026-09-25T14:44:55.346386+00:00",
   "model": "qwen3.5",
   "outputs": [
     {
       "path": "tier_metrics.csv",
-      "sha256": "ed71538d6640589a4746928b96c45de362469f7ae930bcc3db12656673058fcf"
+      "sha256": "7ed4944c4fd134bfbdef10500b4e0a62cf6e9523ef293bcada048cbade351a5c"
     },
     {
       "path": "task_f1.csv",
-      "sha256": "ceb375ca1e19a5073982f044f04cd751937f2eb2207d5905435752c0891c4167"
+      "sha256": "d0e40d0900c40ea2cd6800d5c265206654aa6db6f3e48ad5b543ddf71702435e"
     }
   ],
   "schema_version": 1,
   "sources": [
     {
       "path": "paper_plots/gold/iclr2027/full_benchmark_records.csv",
-      "sha256": "5f16166c847dfaa3394c352c1bdc35a5311a23de2fb41a0b94d4d7138aac3134"
+      "sha256": "599dddce39dff4afe404e59e0204bb0ffd45aa8f98657a409d10d46144bfae15"
     },
     {
       "path": "paper_plots/gold/iclr2027/codeact_x1000_records.csv",
-      "sha256": "52b76824c624aeaa913833ba742089da2806672bb9d9d16de345713752bf702d"
+      "sha256": "d6d103366f78f6b7c997e503a940cffe5d6c116c897c5f4aa47a1d03fcee9654"
     }
   ]
 }

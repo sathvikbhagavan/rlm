@@ -68,6 +68,10 @@ FIELDNAMES = (
     "repetition",
     "question_count",
     "f1",
+    "score_available",
+    "original_f1",
+    "score_correction_status",
+    "ground_truth_version",
     "calls",
     "cost_usd",
     "input_tokens",
@@ -131,6 +135,10 @@ def row(
         "repetition": int(run["repetition"]),
         "question_count": QUESTION_COUNTS[task],
         "f1": successful_score(run),
+        "score_available": True,
+        "original_f1": "",
+        "score_correction_status": "",
+        "ground_truth_version": "",
         **{
             field: metrics.get(field)
             for field in (
@@ -168,6 +176,10 @@ def provisional_matched_row(run: dict[str, Any]) -> dict[str, Any]:
         "question_count": QUESTION_COUNTS[task],
         "status": status,
         "f1": "",
+        "score_available": False,
+        "original_f1": "",
+        "score_correction_status": "",
+        "ground_truth_version": "",
         "calls": "",
         "cost_usd": "",
         "input_tokens": "",
@@ -223,11 +235,40 @@ def build_rows(campaigns: dict[str, dict[str, Any]]) -> list[dict[str, Any]]:
     return sorted(rows, key=lambda item: (item["study"], item["arm"], item["run_id"]))
 
 
+def apply_ground_truth_corrections(
+    rows: list[dict[str, Any]], path: Path
+) -> dict[str, Any]:
+    """Invalidate stale scores while preserving immutable control-run evidence."""
+    payload = json.loads(path.read_text(encoding="utf-8"))
+    affected = {str(task) for task in payload["affected_tasks"]}
+    for record in rows:
+        record["ground_truth_version"] = str(payload["corrected_bundle"])
+        record["original_f1"] = record.get("f1", "")
+        if str(record["task"]) not in affected:
+            record["score_correction_status"] = "not_affected"
+            continue
+        if bool(record.get("score_available")):
+            record["score_available"] = False
+            record["f1"] = ""
+            record["score_correction_status"] = "historical_score_invalidated"
+            record["sources"] = (
+                f"{record['sources']};ground-truth:{payload['correction_id']}"
+            )
+        else:
+            record["score_correction_status"] = "affected_without_historical_score"
+    return payload
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--cache-dir", type=Path, default=Path("artifacts/control-room/shared"))
     parser.add_argument(
         "--output-dir", type=Path, default=Path("paper_plots/gold/iclr2027/causal_controls")
+    )
+    parser.add_argument(
+        "--ground-truth-corrections",
+        type=Path,
+        default=Path("paper_plots/gold/ground_truth_corrections.json"),
     )
     args = parser.parse_args()
 
@@ -250,6 +291,8 @@ def main() -> int:
     qwen_rows = sorted(
         (provisional_matched_row(run) for run in qwen_matched), key=lambda item: item["run_id"]
     )
+    correction_manifest = apply_ground_truth_corrections(rows, args.ground_truth_corrections)
+    apply_ground_truth_corrections(qwen_rows, args.ground_truth_corrections)
     args.output_dir.mkdir(parents=True, exist_ok=True)
     records_path = args.output_dir / "records.csv"
     with records_path.open("w", newline="", encoding="utf-8") as stream:
@@ -276,6 +319,17 @@ def main() -> int:
         "record_count": len(rows),
         "records_sha256": sha256_file(records_path),
         "matched_qwen_provisional_sha256": sha256_file(provisional_path),
+        "ground_truth_corrections": {
+            "path": str(args.ground_truth_corrections),
+            "sha256": sha256_file(args.ground_truth_corrections),
+            "correction_id": correction_manifest["correction_id"],
+            "corrected_bundle": correction_manifest["corrected_bundle"],
+            "policy": correction_manifest["policy"],
+            "final_records": dict(Counter(row["score_correction_status"] for row in rows)),
+            "provisional_records": dict(
+                Counter(row["score_correction_status"] for row in qwen_rows)
+            ),
+        },
         "selection": {
             "matched_cardinality": "GPT-5 mini only; 725/725 succeeded",
             "oracle_predicate": "Qwen 3.5 and Claude Haiku 4.5; 150/150 succeeded",

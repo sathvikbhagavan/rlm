@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "correction_id": "rxnhaystack-ground-truth-2026-09-25-v2",
+  "corrected_bundle": "rxnhaystack-human-1.6.0",
+  "policy": "Historical scores are invalidated when exact rescoring would require prediction indices that were not retained in the sanitized result record. Raw costs, timing, status, and token measurements remain valid. Aggregate score tables use the unaffected scored rows and report reduced score coverage; no missing corrected score is imputed.",
+  "affected_tasks": {
+    "tier3/task6": "Acyl-chloride primary-amine membership excludes chloroformates and carbamoyl chlorides.",
+    "tier3/task7": "Multi-site transformations and connectivity-only comparison changed one or more subquestion memberships.",
+    "tier3/task10": "Wittig membership no longer admits P=S carbonyl thionations.",
+    "tier3/task18": "Ring-system construction now ignores external substituent properties.",
+    "tier3/task23": "Only uppercase absolute R/S centers satisfy the predicate.",
+    "tier4/task15": "Quinoline and indole accepted-chain sets are now exhaustive rather than capped."
+  }
+}

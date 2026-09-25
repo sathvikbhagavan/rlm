@@ -1,0 +1,91 @@
+{
+  "analysis_rule": "First submitted non-abstained baseline answer; semantic set scoring; post-reference revisions excluded from accuracy. Timing components are reported separately and are not summed because offline time may overlap wall time.",
+  "corrected_bundle": {
+    "admin_ground_truth_sha256": "80f6876b8f90d57b4a62c15221abdf3908ce55eb54e0770a2b0029a9b0f16181",
+    "bundle_version": "rxnhaystack-human-1.6.0",
+    "dataset_sha256": "9f9b2e71676e3e8f132b495b3fc62e2fdec01bc5b43f7be3dc09ef279c351b14",
+    "path": "human_eval/generated/canonical-v7",
+    "questions_sha256": "4164ef4dc76334b79e79c679f25570e59a35ff2b338ae0aa68e02fb896cc675a"
+  },
+  "files": {
+    "README.md": {
+      "bytes": 2017,
+      "sha256": "1052ad413680392662207ad03433e9dec559bb28dea40c5fc3e3f376a46964ee"
+    },
+    "annotator_summary.csv": {
+      "bytes": 1181,
+      "sha256": "c1e319ecd4bfc37d021e4b5a30961ae5c86466f9b97b0bd48c6f4f65aa44561b"
+    },
+    "baseline_pairwise_agreement.csv": {
+      "bytes": 366,
+      "sha256": "be8419e370267c1fe5f4e0f363e65188b55c3365d9f312723e812c822d8dc456"
+    },
+    "disagreements.csv": {
+      "bytes": 1,
+      "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
+    },
+    "human_model_tier_comparison.csv": {
+      "bytes": 1451,
+      "sha256": "e015d9486379f44fe384e764e3435b1f7d579e67bfde0a596fd967eaa2cbcbf0"
+    },
+    "item_metrics.csv": {
+      "bytes": 6905,
+      "sha256": "16c31acd079844ca87b5b85305ca10e557f782b8b2f8d208fce51f305734a320"
+    },
+    "reviewer_feedback_audit.csv": {
+      "bytes": 2936,
+      "sha256": "790002353bd8aaf098b2407af5fd60162eba84c0eebee122f96740530b84bfd1"
+    },
+    "summary.json": {
+      "bytes": 2835,
+      "sha256": "1f8911af23546e807847a5b1cdb3247ae70ae27aacae61d0a5440463a5ddc5e5"
+    }
+  },
+  "inputs": [
+    {
+      "anonymous_annotator_id": "rxh-e5348a8ba85c",
+      "bytes": 8579227,
+      "exported_at": "2026-09-19T21:30:02.939147+00:00",
+      "filename": "rxnhaystack_human_annotation_rxh-e5348a8ba85c.zip",
+      "original_bundle": {
+        "bundle_version": "rxnhaystack-human-1.2.0",
+        "dataset_sha256": "9f9b2e71676e3e8f132b495b3fc62e2fdec01bc5b43f7be3dc09ef279c351b14",
+        "questions_sha256": "91d9c7795320e382e3bc9e74ac3b23b7033ffccbf4a8a8b65f215704f01e7b5c"
+      },
+      "reviewer": "reviewer-1",
+      "sha256": "3e279efe7e36e177255ae6b730963fee42edacda8ff3473abe2c986765c9535b"
+    },
+    {
+      "anonymous_annotator_id": "rxh-e39c32021e72",
+      "bytes": 6749637,
+      "exported_at": "2026-09-25T13:42:57.522558+00:00",
+      "filename": "rxnhaystack_human_annotation_rxh-e39c32021e72.zip",
+      "original_bundle": {
+        "bundle_version": "rxnhaystack-human-1.5.0",
+        "dataset_sha256": "9f9b2e71676e3e8f132b495b3fc62e2fdec01bc5b43f7be3dc09ef279c351b14",
+        "questions_sha256": "3b82a3e89cb1ff4a0deffe9b379baf374de4f79d1c5346f7ff9dd47099424777"
+      },
+      "reviewer": "reviewer-2",
+      "sha256": "5b18327f1e59e3a765a88d6298071c07e8c5296f4ae3f93adaa3d0b9f2bceaf2"
+    },
+    {
+      "anonymous_annotator_id": "rxh-316e8cece0f1",
+      "bytes": 2205207,
+      "exported_at": "2026-09-25T10:08:16.430727+00:00",
+      "filename": "rxnhaystack_human_annotation_rxh-316e8cece0f1.zip",
+      "original_bundle": {
+        "bundle_version": "rxnhaystack-human-1.4.0",
+        "dataset_sha256": "9f9b2e71676e3e8f132b495b3fc62e2fdec01bc5b43f7be3dc09ef279c351b14",
+        "questions_sha256": "e24806cbd07586c59a245f97ae21a50482ee1441812735a584e2983412457c02"
+      },
+      "reviewer": "reviewer-3",
+      "sha256": "224f0c396ce90ae5834175bde190a1a4e42df930d196038b7b7814f5aafa9ea2"
+    }
+  ],
+  "model_comparison_source": {
+    "note": "Corrected historical scores marked unavailable are excluded; coverage is explicit.",
+    "path": "paper_plots/gold/iclr2027/full_benchmark_records.csv",
+    "sha256": "599dddce39dff4afe404e59e0204bb0ffd45aa8f98657a409d10d46144bfae15"
+  },
+  "schema_version": 1
+}

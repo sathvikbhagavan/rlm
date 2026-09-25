@@ -3,15 +3,20 @@ from __future__ import annotations
 from pathlib import Path
 
 from tier3.generate_hardcoded_ground_truth import (
+    TASK6_AMIDE_COUPLING_SMIRKS,
+    TASK7_TO_FG_SMIRKS,
     compute_task7_gt,
     compute_task18_gt,
     load_indexed_lines,
     reaction_constructs_new_ring_system,
+    task6_build_reaction_query,
+    task6_reaction_matches,
 )
 from tier3.task7_hardcoded_ground_truth import (
     TASK7_HARDCODED_GROUND_TRUTH_INDICES_BY_REACTION,
     TASK7_POSITIVE_REACTIONS_BY_KEY,
 )
+from tier3.task10_mechanism_evaluator import reaction_line_matches_mechanism
 from tier3.task18_hardcoded_ground_truth import (
     TASK18_HARDCODED_GROUND_TRUTH_INDICES,
     TASK18_POSITIVE_REACTIONS,
@@ -33,16 +38,47 @@ def test_task7_frozen_answer_includes_repeated_multi_site_transformations():
     assert skipped == 0
     assert computed == TASK7_HARDCODED_GROUND_TRUTH_INDICES_BY_REACTION
     assert TASK7_POSITIVE_REACTIONS_BY_KEY == {
-        "grignard_ketone_to_tertiary_alcohol": 33,
-        "grignard_aldehyde_to_secondary_alcohol": 73,
+        "grignard_ketone_to_tertiary_alcohol": 43,
+        "grignard_aldehyde_to_secondary_alcohol": 78,
         "nitrile_to_amine": 275,
-        "nitro_groups_to_amines": 2064,
-        "alcohol_to_azide": 121,
+        "nitro_groups_to_amines": 2067,
+        "alcohol_to_azide": 133,
         "alcohol_to_carboxylic_acid": 64,
     }
     # Reaction 3907 oxidizes both primary alcohols in one reactant to the
     # corresponding dicarboxylic acid in the recorded product.
     assert 3907 in computed["alcohol_to_carboxylic_acid"]
+
+
+def test_task6_acyl_chloride_excludes_chloroformates():
+    lines = load_indexed_lines(str(DATASET))
+    query = task6_build_reaction_query(
+        TASK6_AMIDE_COUPLING_SMIRKS["acyl_chloride_with_primary_amine"]
+    )
+    # 68 is carbamate formation from benzyl chloroformate; 72 is ordinary
+    # carbon-substituted acyl-chloride amide formation.
+    assert not task6_reaction_matches(lines[68], query)
+    assert task6_reaction_matches(lines[72], query)
+
+
+def test_task7_connectivity_contract_accepts_stereospecified_grignard_product():
+    lines = load_indexed_lines(str(DATASET))
+    query = task6_build_reaction_query(
+        TASK7_TO_FG_SMIRKS["grignard_ketone_to_tertiary_alcohol"]
+    )
+    assert task6_reaction_matches(
+        lines[8243],
+        query,
+        allow_repeated_single_reactant_transform=True,
+        isomeric_smiles=False,
+    )
+
+
+def test_task10_wittig_requires_a_carbon_ylide_not_phosphorus_sulfide():
+    lines = load_indexed_lines(str(DATASET))
+    assert reaction_line_matches_mechanism(lines[2533], "wittig_olefination")
+    # Lawesson-reagent thionation was the first reported false-positive family.
+    assert not reaction_line_matches_mechanism(lines[11206], "wittig_olefination")
 
 
 def test_task18_ring_equivalence_ignores_substitution_but_retains_ring_chemistry():

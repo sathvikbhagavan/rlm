@@ -34,8 +34,8 @@ TASK18_GROUND_TRUTH_DEFINITION = (
     "ignore substituent-dependent atom properties"
 )
 TASK6_AMIDE_COUPLING_SMIRKS: dict[str, str] = {
-    "acyl_chloride_with_primary_amine": "[*:1]-[C;H0;D3;+0:2](=[O;H0;D1;+0:3])-[Cl].[#7;H2;!$(N[O,N]);D1;+0:5]>>[*:1]-[C;H0;D3;+0:2](=[O;H0;D1;+0:3])-[#7;H1;D2;+0:5]",
-    "acyl_chloride_with_secondary_amine": "[*:1]-[C;H0;D3;+0:2](=[O;H0;D1;+0:3])-[Cl].[#7;H1;D2;+0:5]>>[*:1]-[C;H0;D3;+0:2](=[O;H0;D1;+0:3])-[#7;H0;D3;+0:5]",
+    "acyl_chloride_with_primary_amine": "[#6:1]-[C;H0;D3;+0:2](=[O;H0;D1;+0:3])-[Cl].[#7;H2;!$(N[O,N]);D1;+0:5]>>[#6:1]-[C;H0;D3;+0:2](=[O;H0;D1;+0:3])-[#7;H1;D2;+0:5]",
+    "acyl_chloride_with_secondary_amine": "[#6:1]-[C;H0;D3;+0:2](=[O;H0;D1;+0:3])-[Cl].[#7;H1;D2;+0:5]>>[#6:1]-[C;H0;D3;+0:2](=[O;H0;D1;+0:3])-[#7;H0;D3;+0:5]",
     "carboxylic_acid_with_primary_amine": "[CX3;+0:2](=[O;H0;D1;+0:3])-[O;H1;D1;+0].[#7;H2;D1;+0:5]>>[CX3;+0:2](=[O;H0;D1;+0:3])-[#7;H1;D2;+0:5]",
     "ester_with_primary_amine": "[#6:1]-[C;H0;D3;+0:2](=[O;!$(OC(C)(C)C);H0;D1;+0:3])-[O;H0;D2;+0].[#7;H2;D1;+0:5]>>[#6:1]-[C;H0;D3;+0:2](=[O;H0;D1;+0:3])-[#7;H1;D2;+0:5]",
     "ester_with_secondary_amine": "[#6:1]-[C;H0;D3;+0:2](=[O;H0;D1;+0:3])-[O;!$(OC(C)(C)C);H0;D2;+0].[#7;H1;D2;+0:5]>>[#6:1]-[C;H0;D3;+0:2](=[O;H0;D1;+0:3])-[#7;H0;D3;+0:5]",
@@ -313,8 +313,14 @@ def task6_parse_reaction_mols(indexed_line: str) -> tuple[list[Chem.Mol], list[C
     return [m for m in reactants if m is not None], [m for m in products if m is not None]
 
 
-def task6_canonical_smiles_set(mols: list[Chem.Mol]) -> set[str]:
-    return {Chem.MolToSmiles(m) for m in mols if m is not None}
+def task6_canonical_smiles_set(
+    mols: list[Chem.Mol], *, isomeric_smiles: bool = True
+) -> set[str]:
+    return {
+        Chem.MolToSmiles(m, isomericSmiles=isomeric_smiles)
+        for m in mols
+        if m is not None
+    }
 
 
 def task6_reaction_matches(
@@ -322,11 +328,14 @@ def task6_reaction_matches(
     query_reaction: rdChemReactions.ChemicalReaction,
     *,
     allow_repeated_single_reactant_transform: bool = False,
+    isomeric_smiles: bool = True,
 ) -> bool:
     reactants, products = task6_parse_reaction_mols(indexed_line)
     template = query_reaction
     template.Initialize()
-    actual_product_smiles = task6_canonical_smiles_set(products)
+    actual_product_smiles = task6_canonical_smiles_set(
+        products, isomeric_smiles=isomeric_smiles
+    )
     num_template_reactants = template.GetNumReactantTemplates()
     for perm in permutations(reactants, min(num_template_reactants, len(reactants))):
         if len(perm) != num_template_reactants:
@@ -340,7 +349,9 @@ def task6_reaction_matches(
             for mol in prod_set:
                 try:
                     Chem.SanitizeMol(mol)
-                    generated_smiles.add(Chem.MolToSmiles(mol))
+                    generated_smiles.add(
+                        Chem.MolToSmiles(mol, isomericSmiles=isomeric_smiles)
+                    )
                 except Exception:
                     continue
             if generated_smiles and generated_smiles.issubset(actual_product_smiles):
@@ -353,7 +364,7 @@ def task6_reaction_matches(
             if max_applications < 2:
                 continue
             frontier = [starting_mol]
-            seen = {Chem.MolToSmiles(starting_mol)}
+            seen = {Chem.MolToSmiles(starting_mol, isomericSmiles=isomeric_smiles)}
             for _ in range(max_applications):
                 next_frontier: list[Chem.Mol] = []
                 for current_mol in frontier:
@@ -367,7 +378,11 @@ def task6_reaction_matches(
                         for mol in prod_set:
                             try:
                                 Chem.SanitizeMol(mol)
-                                generated_smiles.add(Chem.MolToSmiles(mol))
+                                generated_smiles.add(
+                                    Chem.MolToSmiles(
+                                        mol, isomericSmiles=isomeric_smiles
+                                    )
+                                )
                                 sanitized_products.append(mol)
                             except Exception:
                                 continue
@@ -376,7 +391,9 @@ def task6_reaction_matches(
                         if len(sanitized_products) != 1:
                             continue
                         product_mol = sanitized_products[0]
-                        product_smiles = Chem.MolToSmiles(product_mol)
+                        product_smiles = Chem.MolToSmiles(
+                            product_mol, isomericSmiles=isomeric_smiles
+                        )
                         if product_smiles not in seen:
                             seen.add(product_smiles)
                             next_frontier.append(product_mol)
@@ -439,6 +456,10 @@ def compute_task7_gt(lines: list[str]) -> tuple[dict[str, list[int]], int, int]:
                     line,
                     query_reaction,
                     allow_repeated_single_reactant_transform=True,
+                    # These templates define connectivity, not the configuration of a
+                    # newly formed stereocenter. Existing stereochemistry is therefore
+                    # irrelevant to membership in the transformation family.
+                    isomeric_smiles=False,
                 ):
                     indices_by_reaction[reaction_key].append(idx)
         except Exception:

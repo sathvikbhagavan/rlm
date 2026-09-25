@@ -2,11 +2,11 @@
   "figures": [
     {
       "path": "qwen3_5_core_metrics.pdf",
-      "sha256": "14c4a842cb2c2779bb852aa4036c87b78547044d79e87663b4479e1a4e7155d6"
+      "sha256": "6a932abc18e6a34f5bd13df8445017b883e65c0145788aa6d8b7851a68ec9af2"
     },
     {
       "path": "qwen3_5_core_metrics.png",
-      "sha256": "ec68566388d8669d9951a373fb9e1803c9cf4b18b73634fc1d17a4cdd202a10c"
+      "sha256": "b31ef6b153cad2c77bcb5b08cbec794cfe7c57346dc254f1ea477797c258ffaf"
     },
     {
       "path": "qwen3_5_resource_diagnostics.pdf",
@@ -18,25 +18,25 @@
     },
     {
       "path": "qwen3_5_task_heatmap.pdf",
-      "sha256": "95a3c38e7f66591c38498ea7933dd7c97b90f7abd21782e7f6ef979854432ebc"
+      "sha256": "34e36f5f2ba8c2a39150693b243b9a744600c2992a4be7beb289995d2ef275ac"
     },
     {
       "path": "qwen3_5_task_heatmap.png",
-      "sha256": "a8cf20742b70fb85ba76fe427ceb260903692fcc1ed3114c4aca8f19eb17df74"
+      "sha256": "7c7aedeef145d41d93ae43e2cd3d52e816bbeab9b1a32cecb3e2a2d8e2576c13"
     }
   ],
   "model": "qwen3.5",
-  "model_label": "Qwen 3.5",
+  "model_label": "Qwen3.5-397B-A17B",
   "palette": "Plasma",
   "schema_version": 1,
   "sources": [
     {
       "path": "paper_plots/gold/iclr2027/model_appendix/qwen3.5/tier_metrics.csv",
-      "sha256": "ed71538d6640589a4746928b96c45de362469f7ae930bcc3db12656673058fcf"
+      "sha256": "7ed4944c4fd134bfbdef10500b4e0a62cf6e9523ef293bcada048cbade351a5c"
     },
     {
       "path": "paper_plots/gold/iclr2027/model_appendix/qwen3.5/task_f1.csv",
-      "sha256": "ceb375ca1e19a5073982f044f04cd751937f2eb2207d5905435752c0891c4167"
+      "sha256": "d0e40d0900c40ea2cd6800d5c265206654aa6db6f3e48ad5b543ddf71702435e"
     }
   ]
 }

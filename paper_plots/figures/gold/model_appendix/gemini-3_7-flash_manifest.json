@@ -2,27 +2,27 @@
   "figures": [
     {
       "path": "gemini-3_7-flash_core_metrics.pdf",
-      "sha256": "e2bfeb51bed74fdb0a2cc402354bb0a0807aa45072c5235fcb7a47b09edd656d"
+      "sha256": "39bb62fe653ce9eb57021c7e7315f11dd9cd9328591d5dddc0a917e2afc92723"
     },
     {
       "path": "gemini-3_7-flash_core_metrics.png",
-      "sha256": "8d465aa690df6c1cd5b9bdfb8603f28d837c668b51d56c22a9584c7e0a7f2fd0"
+      "sha256": "072368a96e51a5e6445e63166899f12be9e3a05c7c602e5aea78ec618883f5ab"
     },
     {
       "path": "gemini-3_7-flash_resource_diagnostics.pdf",
-      "sha256": "6b434090baa4ffef99c5e12399f7a4647d7abe87bcd89574e77bceb37d0ce049"
+      "sha256": "16f3bb91c81c1051daa9a86dd3e7351952397e8684483ce376fdc3414bcf5a7c"
     },
     {
       "path": "gemini-3_7-flash_resource_diagnostics.png",
-      "sha256": "a4594f3ed571e8e416f53362bd458d9093754ec071426013a6efa5547abc3661"
+      "sha256": "3dfe05e856c1d9dd8bba1f7fd407f1d9d01c6c7b76cfa6c564cb0aa28f41dd81"
     },
     {
       "path": "gemini-3_7-flash_task_heatmap.pdf",
-      "sha256": "2db12b706672a9db4cedaf1bfb22439a4cdcfbef0f23cad2a52078b701f5e16e"
+      "sha256": "f4967e56940d8a3d9d9ae0120a611b7815da0576f5ea3cad3199e92a2d34a1e1"
     },
     {
       "path": "gemini-3_7-flash_task_heatmap.png",
-      "sha256": "bbfdaed5aee58faa41da8ec13dc0ce3b1b0806678ca239bfb676a5cddd5733ed"
+      "sha256": "7a6c31d0f784c3162661a9b37e91a7ac2fe5489472231572919a97a1188e4d2e"
     }
   ],
   "model": "gemini-3.7-flash",
@@ -32,11 +32,11 @@
   "sources": [
     {
       "path": "paper_plots/gold/iclr2027/model_appendix/gemini-3.7-flash/tier_metrics.csv",
-      "sha256": "f359c8485e6e33ad1943530bbd6869a2486b74383b1ee15120005b0f468b1057"
+      "sha256": "f10cbb721cb81526795db3e287067bec3ef62529a6b75ea10f760cfe08ff5080"
     },
     {
       "path": "paper_plots/gold/iclr2027/model_appendix/gemini-3.7-flash/task_f1.csv",
-      "sha256": "902af7fcd69c4dcd84fdc747997d12ccd1d05883a715ab965a2c79c6f8ca255d"
+      "sha256": "aba0f606685e42d7c947794424471ab62b3d820f89b649f2fb0561c140270b9d"
     }
   ]
 }

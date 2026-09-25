@@ -5,22 +5,22 @@
     "terminal_failures": "score zero",
     "within_model": "question-weighted mean across task scripts and repetitions"
   },
-  "generated_at": "2026-09-25T09:23:59.051207+00:00",
+  "generated_at": "2026-09-25T14:35:51.647660+00:00",
   "outputs": [
     {
       "path": "per_model.csv",
-      "sha256": "769eee234aa5db97993b377be2f9e0bf774a1ed672efcb9f92e05841d66b5fd8"
+      "sha256": "0a3bafcdab88506f24827395547480dc9b149868f19e761734ebed84928ad421"
     },
     {
       "path": "across_models.csv",
-      "sha256": "cee87e5cc46b50d19c284a276dde195ffd09b9a33c02a01e0b965742b1ed9c7c"
+      "sha256": "44036efb046fbc4d362bef1aa8fc018bcf8f39a3b8ae37ea9d40a5dc6ea44481"
     }
   ],
   "schema_version": 1,
   "source": {
     "path": "paper_plots/gold/iclr2027/full_benchmark_records.csv",
-    "sha256": "11ad780d29f0b214bc8f4836e0f720cd13370e9921fbee40bd4a7958797783b1"
+    "sha256": "599dddce39dff4afe404e59e0204bb0ffd45aa8f98657a409d10d46144bfae15"
   },
-  "source_repository_commit": "91d13f9853884d2055a7d1c525c8e7826c796259",
-  "source_snapshot_as_of": "2026-09-25T09:15:30.738545+00:00"
+  "source_repository_commit": "ffbbe41dbdf2ff6354ab21d39149d6dfea114e0d",
+  "source_snapshot_as_of": "2026-09-25T14:23:55.984574+00:00"
 }

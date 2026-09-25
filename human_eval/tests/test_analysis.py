@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import zipfile
 from pathlib import Path
 
 from human_eval.analysis import (
@@ -8,6 +9,7 @@ from human_eval.analysis import (
     answer_scores,
     cohen_kappa,
     krippendorff_alpha_nominal,
+    load_export,
     set_scores,
 )
 from human_eval.db import Store
@@ -89,3 +91,36 @@ def test_export_analysis_round_trip(tmp_path: Path, tiny_bundle: Path):
     assert summary["timing_totals"]["self_reported_offline_minutes"] == 2.0
     assert (output / "item_metrics.csv").is_file()
     assert (output / "summary.json").is_file()
+
+
+def test_load_export_accepts_finder_wrapped_archive(tmp_path: Path, tiny_bundle: Path):
+    store = Store(tmp_path / "state.sqlite")
+    user = store.profile()["annotator_id"]
+    bundle_manifest = json.loads((tiny_bundle / "manifest.json").read_text())
+    original = tmp_path / "original.zip"
+    original.write_bytes(export_zip(store, user, bundle_manifest))
+    wrapped = tmp_path / "wrapped.zip"
+    with zipfile.ZipFile(original) as source, zipfile.ZipFile(wrapped, "w") as target:
+        for name in source.namelist():
+            target.writestr(f"export/{name}", source.read(name))
+        target.writestr("__MACOSX/export/._manifest.json", b"finder metadata")
+    assert load_export(wrapped) == load_export(original)
+
+
+def test_load_export_rejects_checksum_mismatch(tmp_path: Path, tiny_bundle: Path):
+    store = Store(tmp_path / "state.sqlite")
+    user = store.profile()["annotator_id"]
+    bundle_manifest = json.loads((tiny_bundle / "manifest.json").read_text())
+    original = tmp_path / "original.zip"
+    original.write_bytes(export_zip(store, user, bundle_manifest))
+    corrupted = tmp_path / "corrupted.zip"
+    with zipfile.ZipFile(original) as source, zipfile.ZipFile(corrupted, "w") as target:
+        for name in source.namelist():
+            data = b"corrupted\n" if name == "annotations.jsonl" else source.read(name)
+            target.writestr(name, data)
+    try:
+        load_export(corrupted)
+    except ValueError as error:
+        assert "mismatch" in str(error)
+    else:
+        raise AssertionError("corrupted export was accepted")

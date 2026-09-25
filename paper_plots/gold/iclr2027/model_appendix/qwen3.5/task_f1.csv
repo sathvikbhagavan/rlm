@@ -1,241 +1,241 @@
-model,tier,task,task_label,method,context,repetitions,successful_jobs,failed_jobs,f1_mean,f1_std
-qwen3.5,1,tier1/task1,T1.1 Exact product lookup (10Q),llm,100,5,5,0,0.9866666666666667,0.016329931618554464
-qwen3.5,1,tier1/task1,T1.1 Exact product lookup (10Q),llm,500,5,5,0,0.968095238095238,0.017142857142857158
-qwen3.5,1,tier1/task1,T1.1 Exact product lookup (10Q),codeact,100,5,5,0,1.0,0.0
-qwen3.5,1,tier1/task1,T1.1 Exact product lookup (10Q),codeact,500,5,5,0,1.0,0.0
-qwen3.5,1,tier1/task1,T1.1 Exact product lookup (10Q),codeact,1000,5,5,0,1.0,0.0
-qwen3.5,1,tier1/task1,T1.1 Exact product lookup (10Q),rlm,100,5,5,0,1.0,0.0
-qwen3.5,1,tier1/task1,T1.1 Exact product lookup (10Q),rlm,500,5,5,0,1.0,0.0
-qwen3.5,1,tier1/task1,T1.1 Exact product lookup (10Q),rlm,full,5,5,0,1.0,0.0
-qwen3.5,2,tier2/task2,T2.1 Molecular-weight change (6Q),llm,100,5,5,0,0.0,0.0
-qwen3.5,2,tier2/task2,T2.1 Molecular-weight change (6Q),llm,500,5,5,0,0.0,0.0
-qwen3.5,2,tier2/task2,T2.1 Molecular-weight change (6Q),codeact,100,5,5,0,1.0,0.0
-qwen3.5,2,tier2/task2,T2.1 Molecular-weight change (6Q),codeact,500,5,5,0,1.0,0.0
-qwen3.5,2,tier2/task2,T2.1 Molecular-weight change (6Q),codeact,1000,5,5,0,1.0,0.0
-qwen3.5,2,tier2/task2,T2.1 Molecular-weight change (6Q),rlm,100,5,5,0,1.0,0.0
-qwen3.5,2,tier2/task2,T2.1 Molecular-weight change (6Q),rlm,500,5,5,0,1.0,0.0
-qwen3.5,2,tier2/task2,T2.1 Molecular-weight change (6Q),rlm,full,5,5,0,1.0,0.0
-qwen3.5,2,tier2/task3,T2.2 Ring-count change (5Q),llm,100,5,5,0,0.015017921146953406,0.01940270200267377
-qwen3.5,2,tier2/task3,T2.2 Ring-count change (5Q),llm,500,5,5,0,0.023713798977853494,0.02904335367933717
-qwen3.5,2,tier2/task3,T2.2 Ring-count change (5Q),codeact,100,5,5,0,1.0,0.0
-qwen3.5,2,tier2/task3,T2.2 Ring-count change (5Q),codeact,500,5,5,0,0.938,0.07593418202627854
-qwen3.5,2,tier2/task3,T2.2 Ring-count change (5Q),codeact,1000,5,5,0,0.9957142857142858,0.0034992710611188135
-qwen3.5,2,tier2/task3,T2.2 Ring-count change (5Q),rlm,100,5,5,0,0.96,0.07999999999999999
-qwen3.5,2,tier2/task3,T2.2 Ring-count change (5Q),rlm,500,5,5,0,0.96,0.07999999999999999
-qwen3.5,2,tier2/task3,T2.2 Ring-count change (5Q),rlm,full,5,5,0,1.0,0.0
-qwen3.5,2,tier2/task4,T2.3 Aromatic-ring formation (5Q),llm,100,5,5,0,0.020681803518697736,0.0015632086120308706
-qwen3.5,2,tier2/task4,T2.3 Aromatic-ring formation (5Q),llm,500,5,5,0,0.02276193693531809,6.338211184040213e-05
-qwen3.5,2,tier2/task4,T2.3 Aromatic-ring formation (5Q),codeact,100,5,5,0,1.0,0.0
-qwen3.5,2,tier2/task4,T2.3 Aromatic-ring formation (5Q),codeact,500,5,5,0,1.0,0.0
-qwen3.5,2,tier2/task4,T2.3 Aromatic-ring formation (5Q),codeact,1000,5,5,0,1.0,0.0
-qwen3.5,2,tier2/task4,T2.3 Aromatic-ring formation (5Q),rlm,100,5,5,0,1.0,0.0
-qwen3.5,2,tier2/task4,T2.3 Aromatic-ring formation (5Q),rlm,500,5,5,0,1.0,0.0
-qwen3.5,2,tier2/task4,T2.3 Aromatic-ring formation (5Q),rlm,full,5,5,0,1.0,0.0
-qwen3.5,2,tier2/task5,T2.4 Combined weight + rings (4Q),llm,100,5,5,0,0.0,0.0
-qwen3.5,2,tier2/task5,T2.4 Combined weight + rings (4Q),llm,500,5,5,0,0.0,0.0
-qwen3.5,2,tier2/task5,T2.4 Combined weight + rings (4Q),codeact,100,5,5,0,0.95,0.1
-qwen3.5,2,tier2/task5,T2.4 Combined weight + rings (4Q),codeact,500,5,5,0,0.95,0.1
-qwen3.5,2,tier2/task5,T2.4 Combined weight + rings (4Q),codeact,1000,5,5,0,1.0,0.0
-qwen3.5,2,tier2/task5,T2.4 Combined weight + rings (4Q),rlm,100,5,5,0,1.0,0.0
-qwen3.5,2,tier2/task5,T2.4 Combined weight + rings (4Q),rlm,500,5,5,0,0.95,0.1
-qwen3.5,2,tier2/task5,T2.4 Combined weight + rings (4Q),rlm,full,5,5,0,1.0,0.0
-qwen3.5,3,tier3/task13,T3.1 New nitrogen atom (1Q),llm,100,5,5,0,0.16960386137322261,0.023336687798871436
-qwen3.5,3,tier3/task13,T3.1 New nitrogen atom (1Q),llm,500,5,5,0,0.14468799853746667,0.0015250750827708378
-qwen3.5,3,tier3/task13,T3.1 New nitrogen atom (1Q),codeact,100,5,5,0,1.0,0.0
-qwen3.5,3,tier3/task13,T3.1 New nitrogen atom (1Q),codeact,500,5,5,0,1.0,0.0
-qwen3.5,3,tier3/task13,T3.1 New nitrogen atom (1Q),codeact,1000,5,5,0,1.0,0.0
-qwen3.5,3,tier3/task13,T3.1 New nitrogen atom (1Q),rlm,100,5,5,0,1.0,0.0
-qwen3.5,3,tier3/task13,T3.1 New nitrogen atom (1Q),rlm,500,5,5,0,1.0,0.0
-qwen3.5,3,tier3/task13,T3.1 New nitrogen atom (1Q),rlm,full,5,5,0,1.0,0.0
-qwen3.5,3,tier3/task14,T3.2 C-N formed / C-O broken (1Q),llm,100,5,5,0,0.32897456931911406,0.02051388939524225
-qwen3.5,3,tier3/task14,T3.2 C-N formed / C-O broken (1Q),llm,500,5,5,0,0.3181189215184812,0.001983489064753863
-qwen3.5,3,tier3/task14,T3.2 C-N formed / C-O broken (1Q),codeact,100,5,5,0,1.0,0.0
-qwen3.5,3,tier3/task14,T3.2 C-N formed / C-O broken (1Q),codeact,500,5,5,0,1.0,0.0
-qwen3.5,3,tier3/task14,T3.2 C-N formed / C-O broken (1Q),codeact,1000,5,5,0,1.0,0.0
-qwen3.5,3,tier3/task14,T3.2 C-N formed / C-O broken (1Q),rlm,100,5,5,0,1.0,0.0
-qwen3.5,3,tier3/task14,T3.2 C-N formed / C-O broken (1Q),rlm,500,5,5,0,1.0,0.0
-qwen3.5,3,tier3/task14,T3.2 C-N formed / C-O broken (1Q),rlm,full,5,5,0,1.0,0.0
-qwen3.5,3,tier3/task15,T3.3 Single C-C bond formation (1Q),llm,100,5,5,0,0.17958845076492133,0.008006381885491446
-qwen3.5,3,tier3/task15,T3.3 Single C-C bond formation (1Q),llm,500,5,5,0,0.0,0.0
-qwen3.5,3,tier3/task15,T3.3 Single C-C bond formation (1Q),codeact,100,5,5,0,0.8150000000000001,0.3112876483254676
-qwen3.5,3,tier3/task15,T3.3 Single C-C bond formation (1Q),codeact,500,5,5,0,1.0,0.0
-qwen3.5,3,tier3/task15,T3.3 Single C-C bond formation (1Q),codeact,1000,5,5,0,0.8466019417475728,0.3067961165048544
-qwen3.5,3,tier3/task15,T3.3 Single C-C bond formation (1Q),rlm,100,5,5,0,0.8400000000000001,0.32
-qwen3.5,3,tier3/task15,T3.3 Single C-C bond formation (1Q),rlm,500,5,5,0,0.3697436281859071,0.26655718233497816
-qwen3.5,3,tier3/task15,T3.3 Single C-C bond formation (1Q),rlm,full,5,5,0,0.5474886921365474,0.4100904305046129
-qwen3.5,3,tier3/task17,T3.4 Fused heterocycle (1Q),llm,100,5,5,0,0.25272727272727274,0.12390345481746051
-qwen3.5,3,tier3/task17,T3.4 Fused heterocycle (1Q),llm,500,5,5,0,0.1746841250652797,0.14345845813013314
-qwen3.5,3,tier3/task17,T3.4 Fused heterocycle (1Q),codeact,100,5,5,0,0.9168831168831169,0.10976907329410618
-qwen3.5,3,tier3/task17,T3.4 Fused heterocycle (1Q),codeact,500,5,5,0,0.8566666666666667,0.1562049935181331
-qwen3.5,3,tier3/task17,T3.4 Fused heterocycle (1Q),codeact,1000,5,5,0,0.9720930232558139,0.055813953488372106
-qwen3.5,3,tier3/task17,T3.4 Fused heterocycle (1Q),rlm,100,5,5,0,0.923076923076923,0.15384615384615388
-qwen3.5,3,tier3/task17,T3.4 Fused heterocycle (1Q),rlm,500,5,5,0,1.0,0.0
-qwen3.5,3,tier3/task17,T3.4 Fused heterocycle (1Q),rlm,full,5,5,0,0.7088308564493795,0.26923900729938444
-qwen3.5,3,tier3/task18,T3.5 New ring system (1Q),llm,100,5,5,0,0.6906491569611894,0.03260551895872401
-qwen3.5,3,tier3/task18,T3.5 New ring system (1Q),llm,500,5,5,0,0.5505433665631985,0.0015694504851369207
-qwen3.5,3,tier3/task18,T3.5 New ring system (1Q),codeact,100,5,5,0,0.6066724413417331,0.06598248182078795
-qwen3.5,3,tier3/task18,T3.5 New ring system (1Q),codeact,500,5,5,0,0.71004584296393,0.15043244451170726
-qwen3.5,3,tier3/task18,T3.5 New ring system (1Q),codeact,1000,5,5,0,0.6398654638652153,0.05736793964641682
-qwen3.5,3,tier3/task18,T3.5 New ring system (1Q),rlm,100,5,5,0,0.49165566378320635,0.15434564687162858
-qwen3.5,3,tier3/task18,T3.5 New ring system (1Q),rlm,500,5,5,0,0.5988374118625998,0.08659271639193705
-qwen3.5,3,tier3/task18,T3.5 New ring system (1Q),rlm,full,5,5,0,0.3158646813780834,0.22900953068266783
-qwen3.5,3,tier3/task20,T3.6 Fused-ring construction (1Q),llm,100,5,5,0,0.0,0.0
-qwen3.5,3,tier3/task20,T3.6 Fused-ring construction (1Q),llm,500,5,5,0,0.0,0.0
-qwen3.5,3,tier3/task20,T3.6 Fused-ring construction (1Q),codeact,100,5,5,0,1.0,0.0
-qwen3.5,3,tier3/task20,T3.6 Fused-ring construction (1Q),codeact,500,5,5,0,0.9945945945945945,0.010810810810810789
-qwen3.5,3,tier3/task20,T3.6 Fused-ring construction (1Q),codeact,1000,5,5,0,1.0,0.0
-qwen3.5,3,tier3/task20,T3.6 Fused-ring construction (1Q),rlm,100,5,5,0,1.0,0.0
-qwen3.5,3,tier3/task20,T3.6 Fused-ring construction (1Q),rlm,500,5,5,0,1.0,0.0
-qwen3.5,3,tier3/task20,T3.6 Fused-ring construction (1Q),rlm,full,5,5,0,1.0,0.0
-qwen3.5,3,tier3/task21,T3.7 Transition-metal reagent (1Q),llm,100,5,5,0,0.8,0.0
-qwen3.5,3,tier3/task21,T3.7 Transition-metal reagent (1Q),llm,500,5,5,0,0.5432467600977685,0.03232410248539323
-qwen3.5,3,tier3/task21,T3.7 Transition-metal reagent (1Q),codeact,100,5,5,0,1.0,0.0
-qwen3.5,3,tier3/task21,T3.7 Transition-metal reagent (1Q),codeact,500,5,5,0,1.0,0.0
-qwen3.5,3,tier3/task21,T3.7 Transition-metal reagent (1Q),codeact,1000,5,5,0,1.0,0.0
-qwen3.5,3,tier3/task21,T3.7 Transition-metal reagent (1Q),rlm,100,5,5,0,1.0,0.0
-qwen3.5,3,tier3/task21,T3.7 Transition-metal reagent (1Q),rlm,500,5,5,0,1.0,0.0
-qwen3.5,3,tier3/task21,T3.7 Transition-metal reagent (1Q),rlm,full,5,5,0,1.0,0.0
-qwen3.5,3,tier3/task22,T3.8 HATU / T3P reagent (1Q),llm,100,5,5,0,0.0,0.0
-qwen3.5,3,tier3/task22,T3.8 HATU / T3P reagent (1Q),llm,500,5,5,0,0.0,0.0
-qwen3.5,3,tier3/task22,T3.8 HATU / T3P reagent (1Q),codeact,100,5,5,0,1.0,0.0
-qwen3.5,3,tier3/task22,T3.8 HATU / T3P reagent (1Q),codeact,500,5,5,0,0.8139194139194139,0.35947785576411845
-qwen3.5,3,tier3/task22,T3.8 HATU / T3P reagent (1Q),codeact,1000,5,5,0,0.6618087855297158,0.3955744201128852
-qwen3.5,3,tier3/task22,T3.8 HATU / T3P reagent (1Q),rlm,100,5,5,0,1.0,0.0
-qwen3.5,3,tier3/task22,T3.8 HATU / T3P reagent (1Q),rlm,500,5,5,0,1.0,0.0
-qwen3.5,3,tier3/task22,T3.8 HATU / T3P reagent (1Q),rlm,full,5,5,0,0.949003815175922,0.041638210549218076
-qwen3.5,3,tier3/task23,T3.9 New stereocenter (1Q),llm,100,5,5,0,0.25,0.0
-qwen3.5,3,tier3/task23,T3.9 New stereocenter (1Q),llm,500,5,5,0,0.023333333333333334,0.019293061504650374
-qwen3.5,3,tier3/task23,T3.9 New stereocenter (1Q),codeact,100,5,5,0,1.0,0.0
-qwen3.5,3,tier3/task23,T3.9 New stereocenter (1Q),codeact,500,5,5,0,1.0,0.0
-qwen3.5,3,tier3/task23,T3.9 New stereocenter (1Q),codeact,1000,5,5,0,1.0,0.0
-qwen3.5,3,tier3/task23,T3.9 New stereocenter (1Q),rlm,100,5,5,0,1.0,0.0
-qwen3.5,3,tier3/task23,T3.9 New stereocenter (1Q),rlm,500,5,5,0,1.0,0.0
-qwen3.5,3,tier3/task23,T3.9 New stereocenter (1Q),rlm,full,5,5,0,0.999656475437994,0.0
-qwen3.5,3,tier3/task24,T3.10 E-alkene formation (1Q),llm,100,5,5,0,0.3047619047619048,0.02332847374079217
-qwen3.5,3,tier3/task24,T3.10 E-alkene formation (1Q),llm,500,5,5,0,0.0,0.0
-qwen3.5,3,tier3/task24,T3.10 E-alkene formation (1Q),codeact,100,5,5,0,1.0,0.0
-qwen3.5,3,tier3/task24,T3.10 E-alkene formation (1Q),codeact,500,5,5,0,1.0,0.0
-qwen3.5,3,tier3/task24,T3.10 E-alkene formation (1Q),codeact,1000,5,5,0,1.0,0.0
-qwen3.5,3,tier3/task24,T3.10 E-alkene formation (1Q),rlm,100,5,5,0,1.0,0.0
-qwen3.5,3,tier3/task24,T3.10 E-alkene formation (1Q),rlm,500,5,5,0,1.0,0.0
-qwen3.5,3,tier3/task24,T3.10 E-alkene formation (1Q),rlm,full,5,5,0,0.8,0.4
-qwen3.5,3,tier3/task6,T3.11-14 Amide couplings (4Q),llm,100,5,5,0,0.41071428571428575,0.02187044413199264
-qwen3.5,3,tier3/task6,T3.11-14 Amide couplings (4Q),llm,500,5,5,0,0.04648066411547692,0.0022365885542912985
-qwen3.5,3,tier3/task6,T3.11-14 Amide couplings (4Q),codeact,100,5,5,0,0.798874458874459,0.08228800467447883
-qwen3.5,3,tier3/task6,T3.11-14 Amide couplings (4Q),codeact,500,5,5,0,0.6377991789606346,0.06303833347089623
-qwen3.5,3,tier3/task6,T3.11-14 Amide couplings (4Q),codeact,1000,5,5,0,0.6176246248393014,0.07898840629905496
-qwen3.5,3,tier3/task6,T3.11-14 Amide couplings (4Q),rlm,100,5,5,0,0.7348215673215674,0.05964222283220093
-qwen3.5,3,tier3/task6,T3.11-14 Amide couplings (4Q),rlm,500,5,5,0,0.6509653432889538,0.04239557282258606
-qwen3.5,3,tier3/task6,T3.11-14 Amide couplings (4Q),rlm,full,5,5,0,0.41254004490261653,0.08723788292020858
-qwen3.5,3,tier3/task7,T3.15-19 Group transformations (5Q),llm,100,5,5,0,0.5055584415584415,0.04801308517757775
-qwen3.5,3,tier3/task7,T3.15-19 Group transformations (5Q),llm,500,5,5,0,0.29414285714285715,0.0014412139000401444
-qwen3.5,3,tier3/task7,T3.15-19 Group transformations (5Q),codeact,100,5,5,0,0.9229292929292929,0.010886621079036417
-qwen3.5,3,tier3/task7,T3.15-19 Group transformations (5Q),codeact,500,5,5,0,0.8623953823953825,0.07579533725277668
-qwen3.5,3,tier3/task7,T3.15-19 Group transformations (5Q),codeact,1000,5,5,0,0.8182523486052897,0.07925239641407543
-qwen3.5,3,tier3/task7,T3.15-19 Group transformations (5Q),rlm,100,5,5,0,0.9318181818181819,0.0
-qwen3.5,3,tier3/task7,T3.15-19 Group transformations (5Q),rlm,500,5,5,0,0.9098874458874459,0.024705921639252837
-qwen3.5,3,tier3/task7,T3.15-19 Group transformations (5Q),rlm,full,5,5,0,0.6920742078948832,0.06074167974867054
-qwen3.5,3,tier3/task8,T3.20-21 Protecting groups (2Q),llm,100,5,5,0,0.75,0.0
-qwen3.5,3,tier3/task8,T3.20-21 Protecting groups (2Q),llm,500,5,5,0,0.23261392729134664,0.0067139327666343816
-qwen3.5,3,tier3/task8,T3.20-21 Protecting groups (2Q),codeact,100,5,5,0,0.9386363636363637,0.042881732418439115
-qwen3.5,3,tier3/task8,T3.20-21 Protecting groups (2Q),codeact,500,5,5,0,0.777441545345686,0.20132994475032598
-qwen3.5,3,tier3/task8,T3.20-21 Protecting groups (2Q),codeact,1000,5,5,0,0.8213495975313203,0.060036394579503244
-qwen3.5,3,tier3/task8,T3.20-21 Protecting groups (2Q),rlm,100,5,5,0,0.9727272727272727,0.022268088570756146
-qwen3.5,3,tier3/task8,T3.20-21 Protecting groups (2Q),rlm,500,5,5,0,0.7936826331563174,0.14751897114170293
-qwen3.5,3,tier3/task8,T3.20-21 Protecting groups (2Q),rlm,full,5,5,0,0.8456944738863316,0.11369870068044464
-qwen3.5,3,tier3/task9,T3.22-25 Named reactions (4Q),llm,100,5,5,0,0.5209279609279609,0.012304027547105762
-qwen3.5,3,tier3/task9,T3.22-25 Named reactions (4Q),llm,500,5,5,0,0.14418369548443105,0.028565178628300148
-qwen3.5,3,tier3/task9,T3.22-25 Named reactions (4Q),codeact,100,5,5,0,0.8635509506833037,0.02449365454026714
-qwen3.5,3,tier3/task9,T3.22-25 Named reactions (4Q),codeact,500,5,5,0,0.849470449840015,0.015042809785579798
-qwen3.5,3,tier3/task9,T3.22-25 Named reactions (4Q),codeact,1000,5,5,0,0.7399482856290936,0.06806648746887309
-qwen3.5,3,tier3/task9,T3.22-25 Named reactions (4Q),rlm,100,5,5,0,0.8774368686868688,0.06169766870589581
-qwen3.5,3,tier3/task9,T3.22-25 Named reactions (4Q),rlm,500,5,5,0,0.8100713861307248,0.047283030630505256
-qwen3.5,3,tier3/task9,T3.22-25 Named reactions (4Q),rlm,full,5,5,0,0.6029520570550548,0.10832257251879665
-qwen3.5,3,tier3/task10,T3.26-30 Mechanisms I (5Q),llm,100,5,5,0,0.3988888888888889,0.031630583730947716
-qwen3.5,3,tier3/task10,T3.26-30 Mechanisms I (5Q),llm,500,5,5,0,0.6937800865800867,0.01040941489072981
-qwen3.5,3,tier3/task10,T3.26-30 Mechanisms I (5Q),codeact,100,5,5,0,0.7814718614718614,0.039300281394314324
-qwen3.5,3,tier3/task10,T3.26-30 Mechanisms I (5Q),codeact,500,5,5,0,0.8686470418470419,0.040139874103881604
-qwen3.5,3,tier3/task10,T3.26-30 Mechanisms I (5Q),codeact,1000,5,5,0,0.7185986550137493,0.01989425455751441
-qwen3.5,3,tier3/task10,T3.26-30 Mechanisms I (5Q),rlm,100,5,5,0,0.6461471861471861,0.11281411306323731
-qwen3.5,3,tier3/task10,T3.26-30 Mechanisms I (5Q),rlm,500,5,5,0,0.7433758764111705,0.12870934963361452
-qwen3.5,3,tier3/task10,T3.26-30 Mechanisms I (5Q),rlm,full,5,5,0,0.4581540701309724,0.08566415433728386
-qwen3.5,3,tier3/task10b,T3.31-35 Mechanisms II (5Q),llm,100,5,5,0,0.5680000000000001,0.007111111111111112
-qwen3.5,3,tier3/task10b,T3.31-35 Mechanisms II (5Q),llm,500,5,5,0,0.2794949494949495,0.0200285481385117
-qwen3.5,3,tier3/task10b,T3.31-35 Mechanisms II (5Q),codeact,100,5,5,0,0.7334574314574315,0.05927774025769099
-qwen3.5,3,tier3/task10b,T3.31-35 Mechanisms II (5Q),codeact,500,5,5,0,0.6119020979020979,0.04269301271446408
-qwen3.5,3,tier3/task10b,T3.31-35 Mechanisms II (5Q),codeact,1000,5,5,0,0.5744822684822685,0.04397159529457846
-qwen3.5,3,tier3/task10b,T3.31-35 Mechanisms II (5Q),rlm,100,5,5,0,0.7277561327561328,0.0338420726751217
-qwen3.5,3,tier3/task10b,T3.31-35 Mechanisms II (5Q),rlm,500,5,5,0,0.5884766344766346,0.07517326087106714
-qwen3.5,3,tier3/task10b,T3.31-35 Mechanisms II (5Q),rlm,full,5,5,0,0.2870846231684055,0.11006782825717855
-qwen3.5,4,tier4/task11,T4.1-2 Fixed-length chains (2Q),llm,100,5,5,0,0.0,0.0
-qwen3.5,4,tier4/task11,T4.1-2 Fixed-length chains (2Q),llm,500,5,5,0,0.0,0.0
-qwen3.5,4,tier4/task11,T4.1-2 Fixed-length chains (2Q),codeact,100,5,5,0,0.9666666666666666,0.0666666666666667
-qwen3.5,4,tier4/task11,T4.1-2 Fixed-length chains (2Q),codeact,500,5,5,0,0.8666666666666666,0.19436506316151
-qwen3.5,4,tier4/task11,T4.1-2 Fixed-length chains (2Q),codeact,1000,5,5,0,0.9333333333333332,0.08164965809277264
-qwen3.5,4,tier4/task11,T4.1-2 Fixed-length chains (2Q),rlm,100,5,5,0,1.0,0.0
-qwen3.5,4,tier4/task11,T4.1-2 Fixed-length chains (2Q),rlm,500,5,5,0,1.0,0.0
-qwen3.5,4,tier4/task11,T4.1-2 Fixed-length chains (2Q),rlm,full,5,5,0,0.9,0.2
-qwen3.5,4,tier4/task12,T4.3-4 Longest chains (2Q),llm,100,5,5,0,0.22222222222222224,0.0
-qwen3.5,4,tier4/task12,T4.3-4 Longest chains (2Q),llm,500,5,5,0,0.22222222222222224,0.0
-qwen3.5,4,tier4/task12,T4.3-4 Longest chains (2Q),codeact,100,5,5,0,0.5749257278669043,0.2577587361264527
-qwen3.5,4,tier4/task12,T4.3-4 Longest chains (2Q),codeact,500,5,5,0,0.21414141414141413,0.009896928253669402
-qwen3.5,4,tier4/task12,T4.3-4 Longest chains (2Q),codeact,1000,5,5,0,0.5212121212121212,0.29891822782805416
-qwen3.5,4,tier4/task12,T4.3-4 Longest chains (2Q),rlm,100,5,5,0,1.0,0.0
-qwen3.5,4,tier4/task12,T4.3-4 Longest chains (2Q),rlm,500,5,5,0,1.0,0.0
-qwen3.5,4,tier4/task12,T4.3-4 Longest chains (2Q),rlm,full,5,5,0,1.0,0.0
-qwen3.5,4,tier4/task12b,T4.5 Hub molecules (1Q),llm,100,5,5,0,0.0,0.0
-qwen3.5,4,tier4/task12b,T4.5 Hub molecules (1Q),llm,500,5,5,0,0.0,0.0
-qwen3.5,4,tier4/task12b,T4.5 Hub molecules (1Q),codeact,100,5,5,0,1.0,0.0
-qwen3.5,4,tier4/task12b,T4.5 Hub molecules (1Q),codeact,500,5,5,0,1.0,0.0
-qwen3.5,4,tier4/task12b,T4.5 Hub molecules (1Q),codeact,1000,5,5,0,1.0,0.0
-qwen3.5,4,tier4/task12b,T4.5 Hub molecules (1Q),rlm,100,5,5,0,0.8,0.4
-qwen3.5,4,tier4/task12b,T4.5 Hub molecules (1Q),rlm,500,5,5,0,0.8,0.4
-qwen3.5,4,tier4/task12b,T4.5 Hub molecules (1Q),rlm,full,5,5,0,0.9821717089956264,0.035293894333739924
-qwen3.5,4,tier4/task13,T4.6-9 Group-constrained chains (4Q),llm,100,5,5,0,0.0,0.0
-qwen3.5,4,tier4/task13,T4.6-9 Group-constrained chains (4Q),llm,500,5,5,0,0.0,0.0
-qwen3.5,4,tier4/task13,T4.6-9 Group-constrained chains (4Q),codeact,100,5,5,0,0.75,0.15811388300841897
-qwen3.5,4,tier4/task13,T4.6-9 Group-constrained chains (4Q),codeact,500,5,5,0,0.9,0.1224744871391589
-qwen3.5,4,tier4/task13,T4.6-9 Group-constrained chains (4Q),codeact,1000,5,5,0,0.55,0.18708286933869708
-qwen3.5,4,tier4/task13,T4.6-9 Group-constrained chains (4Q),rlm,100,5,5,0,0.8,0.1
-qwen3.5,4,tier4/task13,T4.6-9 Group-constrained chains (4Q),rlm,500,5,5,0,0.8,0.18708286933869708
-qwen3.5,4,tier4/task13,T4.6-9 Group-constrained chains (4Q),rlm,full,5,5,0,0.6915565508290994,0.18682912775385907
-qwen3.5,4,tier4/task14,T4.10-11 Protecting-group pairs (2Q),llm,100,5,5,0,0.3,0.2449489742783178
-qwen3.5,4,tier4/task14,T4.10-11 Protecting-group pairs (2Q),llm,500,5,5,0,0.0,0.0
-qwen3.5,4,tier4/task14,T4.10-11 Protecting-group pairs (2Q),codeact,100,5,5,0,0.74,0.22449944320643647
-qwen3.5,4,tier4/task14,T4.10-11 Protecting-group pairs (2Q),codeact,500,5,5,0,0.65,0.25495097567963926
-qwen3.5,4,tier4/task14,T4.10-11 Protecting-group pairs (2Q),codeact,1000,5,5,0,0.6055555555555555,0.1222222222222222
-qwen3.5,4,tier4/task14,T4.10-11 Protecting-group pairs (2Q),rlm,100,5,5,0,0.9,0.2
-qwen3.5,4,tier4/task14,T4.10-11 Protecting-group pairs (2Q),rlm,500,5,5,0,0.9066666666666666,0.12183777921664712
-qwen3.5,4,tier4/task14,T4.10-11 Protecting-group pairs (2Q),rlm,full,5,5,0,0.5562404884046576,0.13915072283757698
-qwen3.5,4,tier4/task15,T4.12-15 Ring-construction chains (4Q),llm,100,5,5,0,0.0,0.0
-qwen3.5,4,tier4/task15,T4.12-15 Ring-construction chains (4Q),llm,500,5,5,0,0.0,0.0
-qwen3.5,4,tier4/task15,T4.12-15 Ring-construction chains (4Q),codeact,100,5,5,0,0.6206980519480519,0.10954694126736532
-qwen3.5,4,tier4/task15,T4.12-15 Ring-construction chains (4Q),codeact,500,5,5,0,0.5148268398268397,0.09091930085935734
-qwen3.5,4,tier4/task15,T4.12-15 Ring-construction chains (4Q),codeact,1000,5,5,0,0.501482128982129,0.11779564488861914
-qwen3.5,4,tier4/task15,T4.12-15 Ring-construction chains (4Q),rlm,100,5,5,0,0.9,0.1224744871391589
-qwen3.5,4,tier4/task15,T4.12-15 Ring-construction chains (4Q),rlm,500,5,5,0,0.85,0.2
-qwen3.5,4,tier4/task15,T4.12-15 Ring-construction chains (4Q),rlm,full,5,5,0,0.8708333333333333,0.12936812246883353
-qwen3.5,4,tier4/task16,T4.16-25 Truncated routes (10Q),llm,100,5,5,0,0.0,0.0
-qwen3.5,4,tier4/task16,T4.16-25 Truncated routes (10Q),llm,500,5,5,0,0.0,0.0
-qwen3.5,4,tier4/task16,T4.16-25 Truncated routes (10Q),codeact,100,5,5,0,0.753,0.020250285777590277
-qwen3.5,4,tier4/task16,T4.16-25 Truncated routes (10Q),codeact,500,5,5,0,0.7138888888888889,0.10134892667547896
-qwen3.5,4,tier4/task16,T4.16-25 Truncated routes (10Q),codeact,1000,5,5,0,0.6731587301587302,0.08261531028553491
-qwen3.5,4,tier4/task16,T4.16-25 Truncated routes (10Q),rlm,100,5,5,0,0.6583333333333334,0.02721655269759086
-qwen3.5,4,tier4/task16,T4.16-25 Truncated routes (10Q),rlm,500,5,5,0,0.6022222222222222,0.09526441435276506
-qwen3.5,4,tier4/task16,T4.16-25 Truncated routes (10Q),rlm,full,5,4,1,0.0,0.0
-qwen3.5,4,tier4/task17,T4.26-30 SMIRKS chains I (5Q),llm,100,5,5,0,0.26666666666666666,0.0
-qwen3.5,4,tier4/task17,T4.26-30 SMIRKS chains I (5Q),llm,500,5,5,0,0.0,0.0
-qwen3.5,4,tier4/task17,T4.26-30 SMIRKS chains I (5Q),codeact,100,5,5,0,0.6723809523809524,0.08272019333565131
-qwen3.5,4,tier4/task17,T4.26-30 SMIRKS chains I (5Q),codeact,500,5,5,0,0.439047619047619,0.16021952061025677
-qwen3.5,4,tier4/task17,T4.26-30 SMIRKS chains I (5Q),codeact,1000,5,5,0,0.34028860028860025,0.06982030143296795
-qwen3.5,4,tier4/task17,T4.26-30 SMIRKS chains I (5Q),rlm,100,5,5,0,0.5114949494949494,0.07846253469055355
-qwen3.5,4,tier4/task17,T4.26-30 SMIRKS chains I (5Q),rlm,500,5,5,0,0.4493333333333333,0.1609748082430567
-qwen3.5,4,tier4/task17,T4.26-30 SMIRKS chains I (5Q),rlm,full,5,5,0,0.0784055968300614,0.06343124737038187
-qwen3.5,4,tier4/task17b,T4.31-35 SMIRKS chains II (5Q),llm,100,5,5,0,0.0,0.0
-qwen3.5,4,tier4/task17b,T4.31-35 SMIRKS chains II (5Q),llm,500,5,5,0,0.0,0.0
-qwen3.5,4,tier4/task17b,T4.31-35 SMIRKS chains II (5Q),codeact,100,5,5,0,0.7588571428571428,0.12226494408982476
-qwen3.5,4,tier4/task17b,T4.31-35 SMIRKS chains II (5Q),codeact,500,5,5,0,0.435974025974026,0.06035272414494131
-qwen3.5,4,tier4/task17b,T4.31-35 SMIRKS chains II (5Q),codeact,1000,5,5,0,0.6306060606060606,0.09422439659982206
-qwen3.5,4,tier4/task17b,T4.31-35 SMIRKS chains II (5Q),rlm,100,5,5,0,0.5980952380952381,0.10932072268405138
-qwen3.5,4,tier4/task17b,T4.31-35 SMIRKS chains II (5Q),rlm,500,5,5,0,0.5599999999999999,0.15584892970081282
-qwen3.5,4,tier4/task17b,T4.31-35 SMIRKS chains II (5Q),rlm,full,5,5,0,0.10748933438574111,0.05052301180415408
+model,tier,task,task_label,method,context,repetitions,successful_jobs,failed_jobs,scoreable_jobs,score_coverage,f1_mean,f1_std
+qwen3.5,1,tier1/task1,T1.1 Exact product lookup (10Q),llm,100,5,5,0,5,1.0,0.9866666666666667,0.016329931618554464
+qwen3.5,1,tier1/task1,T1.1 Exact product lookup (10Q),llm,500,5,5,0,5,1.0,0.968095238095238,0.017142857142857158
+qwen3.5,1,tier1/task1,T1.1 Exact product lookup (10Q),codeact,100,5,5,0,5,1.0,1.0,0.0
+qwen3.5,1,tier1/task1,T1.1 Exact product lookup (10Q),codeact,500,5,5,0,5,1.0,1.0,0.0
+qwen3.5,1,tier1/task1,T1.1 Exact product lookup (10Q),codeact,1000,5,5,0,5,1.0,1.0,0.0
+qwen3.5,1,tier1/task1,T1.1 Exact product lookup (10Q),rlm,100,5,5,0,5,1.0,1.0,0.0
+qwen3.5,1,tier1/task1,T1.1 Exact product lookup (10Q),rlm,500,5,5,0,5,1.0,1.0,0.0
+qwen3.5,1,tier1/task1,T1.1 Exact product lookup (10Q),rlm,full,5,5,0,5,1.0,1.0,0.0
+qwen3.5,2,tier2/task2,T2.1 Molecular-weight change (6Q),llm,100,5,5,0,5,1.0,0.0,0.0
+qwen3.5,2,tier2/task2,T2.1 Molecular-weight change (6Q),llm,500,5,5,0,5,1.0,0.0,0.0
+qwen3.5,2,tier2/task2,T2.1 Molecular-weight change (6Q),codeact,100,5,5,0,5,1.0,1.0,0.0
+qwen3.5,2,tier2/task2,T2.1 Molecular-weight change (6Q),codeact,500,5,5,0,5,1.0,1.0,0.0
+qwen3.5,2,tier2/task2,T2.1 Molecular-weight change (6Q),codeact,1000,5,5,0,5,1.0,1.0,0.0
+qwen3.5,2,tier2/task2,T2.1 Molecular-weight change (6Q),rlm,100,5,5,0,5,1.0,1.0,0.0
+qwen3.5,2,tier2/task2,T2.1 Molecular-weight change (6Q),rlm,500,5,5,0,5,1.0,1.0,0.0
+qwen3.5,2,tier2/task2,T2.1 Molecular-weight change (6Q),rlm,full,5,5,0,5,1.0,1.0,0.0
+qwen3.5,2,tier2/task3,T2.2 Ring-count change (5Q),llm,100,5,5,0,5,1.0,0.015017921146953406,0.01940270200267377
+qwen3.5,2,tier2/task3,T2.2 Ring-count change (5Q),llm,500,5,5,0,5,1.0,0.023713798977853494,0.02904335367933717
+qwen3.5,2,tier2/task3,T2.2 Ring-count change (5Q),codeact,100,5,5,0,5,1.0,1.0,0.0
+qwen3.5,2,tier2/task3,T2.2 Ring-count change (5Q),codeact,500,5,5,0,5,1.0,0.938,0.07593418202627854
+qwen3.5,2,tier2/task3,T2.2 Ring-count change (5Q),codeact,1000,5,5,0,5,1.0,0.9957142857142858,0.0034992710611188135
+qwen3.5,2,tier2/task3,T2.2 Ring-count change (5Q),rlm,100,5,5,0,5,1.0,0.96,0.07999999999999999
+qwen3.5,2,tier2/task3,T2.2 Ring-count change (5Q),rlm,500,5,5,0,5,1.0,0.96,0.07999999999999999
+qwen3.5,2,tier2/task3,T2.2 Ring-count change (5Q),rlm,full,5,5,0,5,1.0,1.0,0.0
+qwen3.5,2,tier2/task4,T2.3 Aromatic-ring formation (5Q),llm,100,5,5,0,5,1.0,0.020681803518697736,0.0015632086120308706
+qwen3.5,2,tier2/task4,T2.3 Aromatic-ring formation (5Q),llm,500,5,5,0,5,1.0,0.02276193693531809,6.338211184040213e-05
+qwen3.5,2,tier2/task4,T2.3 Aromatic-ring formation (5Q),codeact,100,5,5,0,5,1.0,1.0,0.0
+qwen3.5,2,tier2/task4,T2.3 Aromatic-ring formation (5Q),codeact,500,5,5,0,5,1.0,1.0,0.0
+qwen3.5,2,tier2/task4,T2.3 Aromatic-ring formation (5Q),codeact,1000,5,5,0,5,1.0,1.0,0.0
+qwen3.5,2,tier2/task4,T2.3 Aromatic-ring formation (5Q),rlm,100,5,5,0,5,1.0,1.0,0.0
+qwen3.5,2,tier2/task4,T2.3 Aromatic-ring formation (5Q),rlm,500,5,5,0,5,1.0,1.0,0.0
+qwen3.5,2,tier2/task4,T2.3 Aromatic-ring formation (5Q),rlm,full,5,5,0,5,1.0,1.0,0.0
+qwen3.5,2,tier2/task5,T2.4 Combined weight + rings (4Q),llm,100,5,5,0,5,1.0,0.0,0.0
+qwen3.5,2,tier2/task5,T2.4 Combined weight + rings (4Q),llm,500,5,5,0,5,1.0,0.0,0.0
+qwen3.5,2,tier2/task5,T2.4 Combined weight + rings (4Q),codeact,100,5,5,0,5,1.0,0.95,0.1
+qwen3.5,2,tier2/task5,T2.4 Combined weight + rings (4Q),codeact,500,5,5,0,5,1.0,0.95,0.1
+qwen3.5,2,tier2/task5,T2.4 Combined weight + rings (4Q),codeact,1000,5,5,0,5,1.0,1.0,0.0
+qwen3.5,2,tier2/task5,T2.4 Combined weight + rings (4Q),rlm,100,5,5,0,5,1.0,1.0,0.0
+qwen3.5,2,tier2/task5,T2.4 Combined weight + rings (4Q),rlm,500,5,5,0,5,1.0,0.95,0.1
+qwen3.5,2,tier2/task5,T2.4 Combined weight + rings (4Q),rlm,full,5,5,0,5,1.0,1.0,0.0
+qwen3.5,3,tier3/task13,T3.1 New nitrogen atom (1Q),llm,100,5,5,0,5,1.0,0.16960386137322261,0.023336687798871436
+qwen3.5,3,tier3/task13,T3.1 New nitrogen atom (1Q),llm,500,5,5,0,5,1.0,0.14468799853746667,0.0015250750827708378
+qwen3.5,3,tier3/task13,T3.1 New nitrogen atom (1Q),codeact,100,5,5,0,5,1.0,1.0,0.0
+qwen3.5,3,tier3/task13,T3.1 New nitrogen atom (1Q),codeact,500,5,5,0,5,1.0,1.0,0.0
+qwen3.5,3,tier3/task13,T3.1 New nitrogen atom (1Q),codeact,1000,5,5,0,5,1.0,1.0,0.0
+qwen3.5,3,tier3/task13,T3.1 New nitrogen atom (1Q),rlm,100,5,5,0,5,1.0,1.0,0.0
+qwen3.5,3,tier3/task13,T3.1 New nitrogen atom (1Q),rlm,500,5,5,0,5,1.0,1.0,0.0
+qwen3.5,3,tier3/task13,T3.1 New nitrogen atom (1Q),rlm,full,5,5,0,5,1.0,1.0,0.0
+qwen3.5,3,tier3/task14,T3.2 C-N formed / C-O broken (1Q),llm,100,5,5,0,5,1.0,0.32897456931911406,0.02051388939524225
+qwen3.5,3,tier3/task14,T3.2 C-N formed / C-O broken (1Q),llm,500,5,5,0,5,1.0,0.3181189215184812,0.001983489064753863
+qwen3.5,3,tier3/task14,T3.2 C-N formed / C-O broken (1Q),codeact,100,5,5,0,5,1.0,1.0,0.0
+qwen3.5,3,tier3/task14,T3.2 C-N formed / C-O broken (1Q),codeact,500,5,5,0,5,1.0,1.0,0.0
+qwen3.5,3,tier3/task14,T3.2 C-N formed / C-O broken (1Q),codeact,1000,5,5,0,5,1.0,1.0,0.0
+qwen3.5,3,tier3/task14,T3.2 C-N formed / C-O broken (1Q),rlm,100,5,5,0,5,1.0,1.0,0.0
+qwen3.5,3,tier3/task14,T3.2 C-N formed / C-O broken (1Q),rlm,500,5,5,0,5,1.0,1.0,0.0
+qwen3.5,3,tier3/task14,T3.2 C-N formed / C-O broken (1Q),rlm,full,5,5,0,5,1.0,1.0,0.0
+qwen3.5,3,tier3/task15,T3.3 Single C-C bond formation (1Q),llm,100,5,5,0,5,1.0,0.17958845076492133,0.008006381885491446
+qwen3.5,3,tier3/task15,T3.3 Single C-C bond formation (1Q),llm,500,5,5,0,5,1.0,0.0,0.0
+qwen3.5,3,tier3/task15,T3.3 Single C-C bond formation (1Q),codeact,100,5,5,0,5,1.0,0.8150000000000001,0.3112876483254676
+qwen3.5,3,tier3/task15,T3.3 Single C-C bond formation (1Q),codeact,500,5,5,0,5,1.0,1.0,0.0
+qwen3.5,3,tier3/task15,T3.3 Single C-C bond formation (1Q),codeact,1000,5,5,0,5,1.0,0.8466019417475728,0.3067961165048544
+qwen3.5,3,tier3/task15,T3.3 Single C-C bond formation (1Q),rlm,100,5,5,0,5,1.0,0.8400000000000001,0.32
+qwen3.5,3,tier3/task15,T3.3 Single C-C bond formation (1Q),rlm,500,5,5,0,5,1.0,0.3697436281859071,0.26655718233497816
+qwen3.5,3,tier3/task15,T3.3 Single C-C bond formation (1Q),rlm,full,5,5,0,5,1.0,0.5474886921365474,0.4100904305046129
+qwen3.5,3,tier3/task17,T3.4 Fused heterocycle (1Q),llm,100,5,5,0,5,1.0,0.25272727272727274,0.12390345481746051
+qwen3.5,3,tier3/task17,T3.4 Fused heterocycle (1Q),llm,500,5,5,0,5,1.0,0.1746841250652797,0.14345845813013314
+qwen3.5,3,tier3/task17,T3.4 Fused heterocycle (1Q),codeact,100,5,5,0,5,1.0,0.9168831168831169,0.10976907329410618
+qwen3.5,3,tier3/task17,T3.4 Fused heterocycle (1Q),codeact,500,5,5,0,5,1.0,0.8566666666666667,0.1562049935181331
+qwen3.5,3,tier3/task17,T3.4 Fused heterocycle (1Q),codeact,1000,5,5,0,5,1.0,0.9720930232558139,0.055813953488372106
+qwen3.5,3,tier3/task17,T3.4 Fused heterocycle (1Q),rlm,100,5,5,0,5,1.0,0.923076923076923,0.15384615384615388
+qwen3.5,3,tier3/task17,T3.4 Fused heterocycle (1Q),rlm,500,5,5,0,5,1.0,1.0,0.0
+qwen3.5,3,tier3/task17,T3.4 Fused heterocycle (1Q),rlm,full,5,5,0,5,1.0,0.7088308564493795,0.26923900729938444
+qwen3.5,3,tier3/task18,T3.5 New ring system (1Q),llm,100,5,5,0,0,0.0,,
+qwen3.5,3,tier3/task18,T3.5 New ring system (1Q),llm,500,5,5,0,0,0.0,,
+qwen3.5,3,tier3/task18,T3.5 New ring system (1Q),codeact,100,5,5,0,0,0.0,,
+qwen3.5,3,tier3/task18,T3.5 New ring system (1Q),codeact,500,5,5,0,0,0.0,,
+qwen3.5,3,tier3/task18,T3.5 New ring system (1Q),codeact,1000,5,5,0,0,0.0,,
+qwen3.5,3,tier3/task18,T3.5 New ring system (1Q),rlm,100,5,5,0,0,0.0,,
+qwen3.5,3,tier3/task18,T3.5 New ring system (1Q),rlm,500,5,5,0,0,0.0,,
+qwen3.5,3,tier3/task18,T3.5 New ring system (1Q),rlm,full,5,5,0,0,0.0,,
+qwen3.5,3,tier3/task20,T3.6 Fused-ring construction (1Q),llm,100,5,5,0,5,1.0,0.0,0.0
+qwen3.5,3,tier3/task20,T3.6 Fused-ring construction (1Q),llm,500,5,5,0,5,1.0,0.0,0.0
+qwen3.5,3,tier3/task20,T3.6 Fused-ring construction (1Q),codeact,100,5,5,0,5,1.0,1.0,0.0
+qwen3.5,3,tier3/task20,T3.6 Fused-ring construction (1Q),codeact,500,5,5,0,5,1.0,0.9945945945945945,0.010810810810810789
+qwen3.5,3,tier3/task20,T3.6 Fused-ring construction (1Q),codeact,1000,5,5,0,5,1.0,1.0,0.0
+qwen3.5,3,tier3/task20,T3.6 Fused-ring construction (1Q),rlm,100,5,5,0,5,1.0,1.0,0.0
+qwen3.5,3,tier3/task20,T3.6 Fused-ring construction (1Q),rlm,500,5,5,0,5,1.0,1.0,0.0
+qwen3.5,3,tier3/task20,T3.6 Fused-ring construction (1Q),rlm,full,5,5,0,5,1.0,1.0,0.0
+qwen3.5,3,tier3/task21,T3.7 Transition-metal reagent (1Q),llm,100,5,5,0,5,1.0,0.8,0.0
+qwen3.5,3,tier3/task21,T3.7 Transition-metal reagent (1Q),llm,500,5,5,0,5,1.0,0.5432467600977685,0.03232410248539323
+qwen3.5,3,tier3/task21,T3.7 Transition-metal reagent (1Q),codeact,100,5,5,0,5,1.0,1.0,0.0
+qwen3.5,3,tier3/task21,T3.7 Transition-metal reagent (1Q),codeact,500,5,5,0,5,1.0,1.0,0.0
+qwen3.5,3,tier3/task21,T3.7 Transition-metal reagent (1Q),codeact,1000,5,5,0,5,1.0,1.0,0.0
+qwen3.5,3,tier3/task21,T3.7 Transition-metal reagent (1Q),rlm,100,5,5,0,5,1.0,1.0,0.0
+qwen3.5,3,tier3/task21,T3.7 Transition-metal reagent (1Q),rlm,500,5,5,0,5,1.0,1.0,0.0
+qwen3.5,3,tier3/task21,T3.7 Transition-metal reagent (1Q),rlm,full,5,5,0,5,1.0,1.0,0.0
+qwen3.5,3,tier3/task22,T3.8 HATU / T3P reagent (1Q),llm,100,5,5,0,5,1.0,0.0,0.0
+qwen3.5,3,tier3/task22,T3.8 HATU / T3P reagent (1Q),llm,500,5,5,0,5,1.0,0.0,0.0
+qwen3.5,3,tier3/task22,T3.8 HATU / T3P reagent (1Q),codeact,100,5,5,0,5,1.0,1.0,0.0
+qwen3.5,3,tier3/task22,T3.8 HATU / T3P reagent (1Q),codeact,500,5,5,0,5,1.0,0.8139194139194139,0.35947785576411845
+qwen3.5,3,tier3/task22,T3.8 HATU / T3P reagent (1Q),codeact,1000,5,5,0,5,1.0,0.6618087855297158,0.3955744201128852
+qwen3.5,3,tier3/task22,T3.8 HATU / T3P reagent (1Q),rlm,100,5,5,0,5,1.0,1.0,0.0
+qwen3.5,3,tier3/task22,T3.8 HATU / T3P reagent (1Q),rlm,500,5,5,0,5,1.0,1.0,0.0
+qwen3.5,3,tier3/task22,T3.8 HATU / T3P reagent (1Q),rlm,full,5,5,0,5,1.0,0.949003815175922,0.041638210549218076
+qwen3.5,3,tier3/task23,T3.9 New stereocenter (1Q),llm,100,5,5,0,0,0.0,,
+qwen3.5,3,tier3/task23,T3.9 New stereocenter (1Q),llm,500,5,5,0,0,0.0,,
+qwen3.5,3,tier3/task23,T3.9 New stereocenter (1Q),codeact,100,5,5,0,0,0.0,,
+qwen3.5,3,tier3/task23,T3.9 New stereocenter (1Q),codeact,500,5,5,0,0,0.0,,
+qwen3.5,3,tier3/task23,T3.9 New stereocenter (1Q),codeact,1000,5,5,0,0,0.0,,
+qwen3.5,3,tier3/task23,T3.9 New stereocenter (1Q),rlm,100,5,5,0,0,0.0,,
+qwen3.5,3,tier3/task23,T3.9 New stereocenter (1Q),rlm,500,5,5,0,0,0.0,,
+qwen3.5,3,tier3/task23,T3.9 New stereocenter (1Q),rlm,full,5,5,0,0,0.0,,
+qwen3.5,3,tier3/task24,T3.10 E-alkene formation (1Q),llm,100,5,5,0,5,1.0,0.3047619047619048,0.02332847374079217
+qwen3.5,3,tier3/task24,T3.10 E-alkene formation (1Q),llm,500,5,5,0,5,1.0,0.0,0.0
+qwen3.5,3,tier3/task24,T3.10 E-alkene formation (1Q),codeact,100,5,5,0,5,1.0,1.0,0.0
+qwen3.5,3,tier3/task24,T3.10 E-alkene formation (1Q),codeact,500,5,5,0,5,1.0,1.0,0.0
+qwen3.5,3,tier3/task24,T3.10 E-alkene formation (1Q),codeact,1000,5,5,0,5,1.0,1.0,0.0
+qwen3.5,3,tier3/task24,T3.10 E-alkene formation (1Q),rlm,100,5,5,0,5,1.0,1.0,0.0
+qwen3.5,3,tier3/task24,T3.10 E-alkene formation (1Q),rlm,500,5,5,0,5,1.0,1.0,0.0
+qwen3.5,3,tier3/task24,T3.10 E-alkene formation (1Q),rlm,full,5,5,0,5,1.0,0.8,0.4
+qwen3.5,3,tier3/task6,T3.11-14 Amide couplings (4Q),llm,100,5,5,0,0,0.0,,
+qwen3.5,3,tier3/task6,T3.11-14 Amide couplings (4Q),llm,500,5,5,0,0,0.0,,
+qwen3.5,3,tier3/task6,T3.11-14 Amide couplings (4Q),codeact,100,5,5,0,0,0.0,,
+qwen3.5,3,tier3/task6,T3.11-14 Amide couplings (4Q),codeact,500,5,5,0,0,0.0,,
+qwen3.5,3,tier3/task6,T3.11-14 Amide couplings (4Q),codeact,1000,5,5,0,0,0.0,,
+qwen3.5,3,tier3/task6,T3.11-14 Amide couplings (4Q),rlm,100,5,5,0,0,0.0,,
+qwen3.5,3,tier3/task6,T3.11-14 Amide couplings (4Q),rlm,500,5,5,0,0,0.0,,
+qwen3.5,3,tier3/task6,T3.11-14 Amide couplings (4Q),rlm,full,5,5,0,0,0.0,,
+qwen3.5,3,tier3/task7,T3.15-19 Group transformations (5Q),llm,100,5,5,0,0,0.0,,
+qwen3.5,3,tier3/task7,T3.15-19 Group transformations (5Q),llm,500,5,5,0,0,0.0,,
+qwen3.5,3,tier3/task7,T3.15-19 Group transformations (5Q),codeact,100,5,5,0,0,0.0,,
+qwen3.5,3,tier3/task7,T3.15-19 Group transformations (5Q),codeact,500,5,5,0,0,0.0,,
+qwen3.5,3,tier3/task7,T3.15-19 Group transformations (5Q),codeact,1000,5,5,0,0,0.0,,
+qwen3.5,3,tier3/task7,T3.15-19 Group transformations (5Q),rlm,100,5,5,0,0,0.0,,
+qwen3.5,3,tier3/task7,T3.15-19 Group transformations (5Q),rlm,500,5,5,0,0,0.0,,
+qwen3.5,3,tier3/task7,T3.15-19 Group transformations (5Q),rlm,full,5,5,0,0,0.0,,
+qwen3.5,3,tier3/task8,T3.20-21 Protecting groups (2Q),llm,100,5,5,0,5,1.0,0.75,0.0
+qwen3.5,3,tier3/task8,T3.20-21 Protecting groups (2Q),llm,500,5,5,0,5,1.0,0.23261392729134664,0.0067139327666343816
+qwen3.5,3,tier3/task8,T3.20-21 Protecting groups (2Q),codeact,100,5,5,0,5,1.0,0.9386363636363637,0.042881732418439115
+qwen3.5,3,tier3/task8,T3.20-21 Protecting groups (2Q),codeact,500,5,5,0,5,1.0,0.777441545345686,0.20132994475032598
+qwen3.5,3,tier3/task8,T3.20-21 Protecting groups (2Q),codeact,1000,5,5,0,5,1.0,0.8213495975313203,0.060036394579503244
+qwen3.5,3,tier3/task8,T3.20-21 Protecting groups (2Q),rlm,100,5,5,0,5,1.0,0.9727272727272727,0.022268088570756146
+qwen3.5,3,tier3/task8,T3.20-21 Protecting groups (2Q),rlm,500,5,5,0,5,1.0,0.7936826331563174,0.14751897114170293
+qwen3.5,3,tier3/task8,T3.20-21 Protecting groups (2Q),rlm,full,5,5,0,5,1.0,0.8456944738863316,0.11369870068044464
+qwen3.5,3,tier3/task9,T3.22-25 Named reactions (4Q),llm,100,5,5,0,5,1.0,0.5209279609279609,0.012304027547105762
+qwen3.5,3,tier3/task9,T3.22-25 Named reactions (4Q),llm,500,5,5,0,5,1.0,0.14418369548443105,0.028565178628300148
+qwen3.5,3,tier3/task9,T3.22-25 Named reactions (4Q),codeact,100,5,5,0,5,1.0,0.8635509506833037,0.02449365454026714
+qwen3.5,3,tier3/task9,T3.22-25 Named reactions (4Q),codeact,500,5,5,0,5,1.0,0.849470449840015,0.015042809785579798
+qwen3.5,3,tier3/task9,T3.22-25 Named reactions (4Q),codeact,1000,5,5,0,5,1.0,0.7399482856290936,0.06806648746887309
+qwen3.5,3,tier3/task9,T3.22-25 Named reactions (4Q),rlm,100,5,5,0,5,1.0,0.8774368686868688,0.06169766870589581
+qwen3.5,3,tier3/task9,T3.22-25 Named reactions (4Q),rlm,500,5,5,0,5,1.0,0.8100713861307248,0.047283030630505256
+qwen3.5,3,tier3/task9,T3.22-25 Named reactions (4Q),rlm,full,5,5,0,5,1.0,0.6029520570550548,0.10832257251879665
+qwen3.5,3,tier3/task10,T3.26-30 Mechanisms I (5Q),llm,100,5,5,0,0,0.0,,
+qwen3.5,3,tier3/task10,T3.26-30 Mechanisms I (5Q),llm,500,5,5,0,0,0.0,,
+qwen3.5,3,tier3/task10,T3.26-30 Mechanisms I (5Q),codeact,100,5,5,0,0,0.0,,
+qwen3.5,3,tier3/task10,T3.26-30 Mechanisms I (5Q),codeact,500,5,5,0,0,0.0,,
+qwen3.5,3,tier3/task10,T3.26-30 Mechanisms I (5Q),codeact,1000,5,5,0,0,0.0,,
+qwen3.5,3,tier3/task10,T3.26-30 Mechanisms I (5Q),rlm,100,5,5,0,0,0.0,,
+qwen3.5,3,tier3/task10,T3.26-30 Mechanisms I (5Q),rlm,500,5,5,0,0,0.0,,
+qwen3.5,3,tier3/task10,T3.26-30 Mechanisms I (5Q),rlm,full,5,5,0,0,0.0,,
+qwen3.5,3,tier3/task10b,T3.31-35 Mechanisms II (5Q),llm,100,5,5,0,5,1.0,0.5680000000000001,0.007111111111111112
+qwen3.5,3,tier3/task10b,T3.31-35 Mechanisms II (5Q),llm,500,5,5,0,5,1.0,0.2794949494949495,0.0200285481385117
+qwen3.5,3,tier3/task10b,T3.31-35 Mechanisms II (5Q),codeact,100,5,5,0,5,1.0,0.7334574314574315,0.05927774025769099
+qwen3.5,3,tier3/task10b,T3.31-35 Mechanisms II (5Q),codeact,500,5,5,0,5,1.0,0.6119020979020979,0.04269301271446408
+qwen3.5,3,tier3/task10b,T3.31-35 Mechanisms II (5Q),codeact,1000,5,5,0,5,1.0,0.5744822684822685,0.04397159529457846
+qwen3.5,3,tier3/task10b,T3.31-35 Mechanisms II (5Q),rlm,100,5,5,0,5,1.0,0.7277561327561328,0.0338420726751217
+qwen3.5,3,tier3/task10b,T3.31-35 Mechanisms II (5Q),rlm,500,5,5,0,5,1.0,0.5884766344766346,0.07517326087106714
+qwen3.5,3,tier3/task10b,T3.31-35 Mechanisms II (5Q),rlm,full,5,5,0,5,1.0,0.2870846231684055,0.11006782825717855
+qwen3.5,4,tier4/task11,T4.1-2 Fixed-length chains (2Q),llm,100,5,5,0,5,1.0,0.0,0.0
+qwen3.5,4,tier4/task11,T4.1-2 Fixed-length chains (2Q),llm,500,5,5,0,5,1.0,0.0,0.0
+qwen3.5,4,tier4/task11,T4.1-2 Fixed-length chains (2Q),codeact,100,5,5,0,5,1.0,0.9666666666666666,0.0666666666666667
+qwen3.5,4,tier4/task11,T4.1-2 Fixed-length chains (2Q),codeact,500,5,5,0,5,1.0,0.8666666666666666,0.19436506316151
+qwen3.5,4,tier4/task11,T4.1-2 Fixed-length chains (2Q),codeact,1000,5,5,0,5,1.0,0.9333333333333332,0.08164965809277264
+qwen3.5,4,tier4/task11,T4.1-2 Fixed-length chains (2Q),rlm,100,5,5,0,5,1.0,1.0,0.0
+qwen3.5,4,tier4/task11,T4.1-2 Fixed-length chains (2Q),rlm,500,5,5,0,5,1.0,1.0,0.0
+qwen3.5,4,tier4/task11,T4.1-2 Fixed-length chains (2Q),rlm,full,5,5,0,5,1.0,0.9,0.2
+qwen3.5,4,tier4/task12,T4.3-4 Longest chains (2Q),llm,100,5,5,0,5,1.0,0.22222222222222224,0.0
+qwen3.5,4,tier4/task12,T4.3-4 Longest chains (2Q),llm,500,5,5,0,5,1.0,0.22222222222222224,0.0
+qwen3.5,4,tier4/task12,T4.3-4 Longest chains (2Q),codeact,100,5,5,0,5,1.0,0.5749257278669043,0.2577587361264527
+qwen3.5,4,tier4/task12,T4.3-4 Longest chains (2Q),codeact,500,5,5,0,5,1.0,0.21414141414141413,0.009896928253669402
+qwen3.5,4,tier4/task12,T4.3-4 Longest chains (2Q),codeact,1000,5,5,0,5,1.0,0.5212121212121212,0.29891822782805416
+qwen3.5,4,tier4/task12,T4.3-4 Longest chains (2Q),rlm,100,5,5,0,5,1.0,1.0,0.0
+qwen3.5,4,tier4/task12,T4.3-4 Longest chains (2Q),rlm,500,5,5,0,5,1.0,1.0,0.0
+qwen3.5,4,tier4/task12,T4.3-4 Longest chains (2Q),rlm,full,5,5,0,5,1.0,1.0,0.0
+qwen3.5,4,tier4/task12b,T4.5 Hub molecules (1Q),llm,100,5,5,0,5,1.0,0.0,0.0
+qwen3.5,4,tier4/task12b,T4.5 Hub molecules (1Q),llm,500,5,5,0,5,1.0,0.0,0.0
+qwen3.5,4,tier4/task12b,T4.5 Hub molecules (1Q),codeact,100,5,5,0,5,1.0,1.0,0.0
+qwen3.5,4,tier4/task12b,T4.5 Hub molecules (1Q),codeact,500,5,5,0,5,1.0,1.0,0.0
+qwen3.5,4,tier4/task12b,T4.5 Hub molecules (1Q),codeact,1000,5,5,0,5,1.0,1.0,0.0
+qwen3.5,4,tier4/task12b,T4.5 Hub molecules (1Q),rlm,100,5,5,0,5,1.0,0.8,0.4
+qwen3.5,4,tier4/task12b,T4.5 Hub molecules (1Q),rlm,500,5,5,0,5,1.0,0.8,0.4
+qwen3.5,4,tier4/task12b,T4.5 Hub molecules (1Q),rlm,full,5,5,0,5,1.0,0.9821717089956264,0.035293894333739924
+qwen3.5,4,tier4/task13,T4.6-9 Group-constrained chains (4Q),llm,100,5,5,0,5,1.0,0.0,0.0
+qwen3.5,4,tier4/task13,T4.6-9 Group-constrained chains (4Q),llm,500,5,5,0,5,1.0,0.0,0.0
+qwen3.5,4,tier4/task13,T4.6-9 Group-constrained chains (4Q),codeact,100,5,5,0,5,1.0,0.75,0.15811388300841897
+qwen3.5,4,tier4/task13,T4.6-9 Group-constrained chains (4Q),codeact,500,5,5,0,5,1.0,0.9,0.1224744871391589
+qwen3.5,4,tier4/task13,T4.6-9 Group-constrained chains (4Q),codeact,1000,5,5,0,5,1.0,0.55,0.18708286933869708
+qwen3.5,4,tier4/task13,T4.6-9 Group-constrained chains (4Q),rlm,100,5,5,0,5,1.0,0.8,0.1
+qwen3.5,4,tier4/task13,T4.6-9 Group-constrained chains (4Q),rlm,500,5,5,0,5,1.0,0.8,0.18708286933869708
+qwen3.5,4,tier4/task13,T4.6-9 Group-constrained chains (4Q),rlm,full,5,5,0,5,1.0,0.6915565508290994,0.18682912775385907
+qwen3.5,4,tier4/task14,T4.10-11 Protecting-group pairs (2Q),llm,100,5,5,0,5,1.0,0.3,0.2449489742783178
+qwen3.5,4,tier4/task14,T4.10-11 Protecting-group pairs (2Q),llm,500,5,5,0,5,1.0,0.0,0.0
+qwen3.5,4,tier4/task14,T4.10-11 Protecting-group pairs (2Q),codeact,100,5,5,0,5,1.0,0.74,0.22449944320643647
+qwen3.5,4,tier4/task14,T4.10-11 Protecting-group pairs (2Q),codeact,500,5,5,0,5,1.0,0.65,0.25495097567963926
+qwen3.5,4,tier4/task14,T4.10-11 Protecting-group pairs (2Q),codeact,1000,5,5,0,5,1.0,0.6055555555555555,0.1222222222222222
+qwen3.5,4,tier4/task14,T4.10-11 Protecting-group pairs (2Q),rlm,100,5,5,0,5,1.0,0.9,0.2
+qwen3.5,4,tier4/task14,T4.10-11 Protecting-group pairs (2Q),rlm,500,5,5,0,5,1.0,0.9066666666666666,0.12183777921664712
+qwen3.5,4,tier4/task14,T4.10-11 Protecting-group pairs (2Q),rlm,full,5,5,0,5,1.0,0.5562404884046576,0.13915072283757698
+qwen3.5,4,tier4/task15,T4.12-15 Ring-construction chains (4Q),llm,100,5,5,0,0,0.0,,
+qwen3.5,4,tier4/task15,T4.12-15 Ring-construction chains (4Q),llm,500,5,5,0,0,0.0,,
+qwen3.5,4,tier4/task15,T4.12-15 Ring-construction chains (4Q),codeact,100,5,5,0,0,0.0,,
+qwen3.5,4,tier4/task15,T4.12-15 Ring-construction chains (4Q),codeact,500,5,5,0,0,0.0,,
+qwen3.5,4,tier4/task15,T4.12-15 Ring-construction chains (4Q),codeact,1000,5,5,0,0,0.0,,
+qwen3.5,4,tier4/task15,T4.12-15 Ring-construction chains (4Q),rlm,100,5,5,0,0,0.0,,
+qwen3.5,4,tier4/task15,T4.12-15 Ring-construction chains (4Q),rlm,500,5,5,0,0,0.0,,
+qwen3.5,4,tier4/task15,T4.12-15 Ring-construction chains (4Q),rlm,full,5,5,0,0,0.0,,
+qwen3.5,4,tier4/task16,T4.16-25 Truncated routes (10Q),llm,100,5,5,0,5,1.0,0.0,0.0
+qwen3.5,4,tier4/task16,T4.16-25 Truncated routes (10Q),llm,500,5,5,0,5,1.0,0.0,0.0
+qwen3.5,4,tier4/task16,T4.16-25 Truncated routes (10Q),codeact,100,5,5,0,5,1.0,0.753,0.020250285777590277
+qwen3.5,4,tier4/task16,T4.16-25 Truncated routes (10Q),codeact,500,5,5,0,5,1.0,0.7138888888888889,0.10134892667547896
+qwen3.5,4,tier4/task16,T4.16-25 Truncated routes (10Q),codeact,1000,5,5,0,5,1.0,0.6731587301587302,0.08261531028553491
+qwen3.5,4,tier4/task16,T4.16-25 Truncated routes (10Q),rlm,100,5,5,0,5,1.0,0.6583333333333334,0.02721655269759086
+qwen3.5,4,tier4/task16,T4.16-25 Truncated routes (10Q),rlm,500,5,5,0,5,1.0,0.6022222222222222,0.09526441435276506
+qwen3.5,4,tier4/task16,T4.16-25 Truncated routes (10Q),rlm,full,5,4,1,5,1.0,0.0,0.0
+qwen3.5,4,tier4/task17,T4.26-30 SMIRKS chains I (5Q),llm,100,5,5,0,5,1.0,0.26666666666666666,0.0
+qwen3.5,4,tier4/task17,T4.26-30 SMIRKS chains I (5Q),llm,500,5,5,0,5,1.0,0.0,0.0
+qwen3.5,4,tier4/task17,T4.26-30 SMIRKS chains I (5Q),codeact,100,5,5,0,5,1.0,0.6723809523809524,0.08272019333565131
+qwen3.5,4,tier4/task17,T4.26-30 SMIRKS chains I (5Q),codeact,500,5,5,0,5,1.0,0.439047619047619,0.16021952061025677
+qwen3.5,4,tier4/task17,T4.26-30 SMIRKS chains I (5Q),codeact,1000,5,5,0,5,1.0,0.34028860028860025,0.06982030143296795
+qwen3.5,4,tier4/task17,T4.26-30 SMIRKS chains I (5Q),rlm,100,5,5,0,5,1.0,0.5114949494949494,0.07846253469055355
+qwen3.5,4,tier4/task17,T4.26-30 SMIRKS chains I (5Q),rlm,500,5,5,0,5,1.0,0.4493333333333333,0.1609748082430567
+qwen3.5,4,tier4/task17,T4.26-30 SMIRKS chains I (5Q),rlm,full,5,5,0,5,1.0,0.0784055968300614,0.06343124737038187
+qwen3.5,4,tier4/task17b,T4.31-35 SMIRKS chains II (5Q),llm,100,5,5,0,5,1.0,0.0,0.0
+qwen3.5,4,tier4/task17b,T4.31-35 SMIRKS chains II (5Q),llm,500,5,5,0,5,1.0,0.0,0.0
+qwen3.5,4,tier4/task17b,T4.31-35 SMIRKS chains II (5Q),codeact,100,5,5,0,5,1.0,0.7588571428571428,0.12226494408982476
+qwen3.5,4,tier4/task17b,T4.31-35 SMIRKS chains II (5Q),codeact,500,5,5,0,5,1.0,0.435974025974026,0.06035272414494131
+qwen3.5,4,tier4/task17b,T4.31-35 SMIRKS chains II (5Q),codeact,1000,5,5,0,5,1.0,0.6306060606060606,0.09422439659982206
+qwen3.5,4,tier4/task17b,T4.31-35 SMIRKS chains II (5Q),rlm,100,5,5,0,5,1.0,0.5980952380952381,0.10932072268405138
+qwen3.5,4,tier4/task17b,T4.31-35 SMIRKS chains II (5Q),rlm,500,5,5,0,5,1.0,0.5599999999999999,0.15584892970081282
+qwen3.5,4,tier4/task17b,T4.31-35 SMIRKS chains II (5Q),rlm,full,5,5,0,5,1.0,0.10748933438574111,0.05052301180415408

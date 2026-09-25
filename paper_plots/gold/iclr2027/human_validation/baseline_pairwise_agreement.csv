@@ -1,0 +1,4 @@
+annotator_a,annotator_b,answer_cohen_kappa,answer_disagreement_items,correctness_cohen_kappa,overlap_items,raw_answer_agreement,raw_correctness_agreement
+reviewer-3,reviewer-2,1.0,,1.0,3,1.0,1.0
+reviewer-3,reviewer-1,0.5454545454545454,rxh-t3-task10-wittig-olefination|rxh-t4-task17-boc-buchwald,0.5454545454545455,5,0.6,0.8
+reviewer-2,reviewer-1,1.0,,1.0,3,1.0,1.0

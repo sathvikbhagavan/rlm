@@ -81,6 +81,17 @@ def population_std(values: list[float]) -> float:
     return statistics.pstdev(values) if values else 0.0
 
 
+def as_bool(value: Any) -> bool:
+    return str(value).lower() in {"1", "true", "yes"}
+
+
+def row_score_available(row: dict[str, Any]) -> bool:
+    """Read the explicit score flag, with legacy-table compatibility."""
+    if "score_available" in row:
+        return as_bool(row["score_available"])
+    return row.get("status") == "succeeded" and row.get("f1") not in {None, ""}
+
+
 def summarize_model(
     rows: list[dict[str, str]], model: str
 ) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
@@ -110,11 +121,21 @@ def summarize_model(
             by_repetition[int(row["repetition"])].append(row)
         repetition_values: dict[str, list[float]] = defaultdict(list)
         for repetition_group in by_repetition.values():
-            resolved_trajectories = sum(int(row["question_count"]) for row in repetition_group)
+            scoreable = [
+                row
+                for row in repetition_group
+                if row["status"] == "failed"
+                or (row["status"] == "succeeded" and row_score_available(row))
+            ]
+            scoreable_trajectories = sum(int(row["question_count"]) for row in scoreable)
             successful = [row for row in repetition_group if row["status"] == "succeeded"]
+            scored_successful = [row for row in successful if row_score_available(row)]
             successful_trajectories = sum(int(row["question_count"]) for row in successful)
-            f1_numerator = sum(float(row["f1"]) * int(row["question_count"]) for row in successful)
-            repetition_values["f1"].append(f1_numerator / resolved_trajectories)
+            f1_numerator = sum(
+                float(row["f1"]) * int(row["question_count"]) for row in scored_successful
+            )
+            if scoreable_trajectories:
+                repetition_values["f1"].append(f1_numerator / scoreable_trajectories)
             if successful_trajectories:
                 for metric in ADDITIVE_METRICS:
                     measured = [row for row in successful if row[metric] != ""]
@@ -141,8 +162,17 @@ def summarize_model(
             "successful_jobs": sum(row["status"] == "succeeded" for row in group),
             "failed_jobs": sum(row["status"] == "failed" for row in group),
             "question_trajectories": sum(int(row["question_count"]) for row in group),
+            "scoreable_trajectories": sum(
+                int(row["question_count"])
+                for row in group
+                if row["status"] == "failed"
+                or (row["status"] == "succeeded" and row_score_available(row))
+            ),
             "repetitions": len(by_repetition),
         }
+        output["score_coverage"] = (
+            output["scoreable_trajectories"] / output["question_trajectories"]
+        )
         for metric in ("f1", *ADDITIVE_METRICS, "peak_combined_memory_mib"):
             values = repetition_values[metric]
             output[f"{metric}_mean"] = statistics.fmean(values) if values else None
@@ -161,8 +191,15 @@ def summarize_model(
             CONTEXT_ORDER[item[0][2]],
         ),
     ):
+        scoreable = [
+            row
+            for row in group
+            if row["status"] == "failed"
+            or (row["status"] == "succeeded" and row_score_available(row))
+        ]
         resolved_scores = [
-            float(row["f1"]) if row["status"] == "succeeded" else 0.0 for row in group
+            float(row["f1"]) if row["status"] == "succeeded" else 0.0
+            for row in scoreable
         ]
         task_summaries.append(
             {
@@ -175,8 +212,10 @@ def summarize_model(
                 "repetitions": len(group),
                 "successful_jobs": sum(row["status"] == "succeeded" for row in group),
                 "failed_jobs": sum(row["status"] == "failed" for row in group),
-                "f1_mean": statistics.fmean(resolved_scores),
-                "f1_std": population_std(resolved_scores),
+                "scoreable_jobs": len(scoreable),
+                "score_coverage": len(scoreable) / len(group),
+                "f1_mean": statistics.fmean(resolved_scores) if resolved_scores else None,
+                "f1_std": population_std(resolved_scores) if resolved_scores else None,
             }
         )
     return summaries, task_summaries
@@ -222,8 +261,14 @@ def main() -> None:
             {"path": path.name, "sha256": sha256_file(path)} for path in (summary_path, task_path)
         ],
         "aggregation": {
-            "f1": "question-weighted within each repetition; terminal failures score zero",
-            "additive_resources": "sum divided by successful question trajectories",
+            "f1": (
+                "question-weighted within each repetition; terminal failures score zero; "
+                "ground-truth-invalidated successes are excluded and reduce score coverage"
+            ),
+            "additive_resources": (
+                "sum divided by all successful question trajectories, including runs whose "
+                "historical scores were invalidated"
+            ),
             "peak_memory": "mean combined process-tree plus Docker peak per successful job",
             "variation": "population standard deviation across five repetitions",
         },
