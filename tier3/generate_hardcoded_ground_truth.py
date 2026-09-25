@@ -14,8 +14,12 @@ from pprint import pformat
 from rdkit import Chem, rdBase
 from rdkit.Chem import rdChemReactions
 
-
-DATASET_PATH = __import__("os").environ.get("RXNHAYSTACK_CLEANED_DATASET", __import__("os").path.expanduser("~/datasets/rxnhaystack/reactionSmilesFigShareUSPTO2023_cleaned.txt"))
+DATASET_PATH = __import__("os").environ.get(
+    "RXNHAYSTACK_CLEANED_DATASET",
+    __import__("os").path.expanduser(
+        "~/datasets/rxnhaystack/reactionSmilesFigShareUSPTO2023_cleaned.txt"
+    ),
+)
 PYRIDINE_SMARTS = "c1ccncc1"
 QUINOLINE_SMARTS = "c1ccc2ncccc2c1"
 TASK17_RING_SYSTEMS: dict[str, str] = {
@@ -61,7 +65,7 @@ TASK9_NAMED_REACTIONS_SMIRKS: dict[str, str] = {
 
 
 def load_indexed_lines(dataset_path: str = DATASET_PATH) -> list[str]:
-    with open(dataset_path, "r", encoding="utf-8") as handle:
+    with open(dataset_path, encoding="utf-8") as handle:
         raw_lines = [line.strip() for line in handle if line.strip()]
     return [f"{i} {line}" for i, line in enumerate(raw_lines)]
 
@@ -136,7 +140,9 @@ def bond_multiset(mols: list[Chem.Mol]) -> Counter[tuple[int, int, Chem.BondType
     return counts
 
 
-def breaks_at_least_one_co_bond(reactant_mols: list[Chem.Mol], product_mols: list[Chem.Mol]) -> bool:
+def breaks_at_least_one_co_bond(
+    reactant_mols: list[Chem.Mol], product_mols: list[Chem.Mol]
+) -> bool:
     bond_difference = bond_multiset(reactant_mols) - bond_multiset(product_mols)
     for (atom_a, atom_b, _), count in bond_difference.items():
         if count > 0 and {atom_a, atom_b} == {6, 8}:
@@ -312,7 +318,10 @@ def task6_canonical_smiles_set(mols: list[Chem.Mol]) -> set[str]:
 
 
 def task6_reaction_matches(
-    indexed_line: str, query_reaction: rdChemReactions.ChemicalReaction
+    indexed_line: str,
+    query_reaction: rdChemReactions.ChemicalReaction,
+    *,
+    allow_repeated_single_reactant_transform: bool = False,
 ) -> bool:
     reactants, products = task6_parse_reaction_mols(indexed_line)
     template = query_reaction
@@ -336,6 +345,44 @@ def task6_reaction_matches(
                     continue
             if generated_smiles and generated_smiles.issubset(actual_product_smiles):
                 return True
+
+    if allow_repeated_single_reactant_transform and num_template_reactants == 1:
+        reactant_template = template.GetReactantTemplate(0)
+        for starting_mol in reactants:
+            max_applications = len(starting_mol.GetSubstructMatches(reactant_template))
+            if max_applications < 2:
+                continue
+            frontier = [starting_mol]
+            seen = {Chem.MolToSmiles(starting_mol)}
+            for _ in range(max_applications):
+                next_frontier: list[Chem.Mol] = []
+                for current_mol in frontier:
+                    try:
+                        product_sets = template.RunReactants((current_mol,))
+                    except Exception:
+                        continue
+                    for prod_set in product_sets:
+                        generated_smiles: set[str] = set()
+                        sanitized_products: list[Chem.Mol] = []
+                        for mol in prod_set:
+                            try:
+                                Chem.SanitizeMol(mol)
+                                generated_smiles.add(Chem.MolToSmiles(mol))
+                                sanitized_products.append(mol)
+                            except Exception:
+                                continue
+                        if generated_smiles and generated_smiles.issubset(actual_product_smiles):
+                            return True
+                        if len(sanitized_products) != 1:
+                            continue
+                        product_mol = sanitized_products[0]
+                        product_smiles = Chem.MolToSmiles(product_mol)
+                        if product_smiles not in seen:
+                            seen.add(product_smiles)
+                            next_frontier.append(product_mol)
+                frontier = next_frontier
+                if not frontier:
+                    break
     return False
 
 
@@ -388,7 +435,11 @@ def compute_task7_gt(lines: list[str]) -> tuple[dict[str, list[int]], int, int]:
             idx = int(idx_str)
             valid_reactions += 1
             for reaction_key, query_reaction in query_reactions.items():
-                if task6_reaction_matches(line, query_reaction):
+                if task6_reaction_matches(
+                    line,
+                    query_reaction,
+                    allow_repeated_single_reactant_transform=True,
+                ):
                     indices_by_reaction[reaction_key].append(idx)
         except Exception:
             skipped_reactions += 1
@@ -493,9 +544,7 @@ def compute_task19_gt(lines: list[str]) -> tuple[list[int], int, int]:
         try:
             idx, reactant_smiles, product_smiles = parse_reaction_sides(line)
             valid_reactions += 1
-            product_has_quinoline = product_contains_substructure(
-                product_smiles, QUINOLINE_SMARTS
-            )
+            product_has_quinoline = product_contains_substructure(product_smiles, QUINOLINE_SMARTS)
             reactant_has_quinoline = product_contains_substructure(
                 reactant_smiles, QUINOLINE_SMARTS
             )
@@ -640,12 +689,8 @@ def ring_systems_equivalent(
     ) -> tuple[tuple[int, bool], int, tuple[tuple[bool, float], ...]]:
         return labels[node], len(adjacency[node]), tuple(sorted(adjacency[node].values()))
 
-    signatures_a = sorted(
-        node_signature(labels_a, adjacency_a, node) for node in range(node_count)
-    )
-    signatures_b = sorted(
-        node_signature(labels_b, adjacency_b, node) for node in range(node_count)
-    )
+    signatures_a = sorted(node_signature(labels_a, adjacency_a, node) for node in range(node_count))
+    signatures_b = sorted(node_signature(labels_b, adjacency_b, node) for node in range(node_count))
     if signatures_a != signatures_b:
         return False
 
@@ -788,7 +833,7 @@ def write_task7_module(
         handle.write(f"TASK7_SKIPPED_REACTIONS = {skipped_reactions}\n")
         handle.write(
             "TASK7_GROUND_TRUTH_DEFINITION = "
-            '"reaction SMIRKS template match via RDKit RunReactants"\n'
+            '"reaction SMIRKS template match via RDKit RunReactants; for single-reactant templates, repeated occurrences of the same transformation in one reaction are matched to the recorded final product"\n'
         )
         handle.write("TASK7_TO_FG_SMIRKS = ")
         handle.write(pformat(TASK7_TO_FG_SMIRKS, width=100))
@@ -887,10 +932,7 @@ def write_task18_module(
         handle.write(f"TASK18_SKIPPED_REACTIONS = {skipped_reactions}\n")
         handle.write(f"TASK18_POSITIVE_REACTIONS = {len(indices)}\n")
         handle.write(f"TASK18_RDKIT_VERSION = {rdBase.rdkitVersion!r}\n")
-        handle.write(
-            "TASK18_GROUND_TRUTH_DEFINITION = "
-            f"{TASK18_GROUND_TRUTH_DEFINITION!r}\n\n"
-        )
+        handle.write(f"TASK18_GROUND_TRUTH_DEFINITION = {TASK18_GROUND_TRUTH_DEFINITION!r}\n\n")
         handle.write("TASK18_HARDCODED_GROUND_TRUTH_INDICES = ")
         handle.write(pformat(indices, width=100))
         handle.write("\n")
@@ -914,7 +956,7 @@ def write_task19_module(
         handle.write(f"TASK19_SKIPPED_REACTIONS = {skipped_reactions}\n")
         handle.write(f"TASK19_POSITIVE_REACTIONS = {len(indices)}\n")
         handle.write(
-            'TASK19_GROUND_TRUTH_DEFINITION = '
+            "TASK19_GROUND_TRUTH_DEFINITION = "
             '"product contains quinoline and no reactant contains quinoline"\n'
         )
         handle.write(f'TASK19_QUINOLINE_SMARTS = "{QUINOLINE_SMARTS}"\n\n')
@@ -1125,8 +1167,7 @@ def main() -> None:
     print(f"Wrote {task14_out_path}")
     print(f"task14 positives: {len(task14_indices)}")
     print(
-        f"task14 intersection of task11 ({len(task11_indices)}) "
-        f"and task12 ({len(task12_indices)})"
+        f"task14 intersection of task11 ({len(task11_indices)}) and task12 ({len(task12_indices)})"
     )
 
     task15_indices, task15_valid, task15_skipped = compute_task15_gt(lines)

@@ -1,5 +1,19 @@
 # Canonical bundle changelog
 
+## rxnhaystack-human-1.5.0 — September 25, 2026
+
+- Corrects Tier-3 Task 7 multi-site transformations. Successive applications of a
+  single-reactant template are now followed to the recorded final product. Four answer sets gain
+  14 records in total, including the reported double oxidation at reaction 3907.
+- Makes Tier-4 Task 13's existing carboxylic-acid predicate explicit: neutral, protonated
+  R-C(=O)-OH matching `[CX3](=O)[OX2H1]`; carboxylates and their salts are excluded. Its 550-chain
+  protected answer is unchanged.
+- Removes Tier-4 Task 15's 200-solution mining cap for canonical full-dataset answers. Quinoline
+  increases from 199 to 299 accepted chains and indole from 184 to 241; benzothiazole (44) and
+  benzimidazole (142) are unchanged.
+- Adds a historical model-rescoring ledger to `TIER3_TIER4_AUDIT.md` so corrected scores remain
+  traceable to their oracle and prompt versions.
+
 ## rxnhaystack-human-1.4.0 — September 24, 2026
 
 - Corrects Tier-3 Task 18 ring-system equivalence. The old fragment comparison retained

@@ -6,7 +6,6 @@ import json
 import re
 from pathlib import Path
 
-from rlm.codeact_helpers import load_lines
 from task15_ring_chain_graph import (
     PATH_LENGTH,
     build_molecule_graphs,
@@ -16,7 +15,14 @@ from task15_ring_chain_graph import (
 )
 from task15_ring_chain_ground_truth import DEFAULT_RING_QUERIES, question_key
 
-DATASET_PATH = __import__("os").environ.get("RXNHAYSTACK_CLEANED_DATASET", __import__("os").path.expanduser("~/datasets/rxnhaystack/reactionSmilesFigShareUSPTO2023_cleaned.txt"))
+from rlm.codeact_helpers import load_lines
+
+DATASET_PATH = __import__("os").environ.get(
+    "RXNHAYSTACK_CLEANED_DATASET",
+    __import__("os").path.expanduser(
+        "~/datasets/rxnhaystack/reactionSmilesFigShareUSPTO2023_cleaned.txt"
+    ),
+)
 TIER4_DIR = Path(__file__).resolve().parent
 CHAINS_JSON_PATH = TIER4_DIR / "task15_ring_hardcoded_chains.json"
 GROUND_TRUTH_PY_PATH = TIER4_DIR / "task15_ring_chain_ground_truth.py"
@@ -43,6 +49,7 @@ def mine_full_dataset() -> dict[str, dict[str, object]]:
             ring_system=ring_system,
             min_path_reactions=PATH_LENGTH,
             max_path_reactions=PATH_LENGTH,
+            max_accepted_chains=None,
         )
         if gt is None:
             raise ValueError(f"No full-dataset {PATH_LENGTH}-reaction chain for {ring_system}")
@@ -73,19 +80,16 @@ def write_chains_json(mined: dict[str, dict[str, object]]) -> None:
 
 
 def update_ground_truth_module(mined: dict[str, dict[str, object]]) -> None:
-    count_lines = [f'    {key!r}: {payload["chain_count"]},' for key, payload in mined.items()]
+    count_lines = [f"    {key!r}: {payload['chain_count']}," for key, payload in mined.items()]
     example_lines = [
-        f'    {key!r}: {tuple(payload["example_chain"])},'
-        for key, payload in mined.items()
+        f"    {key!r}: {tuple(payload['example_chain'])}," for key, payload in mined.items()
     ]
 
     text = GROUND_TRUTH_PY_PATH.read_text(encoding="utf-8")
 
     count_pattern = r"HARDCODED_GT_CHAIN_COUNTS: dict\[str, int\] = \{[^}]*\}"
     count_replacement = (
-        "HARDCODED_GT_CHAIN_COUNTS: dict[str, int] = {\n"
-        + "\n".join(count_lines)
-        + "\n}"
+        "HARDCODED_GT_CHAIN_COUNTS: dict[str, int] = {\n" + "\n".join(count_lines) + "\n}"
     )
     text, count = re.subn(count_pattern, count_replacement, text, count=1)
     if count != 1:
@@ -93,9 +97,7 @@ def update_ground_truth_module(mined: dict[str, dict[str, object]]) -> None:
 
     example_pattern = r"HARDCODED_GT_EXAMPLE: dict\[str, tuple\[int, \.\.\.\]\] = \{[^}]*\}"
     example_replacement = (
-        "HARDCODED_GT_EXAMPLE: dict[str, tuple[int, ...]] = {\n"
-        + "\n".join(example_lines)
-        + "\n}"
+        "HARDCODED_GT_EXAMPLE: dict[str, tuple[int, ...]] = {\n" + "\n".join(example_lines) + "\n}"
     )
     text, count = re.subn(example_pattern, example_replacement, text, count=1)
     if count != 1:

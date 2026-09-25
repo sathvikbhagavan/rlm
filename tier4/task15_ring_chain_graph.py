@@ -361,6 +361,7 @@ def shortest_ring_construction_path(
     ring_system: str,
     min_path_reactions: int,
     max_path_reactions: int,
+    max_accepted_chains: int | None = MAX_ACCEPTED_CHAINS,
 ) -> GroundTruthPath | None:
     targets = sorted(
         smiles
@@ -397,11 +398,11 @@ def shortest_ring_construction_path(
                             tuple(reversed(next_molecules)),
                         )
                     )
-                    if len(solutions) >= MAX_ACCEPTED_CHAINS:
+                    if max_accepted_chains is not None and len(solutions) >= max_accepted_chains:
                         break
                 elif len(next_reactions) < max_path_reactions:
                     next_paths.append((prev, next_reactions, next_molecules))
-            if len(solutions) >= MAX_ACCEPTED_CHAINS:
+            if max_accepted_chains is not None and len(solutions) >= max_accepted_chains:
                 break
 
         if solutions:
@@ -697,6 +698,9 @@ def ground_truth_ring_path_in_context(
     records = parse_records_from_lines(context_lines)
     _forward, reverse_graph, annotations, filters = build_molecule_graphs(records)
     context_indices = set(records.keys())
+    max_accepted_chains = (
+        None if len(records) >= FULL_CONTEXT_CHAIN_THRESHOLD else MAX_ACCEPTED_CHAINS
+    )
 
     from task15_ring_chain_ground_truth import hardcoded_chains_for_question
 
@@ -713,6 +717,7 @@ def ground_truth_ring_path_in_context(
             ring_system=ring_system,
             min_path_reactions=path_length,
             max_path_reactions=path_length,
+            max_accepted_chains=max_accepted_chains,
         )
         return gt, filters
 
@@ -729,8 +734,11 @@ def ground_truth_ring_path_in_context(
             solutions.append((reaction_chain, molecule_chain))
 
     if solutions:
+        selected_solutions = (
+            solutions if max_accepted_chains is None else solutions[:max_accepted_chains]
+        )
         gt = build_ground_truth_from_solutions(
-            solutions=solutions[:MAX_ACCEPTED_CHAINS],
+            solutions=selected_solutions,
             ring_system=ring_system,
             annotations=annotations,
             objective="shortest",
@@ -743,6 +751,7 @@ def ground_truth_ring_path_in_context(
         ring_system=ring_system,
         min_path_reactions=path_length,
         max_path_reactions=path_length,
+        max_accepted_chains=max_accepted_chains,
     )
     return gt, filters
 

@@ -3,9 +3,14 @@ from __future__ import annotations
 from pathlib import Path
 
 from tier3.generate_hardcoded_ground_truth import (
+    compute_task7_gt,
     compute_task18_gt,
     load_indexed_lines,
     reaction_constructs_new_ring_system,
+)
+from tier3.task7_hardcoded_ground_truth import (
+    TASK7_HARDCODED_GROUND_TRUTH_INDICES_BY_REACTION,
+    TASK7_POSITIVE_REACTIONS_BY_KEY,
 )
 from tier3.task18_hardcoded_ground_truth import (
     TASK18_HARDCODED_GROUND_TRUTH_INDICES,
@@ -17,9 +22,27 @@ from tier3.task23_hardcoded_ground_truth import (
 )
 from tier3.task23_stereocenter_evaluator import compute_ground_truth_indices as compute_task23
 
-
 ROOT = Path(__file__).resolve().parents[2]
 DATASET = ROOT / "human_eval/data/reactionSmilesFigShareUSPTO2023_cleaned.txt"
+
+
+def test_task7_frozen_answer_includes_repeated_multi_site_transformations():
+    lines = load_indexed_lines(str(DATASET))
+    computed, valid, skipped = compute_task7_gt(lines)
+    assert len(lines) == valid == 122456
+    assert skipped == 0
+    assert computed == TASK7_HARDCODED_GROUND_TRUTH_INDICES_BY_REACTION
+    assert TASK7_POSITIVE_REACTIONS_BY_KEY == {
+        "grignard_ketone_to_tertiary_alcohol": 33,
+        "grignard_aldehyde_to_secondary_alcohol": 73,
+        "nitrile_to_amine": 275,
+        "nitro_groups_to_amines": 2064,
+        "alcohol_to_azide": 121,
+        "alcohol_to_carboxylic_acid": 64,
+    }
+    # Reaction 3907 oxidizes both primary alcohols in one reactant to the
+    # corresponding dicarboxylic acid in the recorded product.
+    assert 3907 in computed["alcohol_to_carboxylic_acid"]
 
 
 def test_task18_ring_equivalence_ignores_substitution_but_retains_ring_chemistry():

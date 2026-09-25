@@ -1,6 +1,6 @@
 # Tier 3 and Tier 4 canonical-answer audit
 
-Audit date: 2026-09-24
+Audit date: 2026-09-25
 
 Dataset SHA-256: `9f9b2e71676e3e8f132b495b3fc62e2fdec01bc5b43f7be3dc09ef279c351b14`
 
@@ -25,18 +25,35 @@ canonical questions are outside its scope.
 
 | Canonical family | Questions | Result |
 | --- | ---: | --- |
-| T3 Tasks 6, 7, 8 | 15 | Exact regeneration for every subquestion |
+| T3 Tasks 6, 7, 8 | 15 | Tasks 6 and 8 exact; Task 7 corrected as described below |
 | T3 Tasks 10 and 10b | 10 | Exact regeneration for every subquestion |
 | T3 Tasks 11, 12, 15 | 3 | Tasks 11 and 15 exact in both checked environments; Task 12 exact under its benchmark RDKit 2025.09.6 contract |
 | T3 Tasks 18, 19, 20 | 3 | Tasks 19 and 20 exact; Task 18 corrected as described below |
 | T3 Tasks 21 and 22 | 2 | Exact regeneration |
 | T3 Tasks 23 and 24 | 2 | Task 24 exact; Task 23 corrected as described below |
 | T4 Tasks 11, 12, 12b | 5 | All complete-dataset answers regenerate exactly |
-| T4 Tasks 13, 14, 15 | 10 | All stored chains/pairs regenerate exactly; Task 15 scoring corrected below |
+| T4 Tasks 13, 14, 15 | 10 | Task 13 definition clarified; Task 14 exact; Task 15 alternatives and scoring corrected below |
 | T4 Task 16 | 10 | Every stored full chain and derived prefix regenerates exactly |
 | T4 Tasks 17 and 17b | 10 | Every stored sequential-template chain regenerates exactly |
 
 ## Corrections
+
+### Tier 3 Task 7
+
+The old reaction-template matcher applied a single-reactant transformation only
+once. It therefore omitted records in which the same requested transformation
+occurred at multiple sites and the stored product contained the fully
+transformed molecule. Reaction 3907, where both primary alcohols are oxidized
+to a dicarboxylic acid, is the reported example. The matcher now follows
+successive single-reactant template applications up to the number of matching
+sites and accepts the recorded final product. Four subquestions gain records:
+
+- nitrile to amine: 274 to 275 (adds 43529);
+- nitro groups to amines: 2,053 to 2,064 (adds 11 records);
+- alcohol to azide: 120 to 121 (adds 9683);
+- alcohol to carboxylic acid: 63 to 64 (adds 3907).
+
+Both Grignard subquestions are unchanged.
 
 ### Tier 3 Task 18
 
@@ -67,7 +84,33 @@ includes `BrCc1cccc(Br)c1`.
 The prompt asks for any one valid chain, but the human evaluator previously
 required the annotator to submit the complete set of 44 to 199 alternatives.
 The new `one_of_reaction_chains` answer type accepts exactly one stored valid
-chain. The underlying stored alternatives were complete and unchanged.
+chain. A separate 200-solution traversal cap also made two stored alternative
+sets incomplete. Exhaustive mining now stores 299 quinoline chains (formerly
+199) and 241 indole chains (formerly 184). Benzothiazole (44) and
+benzimidazole (142) are unchanged.
+
+### Tier 4 Task 13
+
+The existing SMARTS `[CX3](=O)[OX2H1]` consistently defines
+`carboxylic_acid` as neutral, protonated R-C(=O)-OH. Gabriel's recomputation
+reproduced all 550 stored chains, so the answer is unchanged. The prompt now
+states the SMARTS contract and explicitly excludes carboxylate anions and their
+salts; this removes an avoidable representational ambiguity.
+
+## Historical model rescoring ledger
+
+Keep raw model outputs and context artifacts fixed when applying these entries.
+Do not silently mix corrected scores with scores produced under an older oracle
+or prompt version.
+
+| Feedback source | Task | Required action for historical model results | Reason |
+| --- | --- | --- | --- |
+| Theo | T3 Task 18 | Rescore every LLM, RLM, and CodeAct output at every context size. | Ground-truth membership changed from 46,528 to 17,022. |
+| Theo | T3 Task 23 | Rescore every LLM, RLM, and CodeAct output at every context size. | Ground-truth membership changed from 1,456 to 1,410. |
+| Theo | T4 Task 12b | No model rescore; re-evaluate human submissions made against bundles before 1.3.0. | Model runners compute the answer from each supplied context; the defect was the human extractor treating eight sampling hubs as exhaustive. |
+| Gabriel | T3 Task 7 | Rescore all model outputs for nitrile-to-amine, nitro-to-amine, alcohol-to-azide, and alcohol-to-carboxylic-acid. The two Grignard questions need no score change. | Corrected multi-site matching adds 14 records across four answer sets. |
+| Gabriel | T4 Task 13 | No score-only correction. Preserve old results as the original-prompt condition; rerun the primary-alcohol-to-carboxylic-acid question if results under the clarified definition are needed. | Ground truth is unchanged; only the neutral-acid contract is now explicit. |
+| Gabriel | T4 Task 15 | Rescore Task 15 raw outputs, at minimum the quinoline and indole questions. Report the corrected `macro_reaction_f1` and index-match fields; valid-path/objective-length correctness is unchanged. | The accepted alternative sets expand from 199 to 299 and from 184 to 241. |
 
 ## Version-sensitive record
 

@@ -41,6 +41,14 @@ FUNCTIONAL_GROUP_SMARTS: dict[str, list[str]] = {
     "alkyne": ["C#C"],
 }
 
+FUNCTIONAL_GROUP_PROMPT_CLARIFICATIONS: dict[str, str] = {
+    "carboxylic_acid": (
+        '"carboxylic_acid" means a neutral, protonated R-C(=O)-OH group matching '
+        "RDKit SMARTS [CX3](=O)[OX2H1]. Carboxylate anions and their salts do not "
+        "satisfy this functional-group label."
+    ),
+}
+
 
 @dataclass(frozen=True)
 class ReactionRecord:
@@ -638,6 +646,17 @@ def build_question(
         if molecule_freq_cap is not None
         else scaled_molecule_freq_cap(context_reaction_count)
     )
+    clarification_labels = dict.fromkeys((source_fg, target_fg))
+    clarifications = [
+        FUNCTIONAL_GROUP_PROMPT_CLARIFICATIONS[label]
+        for label in clarification_labels
+        if label in FUNCTIONAL_GROUP_PROMPT_CLARIFICATIONS
+    ]
+    clarification_block = ""
+    if clarifications:
+        clarification_block = "\n    Functional-group definition:\n" + "\n".join(
+            f"    - {clarification}" for clarification in clarifications
+        )
     return f"""
     There is a list of chemical reactions in SMILES format in the provided context, separated by newlines.
     Each reaction is in one of these forms:
@@ -651,6 +670,7 @@ def build_question(
     Find ALL valid reaction chains of exactly {path_length} reactions in the provided context that
     convert a species containing functional group "{source_fg}" into a species containing
     functional group "{target_fg}".
+{clarification_block}
 
     A valid chain is an ordered sequence of {path_length} distinct reaction indices
     [r_0, r_1, ..., r_{path_length - 1}] such that:
