@@ -26,6 +26,35 @@ def test_task15_uses_reaction_f1() -> None:
     assert result_score("tier4/task14", metrics) == ("macro_f1", 0.1)
 
 
+def test_main_capability_matrix_weights_questions_and_scores_failures_zero() -> None:
+    pytest.importorskip("matplotlib")
+    from paper_plots.scripts.plot_main_results import capability_matrix
+
+    rows = [
+        {
+            "model": "gpt-5-mini",
+            "tier": "3",
+            "task": task,
+            "method": "rlm",
+            "context": "full",
+            "repetition": str(repetition),
+            "question_count": question_count,
+            "status": status,
+            "f1": f1,
+        }
+        for repetition in (1, 2)
+        for task, question_count, status, f1 in (
+            ("tier3/task13", "1", "succeeded", "1.0"),
+            ("tier3/task14", "3", "failed", ""),
+        )
+    ]
+
+    matrix, labels = capability_matrix(rows, 3)
+
+    assert labels[0] == "Bond-level"
+    assert matrix[0, 6] == pytest.approx(0.25)
+
+
 def test_terminal_failures_do_not_make_an_arm_provisional() -> None:
     rows = [
         {

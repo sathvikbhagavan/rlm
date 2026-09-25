@@ -10,7 +10,7 @@ gemini-3.7-flash,stereochemistry,0.9998625901751975,10,0
 gemini-3.7-flash,mechanisms,0.5634741011752775,50,0
 gemini-3.7-flash,mechanical_graph,1.0,25,0
 gemini-3.7-flash,chemically_constrained_graph,0.8397678329764509,50,0
-gemini-3.7-flash,route_and_multi_constraint,0.13122973814777028,100,8
+gemini-3.7-flash,route_and_multi_constraint,0.24981811874703744,100,3
 gpt-5-mini,bond_changes,1.0,15,0
 gpt-5-mini,stereochemistry,0.992463363572924,10,0
 gpt-5-mini,mechanisms,0.2957992994825206,50,0

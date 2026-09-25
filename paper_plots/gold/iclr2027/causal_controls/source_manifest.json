@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-09-24T23:51:09.802018+00:00",
-  "git_commit": "edc2d28f5dc766e356e64dca084815e980d4c881",
+  "generated_at": "2026-09-25T00:02:53.059008+00:00",
+  "git_commit": "f98218e652d004fd24f1aff2aa070f4196d0cf36",
   "matched_qwen_provisional_sha256": "08ea357205a81fbc66ceb59de8560fa456847b360213a4eebd3a9ac14c19aad4",
   "record_count": 1040,
   "records_sha256": "241f4a6e9929d6db95c29841fc0f14b9138a7fe1e0ec3694d685d0fa101b571e",
@@ -50,7 +50,7 @@
     "artifacts/control-room/shared/jed25-r2-oracle-predicate-repair-qwen-x500.json": "2f7c38ea35544f42c2da43b91666401fee8f959b218bb88b4c1dbae805e56417",
     "artifacts/control-room/shared/jed25-r2-oracle-predicate-repair-qwen-xfull.json": "7065bad6306f5e5b61701c356ea3969d1fbb9e67d40cb938ba1de0cb108fe588",
     "artifacts/control-room/shared/jed25-r3-oracle-predicate-qwen-xfull-failed.json": "18b16d99ac7d87bdc04382f0d2b1d99d54b2c1f2ed765d5381469956778bf2b6",
-    "artifacts/control-room/shared/kuma-claude-rlm-v34.json": "5062344cb2d31e21bda1398149b04c89cf1260f406221b1b141243a79821a7c2",
+    "artifacts/control-room/shared/kuma-claude-rlm-v34.json": "c280b1cd615735db99c48a08fe22c1697c75c754b74fae55d6703f0cfafe7b28",
     "artifacts/control-room/shared/kuma-full-v34-4644942a.json": "b4f4d1dd2901c49f560dabc4e515ceb68fb67c2fd7b220b5cf8b2cb0647b3ce1",
     "artifacts/control-room/shared/kuma-gpt-matched-v7.json": "aaf2327305ad0d8c2c8d533f4ed41f4856f65844c9edc3474495885212079df3",
     "artifacts/control-room/shared/kuma-matched-v7-f95a2ee9.json": "384b33fd9718a87ba39f19256537cb7fb5649b78276d4919ba886067bc9077ca",

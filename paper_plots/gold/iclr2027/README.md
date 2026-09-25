@@ -1,6 +1,6 @@
 # Gold ICLR 2027 plotting results
 
-Frozen from the shared experiment dashboard at `2026-09-24T23:24:44.366380+00:00`.
+Frozen from the shared experiment dashboard at `2026-09-24T23:48:41.930724+00:00`.
 
 Gold means that the plotting input is frozen, auditable, and provenance-recorded. It does not mean every experiment arm is finished. `arm_status.csv` and the `arm_final` columns distinguish terminal arms from provisional ones.
 
@@ -36,8 +36,7 @@ All plotting aggregates score terminal failed jobs as zero. Running, stale, and 
 
 ## Causal controls
 
-The `causal_controls/` directory freezes the completed GPT-5-mini matched-cardinality arm, Qwen/Claude chemistry-rule controls and their ordinary RLM counterparts, and the deterministic executor ceiling. Its record tables and source manifest preserve the aggregation rules and contributing snapshots.
-The directory also stores a status-explicit provisional Qwen matched-cardinality snapshot, which is excluded from final inference until all 725 cells terminate.
+The `causal_controls/` directory freezes the completed GPT-5-mini matched-cardinality arm, Qwen/Claude chemistry-rule controls and their ordinary RLM counterparts, and the deterministic executor ceiling. Its record tables and source manifest preserve the aggregation rules and contributing snapshots. The directory also stores a status-explicit provisional Qwen matched-cardinality snapshot, which is excluded from final inference until all 725 cells terminate.
 
 ## Prospective-route control
 
@@ -49,6 +48,8 @@ Regenerate from the repository root:
 uv run --frozen python paper_plots/scripts/build_gold_results.py
 uv run --with-requirements paper_plots/requirements.txt \
   python paper_plots/scripts/plot_gold_scaling_by_tier.py
+uv run --with-requirements paper_plots/requirements.txt \
+  python paper_plots/scripts/plot_main_results.py
 uv run --with-requirements paper_plots/requirements.txt \
   python paper_plots/scripts/plot_gold_efficiency_by_tier.py
 uv run --frozen python paper_plots/scripts/build_capability_split.py

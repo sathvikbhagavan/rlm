@@ -741,6 +741,8 @@ def write_readme(path: Path, arms: list[dict[str, Any]], *, as_of: str) -> None:
             "uv run --with-requirements paper_plots/requirements.txt \\",
             "  python paper_plots/scripts/plot_gold_scaling_by_tier.py",
             "uv run --with-requirements paper_plots/requirements.txt \\",
+            "  python paper_plots/scripts/plot_main_results.py",
+            "uv run --with-requirements paper_plots/requirements.txt \\",
             "  python paper_plots/scripts/plot_gold_efficiency_by_tier.py",
             "uv run --frozen python paper_plots/scripts/build_capability_split.py",
             "uv run --frozen python paper_plots/scripts/build_efficiency_appendix.py",
@@ -814,9 +816,7 @@ def main() -> None:
     expected_qwen_ids = {
         str(row["run_id"]).replace("-x500-", "-x1000-")
         for row in rows
-        if row["model"] == "qwen3.5"
-        and row["method"] == "codeact"
-        and row["context"] == "500"
+        if row["model"] == "qwen3.5" and row["method"] == "codeact" and row["context"] == "500"
     }
     qwen_extension_rows, qwen_pack_manifest = load_result_pack(
         args.qwen_x1000_pack,
@@ -836,10 +836,7 @@ def main() -> None:
         expected_run_ids=expected_gemini_ids,
     )
     extension_rows = (
-        qwen_extension_rows
-        + deepseek_extension_rows
-        + gemini_extension_rows
-        + gpt_extension_rows
+        qwen_extension_rows + deepseek_extension_rows + gemini_extension_rows + gpt_extension_rows
     )
     deepseek_rlm_rows = [
         flattened

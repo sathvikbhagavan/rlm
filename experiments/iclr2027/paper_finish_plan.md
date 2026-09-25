@@ -147,6 +147,13 @@ queue for finishing the submission.
 - [x] Add aggregate, per-target, and resource views for the complete Task-16
   decomposition (30 jobs; 90 target-level trajectories).
 
+#### Final figure consistency audit
+
+- [ ] Before the final submission freeze, inspect every main-text and appendix
+  figure and heatmap for a consistent Plasma-derived palette, fixed interface
+  colors, typography, metric units, and colorbar range. Regenerate any remaining
+  legacy figure that still uses an older palette.
+
 #### Cost and resource disclosure
 
 - [x] Report recorded API cost in USD per successful trajectory alongside
