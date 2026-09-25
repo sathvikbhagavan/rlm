@@ -23,8 +23,8 @@ the active figure directory.
 ## Post-submission corrected-score audit
 
 After a versioned ground-truth change, preserved logs can reconstruct exact
-scores for audit. Submission-time builders nevertheless exclude every affected
-task score until the complete frozen arm has been checked under one policy:
+scores for audit. Submission-time builders use exact recovered scores where
+available and explicitly marked historical scores for the unresolved rows:
 
 ```sh
 WANDB_API_KEY=... uv run python \
@@ -58,6 +58,7 @@ replaced atomically and, by default, cannot be replaced by one with fewer
 recovered runs. It can then be joined to the frozen experiment tables by
 `build_post_submission_queue.py`, which records every affected run with
 its experiment, arm, model, task, context, configured seed, and repetition.
-The current submission freeze does not restore either recovered or historical
-scores to paper aggregates. All affected identities remain explicitly queued
-for the complete post-submission audit.
+The current submission freeze restores exact recovered scores. Only unresolved
+identities remain in the post-submission queue; their preserved historical
+scores keep the terminal trajectory denominator complete and retain an explicit
+internal status marker.

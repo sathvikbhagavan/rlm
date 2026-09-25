@@ -166,8 +166,11 @@ def main() -> None:
         "aggregation": {
             "scope": "terminal full-corpus RLM arms",
             "within_model": "question-weighted mean across task scripts and repetitions",
-            "terminal_failures": "score zero when the task score is available",
-            "corrected_tasks": "excluded pending post-submission audit",
+            "terminal_failures": "score zero",
+            "corrected_tasks": (
+                "exact corrected rescores where recoverable; otherwise the explicit "
+                "submission-freeze historical value"
+            ),
             "across_models": "unweighted mean and observed model range",
         },
     }

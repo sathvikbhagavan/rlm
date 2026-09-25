@@ -132,6 +132,9 @@ DEFAULT_DEEPSEEK_RLM_X1000_PACK = Path(
     "paper_plots/gold/source_packs/deepseek-rlm-x1000-docker-succeeded-pack.tgz"
 )
 DEFAULT_SCORE_RECOVERIES = Path("paper_plots/gold/source_packs/deepseek-score-recoveries.json")
+DEFAULT_GPT_RLM_X1000_SCORE_RECOVERIES = Path(
+    "paper_plots/gold/source_packs/gpt-rlm-x1000-score-recoveries.json"
+)
 DEFAULT_GROUND_TRUTH_CORRECTIONS = Path("paper_plots/gold/ground_truth_corrections.json")
 DEFAULT_CORRECTED_SCORE_RECOVERIES = Path("paper_plots/gold/corrected_score_recoveries.json")
 GPT_RLM_X1000_DOCKER_CAMPAIGN = "iclr2027-gpt5mini-rlm-x1000-docker-v1"
@@ -843,6 +846,12 @@ def parse_args() -> argparse.Namespace:
         help="Provenance-recorded score recoveries for legacy successful runs.",
     )
     parser.add_argument(
+        "--gpt-rlm-x1000-score-recoveries",
+        type=Path,
+        default=DEFAULT_GPT_RLM_X1000_SCORE_RECOVERIES,
+        help="Provenance-recorded recovery for unscored GPT RLM x1000 successes.",
+    )
+    parser.add_argument(
         "--ground-truth-corrections",
         type=Path,
         default=DEFAULT_GROUND_TRUTH_CORRECTIONS,
@@ -965,6 +974,9 @@ def main() -> None:
     ]
     if unresolved_gpt:
         raise ValueError(f"GPT-5-mini RLM x1000 arm is not terminal: {unresolved_gpt[:3]!r}")
+    gpt_rlm_recovery_manifest = apply_score_recoveries(
+        gpt_rlm_rows, args.gpt_rlm_x1000_score_recoveries
+    )
     rlm_x1000_rows = deepseek_rlm_rows + gemini_rlm_rows + gpt_rlm_rows
     all_rows = rows + extension_rows + rlm_x1000_rows
     ground_truth_correction_manifest = apply_ground_truth_corrections(
@@ -1081,6 +1093,11 @@ def main() -> None:
             "path": str(args.score_recoveries),
             "sha256": sha256_file(args.score_recoveries),
             "count": len(score_recovery_manifest["recoveries"]),
+        },
+        "gpt_rlm_x1000_score_recoveries": {
+            "path": str(args.gpt_rlm_x1000_score_recoveries),
+            "sha256": sha256_file(args.gpt_rlm_x1000_score_recoveries),
+            "count": len(gpt_rlm_recovery_manifest["recoveries"]),
         },
         "ground_truth_corrections": {
             "path": str(args.ground_truth_corrections),
