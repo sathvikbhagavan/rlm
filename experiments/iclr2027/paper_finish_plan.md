@@ -196,6 +196,17 @@ queue for finishing the submission.
 
 ### 7. Finish and verify the released artifact (delegated)
 
+- [ ] Audit every file in the supplementary-material package. Remove obsolete,
+  duplicated, generated, private, or submission-irrelevant files, and scan all
+  source, configuration, logs, metadata, and history included in the package
+  for credentials, tokens, account identifiers, private paths, and other
+  sensitive information before release.
+- [ ] After the benchmark questions are frozen, update the supplementary
+  questions and answers, ground-truth generation and evaluation code, and all
+  accompanying documentation. Recompute every metric affected by a corrected
+  question, answer, ground truth, or evaluator across every relevant model,
+  interface, context, repetition, and control study before freezing the final
+  plots, tables, and manuscript values.
 - [ ] Verify that the submitted artifact matches the reproducibility claims:
   questions, answers, generators, deterministic executor, fixed seeds,
   environment lock, checksums, ledgers/traces, resource limits, reconstruction

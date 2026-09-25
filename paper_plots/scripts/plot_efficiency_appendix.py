@@ -8,12 +8,16 @@ import csv
 import json
 from pathlib import Path
 
-import matplotlib as mpl
 import matplotlib.pyplot as plt
+from plot_style import METHOD_COLORS, apply_paper_style
 
 CONTEXTS = ("100", "500", "full")
 CONTEXT_LABELS = {"100": "100", "500": "500", "full": "Full corpus"}
-COLORS = {"100": "#0072B2", "500": "#D55E00", "full": "#009E73"}
+COLORS = {
+    "100": METHOD_COLORS["llm"],
+    "500": METHOD_COLORS["codeact"],
+    "full": METHOD_COLORS["rlm"],
+}
 MARKERS = {"100": "o", "500": "s", "full": "D"}
 METRICS = (
     ("calls_per_trajectory", "Model calls / trajectory"),
@@ -24,24 +28,7 @@ METRICS = (
     ("peak_memory_mib_per_job", "Peak memory (MiB) / job"),
 )
 
-mpl.rcParams.update(
-    {
-        "font.family": "serif",
-        "font.serif": ["Times New Roman", "Times", "DejaVu Serif"],
-        "mathtext.fontset": "stix",
-        "font.size": 8,
-        "axes.titlesize": 8.5,
-        "axes.labelsize": 8,
-        "xtick.labelsize": 7.5,
-        "ytick.labelsize": 7.5,
-        "legend.fontsize": 7.5,
-        "axes.linewidth": 0.7,
-        "lines.linewidth": 1.5,
-        "pdf.fonttype": 42,
-        "ps.fonttype": 42,
-        "savefig.facecolor": "white",
-    }
-)
+apply_paper_style()
 
 
 def read_csv(path: Path) -> list[dict[str, str]]:
@@ -84,26 +71,16 @@ def make_figure(rows: list[dict[str, str]]) -> plt.Figure:
         axis.tick_params(length=2.5, width=0.6)
     for axis in axes[1]:
         axis.set_xlabel("Benchmark tier")
-    axes[0, 0].legend(frameon=False, loc="upper left")
-    fig.suptitle(
-        "RLM resource use grows with task and corpus scale",
-        y=0.995,
-        fontsize=10,
-        fontweight="bold",
+    handles, labels = axes[0, 0].get_legend_handles_labels()
+    fig.legend(
+        handles,
+        labels,
+        loc="upper center",
+        ncol=3,
+        frameon=False,
+        bbox_to_anchor=(0.5, 0.995),
     )
-    fig.text(
-        0.5,
-        0.005,
-        "RLM only; unweighted mean ± SEM across Qwen, Gemini, GPT-5 mini, and Claude. "
-        "Additive metrics summarize 5,930 successful\nscored trajectories from 1,791 jobs; "
-        "peak memory is measured per successful job. Recorded latency and process wall time "
-        "are independent elapsed-time measurements.",
-        ha="center",
-        va="bottom",
-        fontsize=6.6,
-        color="#555555",
-    )
-    fig.subplots_adjust(left=0.065, right=0.99, top=0.90, bottom=0.14, hspace=0.34, wspace=0.25)
+    fig.subplots_adjust(left=0.065, right=0.99, top=0.89, bottom=0.10, hspace=0.34, wspace=0.25)
     return fig
 
 
