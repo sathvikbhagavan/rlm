@@ -6,6 +6,13 @@ This replaces the earlier carry-forward queue. The original author list below
 is retained as the historical record; this section is the single operational
 queue for finishing the submission.
 
+### Current writing queue
+
+1. Freeze the claim/evidence table and final six-model narrative.
+2. Final framing, related-work, Methods, and limitations polish.
+3. Audit claims, citations, terminology, model names, captions, and appendix
+   pointers.
+
 ### 1. Audit every evaluator and freeze the scientific results
 
 - [ ] Enumerate every ground-truth, evaluator, and metric implementation that
