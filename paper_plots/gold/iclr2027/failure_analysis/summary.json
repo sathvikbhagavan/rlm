@@ -1,0 +1,40 @@
+{
+  "excluded_pending_corrected_rescores": 121,
+  "frozen_jobs": 6150,
+  "generated_at": "2026-09-25T21:03:47.402116+00:00",
+  "ground_truth_version": "rxnhaystack-human-1.6.0",
+  "inputs": {
+    "paper_plots/gold/corrected_score_recoveries.json": "96b580071f441cb2a69c929b4e0506e2006614c2bc209f077499737bd010fa20",
+    "paper_plots/gold/iclr2027/final_arm_records.csv": "161953768432ee630bee8f3ea3a6e10005b7f3e1d512e915090e4d8d1a8b10a1",
+    "paper_plots/gold/iclr2027/post_submission/pending_corrected_rescores.csv": "83c2547182044550fe774e1b9d32948486073e6792e2ee8c05f0d285ba2a9e54"
+  },
+  "interpretation": {
+    "job_outcomes": "All valid final-arm jobs after mandatory pending-rescore exclusion.",
+    "trace_signatures": "Corrected-task question outputs with retained predictions and exact corrected precision/recall. Signatures describe set errors, not inferred chemical causes."
+  },
+  "outputs": {
+    "paper_plots/gold/iclr2027/failure_analysis/job_outcomes.csv": "e18df20754e766639f40dd7f3d8d6ed1660cfe345e63462f765520c57e0eb5fb",
+    "paper_plots/gold/iclr2027/failure_analysis/task_error_signatures.csv": "caf6bdaebdc49442691f84f7523d099be83249b38514b8121ddc251519b8c61c",
+    "paper_plots/gold/iclr2027/failure_analysis/trace_error_records.csv": "874c2b15133246331cc297f271d7a4f7376a275ad3522fc94e083d6a66763982",
+    "paper_plots/gold/iclr2027/failure_analysis/trace_error_signatures.csv": "e43866c5779b39564983a84199ae1884c436bf3464f6029ca7da4a9f4aa50cfd"
+  },
+  "paper_models": [
+    "Claude Haiku 4.5",
+    "DeepSeek V4 Flash",
+    "GPT-5 mini",
+    "Gemini 3.7 Flash",
+    "Qwen 3.5"
+  ],
+  "schema_version": 1,
+  "trace_classifiable_question_outputs": 2229,
+  "trace_outputs_without_exact_precision_recall": 1441,
+  "trace_tasks": [
+    "tier3/task10",
+    "tier3/task18",
+    "tier3/task23",
+    "tier3/task6",
+    "tier3/task7"
+  ],
+  "valid_expected_trajectories": 20271,
+  "valid_jobs": 6029
+}

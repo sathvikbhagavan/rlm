@@ -211,12 +211,20 @@ queue for finishing the submission.
 
 ### 5. Complete the trace-based failure analysis
 
-- [ ] Classify failures across models and interfaces from the recorded traces,
+- [x] Classify failures across models and interfaces from the recorded traces,
   separating scientific errors from evaluator, provider, timeout, memory, and
   transport failures.
-- [ ] Quantify the scientifically meaningful failure modes by task family and
+- [x] Quantify the scientifically meaningful failure modes by task family and
   method, inspect representative traces, and add the resulting plot and prose
   to the main paper or appendix as appropriate.
+
+Completed on the corrected five-model freeze. The full 6,029-job valid
+population separates scientific outcomes from execution failures. Exact
+precision/recall reconstruction supports set-error signatures for 2,229
+question outputs from corrected Tier-3 Tasks 6, 7, 10, 18, and 23; outputs
+without sufficient retained detail remain unclassified. The data, source
+hashes, plot, and interpretation boundary are in
+`paper_plots/gold/iclr2027/failure_analysis/`.
 
 ### 6. Iterate and finalize Figure 1
 
@@ -716,8 +724,10 @@ publication-quality plot/table, manuscript prose, and a compiled Overleaf push.
 6. **Consolidate human annotations.** Import all collaborator exports, verify
    expertise and assignments, run the existing analysis, and report the actual
    study design.
-7. **Implement and run the multi-model failure analysis.** Freeze the taxonomy,
-   audit labels, create the figure, and select trace examples.
+7. **Completed: multi-model failure analysis.** The corrected five-model
+   population separates execution failures from scientific outcomes; the
+   reconstructable trace cohort quantifies observable set-error signatures,
+   and directly inspected traces provide chemistry-specific examples.
 8. **Completed: efficiency appendix.** Calls, tokens, latency, tool time, wall
    time, memory, cost, accounting coverage, and early-failure caveats are
    reported.
