@@ -107,7 +107,7 @@
     "wall_time_by_tier_across_models.png": "8515a26a955a9fda9a22ada6bf2f6f9e0636d3fd909057c0fa6b9472c205f840"
   },
   "freeze_id": "rxnhaystack-iclr2027-submission-2026-09-25-v1",
-  "generated_at": "2026-09-25T21:23:58.845476+00:00",
+  "generated_at": "2026-09-25T21:27:42.107369+00:00",
   "gold_checksums": {
     "README.md": "71669d4bab3d63b3e29d3816ce5894252e3ac894e3ab76240186d77d088134a1",
     "arm_status.csv": "754124d630187a6d07f3dc228793d4dd40779cb6e97b4c30c9638ebdc153ac89",
@@ -174,7 +174,7 @@
     "compiled_pdf": {
       "bytes": 2502857,
       "path": "iclr2027.pdf",
-      "sha256": "a64de1e8c977b5a2e8ccec47842cdcbf459fc3bc7e2f15a514ff283ec60c4432"
+      "sha256": "5a0576c8209f0df597d0953a9694495e02b0f844dfa0d83b67602c5a2b758386"
     },
     "figure_checksums": {
       "claude-haiku-4_5_core_metrics.pdf": "99312109896357292f937f74bc86c31fafa61791f793be4081a28ee20279ddc2",
@@ -210,9 +210,9 @@
       "task16_resource_diagnostics.pdf": "1dc26b8e78e3bbd74b17ab361ebdec5b4f5015c0b1fe2ba2fb7917121bf288c9",
       "task16_target_breakdown.pdf": "0e216372dcdc9b372346475a450352f910b2b1fe998443e900e3c30afb352d60"
     },
-    "git_commit": "e912f7431b2f8f920aa1b28044cd8fbe5edb5985",
+    "git_commit": "33c08cf44d35fb83d80a25fa46b6915adf9a4721",
     "source_checksums": {
-      "appendix.tex": "3a1ea94625045d6394908b7c1eeb84d8229c4817649d380ecb72fb3b6375f248",
+      "appendix.tex": "6b6acc957f018af8353eb09398cfabdac99e4bcbdf5db16a63ac1f2c9b62af0e",
       "checklist.tex": "780ba13c480f652dcc42e69ed61a752ce0ea270f15d332d4a45b059dabad84f6",
       "full_version_backup/appendix.tex": "3d4ba06f5c8cd0d96609542432107d8c9cdc60c5c281be6bc9c22d0003c82d9b",
       "full_version_backup/neurips_2026.tex": "59ab7c0b537b6212b6b3fde622d3893bb25c2f607f2b62572e4a747b95dd9f0e",
@@ -233,6 +233,6 @@
       "sections/results.tex": "9977f876e076fea0c0cf14a8020d45ca203067e74161f619805f76a17f0c54e5"
     }
   },
-  "repository_commit": "37fde6de381bc0ddc0a0226ea0b156d7bcfafed5",
+  "repository_commit": "62481b05f60c417cb71d43ae5027a47c1d83d116",
   "schema_version": 1
 }
