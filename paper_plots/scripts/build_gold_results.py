@@ -23,6 +23,7 @@ from rxnhaystack.control_room import (
     merge_snapshots,
     scientific_dashboard_view,
 )
+from rxnhaystack.score_recovery import apply_corrected_score_recoveries
 
 MODEL_ORDER = (
     "qwen3.5",
@@ -127,6 +128,7 @@ DEFAULT_DEEPSEEK_RLM_X1000_PACK = Path(
 )
 DEFAULT_SCORE_RECOVERIES = Path("paper_plots/gold/source_packs/deepseek-score-recoveries.json")
 DEFAULT_GROUND_TRUTH_CORRECTIONS = Path("paper_plots/gold/ground_truth_corrections.json")
+DEFAULT_CORRECTED_SCORE_RECOVERIES = Path("paper_plots/gold/corrected_score_recoveries.json")
 GPT_RLM_X1000_DOCKER_CAMPAIGN = "iclr2027-gpt5mini-rlm-x1000-docker-v1"
 
 
@@ -323,9 +325,7 @@ def apply_score_recoveries(rows: list[dict[str, Any]], path: Path) -> dict[str, 
     return payload
 
 
-def apply_ground_truth_corrections(
-    rows: list[dict[str, Any]], path: Path
-) -> dict[str, Any]:
+def apply_ground_truth_corrections(rows: list[dict[str, Any]], path: Path) -> dict[str, Any]:
     """Invalidate stale scores without altering immutable model-run evidence."""
     payload = json.loads(path.read_text())
     affected = {str(task) for task in payload["affected_tasks"]}
@@ -763,9 +763,10 @@ def write_readme(path: Path, arms: list[dict[str, Any]], *, as_of: str) -> None:
             "source manifest preserve the aggregation rules and contributing snapshots. The "
             "directory also stores a status-explicit provisional Qwen matched-cardinality "
             "snapshot, which is excluded from final inference until all 725 cells terminate.",
-            "Ground-truth-invalidated control scores are excluded exactly as in the main "
-            "benchmark tables; the causal-control aggregates report their score coverage, "
-            "while retaining all measured resource fields.",
+            "Exact corrected rescores are included and labeled `corrected_exact_rescore`. "
+            "Remaining ground-truth-invalidated control scores are excluded exactly as in "
+            "the main benchmark tables; the causal-control aggregates report their score "
+            "coverage while retaining all measured resource fields.",
             "",
             "## Prospective-route control",
             "",
@@ -834,6 +835,12 @@ def parse_args() -> argparse.Namespace:
         type=Path,
         default=DEFAULT_GROUND_TRUTH_CORRECTIONS,
         help="Versioned corrections applied after legacy score recoveries.",
+    )
+    parser.add_argument(
+        "--corrected-score-recoveries",
+        type=Path,
+        default=DEFAULT_CORRECTED_SCORE_RECOVERIES,
+        help="Exact rescores recovered after ground-truth correction.",
     )
     return parser.parse_args()
 
@@ -944,6 +951,9 @@ def main() -> None:
     ground_truth_correction_manifest = apply_ground_truth_corrections(
         all_rows, args.ground_truth_corrections
     )
+    corrected_recovery_manifest, corrected_recovery_count = apply_corrected_score_recoveries(
+        all_rows, args.corrected_score_recoveries
+    )
     arms = arm_summaries(all_rows)
     add_arm_finality(all_rows, arms)
     scaling = scaling_summaries(all_rows)
@@ -1046,6 +1056,13 @@ def main() -> None:
             "correction_id": ground_truth_correction_manifest["correction_id"],
             "corrected_bundle": ground_truth_correction_manifest["corrected_bundle"],
             "affected_tasks": ground_truth_correction_manifest["affected_tasks"],
+        },
+        "corrected_score_recoveries": {
+            "path": str(args.corrected_score_recoveries),
+            "sha256": sha256_file(args.corrected_score_recoveries),
+            "recovery_id": corrected_recovery_manifest["recovery_id"],
+            "available": len(corrected_recovery_manifest["recoveries"]),
+            "applied": corrected_recovery_count,
         },
         "source_snapshots": [
             {

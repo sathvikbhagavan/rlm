@@ -165,18 +165,31 @@ entries apply:
 ### Applied historical-score policy
 
 The sanitized experiment records retain counts and aggregate metrics but do not
-consistently retain the predicted index sets required for exact rescoring. Old
-precision/recall/counts cannot identify which removed or added members a model
-predicted. The paper gold build therefore applies
-`paper_plots/gold/ground_truth_corrections.json`: historical scores for Tasks 6, 7,
-10, 18, 23, and Tier-4 Task 15 are marked unavailable, their values are preserved in
-`original_f1`, and aggregate tables report reduced score coverage without imputation.
-It invalidated 1,183 scored main-benchmark runs, 79 CodeAct-x1000 runs, and 57
-RLM-x1000 runs. The same overlay invalidated 364 of the 1,040 completed
-causal-control records; 676 remain scoreable. The provisional Qwen matched-cardinality
-table contains 150 invalidated completed scores and 25 affected jobs without a
-historical score. Status, cost, token, timing, and memory evidence is unchanged. Exact
-scores can be restored only from preserved raw predictions or corrected reruns.
+consistently retain the predicted index sets required for exact rescoring. The recovery
+pipeline therefore reads the preserved W&B console logs, reconstructs each historical
+sampled context using the original runner-specific settings, extracts raw predictions
+where present, and validates every reconstruction against the originally reported
+per-question and macro scores. Tier-4 Task 15 is checked against the historical chain
+sets before its expanded alternatives are scored. The nine affected deterministic
+executor cells are rerun against the corrected predicates rather than assumed correct.
+
+`paper_plots/gold/corrected_score_recoveries.json` now freezes 931 unique exact
+rescores. These restore 588 main-benchmark rows, 19 CodeAct-x1000 rows, 43 RLM-x1000
+rows, 216 completed causal-control rows, and 96 provisional Qwen control rows. Some
+run IDs occur in both the main and control tables, so table applications intentionally
+outnumber unique recoveries. Restored rows are labeled `corrected_exact_rescore`, keep
+their historical value in `original_f1`, and carry the recovery ID in `sources`.
+
+Of 1,743 unique affected runs, 812 remain unresolved: 480 logs are in a W&B entity to
+which the current account receives HTTP 403, and 332 accessible logs do not preserve
+enough prediction detail to determine the corrected overlap from aggregate
+precision/recall/counts alone. No corrected score is guessed or imputed. Consequently,
+595 main-benchmark, 60 CodeAct-x1000, 14 RLM-x1000, 148 completed control, and 54
+provisional Qwen control rows remain `historical_score_invalidated`; the respective
+tables also contain 77, 41, 3, 0, and 25 affected jobs without a historical score.
+Status, cost, token, timing, and memory evidence remains valid. The cached source logs,
+extracted prediction ledger, historical Task-15 chain pack, and all input/output
+checksums make the completed recovery reproducible without exposing credentials.
 
 ## Reviewer-source audit
 

@@ -21,6 +21,7 @@ from rxnhaystack.control_room import (
     merge_snapshots,
     scientific_dashboard_view,
 )
+from rxnhaystack.score_recovery import apply_corrected_score_recoveries
 
 EXECUTOR_CAMPAIGN = "iclr2027-oracle-executor-v1"
 GPT = "openai/gpt-5-mini"
@@ -235,9 +236,7 @@ def build_rows(campaigns: dict[str, dict[str, Any]]) -> list[dict[str, Any]]:
     return sorted(rows, key=lambda item: (item["study"], item["arm"], item["run_id"]))
 
 
-def apply_ground_truth_corrections(
-    rows: list[dict[str, Any]], path: Path
-) -> dict[str, Any]:
+def apply_ground_truth_corrections(rows: list[dict[str, Any]], path: Path) -> dict[str, Any]:
     """Invalidate stale scores while preserving immutable control-run evidence."""
     payload = json.loads(path.read_text(encoding="utf-8"))
     affected = {str(task) for task in payload["affected_tasks"]}
@@ -251,9 +250,7 @@ def apply_ground_truth_corrections(
             record["score_available"] = False
             record["f1"] = ""
             record["score_correction_status"] = "historical_score_invalidated"
-            record["sources"] = (
-                f"{record['sources']};ground-truth:{payload['correction_id']}"
-            )
+            record["sources"] = f"{record['sources']};ground-truth:{payload['correction_id']}"
         else:
             record["score_correction_status"] = "affected_without_historical_score"
     return payload
@@ -269,6 +266,11 @@ def main() -> int:
         "--ground-truth-corrections",
         type=Path,
         default=Path("paper_plots/gold/ground_truth_corrections.json"),
+    )
+    parser.add_argument(
+        "--corrected-score-recoveries",
+        type=Path,
+        default=Path("paper_plots/gold/corrected_score_recoveries.json"),
     )
     args = parser.parse_args()
 
@@ -293,6 +295,12 @@ def main() -> int:
     )
     correction_manifest = apply_ground_truth_corrections(rows, args.ground_truth_corrections)
     apply_ground_truth_corrections(qwen_rows, args.ground_truth_corrections)
+    recovery_manifest, recovered_final = apply_corrected_score_recoveries(
+        rows, args.corrected_score_recoveries
+    )
+    _provisional_manifest, recovered_provisional = apply_corrected_score_recoveries(
+        qwen_rows, args.corrected_score_recoveries
+    )
     args.output_dir.mkdir(parents=True, exist_ok=True)
     records_path = args.output_dir / "records.csv"
     with records_path.open("w", newline="", encoding="utf-8") as stream:
@@ -329,6 +337,14 @@ def main() -> int:
             "provisional_records": dict(
                 Counter(row["score_correction_status"] for row in qwen_rows)
             ),
+        },
+        "corrected_score_recoveries": {
+            "path": str(args.corrected_score_recoveries),
+            "sha256": sha256_file(args.corrected_score_recoveries),
+            "recovery_id": recovery_manifest["recovery_id"],
+            "available": len(recovery_manifest["recoveries"]),
+            "applied_final": recovered_final,
+            "applied_provisional": recovered_provisional,
         },
         "selection": {
             "matched_cardinality": "GPT-5 mini only; 725/725 succeeded",

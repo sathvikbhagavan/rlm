@@ -19,3 +19,25 @@ uv run --with-requirements paper_plots/requirements.txt \
 the workshop-era input and plotting implementation for historical
 reproducibility. Their superseded figure exports are intentionally not kept in
 the active figure directory.
+
+## Corrected-score recovery
+
+After a versioned ground-truth change, recover exact scores from preserved run
+logs before rebuilding the tables:
+
+```sh
+WANDB_API_KEY=... uv run python \
+  paper_plots/scripts/recover_corrected_scores.py \
+  --snapshot-dir artifacts/control-room/shared
+uv run python paper_plots/scripts/build_gold_results.py
+uv run python paper_plots/scripts/build_causal_controls.py
+```
+
+The recovery command reconstructs the original sampled context, validates the
+historical score, then scores the same prediction against the corrected answer.
+It writes an exact-rescore manifest and a separate prediction ledger under
+`paper_plots/gold/`; neither contains credentials. Retrieved console logs stay
+in the ignored local cache `artifacts/score-recovery/`. A completed recovery
+ledger is replaced atomically and, by default, cannot be replaced by one with
+fewer recovered runs. Runs without sufficient retained prediction evidence
+remain explicitly invalidated rather than being imputed.

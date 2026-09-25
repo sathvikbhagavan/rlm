@@ -23,9 +23,12 @@ queue for finishing the submission.
   rescored or whether the model saw incorrect inputs and the run must be
   repeated. Re-run API inference only when rescoring cannot recover the valid
   result.
-  The classification is complete, but corrected reruns or recovered raw
-  predictions are still needed for scores currently marked
-  `historical_score_invalidated`; exclusion is not a corrected score.
+  The classification and first recovery pass are complete: 931 unique affected
+  runs have exact corrected scores from preserved logs or deterministic reruns.
+  Another 480 logs await access to Sathvik's W&B entity, and 332 accessible logs
+  lack sufficient retained prediction detail and still require a corrected rerun.
+  Scores still marked `historical_score_invalidated` remain excluded; exclusion
+  is not a corrected score.
 - [x] Apply the audit across LLM, CodeAct, and RLM for every model and control
   experiment that contains an affected task. Verify Task 15's
   `macro_reaction_f1`/`macro_f1` normalization explicitly.

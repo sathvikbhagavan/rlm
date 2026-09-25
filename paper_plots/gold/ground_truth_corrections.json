@@ -2,7 +2,7 @@
   "schema_version": 1,
   "correction_id": "rxnhaystack-ground-truth-2026-09-25-v2",
   "corrected_bundle": "rxnhaystack-human-1.6.0",
-  "policy": "Historical scores are invalidated when exact rescoring would require prediction indices that were not retained in the sanitized result record. Raw costs, timing, status, and token measurements remain valid. Aggregate score tables use the unaffected scored rows and report reduced score coverage; no missing corrected score is imputed.",
+  "policy": "Historical scores are first invalidated for every affected task, then restored only when preserved output logs or a corrected deterministic rerun support exact rescoring. Remaining unavailable scores retain original_f1 and are excluded without imputation. Raw costs, timing, status, token, and memory measurements remain valid.",
   "affected_tasks": {
     "tier3/task6": "Acyl-chloride primary-amine membership excludes chloroformates and carbamoyl chlorides.",
     "tier3/task7": "Multi-site transformations and connectivity-only comparison changed one or more subquestion memberships.",
