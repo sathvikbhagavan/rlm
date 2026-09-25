@@ -5,6 +5,12 @@ qwen3.5,mechanisms,0.372619346649689,50,0
 qwen3.5,mechanical_graph,0.9564343417991253,25,0
 qwen3.5,chemically_constrained_graph,0.7362040513459046,50,0
 qwen3.5,route_and_multi_constraint,0.04647373280395064,100,1
+deepseek-v4-flash,bond_changes,0.8,15,0
+deepseek-v4-flash,stereochemistry,0.5881218748807207,10,0
+deepseek-v4-flash,mechanisms,0.24196095445889593,50,0
+deepseek-v4-flash,mechanical_graph,0.7199805919456574,25,0
+deepseek-v4-flash,chemically_constrained_graph,0.35183201505618117,50,0
+deepseek-v4-flash,route_and_multi_constraint,0.020476190476190474,100,0
 gemini-3.7-flash,bond_changes,1.0,15,0
 gemini-3.7-flash,stereochemistry,0.9998625901751975,10,0
 gemini-3.7-flash,mechanisms,0.5634741011752775,50,0

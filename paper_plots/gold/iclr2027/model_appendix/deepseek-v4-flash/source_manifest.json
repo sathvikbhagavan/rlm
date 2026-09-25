@@ -1,0 +1,35 @@
+{
+  "aggregation": {
+    "additive_resources": "sum divided by successful question trajectories",
+    "f1": "question-weighted within each repetition; terminal failures score zero",
+    "peak_memory": "mean combined process-tree plus Docker peak per successful job",
+    "variation": "population standard deviation across five repetitions"
+  },
+  "generated_at": "2026-09-25T09:23:18.803726+00:00",
+  "model": "deepseek-v4-flash",
+  "outputs": [
+    {
+      "path": "tier_metrics.csv",
+      "sha256": "c5dab5d56bc99bfe363b8dd078f21fc177ceca66682f2d1da58b1382a96200e5"
+    },
+    {
+      "path": "task_f1.csv",
+      "sha256": "8b351e3d8078ec5e30306c076e6c93323c0a539a3fb4b8948a9a7e595feeb388"
+    }
+  ],
+  "schema_version": 1,
+  "sources": [
+    {
+      "path": "paper_plots/gold/iclr2027/full_benchmark_records.csv",
+      "sha256": "11ad780d29f0b214bc8f4836e0f720cd13370e9921fbee40bd4a7958797783b1"
+    },
+    {
+      "path": "paper_plots/gold/iclr2027/codeact_x1000_records.csv",
+      "sha256": "52b76824c624aeaa913833ba742089da2806672bb9d9d16de345713752bf702d"
+    },
+    {
+      "path": "paper_plots/gold/iclr2027/rlm_x1000_records.csv",
+      "sha256": "f09cafc112e5f062e357868ca52baafd4b6ac5af50f2585f336d815d8e361db0"
+    }
+  ]
+}

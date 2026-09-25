@@ -1,7 +1,7 @@
 capability_group,across_model_mean_f1,minimum_model_f1,maximum_model_f1,n_models,included_models
-bond_changes,0.8650560132415459,0.6110611555873348,1.0,4,qwen3.5;gemini-3.7-flash;gpt-5-mini;claude-haiku-4.5
-stereochemistry,0.8881465493885691,0.6604320060871578,0.9998625901751975,4,qwen3.5;gemini-3.7-flash;gpt-5-mini;claude-haiku-4.5
-mechanisms,0.3596809404762734,0.2068310145976065,0.5634741011752775,4,qwen3.5;gemini-3.7-flash;gpt-5-mini;claude-haiku-4.5
-mechanical_graph,0.8277775533141978,0.3947340956206936,1.0,4,qwen3.5;gemini-3.7-flash;gpt-5-mini;claude-haiku-4.5
-chemically_constrained_graph,0.5769702326282576,0.2931296168429678,0.8397678329764509,4,qwen3.5;gemini-3.7-flash;gpt-5-mini;claude-haiku-4.5
-route_and_multi_constraint,0.09019285568219884,0.019863868474148907,0.24981811874703744,4,qwen3.5;gemini-3.7-flash;gpt-5-mini;claude-haiku-4.5
+bond_changes,0.8520448105932367,0.6110611555873348,1.0,5,qwen3.5;deepseek-v4-flash;gemini-3.7-flash;gpt-5-mini;claude-haiku-4.5
+stereochemistry,0.8281416144869993,0.5881218748807207,0.9998625901751975,5,qwen3.5;deepseek-v4-flash;gemini-3.7-flash;gpt-5-mini;claude-haiku-4.5
+mechanisms,0.3361369432727979,0.2068310145976065,0.5634741011752775,5,qwen3.5;deepseek-v4-flash;gemini-3.7-flash;gpt-5-mini;claude-haiku-4.5
+mechanical_graph,0.8062181610404897,0.3947340956206936,1.0,5,qwen3.5;deepseek-v4-flash;gemini-3.7-flash;gpt-5-mini;claude-haiku-4.5
+chemically_constrained_graph,0.5319425891138423,0.2931296168429678,0.8397678329764509,5,qwen3.5;deepseek-v4-flash;gemini-3.7-flash;gpt-5-mini;claude-haiku-4.5
+route_and_multi_constraint,0.07624952264099717,0.019863868474148907,0.24981811874703744,5,qwen3.5;deepseek-v4-flash;gemini-3.7-flash;gpt-5-mini;claude-haiku-4.5

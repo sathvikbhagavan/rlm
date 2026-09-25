@@ -8,10 +8,10 @@ full_benchmark,qwen3.5,Qwen 3.5,codeact,300,300,0,0,0,0,300,0,True,Codeact,termi
 full_benchmark,qwen3.5,Qwen 3.5,rlm,450,449,0,0,1,0,449,0,True,Rlm,terminal and scored
 full_benchmark,deepseek-v4-flash,DeepSeek V4 Flash,llm,300,300,0,0,0,0,300,0,True,LLM,terminal and scored
 full_benchmark,deepseek-v4-flash,DeepSeek V4 Flash,codeact,300,269,0,0,31,0,269,0,True,Codeact,terminal and scored
-full_benchmark,deepseek-v4-flash,DeepSeek V4 Flash,rlm,450,447,2,0,1,0,447,0,False,Rlm,"2 running, stale, pending, or unscored"
+full_benchmark,deepseek-v4-flash,DeepSeek V4 Flash,rlm,450,450,0,0,0,0,450,0,True,Rlm,terminal and scored
 full_benchmark,glm-5.2,GLM 5.2,llm,300,300,0,0,0,0,300,0,True,LLM,terminal and scored
 full_benchmark,glm-5.2,GLM 5.2,codeact,300,0,0,0,1,299,0,0,False,Codeact,"299 running, stale, pending, or unscored"
-full_benchmark,glm-5.2,GLM 5.2,rlm,450,381,0,0,39,30,381,0,False,Rlm,"30 running, stale, pending, or unscored"
+full_benchmark,glm-5.2,GLM 5.2,rlm,450,384,1,0,41,24,384,0,False,Rlm,"25 running, stale, pending, or unscored"
 full_benchmark,gemini-3.7-flash,Gemini 3.7 Flash,llm,300,300,0,0,0,0,300,0,True,LLM,terminal and scored
 full_benchmark,gemini-3.7-flash,Gemini 3.7 Flash,codeact,300,300,0,0,0,0,300,0,True,Codeact,terminal and scored
 full_benchmark,gemini-3.7-flash,Gemini 3.7 Flash,rlm,450,447,0,0,3,0,447,0,True,Rlm,terminal and scored

@@ -1,6 +1,6 @@
 # Gold ICLR 2027 plotting results
 
-Frozen from the shared experiment dashboard at `2026-09-24T23:48:41.930724+00:00`.
+Frozen from the shared experiment dashboard at `2026-09-25T09:15:30.738545+00:00`.
 
 Gold means that the plotting input is frozen, auditable, and provenance-recorded. It does not mean every experiment arm is finished. `arm_status.csv` and the `arm_final` columns distinguish terminal arms from provisional ones.
 
@@ -12,8 +12,8 @@ All plotting aggregates score terminal failed jobs as zero. Running, stale, and 
 | Model | LLM | CodeAct | RLM |
 | --- | ---: | ---: | ---: |
 | Qwen 3.5 | 300/300 final | 300/300 final | 449/450 final |
-| DeepSeek V4 Flash | 300/300 final | 269/300 final | 447/450 provisional |
-| GLM 5.2 | 300/300 final | 0/300 provisional | 381/450 provisional |
+| DeepSeek V4 Flash | 300/300 final | 269/300 final | 450/450 final |
+| GLM 5.2 | 300/300 final | 0/300 provisional | 384/450 provisional |
 | Gemini 3.7 Flash | 300/300 final | 300/300 final | 447/450 final |
 | GPT-5 mini | 300/300 final | 300/300 final | 450/450 final |
 | Claude Haiku 4.5 | 300/300 final | 300/300 final | 450/450 final |
