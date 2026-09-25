@@ -5,19 +5,25 @@
       "artifact-tar": 480,
       "wandb-cache": 1254
     },
-    "recovered": 1518,
+    "phoenix_status": {
+      "answer-not-retained-or-count-mismatch": 11,
+      "no-unique-session": 110,
+      "not-single-question": 320,
+      "recovered": 39
+    },
+    "recovered": 1542,
     "recovered_by_task": {
       "tier3/task10": 296,
-      "tier3/task18": 149,
+      "tier3/task18": 173,
       "tier3/task23": 285,
       "tier3/task6": 309,
       "tier3/task7": 258,
       "tier4/task15": 221
     },
     "unique_affected_runs": 1743,
-    "unresolved": 225,
+    "unresolved": 201,
     "unresolved_by_reason": {
-      "prediction-underdetermined-or-validation-failed": 225
+      "prediction-underdetermined-or-validation-failed": 201
     }
   },
   "dataset": {
@@ -25,12 +31,13 @@
     "records": 122456,
     "sha256": "9f9b2e71676e3e8f132b495b3fc62e2fdec01bc5b43f7be3dc09ef279c351b14"
   },
-  "generated_at": "2026-09-25T19:02:27.634574+00:00",
+  "generated_at": "2026-09-25T20:19:13.767033+00:00",
   "historical_bundle": "rxnhaystack-human-1.3.0",
   "inputs": {
     "artifact_tars": [
       {
         "bytes": 4869232640,
+        "execution_window_count": 480,
         "matched_run_count": 480,
         "path": "/home/amin/artifacts_liacpc15.tar",
         "sha256": "fe8df811a02d466e552ec41c969d8b1f2fbf69fcc44d51ac6c6844f3f693bd6d"
@@ -48,9 +55,21 @@
       "path": "paper_plots/gold/source_packs/task15_historical_chains_pre_ffbbe41.json",
       "sha256": "6a6c2eb49ae21f70e685db3c26e1874c967dfd1b6a4ca024680e6965bae04b89"
     },
+    "phoenix_database": {
+      "bytes": 5934710784,
+      "matched_prediction_count": 39,
+      "path": "/home/amin/rxnhaystack-phoenix-recovery/phoenix.db",
+      "sha256": "75efd5e7ffa41eeea70a27f62e2df3c7588662a9632dfa7c0fb35e4614094f44",
+      "status": {
+        "answer-not-retained-or-count-mismatch": 11,
+        "no-unique-session": 110,
+        "not-single-question": 320,
+        "recovered": 39
+      }
+    },
     "prediction_extract": {
       "path": "paper_plots/gold/source_packs/corrected_score_recovery_predictions.jsonl",
-      "sha256": "2d0cca1b30f99fef90cb3a67624a084e9b83db9c44175615315fd2e9f404c34f"
+      "sha256": "0a12b9c595a1dc0b22750f818606b56c43422d94be47d5324be645601d730d28"
     }
   },
   "recoveries": [
@@ -21865,6 +21884,296 @@
       "source_sha256": "c6544268236274a06813f586f8c9733bc4a2839b8b0cde54925af7f6735c2e7f",
       "task": "tier3/task18",
       "wandb_url": "https://wandb.ai/sathvikbhagavan-epfl/CodeAct-Task18_tier3/runs/7rj5tbnm"
+    },
+    {
+      "historical_score": 0.489795918367347,
+      "phoenix_project": "LLM-Task18_tier3",
+      "phoenix_session_id": "llm-task18-b9af22ce-5bf6-4c1d-aff7-79857fffa6fa",
+      "phoenix_span_id": "af80c635dfc41d91",
+      "prediction_source": "phoenix-db",
+      "question_scores": [
+        {
+          "corrected_f1": 0.923076923076923,
+          "corrected_ground_truth_count": 14,
+          "corrected_precision": 1.0,
+          "corrected_recall": 0.8571428571428571,
+          "historical_ground_truth_count": 37,
+          "old_f1": 0.489795918367347,
+          "predicted_count": 12,
+          "question_id": "rxh-t3-task18",
+          "recovery": "phoenix-direct-output",
+          "validation_old_precision": 1.0,
+          "validation_old_recall": 0.32432432432432434
+        }
+      ],
+      "recomputed_historical_score": 0.489795918367347,
+      "run_id": "full-gemini-3.7-flash-tier3-task18-llm-x100-r01",
+      "score_name": "macro_f1",
+      "score_value": 0.923076923076923,
+      "source_sha256": "99dcbbf7f6cce89313102158b46215f3fefdaa2c5ee9068274926061d91939b6",
+      "task": "tier3/task18",
+      "wandb_url": "https://wandb.ai/sathvikbhagavan-epfl/LLM-Task18_tier3/runs/4bl6m1o2"
+    },
+    {
+      "historical_score": 0.4255319148936171,
+      "phoenix_project": "LLM-Task18_tier3",
+      "phoenix_session_id": "llm-task18-53032d27-a5b9-4786-a790-239074b2ed3e",
+      "phoenix_span_id": "16dc3763fe44653a",
+      "prediction_source": "phoenix-db",
+      "question_scores": [
+        {
+          "corrected_f1": 0.8333333333333333,
+          "corrected_ground_truth_count": 14,
+          "corrected_precision": 1.0,
+          "corrected_recall": 0.7142857142857143,
+          "historical_ground_truth_count": 37,
+          "old_f1": 0.4255319148936171,
+          "predicted_count": 10,
+          "question_id": "rxh-t3-task18",
+          "recovery": "phoenix-direct-output",
+          "validation_old_precision": 1.0,
+          "validation_old_recall": 0.2702702702702703
+        }
+      ],
+      "recomputed_historical_score": 0.4255319148936171,
+      "run_id": "full-gemini-3.7-flash-tier3-task18-llm-x100-r02",
+      "score_name": "macro_f1",
+      "score_value": 0.8333333333333333,
+      "source_sha256": "29a8127f71069ae6686dd345d73644677537a7ec4ea69979a7e7bc6524587c4d",
+      "task": "tier3/task18",
+      "wandb_url": "https://wandb.ai/sathvikbhagavan-epfl/LLM-Task18_tier3/runs/xhqygibp"
+    },
+    {
+      "historical_score": 0.4255319148936171,
+      "phoenix_project": "LLM-Task18_tier3",
+      "phoenix_session_id": "llm-task18-cbb82802-9b58-4c51-a859-cff44b4fe4a4",
+      "phoenix_span_id": "079b520ddf791068",
+      "prediction_source": "phoenix-db",
+      "question_scores": [
+        {
+          "corrected_f1": 0.8333333333333333,
+          "corrected_ground_truth_count": 14,
+          "corrected_precision": 1.0,
+          "corrected_recall": 0.7142857142857143,
+          "historical_ground_truth_count": 37,
+          "old_f1": 0.4255319148936171,
+          "predicted_count": 10,
+          "question_id": "rxh-t3-task18",
+          "recovery": "phoenix-direct-output",
+          "validation_old_precision": 1.0,
+          "validation_old_recall": 0.2702702702702703
+        }
+      ],
+      "recomputed_historical_score": 0.4255319148936171,
+      "run_id": "full-gemini-3.7-flash-tier3-task18-llm-x100-r03",
+      "score_name": "macro_f1",
+      "score_value": 0.8333333333333333,
+      "source_sha256": "c03a3cd1bbb2d7b902284aa37fec03d8cc8e734de35eb4b3b26c6ef6ee6ef7fb",
+      "task": "tier3/task18",
+      "wandb_url": "https://wandb.ai/sathvikbhagavan-epfl/LLM-Task18_tier3/runs/b9qjntf8"
+    },
+    {
+      "historical_score": 0.4583333333333333,
+      "phoenix_project": "LLM-Task18_tier3",
+      "phoenix_session_id": "llm-task18-fe8106a7-8bbf-4c39-a855-59f43931085d",
+      "phoenix_span_id": "7946bbb3ec6dfa3b",
+      "prediction_source": "phoenix-db",
+      "question_scores": [
+        {
+          "corrected_f1": 0.88,
+          "corrected_ground_truth_count": 14,
+          "corrected_precision": 1.0,
+          "corrected_recall": 0.7857142857142857,
+          "historical_ground_truth_count": 37,
+          "old_f1": 0.4583333333333333,
+          "predicted_count": 11,
+          "question_id": "rxh-t3-task18",
+          "recovery": "phoenix-direct-output",
+          "validation_old_precision": 1.0,
+          "validation_old_recall": 0.2972972972972973
+        }
+      ],
+      "recomputed_historical_score": 0.4583333333333333,
+      "run_id": "full-gemini-3.7-flash-tier3-task18-llm-x100-r04",
+      "score_name": "macro_f1",
+      "score_value": 0.88,
+      "source_sha256": "8b68ce7da3361562288ddfeeb98292790b85a0ff8e8561f1cb483ec8a9beb628",
+      "task": "tier3/task18",
+      "wandb_url": "https://wandb.ai/sathvikbhagavan-epfl/LLM-Task18_tier3/runs/knygno3r"
+    },
+    {
+      "historical_score": 0.52,
+      "phoenix_project": "LLM-Task18_tier3",
+      "phoenix_session_id": "llm-task18-80aac5f4-93b6-44ae-9742-48539b2b93ff",
+      "phoenix_span_id": "7efdff382f2d6416",
+      "prediction_source": "phoenix-db",
+      "question_scores": [
+        {
+          "corrected_f1": 0.962962962962963,
+          "corrected_ground_truth_count": 14,
+          "corrected_precision": 1.0,
+          "corrected_recall": 0.9285714285714286,
+          "historical_ground_truth_count": 37,
+          "old_f1": 0.52,
+          "predicted_count": 13,
+          "question_id": "rxh-t3-task18",
+          "recovery": "phoenix-direct-output",
+          "validation_old_precision": 1.0,
+          "validation_old_recall": 0.35135135135135137
+        }
+      ],
+      "recomputed_historical_score": 0.52,
+      "run_id": "full-gemini-3.7-flash-tier3-task18-llm-x100-r05",
+      "score_name": "macro_f1",
+      "score_value": 0.962962962962963,
+      "source_sha256": "7e9966b30c1925ef5327dc93d72962c3f4ebe016635cd42cb40a94302f0f9379",
+      "task": "tier3/task18",
+      "wandb_url": "https://wandb.ai/sathvikbhagavan-epfl/LLM-Task18_tier3/runs/339c30ww"
+    },
+    {
+      "historical_score": 0.29729729729729726,
+      "phoenix_project": "LLM-Task18_tier3",
+      "phoenix_session_id": "llm-task18-742d7c17-16b4-4cdd-9251-b1cd6e6bccc0",
+      "phoenix_span_id": "510278bb616fd2aa",
+      "prediction_source": "phoenix-db",
+      "question_scores": [
+        {
+          "corrected_f1": 0.6055045871559633,
+          "corrected_ground_truth_count": 76,
+          "corrected_precision": 1.0,
+          "corrected_recall": 0.4342105263157895,
+          "historical_ground_truth_count": 189,
+          "old_f1": 0.29729729729729726,
+          "predicted_count": 33,
+          "question_id": "rxh-t3-task18",
+          "recovery": "phoenix-direct-output",
+          "validation_old_precision": 1.0,
+          "validation_old_recall": 0.1746031746031746
+        }
+      ],
+      "recomputed_historical_score": 0.29729729729729726,
+      "run_id": "full-gemini-3.7-flash-tier3-task18-llm-x500-r01",
+      "score_name": "macro_f1",
+      "score_value": 0.6055045871559633,
+      "source_sha256": "07c4733c36a870f4637dee04b308e1d29ad75a4a080d4ca44bc374b703275eee",
+      "task": "tier3/task18",
+      "wandb_url": "https://wandb.ai/sathvikbhagavan-epfl/LLM-Task18_tier3/runs/4rpfy48y"
+    },
+    {
+      "historical_score": 0.29729729729729726,
+      "phoenix_project": "LLM-Task18_tier3",
+      "phoenix_session_id": "llm-task18-fcf66e2d-159d-4ceb-8e78-f37f92bca1c2",
+      "phoenix_span_id": "c860f088b84d9508",
+      "prediction_source": "phoenix-db",
+      "question_scores": [
+        {
+          "corrected_f1": 0.6055045871559633,
+          "corrected_ground_truth_count": 76,
+          "corrected_precision": 1.0,
+          "corrected_recall": 0.4342105263157895,
+          "historical_ground_truth_count": 189,
+          "old_f1": 0.29729729729729726,
+          "predicted_count": 33,
+          "question_id": "rxh-t3-task18",
+          "recovery": "phoenix-direct-output",
+          "validation_old_precision": 1.0,
+          "validation_old_recall": 0.1746031746031746
+        }
+      ],
+      "recomputed_historical_score": 0.29729729729729726,
+      "run_id": "full-gemini-3.7-flash-tier3-task18-llm-x500-r02",
+      "score_name": "macro_f1",
+      "score_value": 0.6055045871559633,
+      "source_sha256": "b9b4b5fab344ca99ad7113d6fcceaa21406144149dacc14ab8077a0a65809bba",
+      "task": "tier3/task18",
+      "wandb_url": "https://wandb.ai/sathvikbhagavan-epfl/LLM-Task18_tier3/runs/pav2jkbn"
+    },
+    {
+      "historical_score": 0.25,
+      "phoenix_project": "LLM-Task18_tier3",
+      "phoenix_session_id": "llm-task18-58b0ac01-d391-4e6e-9da2-859895394383",
+      "phoenix_span_id": "98ca58a45b424268",
+      "prediction_source": "phoenix-db",
+      "question_scores": [
+        {
+          "corrected_f1": 0.5242718446601942,
+          "corrected_ground_truth_count": 76,
+          "corrected_precision": 1.0,
+          "corrected_recall": 0.35526315789473684,
+          "historical_ground_truth_count": 189,
+          "old_f1": 0.25,
+          "predicted_count": 27,
+          "question_id": "rxh-t3-task18",
+          "recovery": "phoenix-direct-output",
+          "validation_old_precision": 1.0,
+          "validation_old_recall": 0.14285714285714285
+        }
+      ],
+      "recomputed_historical_score": 0.25,
+      "run_id": "full-gemini-3.7-flash-tier3-task18-llm-x500-r03",
+      "score_name": "macro_f1",
+      "score_value": 0.5242718446601942,
+      "source_sha256": "7a48a6b8eb081d06aeee75b7b79797d8bf2469a1455f9c29c91ddc656828843d",
+      "task": "tier3/task18",
+      "wandb_url": "https://wandb.ai/sathvikbhagavan-epfl/LLM-Task18_tier3/runs/8hm7jh32"
+    },
+    {
+      "historical_score": 0.3636363636363636,
+      "phoenix_project": "LLM-Task18_tier3",
+      "phoenix_session_id": "llm-task18-64d170ce-4bfe-43cc-b88b-863d45c29346",
+      "phoenix_span_id": "3c4da216addfce45",
+      "prediction_source": "phoenix-db",
+      "question_scores": [
+        {
+          "corrected_f1": 0.6949152542372882,
+          "corrected_ground_truth_count": 76,
+          "corrected_precision": 0.9761904761904762,
+          "corrected_recall": 0.5394736842105263,
+          "historical_ground_truth_count": 189,
+          "old_f1": 0.3636363636363636,
+          "predicted_count": 42,
+          "question_id": "rxh-t3-task18",
+          "recovery": "phoenix-direct-output",
+          "validation_old_precision": 1.0,
+          "validation_old_recall": 0.2222222222222222
+        }
+      ],
+      "recomputed_historical_score": 0.3636363636363636,
+      "run_id": "full-gemini-3.7-flash-tier3-task18-llm-x500-r04",
+      "score_name": "macro_f1",
+      "score_value": 0.6949152542372882,
+      "source_sha256": "173342c5cdc021d59970e1904e79592dfbf921a76344f65051b7e2ea921c4021",
+      "task": "tier3/task18",
+      "wandb_url": "https://wandb.ai/sathvikbhagavan-epfl/LLM-Task18_tier3/runs/v5zgu5vv"
+    },
+    {
+      "historical_score": 0.28959276018099545,
+      "phoenix_project": "LLM-Task18_tier3",
+      "phoenix_session_id": "llm-task18-3ffc6282-8422-4601-a799-2c79a7b201c7",
+      "phoenix_span_id": "48bad8f02d6b7025",
+      "prediction_source": "phoenix-db",
+      "question_scores": [
+        {
+          "corrected_f1": 0.5740740740740741,
+          "corrected_ground_truth_count": 76,
+          "corrected_precision": 0.96875,
+          "corrected_recall": 0.40789473684210525,
+          "historical_ground_truth_count": 189,
+          "old_f1": 0.28959276018099545,
+          "predicted_count": 32,
+          "question_id": "rxh-t3-task18",
+          "recovery": "phoenix-direct-output",
+          "validation_old_precision": 1.0,
+          "validation_old_recall": 0.1693121693121693
+        }
+      ],
+      "recomputed_historical_score": 0.28959276018099545,
+      "run_id": "full-gemini-3.7-flash-tier3-task18-llm-x500-r05",
+      "score_name": "macro_f1",
+      "score_value": 0.5740740740740741,
+      "source_sha256": "02956c5851911c63ca55025b1e0ae18f430c1c40b61cb5968442263693f838fa",
+      "task": "tier3/task18",
+      "wandb_url": "https://wandb.ai/sathvikbhagavan-epfl/LLM-Task18_tier3/runs/wj8qihtk"
     },
     {
       "historical_score": 1.0,
@@ -47376,154 +47685,555 @@
       "wandb_url": "https://wandb.ai/sathvikbhagavan-epfl/CodeAct-Task18_tier3/runs/un07d6f0"
     },
     {
+      "historical_score": 0.6842105263157895,
+      "phoenix_project": "LLM-Task18_tier3",
+      "phoenix_session_id": "llm-task18-f9bae066-3fbb-4c25-979c-266d3184cf70",
+      "phoenix_span_id": "dfbaec4749cac82c",
+      "prediction_source": "phoenix-db",
+      "question_scores": [
+        {
+          "corrected_f1": 0.4905660377358491,
+          "corrected_ground_truth_count": 14,
+          "corrected_precision": 0.3333333333333333,
+          "corrected_recall": 0.9285714285714286,
+          "historical_ground_truth_count": 37,
+          "old_f1": 0.6842105263157895,
+          "predicted_count": 39,
+          "question_id": "rxh-t3-task18",
+          "recovery": "phoenix-direct-output",
+          "validation_old_precision": 0.6666666666666666,
+          "validation_old_recall": 0.7027027027027027
+        }
+      ],
+      "recomputed_historical_score": 0.6842105263157895,
+      "run_id": "full-qwen3.5-397b-tier3-task18-llm-x100-r01",
+      "score_name": "macro_f1",
+      "score_value": 0.4905660377358491,
+      "source_sha256": "bdf74bb9a09e3a3a97391f65c419611395cc0c9469dbea4e21b846316fbf8c3b",
+      "task": "tier3/task18",
+      "wandb_url": "https://wandb.ai/sathvikbhagavan-epfl/LLM-Task18_tier3/runs/eyf0c478"
+    },
+    {
+      "historical_score": 0.75,
+      "phoenix_project": "LLM-Task18_tier3",
+      "phoenix_session_id": "llm-task18-a879874a-4de4-45d4-bd1c-79bcad771782",
+      "phoenix_span_id": "7f560507adaaf76d",
+      "prediction_source": "phoenix-db",
+      "question_scores": [
+        {
+          "corrected_f1": 0.4897959183673469,
+          "corrected_ground_truth_count": 14,
+          "corrected_precision": 0.34285714285714286,
+          "corrected_recall": 0.8571428571428571,
+          "historical_ground_truth_count": 37,
+          "old_f1": 0.75,
+          "predicted_count": 35,
+          "question_id": "rxh-t3-task18",
+          "recovery": "phoenix-direct-output",
+          "validation_old_precision": 0.7714285714285715,
+          "validation_old_recall": 0.7297297297297297
+        }
+      ],
+      "recomputed_historical_score": 0.75,
+      "run_id": "full-qwen3.5-397b-tier3-task18-llm-x100-r02",
+      "score_name": "macro_f1",
+      "score_value": 0.4897959183673469,
+      "source_sha256": "882fd81a841ca0092f6e55aec885b1df6796a3217e9c6abe52389d53fd8e5c0d",
+      "task": "tier3/task18",
+      "wandb_url": "https://wandb.ai/sathvikbhagavan-epfl/LLM-Task18_tier3/runs/nqtaeo4e"
+    },
+    {
+      "historical_score": 0.6567164179104478,
+      "phoenix_project": "LLM-Task18_tier3",
+      "phoenix_session_id": "llm-task18-cc9addef-11d8-434a-93d9-052db94fd6c2",
+      "phoenix_span_id": "078782fbb526d5c8",
+      "prediction_source": "phoenix-db",
+      "question_scores": [
+        {
+          "corrected_f1": 0.5454545454545455,
+          "corrected_ground_truth_count": 14,
+          "corrected_precision": 0.4,
+          "corrected_recall": 0.8571428571428571,
+          "historical_ground_truth_count": 37,
+          "old_f1": 0.6567164179104478,
+          "predicted_count": 30,
+          "question_id": "rxh-t3-task18",
+          "recovery": "phoenix-direct-output",
+          "validation_old_precision": 0.7333333333333333,
+          "validation_old_recall": 0.5945945945945946
+        }
+      ],
+      "recomputed_historical_score": 0.6567164179104478,
+      "run_id": "full-qwen3.5-397b-tier3-task18-llm-x100-r03",
+      "score_name": "macro_f1",
+      "score_value": 0.5454545454545455,
+      "source_sha256": "ab8c9640710bc9b2066f6f3f1b39628a7b381120d76fb16a5f2b90f4dc16f7b2",
+      "task": "tier3/task18",
+      "wandb_url": "https://wandb.ai/sathvikbhagavan-epfl/LLM-Task18_tier3/runs/mt30sheu"
+    },
+    {
+      "historical_score": 0.6666666666666667,
+      "phoenix_project": "LLM-Task18_tier3",
+      "phoenix_session_id": "llm-task18-9a4803fc-ac72-499d-9c94-3443791a1e9f",
+      "phoenix_span_id": "430920c998f4d12a",
+      "prediction_source": "phoenix-db",
+      "question_scores": [
+        {
+          "corrected_f1": 0.5581395348837208,
+          "corrected_ground_truth_count": 14,
+          "corrected_precision": 0.41379310344827586,
+          "corrected_recall": 0.8571428571428571,
+          "historical_ground_truth_count": 37,
+          "old_f1": 0.6666666666666667,
+          "predicted_count": 29,
+          "question_id": "rxh-t3-task18",
+          "recovery": "phoenix-direct-output",
+          "validation_old_precision": 0.7586206896551724,
+          "validation_old_recall": 0.5945945945945946
+        }
+      ],
+      "recomputed_historical_score": 0.6666666666666667,
+      "run_id": "full-qwen3.5-397b-tier3-task18-llm-x100-r04",
+      "score_name": "macro_f1",
+      "score_value": 0.5581395348837208,
+      "source_sha256": "7ec1742d8c418d7697140fc92fc38a27da3784f61d721e2dbc5e1e5f733e62bd",
+      "task": "tier3/task18",
+      "wandb_url": "https://wandb.ai/sathvikbhagavan-epfl/LLM-Task18_tier3/runs/gou9zagd"
+    },
+    {
+      "historical_score": 0.6956521739130435,
+      "phoenix_project": "LLM-Task18_tier3",
+      "phoenix_session_id": "llm-task18-ea3d5be8-69fe-4d07-b0bb-da57b665914f",
+      "phoenix_span_id": "223d78fa1011a742",
+      "prediction_source": "phoenix-db",
+      "question_scores": [
+        {
+          "corrected_f1": 0.5217391304347825,
+          "corrected_ground_truth_count": 14,
+          "corrected_precision": 0.375,
+          "corrected_recall": 0.8571428571428571,
+          "historical_ground_truth_count": 37,
+          "old_f1": 0.6956521739130435,
+          "predicted_count": 32,
+          "question_id": "rxh-t3-task18",
+          "recovery": "phoenix-direct-output",
+          "validation_old_precision": 0.75,
+          "validation_old_recall": 0.6486486486486487
+        }
+      ],
+      "recomputed_historical_score": 0.6956521739130435,
+      "run_id": "full-qwen3.5-397b-tier3-task18-llm-x100-r05",
+      "score_name": "macro_f1",
+      "score_value": 0.5217391304347825,
+      "source_sha256": "a6adb0b42d1f96f953fa7ebacfbab9cce87e579ac2bb1a788dea54abc61f6bb8",
+      "task": "tier3/task18",
+      "wandb_url": "https://wandb.ai/sathvikbhagavan-epfl/LLM-Task18_tier3/runs/67618ldj"
+    },
+    {
       "historical_score": 0.548621190130624,
-      "prediction_source": "artifact-tar",
+      "phoenix_project": "LLM-Task18_tier3",
+      "phoenix_session_id": "llm-task18-1fd10540-ca42-4c2b-96f0-d78cbb9e6e0a",
+      "phoenix_span_id": "ee51ea68b6a67f29",
+      "prediction_source": "phoenix-db",
       "question_scores": [
         {
           "corrected_f1": 0.2638888888888889,
           "corrected_ground_truth_count": 76,
           "corrected_precision": 0.152,
           "corrected_recall": 1.0,
-          "corrected_true_positives": 76,
           "historical_ground_truth_count": 189,
-          "historical_true_positive_options": [
-            189
-          ],
-          "old_f1": 0.5486,
+          "old_f1": 0.548621190130624,
           "predicted_count": 500,
           "question_id": "rxh-t3-task18",
-          "recovery": "aggregate-contingency-bounds",
+          "recovery": "phoenix-direct-output",
           "validation_old_precision": 0.378,
           "validation_old_recall": 1.0
         }
       ],
-      "recomputed_historical_score": 0.5486,
+      "recomputed_historical_score": 0.548621190130624,
       "run_id": "full-qwen3.5-397b-tier3-task18-llm-x500-r01",
       "score_name": "macro_f1",
       "score_value": 0.2638888888888889,
-      "source_sha256": "43f365ff17a71614b3a3222d2cab9e945cd94496bc488443249d4464dfa7600c",
+      "source_sha256": "aebacb8d85784bc626a9602b4178f17f7067fb0335341a8b2d8cf84a2226ec2a",
       "task": "tier3/task18",
       "wandb_url": "https://wandb.ai/sathvikbhagavan-epfl/LLM-Task18_tier3/runs/769tafmi"
     },
     {
       "historical_score": 0.548621190130624,
-      "prediction_source": "artifact-tar",
+      "phoenix_project": "LLM-Task18_tier3",
+      "phoenix_session_id": "llm-task18-2bf73100-f835-43ef-9dc1-ec6b8ddda8c1",
+      "phoenix_span_id": "91a5d46fdf5d2d03",
+      "prediction_source": "phoenix-db",
       "question_scores": [
         {
           "corrected_f1": 0.2638888888888889,
           "corrected_ground_truth_count": 76,
           "corrected_precision": 0.152,
           "corrected_recall": 1.0,
-          "corrected_true_positives": 76,
           "historical_ground_truth_count": 189,
-          "historical_true_positive_options": [
-            189
-          ],
-          "old_f1": 0.5486,
+          "old_f1": 0.548621190130624,
           "predicted_count": 500,
           "question_id": "rxh-t3-task18",
-          "recovery": "aggregate-contingency-bounds",
+          "recovery": "phoenix-direct-output",
           "validation_old_precision": 0.378,
           "validation_old_recall": 1.0
         }
       ],
-      "recomputed_historical_score": 0.5486,
+      "recomputed_historical_score": 0.548621190130624,
       "run_id": "full-qwen3.5-397b-tier3-task18-llm-x500-r02",
       "score_name": "macro_f1",
       "score_value": 0.2638888888888889,
-      "source_sha256": "43f365ff17a71614b3a3222d2cab9e945cd94496bc488443249d4464dfa7600c",
+      "source_sha256": "aebacb8d85784bc626a9602b4178f17f7067fb0335341a8b2d8cf84a2226ec2a",
       "task": "tier3/task18",
       "wandb_url": "https://wandb.ai/sathvikbhagavan-epfl/LLM-Task18_tier3/runs/krel863x"
     },
     {
       "historical_score": 0.5518248175182482,
-      "prediction_source": "artifact-tar",
+      "phoenix_project": "LLM-Task18_tier3",
+      "phoenix_session_id": "llm-task18-cae6a25e-64b8-4e32-a3dd-6a416a599027",
+      "phoenix_span_id": "ce185a67fb71ce9c",
+      "prediction_source": "phoenix-db",
       "question_scores": [
         {
           "corrected_f1": 0.26573426573426573,
           "corrected_ground_truth_count": 76,
           "corrected_precision": 0.1532258064516129,
           "corrected_recall": 1.0,
-          "corrected_true_positives": 76,
           "historical_ground_truth_count": 189,
-          "historical_true_positive_options": [
-            189
-          ],
-          "old_f1": 0.5518,
+          "old_f1": 0.5518248175182482,
           "predicted_count": 496,
           "question_id": "rxh-t3-task18",
-          "recovery": "aggregate-contingency-bounds",
-          "validation_old_precision": 0.381,
+          "recovery": "phoenix-direct-output",
+          "validation_old_precision": 0.3810483870967742,
           "validation_old_recall": 1.0
         }
       ],
-      "recomputed_historical_score": 0.5518,
+      "recomputed_historical_score": 0.5518248175182482,
       "run_id": "full-qwen3.5-397b-tier3-task18-llm-x500-r03",
       "score_name": "macro_f1",
       "score_value": 0.26573426573426573,
-      "source_sha256": "84fba3b4b5943d37ea3f2f0b35231cc10af9d1f3a1c884d95cb4e010f011235e",
+      "source_sha256": "0e1255a9e3798160511deb43e25055d7ec096d7aa302747ea84e8330a39b11ae",
       "task": "tier3/task18",
       "wandb_url": "https://wandb.ai/sathvikbhagavan-epfl/LLM-Task18_tier3/runs/rkb3zj89"
     },
     {
       "historical_score": 0.5518248175182482,
-      "prediction_source": "artifact-tar",
+      "phoenix_project": "LLM-Task18_tier3",
+      "phoenix_session_id": "llm-task18-8c3150c0-17d4-4d4c-bfe3-69eed2835b04",
+      "phoenix_span_id": "39b687f0093c7250",
+      "prediction_source": "phoenix-db",
       "question_scores": [
         {
           "corrected_f1": 0.26573426573426573,
           "corrected_ground_truth_count": 76,
           "corrected_precision": 0.1532258064516129,
           "corrected_recall": 1.0,
-          "corrected_true_positives": 76,
           "historical_ground_truth_count": 189,
-          "historical_true_positive_options": [
-            189
-          ],
-          "old_f1": 0.5518,
+          "old_f1": 0.5518248175182482,
           "predicted_count": 496,
           "question_id": "rxh-t3-task18",
-          "recovery": "aggregate-contingency-bounds",
-          "validation_old_precision": 0.381,
+          "recovery": "phoenix-direct-output",
+          "validation_old_precision": 0.3810483870967742,
           "validation_old_recall": 1.0
         }
       ],
-      "recomputed_historical_score": 0.5518,
+      "recomputed_historical_score": 0.5518248175182482,
       "run_id": "full-qwen3.5-397b-tier3-task18-llm-x500-r04",
       "score_name": "macro_f1",
       "score_value": 0.26573426573426573,
-      "source_sha256": "84fba3b4b5943d37ea3f2f0b35231cc10af9d1f3a1c884d95cb4e010f011235e",
+      "source_sha256": "0e1255a9e3798160511deb43e25055d7ec096d7aa302747ea84e8330a39b11ae",
       "task": "tier3/task18",
       "wandb_url": "https://wandb.ai/sathvikbhagavan-epfl/LLM-Task18_tier3/runs/cisgxm9b"
     },
     {
       "historical_score": 0.5518248175182482,
-      "prediction_source": "artifact-tar",
+      "phoenix_project": "LLM-Task18_tier3",
+      "phoenix_session_id": "llm-task18-66c39bc5-b0a7-4a38-ba96-66100f48b8f2",
+      "phoenix_span_id": "22118f8a1684884b",
+      "prediction_source": "phoenix-db",
       "question_scores": [
         {
           "corrected_f1": 0.26573426573426573,
           "corrected_ground_truth_count": 76,
           "corrected_precision": 0.1532258064516129,
           "corrected_recall": 1.0,
-          "corrected_true_positives": 76,
           "historical_ground_truth_count": 189,
-          "historical_true_positive_options": [
-            189
-          ],
-          "old_f1": 0.5518,
+          "old_f1": 0.5518248175182482,
           "predicted_count": 496,
           "question_id": "rxh-t3-task18",
-          "recovery": "aggregate-contingency-bounds",
-          "validation_old_precision": 0.381,
+          "recovery": "phoenix-direct-output",
+          "validation_old_precision": 0.3810483870967742,
           "validation_old_recall": 1.0
         }
       ],
-      "recomputed_historical_score": 0.5518,
+      "recomputed_historical_score": 0.5518248175182482,
       "run_id": "full-qwen3.5-397b-tier3-task18-llm-x500-r05",
       "score_name": "macro_f1",
       "score_value": 0.26573426573426573,
-      "source_sha256": "84fba3b4b5943d37ea3f2f0b35231cc10af9d1f3a1c884d95cb4e010f011235e",
+      "source_sha256": "0e1255a9e3798160511deb43e25055d7ec096d7aa302747ea84e8330a39b11ae",
       "task": "tier3/task18",
       "wandb_url": "https://wandb.ai/sathvikbhagavan-epfl/LLM-Task18_tier3/runs/8du7tpip"
+    },
+    {
+      "historical_score": 0.5981308411214953,
+      "phoenix_project": "RLMs-Task18_tier3",
+      "phoenix_session_id": "run-rlms-9e50b6e6-0e26-4cf8-b93b-a12f42a56b2f",
+      "phoenix_span_id": "0692d1156a4233c1",
+      "prediction_source": "phoenix-db",
+      "question_scores": [
+        {
+          "corrected_f1": 0.33333333333333337,
+          "corrected_ground_truth_count": 14,
+          "corrected_precision": 0.2,
+          "corrected_recall": 1.0,
+          "historical_ground_truth_count": 37,
+          "old_f1": 0.5981308411214953,
+          "predicted_count": 70,
+          "question_id": "rxh-t3-task18",
+          "recovery": "phoenix-rlm-message-23-answer-line",
+          "validation_old_precision": 0.45714285714285713,
+          "validation_old_recall": 0.8648648648648649
+        }
+      ],
+      "recomputed_historical_score": 0.5981308411214953,
+      "run_id": "full-qwen3.5-397b-tier3-task18-rlm-x100-r01",
+      "score_name": "macro_f1",
+      "score_value": 0.33333333333333337,
+      "source_sha256": "5e19916285b09c003e441eff592ae13e2d0ddd84829bbb57a48415f454e9ee63",
+      "task": "tier3/task18",
+      "wandb_url": "https://wandb.ai/sathvikbhagavan-epfl/RLMs-Task18_tier3/runs/tqubku7l"
+    },
+    {
+      "historical_score": 0.5490196078431372,
+      "phoenix_project": "RLMs-Task18_tier3",
+      "phoenix_session_id": "run-rlms-d68f579b-51f1-4722-b309-3d4d4cb79941",
+      "phoenix_span_id": "2328092be384f5ca",
+      "prediction_source": "phoenix-db",
+      "question_scores": [
+        {
+          "corrected_f1": 1.0,
+          "corrected_ground_truth_count": 14,
+          "corrected_precision": 1.0,
+          "corrected_recall": 1.0,
+          "historical_ground_truth_count": 37,
+          "old_f1": 0.5490196078431372,
+          "predicted_count": 14,
+          "question_id": "rxh-t3-task18",
+          "recovery": "phoenix-rlm-message-15-comma-run",
+          "validation_old_precision": 1.0,
+          "validation_old_recall": 0.3783783783783784
+        }
+      ],
+      "recomputed_historical_score": 0.5490196078431372,
+      "run_id": "full-qwen3.5-397b-tier3-task18-rlm-x100-r02",
+      "score_name": "macro_f1",
+      "score_value": 1.0,
+      "source_sha256": "4ef35d1ed124ff197a58e0a291fad4e8f1efd043a821a982bd9be45c9ef76678",
+      "task": "tier3/task18",
+      "wandb_url": "https://wandb.ai/sathvikbhagavan-epfl/RLMs-Task18_tier3/runs/kc43lot3"
+    },
+    {
+      "historical_score": 0.5769230769230769,
+      "phoenix_project": "RLMs-Task18_tier3",
+      "phoenix_session_id": "run-rlms-dd37af8b-f579-4547-b934-42a70bb1c974",
+      "phoenix_span_id": "0088a3f528995d96",
+      "prediction_source": "phoenix-db",
+      "question_scores": [
+        {
+          "corrected_f1": 0.9655172413793104,
+          "corrected_ground_truth_count": 14,
+          "corrected_precision": 0.9333333333333333,
+          "corrected_recall": 1.0,
+          "historical_ground_truth_count": 37,
+          "old_f1": 0.5769230769230769,
+          "predicted_count": 15,
+          "question_id": "rxh-t3-task18",
+          "recovery": "phoenix-rlm-message-49-comma-run",
+          "validation_old_precision": 1.0,
+          "validation_old_recall": 0.40540540540540543
+        }
+      ],
+      "recomputed_historical_score": 0.5769230769230769,
+      "run_id": "full-qwen3.5-397b-tier3-task18-rlm-x100-r03",
+      "score_name": "macro_f1",
+      "score_value": 0.9655172413793104,
+      "source_sha256": "77aec83f8417447720cc19928b36c946043cf9ae83182dbef0af7850f9421c62",
+      "task": "tier3/task18",
+      "wandb_url": "https://wandb.ai/sathvikbhagavan-epfl/RLMs-Task18_tier3/runs/pfvqoh8i"
+    },
+    {
+      "historical_score": 0.5490196078431372,
+      "phoenix_project": "RLMs-Task18_tier3",
+      "phoenix_session_id": "run-rlms-97e84a77-2b1f-4b82-a1c6-b430eb975a93",
+      "phoenix_span_id": "02b7db0aaf9397e5",
+      "prediction_source": "phoenix-db",
+      "question_scores": [
+        {
+          "corrected_f1": 0.7857142857142857,
+          "corrected_ground_truth_count": 14,
+          "corrected_precision": 0.7857142857142857,
+          "corrected_recall": 0.7857142857142857,
+          "historical_ground_truth_count": 37,
+          "old_f1": 0.5490196078431372,
+          "predicted_count": 14,
+          "question_id": "rxh-t3-task18",
+          "recovery": "phoenix-rlm-message-15-comma-run",
+          "validation_old_precision": 1.0,
+          "validation_old_recall": 0.3783783783783784
+        }
+      ],
+      "recomputed_historical_score": 0.5490196078431372,
+      "run_id": "full-qwen3.5-397b-tier3-task18-rlm-x100-r05",
+      "score_name": "macro_f1",
+      "score_value": 0.7857142857142857,
+      "source_sha256": "1100ac2e5d24597772ac67c7a9124357c99fd592d79850634bdcfe465076f4d5",
+      "task": "tier3/task18",
+      "wandb_url": "https://wandb.ai/sathvikbhagavan-epfl/RLMs-Task18_tier3/runs/cnowk8ol"
+    },
+    {
+      "historical_score": 0.5934065934065934,
+      "phoenix_project": "RLMs-Task18_tier3",
+      "phoenix_session_id": "run-rlms-b1742826-c5d5-476c-96c0-7d2bb6253cc7",
+      "phoenix_span_id": "5ff103e7b1118c57",
+      "prediction_source": "phoenix-db",
+      "question_scores": [
+        {
+          "corrected_f1": 0.775,
+          "corrected_ground_truth_count": 76,
+          "corrected_precision": 0.7380952380952381,
+          "corrected_recall": 0.8157894736842105,
+          "historical_ground_truth_count": 189,
+          "old_f1": 0.5934065934065934,
+          "predicted_count": 84,
+          "question_id": "rxh-t3-task18",
+          "recovery": "phoenix-rlm-message-17-comma-run",
+          "validation_old_precision": 0.9642857142857143,
+          "validation_old_recall": 0.42857142857142855
+        }
+      ],
+      "recomputed_historical_score": 0.5934065934065934,
+      "run_id": "full-qwen3.5-397b-tier3-task18-rlm-x500-r01",
+      "score_name": "macro_f1",
+      "score_value": 0.775,
+      "source_sha256": "9ff29bc578ed56ad63af524dc48cd0d808ddb0c412431d8fecd36704bf46497d",
+      "task": "tier3/task18",
+      "wandb_url": "https://wandb.ai/sathvikbhagavan-epfl/RLMs-Task18_tier3/runs/1grb7p8q"
+    },
+    {
+      "historical_score": 0.45081967213114754,
+      "phoenix_project": "RLMs-Task18_tier3",
+      "phoenix_session_id": "run-rlms-938e2349-ae7d-46c4-94d9-e8867610bd72",
+      "phoenix_span_id": "963eb4ef5e7e6920",
+      "prediction_source": "phoenix-db",
+      "question_scores": [
+        {
+          "corrected_f1": 0.7938931297709924,
+          "corrected_ground_truth_count": 76,
+          "corrected_precision": 0.9454545454545454,
+          "corrected_recall": 0.6842105263157895,
+          "historical_ground_truth_count": 189,
+          "old_f1": 0.45081967213114754,
+          "predicted_count": 55,
+          "question_id": "rxh-t3-task18",
+          "recovery": "phoenix-rlm-message-11-comma-run",
+          "validation_old_precision": 1.0,
+          "validation_old_recall": 0.291005291005291
+        }
+      ],
+      "recomputed_historical_score": 0.45081967213114754,
+      "run_id": "full-qwen3.5-397b-tier3-task18-rlm-x500-r02",
+      "score_name": "macro_f1",
+      "score_value": 0.7938931297709924,
+      "source_sha256": "fd9c74e280d74b227fb061cfbfddb8baf63bac3f90d3b9439f9252a296fb936e",
+      "task": "tier3/task18",
+      "wandb_url": "https://wandb.ai/sathvikbhagavan-epfl/RLMs-Task18_tier3/runs/t9kimwek"
+    },
+    {
+      "historical_score": 0.6334519572953737,
+      "phoenix_project": "RLMs-Task18_tier3",
+      "phoenix_session_id": "run-rlms-22562b16-c73e-4c37-91a2-54f6c8299179",
+      "phoenix_span_id": "f185d4c1e9ed8c83",
+      "prediction_source": "phoenix-db",
+      "question_scores": [
+        {
+          "corrected_f1": 0.7380952380952381,
+          "corrected_ground_truth_count": 76,
+          "corrected_precision": 0.6739130434782609,
+          "corrected_recall": 0.8157894736842105,
+          "historical_ground_truth_count": 189,
+          "old_f1": 0.6334519572953737,
+          "predicted_count": 92,
+          "question_id": "rxh-t3-task18",
+          "recovery": "phoenix-rlm-message-43-comma-run",
+          "validation_old_precision": 0.967391304347826,
+          "validation_old_recall": 0.4708994708994709
+        }
+      ],
+      "recomputed_historical_score": 0.6334519572953737,
+      "run_id": "full-qwen3.5-397b-tier3-task18-rlm-x500-r03",
+      "score_name": "macro_f1",
+      "score_value": 0.7380952380952381,
+      "source_sha256": "a6be8dfe42d0d1a7803df4ba3951796c488ba5702c0392fa0c1543a9e24be2a0",
+      "task": "tier3/task18",
+      "wandb_url": "https://wandb.ai/sathvikbhagavan-epfl/RLMs-Task18_tier3/runs/5xvk11sa"
+    },
+    {
+      "historical_score": 0.5978647686832741,
+      "phoenix_project": "RLMs-Task18_tier3",
+      "phoenix_session_id": "run-rlms-c68d970e-e425-4c67-84cd-7a95c750a280",
+      "phoenix_span_id": "b99737aeec894c6c",
+      "prediction_source": "phoenix-db",
+      "question_scores": [
+        {
+          "corrected_f1": 0.9047619047619047,
+          "corrected_ground_truth_count": 76,
+          "corrected_precision": 0.8260869565217391,
+          "corrected_recall": 1.0,
+          "historical_ground_truth_count": 189,
+          "old_f1": 0.5978647686832741,
+          "predicted_count": 92,
+          "question_id": "rxh-t3-task18",
+          "recovery": "phoenix-rlm-message-13-comma-run",
+          "validation_old_precision": 0.9130434782608695,
+          "validation_old_recall": 0.4444444444444444
+        }
+      ],
+      "recomputed_historical_score": 0.5978647686832741,
+      "run_id": "full-qwen3.5-397b-tier3-task18-rlm-x500-r04",
+      "score_name": "macro_f1",
+      "score_value": 0.9047619047619047,
+      "source_sha256": "a69be303571d9507b19f150e0ef1c90ae2a4c1ff97e1f461c202da8d2903f68c",
+      "task": "tier3/task18",
+      "wandb_url": "https://wandb.ai/sathvikbhagavan-epfl/RLMs-Task18_tier3/runs/27y6hzpi"
+    },
+    {
+      "historical_score": 0.71864406779661,
+      "phoenix_project": "RLMs-Task18_tier3",
+      "phoenix_session_id": "run-rlms-2aa14b53-04b5-4cd1-8665-ca128f06c7ee",
+      "phoenix_span_id": "ef2f08c68d88b301",
+      "prediction_source": "phoenix-db",
+      "question_scores": [
+        {
+          "corrected_f1": 0.8351648351648352,
+          "corrected_ground_truth_count": 76,
+          "corrected_precision": 0.7169811320754716,
+          "corrected_recall": 1.0,
+          "historical_ground_truth_count": 189,
+          "old_f1": 0.71864406779661,
+          "predicted_count": 106,
+          "question_id": "rxh-t3-task18",
+          "recovery": "phoenix-rlm-message-27-answer-line",
+          "validation_old_precision": 1.0,
+          "validation_old_recall": 0.5608465608465608
+        }
+      ],
+      "recomputed_historical_score": 0.71864406779661,
+      "run_id": "full-qwen3.5-397b-tier3-task18-rlm-x500-r05",
+      "score_name": "macro_f1",
+      "score_value": 0.8351648351648352,
+      "source_sha256": "fb680af6e013ea51629e66b8be452e14150bcff1cbf9116db96a461eeb3e741c",
+      "task": "tier3/task18",
+      "wandb_url": "https://wandb.ai/sathvikbhagavan-epfl/RLMs-Task18_tier3/runs/3u52rlo4"
     },
     {
       "historical_score": 1.0,
@@ -48127,211 +48837,291 @@
     },
     {
       "historical_score": 1.0,
-      "prediction_source": "artifact-tar",
+      "phoenix_project": "RLMs-Task23_tier3",
+      "phoenix_session_id": "run-rlms-d8cd32b9-f833-4e55-bf5c-f5d1f30c5632",
+      "phoenix_span_id": "0b9e439f3c29e5c4",
+      "prediction_source": "phoenix-db",
       "question_scores": [
         {
           "corrected_f1": 1.0,
           "corrected_ground_truth_count": 5,
+          "corrected_precision": 1.0,
+          "corrected_recall": 1.0,
           "historical_ground_truth_count": 5,
           "old_f1": 1.0,
+          "predicted_count": 5,
           "question_id": "rxh-t3-task23",
-          "recovery": "ground-truth-unchanged-in-context"
+          "recovery": "phoenix-rlm-message-9-answer-line",
+          "validation_old_precision": 1.0,
+          "validation_old_recall": 1.0
         }
       ],
       "recomputed_historical_score": 1.0,
       "run_id": "full-qwen3.5-397b-tier3-task23-rlm-x100-r01",
       "score_name": "macro_f1",
       "score_value": 1.0,
-      "source_sha256": "000655470f85746fa7d2b25d0d60044424d75402430fe5386854c0eea5b01312",
+      "source_sha256": "6464efc57a2c5cc96912147fdb81bfa7d2f5c53f257d78ea58a085d324afe489",
       "task": "tier3/task23",
       "wandb_url": "https://wandb.ai/sathvikbhagavan-epfl/RLMs-Task23_tier3/runs/flvsb94s"
     },
     {
       "historical_score": 1.0,
-      "prediction_source": "artifact-tar",
+      "phoenix_project": "RLMs-Task23_tier3",
+      "phoenix_session_id": "run-rlms-b9f03724-2f4d-4e00-842c-2d101dd55598",
+      "phoenix_span_id": "254881a715326201",
+      "prediction_source": "phoenix-db",
       "question_scores": [
         {
           "corrected_f1": 1.0,
           "corrected_ground_truth_count": 5,
+          "corrected_precision": 1.0,
+          "corrected_recall": 1.0,
           "historical_ground_truth_count": 5,
           "old_f1": 1.0,
+          "predicted_count": 5,
           "question_id": "rxh-t3-task23",
-          "recovery": "ground-truth-unchanged-in-context"
+          "recovery": "phoenix-rlm-message-11-comma-run",
+          "validation_old_precision": 1.0,
+          "validation_old_recall": 1.0
         }
       ],
       "recomputed_historical_score": 1.0,
       "run_id": "full-qwen3.5-397b-tier3-task23-rlm-x100-r02",
       "score_name": "macro_f1",
       "score_value": 1.0,
-      "source_sha256": "000655470f85746fa7d2b25d0d60044424d75402430fe5386854c0eea5b01312",
+      "source_sha256": "6464efc57a2c5cc96912147fdb81bfa7d2f5c53f257d78ea58a085d324afe489",
       "task": "tier3/task23",
       "wandb_url": "https://wandb.ai/sathvikbhagavan-epfl/RLMs-Task23_tier3/runs/powac6zd"
     },
     {
       "historical_score": 1.0,
-      "prediction_source": "artifact-tar",
+      "phoenix_project": "RLMs-Task23_tier3",
+      "phoenix_session_id": "run-rlms-7e2079a9-242a-4119-9ec4-bea55ae45b42",
+      "phoenix_span_id": "c2ca8fe6b364b804",
+      "prediction_source": "phoenix-db",
       "question_scores": [
         {
           "corrected_f1": 1.0,
           "corrected_ground_truth_count": 5,
+          "corrected_precision": 1.0,
+          "corrected_recall": 1.0,
           "historical_ground_truth_count": 5,
           "old_f1": 1.0,
+          "predicted_count": 5,
           "question_id": "rxh-t3-task23",
-          "recovery": "ground-truth-unchanged-in-context"
+          "recovery": "phoenix-rlm-message-9-answer-line",
+          "validation_old_precision": 1.0,
+          "validation_old_recall": 1.0
         }
       ],
       "recomputed_historical_score": 1.0,
       "run_id": "full-qwen3.5-397b-tier3-task23-rlm-x100-r03",
       "score_name": "macro_f1",
       "score_value": 1.0,
-      "source_sha256": "000655470f85746fa7d2b25d0d60044424d75402430fe5386854c0eea5b01312",
+      "source_sha256": "6464efc57a2c5cc96912147fdb81bfa7d2f5c53f257d78ea58a085d324afe489",
       "task": "tier3/task23",
       "wandb_url": "https://wandb.ai/sathvikbhagavan-epfl/RLMs-Task23_tier3/runs/46f5d3ki"
     },
     {
       "historical_score": 1.0,
-      "prediction_source": "artifact-tar",
+      "phoenix_project": "RLMs-Task23_tier3",
+      "phoenix_session_id": "run-rlms-fe603b2b-72de-4573-82cc-af3203302815",
+      "phoenix_span_id": "d0721cdf82761a9d",
+      "prediction_source": "phoenix-db",
       "question_scores": [
         {
           "corrected_f1": 1.0,
           "corrected_ground_truth_count": 5,
+          "corrected_precision": 1.0,
+          "corrected_recall": 1.0,
           "historical_ground_truth_count": 5,
           "old_f1": 1.0,
+          "predicted_count": 5,
           "question_id": "rxh-t3-task23",
-          "recovery": "ground-truth-unchanged-in-context"
+          "recovery": "phoenix-rlm-message-9-comma-run",
+          "validation_old_precision": 1.0,
+          "validation_old_recall": 1.0
         }
       ],
       "recomputed_historical_score": 1.0,
       "run_id": "full-qwen3.5-397b-tier3-task23-rlm-x100-r04",
       "score_name": "macro_f1",
       "score_value": 1.0,
-      "source_sha256": "000655470f85746fa7d2b25d0d60044424d75402430fe5386854c0eea5b01312",
+      "source_sha256": "6464efc57a2c5cc96912147fdb81bfa7d2f5c53f257d78ea58a085d324afe489",
       "task": "tier3/task23",
       "wandb_url": "https://wandb.ai/sathvikbhagavan-epfl/RLMs-Task23_tier3/runs/pjqdysuq"
     },
     {
       "historical_score": 1.0,
-      "prediction_source": "artifact-tar",
+      "phoenix_project": "RLMs-Task23_tier3",
+      "phoenix_session_id": "run-rlms-4d94967d-a1bc-4e3d-ab73-7ee2cb04ff5a",
+      "phoenix_span_id": "1f7180651a2de2bb",
+      "prediction_source": "phoenix-db",
       "question_scores": [
         {
           "corrected_f1": 1.0,
           "corrected_ground_truth_count": 5,
+          "corrected_precision": 1.0,
+          "corrected_recall": 1.0,
           "historical_ground_truth_count": 5,
           "old_f1": 1.0,
+          "predicted_count": 5,
           "question_id": "rxh-t3-task23",
-          "recovery": "ground-truth-unchanged-in-context"
+          "recovery": "phoenix-rlm-message-9-comma-run",
+          "validation_old_precision": 1.0,
+          "validation_old_recall": 1.0
         }
       ],
       "recomputed_historical_score": 1.0,
       "run_id": "full-qwen3.5-397b-tier3-task23-rlm-x100-r05",
       "score_name": "macro_f1",
       "score_value": 1.0,
-      "source_sha256": "000655470f85746fa7d2b25d0d60044424d75402430fe5386854c0eea5b01312",
+      "source_sha256": "6464efc57a2c5cc96912147fdb81bfa7d2f5c53f257d78ea58a085d324afe489",
       "task": "tier3/task23",
       "wandb_url": "https://wandb.ai/sathvikbhagavan-epfl/RLMs-Task23_tier3/runs/j0jda4et"
     },
     {
       "historical_score": 1.0,
-      "prediction_source": "artifact-tar",
+      "phoenix_project": "RLMs-Task23_tier3",
+      "phoenix_session_id": "run-rlms-4cb47f9b-2e4c-4c28-8b85-a2ea1445205c",
+      "phoenix_span_id": "4c8582247053c2d3",
+      "prediction_source": "phoenix-db",
       "question_scores": [
         {
           "corrected_f1": 1.0,
           "corrected_ground_truth_count": 5,
+          "corrected_precision": 1.0,
+          "corrected_recall": 1.0,
           "historical_ground_truth_count": 5,
           "old_f1": 1.0,
+          "predicted_count": 5,
           "question_id": "rxh-t3-task23",
-          "recovery": "ground-truth-unchanged-in-context"
+          "recovery": "phoenix-rlm-message-9-comma-run",
+          "validation_old_precision": 1.0,
+          "validation_old_recall": 1.0
         }
       ],
       "recomputed_historical_score": 1.0,
       "run_id": "full-qwen3.5-397b-tier3-task23-rlm-x500-r01",
       "score_name": "macro_f1",
       "score_value": 1.0,
-      "source_sha256": "1220e6224d0ecb7a799a0d7985680a46cfa05606457f15ed7f988ee8939fbef1",
+      "source_sha256": "413578d841a03ecf6df83b100442346a5ac7c84050f6ba95ec54e6cfc72ed987",
       "task": "tier3/task23",
       "wandb_url": "https://wandb.ai/sathvikbhagavan-epfl/RLMs-Task23_tier3/runs/6bc7575n"
     },
     {
       "historical_score": 1.0,
-      "prediction_source": "artifact-tar",
+      "phoenix_project": "RLMs-Task23_tier3",
+      "phoenix_session_id": "run-rlms-e34630c8-4558-4b89-a080-5383d9f7676e",
+      "phoenix_span_id": "519881e03edd63d4",
+      "prediction_source": "phoenix-db",
       "question_scores": [
         {
           "corrected_f1": 1.0,
           "corrected_ground_truth_count": 5,
+          "corrected_precision": 1.0,
+          "corrected_recall": 1.0,
           "historical_ground_truth_count": 5,
           "old_f1": 1.0,
+          "predicted_count": 5,
           "question_id": "rxh-t3-task23",
-          "recovery": "ground-truth-unchanged-in-context"
+          "recovery": "phoenix-rlm-message-9-comma-run",
+          "validation_old_precision": 1.0,
+          "validation_old_recall": 1.0
         }
       ],
       "recomputed_historical_score": 1.0,
       "run_id": "full-qwen3.5-397b-tier3-task23-rlm-x500-r02",
       "score_name": "macro_f1",
       "score_value": 1.0,
-      "source_sha256": "1220e6224d0ecb7a799a0d7985680a46cfa05606457f15ed7f988ee8939fbef1",
+      "source_sha256": "413578d841a03ecf6df83b100442346a5ac7c84050f6ba95ec54e6cfc72ed987",
       "task": "tier3/task23",
       "wandb_url": "https://wandb.ai/sathvikbhagavan-epfl/RLMs-Task23_tier3/runs/0sextklc"
     },
     {
       "historical_score": 1.0,
-      "prediction_source": "artifact-tar",
+      "phoenix_project": "RLMs-Task23_tier3",
+      "phoenix_session_id": "run-rlms-788ffccc-6403-4721-afb0-3d821deec447",
+      "phoenix_span_id": "df770581df8694ee",
+      "prediction_source": "phoenix-db",
       "question_scores": [
         {
           "corrected_f1": 1.0,
           "corrected_ground_truth_count": 5,
+          "corrected_precision": 1.0,
+          "corrected_recall": 1.0,
           "historical_ground_truth_count": 5,
           "old_f1": 1.0,
+          "predicted_count": 5,
           "question_id": "rxh-t3-task23",
-          "recovery": "ground-truth-unchanged-in-context"
+          "recovery": "phoenix-rlm-message-11-comma-run",
+          "validation_old_precision": 1.0,
+          "validation_old_recall": 1.0
         }
       ],
       "recomputed_historical_score": 1.0,
       "run_id": "full-qwen3.5-397b-tier3-task23-rlm-x500-r03",
       "score_name": "macro_f1",
       "score_value": 1.0,
-      "source_sha256": "1220e6224d0ecb7a799a0d7985680a46cfa05606457f15ed7f988ee8939fbef1",
+      "source_sha256": "3ea7f250bef1890006dd87ea1760f55b3641c3a2b6f68b6b3ccb41bc8d71e589",
       "task": "tier3/task23",
       "wandb_url": "https://wandb.ai/sathvikbhagavan-epfl/RLMs-Task23_tier3/runs/3xjre26f"
     },
     {
       "historical_score": 1.0,
-      "prediction_source": "artifact-tar",
+      "phoenix_project": "RLMs-Task23_tier3",
+      "phoenix_session_id": "run-rlms-4c3d050e-a83b-4a51-9e35-4f38968439d8",
+      "phoenix_span_id": "6b3965cdd0ce95ff",
+      "prediction_source": "phoenix-db",
       "question_scores": [
         {
           "corrected_f1": 1.0,
           "corrected_ground_truth_count": 5,
+          "corrected_precision": 1.0,
+          "corrected_recall": 1.0,
           "historical_ground_truth_count": 5,
           "old_f1": 1.0,
+          "predicted_count": 5,
           "question_id": "rxh-t3-task23",
-          "recovery": "ground-truth-unchanged-in-context"
+          "recovery": "phoenix-rlm-message-9-comma-run",
+          "validation_old_precision": 1.0,
+          "validation_old_recall": 1.0
         }
       ],
       "recomputed_historical_score": 1.0,
       "run_id": "full-qwen3.5-397b-tier3-task23-rlm-x500-r04",
       "score_name": "macro_f1",
       "score_value": 1.0,
-      "source_sha256": "1220e6224d0ecb7a799a0d7985680a46cfa05606457f15ed7f988ee8939fbef1",
+      "source_sha256": "413578d841a03ecf6df83b100442346a5ac7c84050f6ba95ec54e6cfc72ed987",
       "task": "tier3/task23",
       "wandb_url": "https://wandb.ai/sathvikbhagavan-epfl/RLMs-Task23_tier3/runs/8rctpzto"
     },
     {
       "historical_score": 1.0,
-      "prediction_source": "artifact-tar",
+      "phoenix_project": "RLMs-Task23_tier3",
+      "phoenix_session_id": "run-rlms-e03452ed-2a56-4b6a-81b2-e2be2c1a3546",
+      "phoenix_span_id": "ca46d3b9fe3a6501",
+      "prediction_source": "phoenix-db",
       "question_scores": [
         {
           "corrected_f1": 1.0,
           "corrected_ground_truth_count": 5,
+          "corrected_precision": 1.0,
+          "corrected_recall": 1.0,
           "historical_ground_truth_count": 5,
           "old_f1": 1.0,
+          "predicted_count": 5,
           "question_id": "rxh-t3-task23",
-          "recovery": "ground-truth-unchanged-in-context"
+          "recovery": "phoenix-rlm-message-11-comma-run",
+          "validation_old_precision": 1.0,
+          "validation_old_recall": 1.0
         }
       ],
       "recomputed_historical_score": 1.0,
       "run_id": "full-qwen3.5-397b-tier3-task23-rlm-x500-r05",
       "score_name": "macro_f1",
       "score_value": 1.0,
-      "source_sha256": "1220e6224d0ecb7a799a0d7985680a46cfa05606457f15ed7f988ee8939fbef1",
+      "source_sha256": "413578d841a03ecf6df83b100442346a5ac7c84050f6ba95ec54e6cfc72ed987",
       "task": "tier3/task23",
       "wandb_url": "https://wandb.ai/sathvikbhagavan-epfl/RLMs-Task23_tier3/runs/y355awq7"
     },
@@ -80116,7 +80906,7 @@
       "wandb_url": "https://wandb.ai/liac/RLMs-Task15/runs/ln0p2l3y"
     }
   ],
-  "recovery_id": "rxnhaystack-corrected-score-recovery-2026-09-25-v1",
+  "recovery_id": "rxnhaystack-corrected-score-recovery-2026-09-25-v2",
   "schema_version": 1,
   "unresolved": [
     {
@@ -80568,106 +81358,6 @@
       "source_sha256": "dcfbf9da32b49108ebe4718989fa572398ecd492426813898246324c669439f8",
       "task": "tier3/task10",
       "wandb_url": "https://wandb.ai/sathvikbhagavan-epfl/LLM-Task10/runs/dqx3kvcv"
-    },
-    {
-      "extracted_prediction_count": 0,
-      "parsed_metric_count": 1,
-      "reason": "prediction-underdetermined-or-validation-failed",
-      "resolved_question_count": 0,
-      "run_id": "full-gemini-3.7-flash-tier3-task18-llm-x100-r01",
-      "source_sha256": "0e5a3395b4a49264bc128558ab5aa8885b908d3c60e94aaf59e0e839c965f6d7",
-      "task": "tier3/task18",
-      "wandb_url": "https://wandb.ai/sathvikbhagavan-epfl/LLM-Task18_tier3/runs/4bl6m1o2"
-    },
-    {
-      "extracted_prediction_count": 0,
-      "parsed_metric_count": 1,
-      "reason": "prediction-underdetermined-or-validation-failed",
-      "resolved_question_count": 0,
-      "run_id": "full-gemini-3.7-flash-tier3-task18-llm-x100-r02",
-      "source_sha256": "86e300322ffac5cc2db619015eade9ba65b1e1d93b08b40b689a547645ee83c6",
-      "task": "tier3/task18",
-      "wandb_url": "https://wandb.ai/sathvikbhagavan-epfl/LLM-Task18_tier3/runs/xhqygibp"
-    },
-    {
-      "extracted_prediction_count": 0,
-      "parsed_metric_count": 1,
-      "reason": "prediction-underdetermined-or-validation-failed",
-      "resolved_question_count": 0,
-      "run_id": "full-gemini-3.7-flash-tier3-task18-llm-x100-r03",
-      "source_sha256": "86e300322ffac5cc2db619015eade9ba65b1e1d93b08b40b689a547645ee83c6",
-      "task": "tier3/task18",
-      "wandb_url": "https://wandb.ai/sathvikbhagavan-epfl/LLM-Task18_tier3/runs/b9qjntf8"
-    },
-    {
-      "extracted_prediction_count": 0,
-      "parsed_metric_count": 1,
-      "reason": "prediction-underdetermined-or-validation-failed",
-      "resolved_question_count": 0,
-      "run_id": "full-gemini-3.7-flash-tier3-task18-llm-x100-r04",
-      "source_sha256": "b1aadcdf7354aeba697654150e80e626cd7ad335de2141ef86d35afb2230348e",
-      "task": "tier3/task18",
-      "wandb_url": "https://wandb.ai/sathvikbhagavan-epfl/LLM-Task18_tier3/runs/knygno3r"
-    },
-    {
-      "extracted_prediction_count": 0,
-      "parsed_metric_count": 1,
-      "reason": "prediction-underdetermined-or-validation-failed",
-      "resolved_question_count": 0,
-      "run_id": "full-gemini-3.7-flash-tier3-task18-llm-x100-r05",
-      "source_sha256": "b52a102172cbbbc6811411abc42e981af942f7bb3b801e9051c91daaa7f9908a",
-      "task": "tier3/task18",
-      "wandb_url": "https://wandb.ai/sathvikbhagavan-epfl/LLM-Task18_tier3/runs/339c30ww"
-    },
-    {
-      "extracted_prediction_count": 0,
-      "parsed_metric_count": 1,
-      "reason": "prediction-underdetermined-or-validation-failed",
-      "resolved_question_count": 0,
-      "run_id": "full-gemini-3.7-flash-tier3-task18-llm-x500-r01",
-      "source_sha256": "ec716ae08fe67efbc36b823db428134788cab416a7af07bd4a253cfcb62229c0",
-      "task": "tier3/task18",
-      "wandb_url": "https://wandb.ai/sathvikbhagavan-epfl/LLM-Task18_tier3/runs/4rpfy48y"
-    },
-    {
-      "extracted_prediction_count": 0,
-      "parsed_metric_count": 1,
-      "reason": "prediction-underdetermined-or-validation-failed",
-      "resolved_question_count": 0,
-      "run_id": "full-gemini-3.7-flash-tier3-task18-llm-x500-r02",
-      "source_sha256": "ec716ae08fe67efbc36b823db428134788cab416a7af07bd4a253cfcb62229c0",
-      "task": "tier3/task18",
-      "wandb_url": "https://wandb.ai/sathvikbhagavan-epfl/LLM-Task18_tier3/runs/pav2jkbn"
-    },
-    {
-      "extracted_prediction_count": 0,
-      "parsed_metric_count": 1,
-      "reason": "prediction-underdetermined-or-validation-failed",
-      "resolved_question_count": 0,
-      "run_id": "full-gemini-3.7-flash-tier3-task18-llm-x500-r03",
-      "source_sha256": "2a8b467e4e617fb6073cf565c1c5a0d05208368672130ba43148ce1b74911b0d",
-      "task": "tier3/task18",
-      "wandb_url": "https://wandb.ai/sathvikbhagavan-epfl/LLM-Task18_tier3/runs/8hm7jh32"
-    },
-    {
-      "extracted_prediction_count": 0,
-      "parsed_metric_count": 1,
-      "reason": "prediction-underdetermined-or-validation-failed",
-      "resolved_question_count": 0,
-      "run_id": "full-gemini-3.7-flash-tier3-task18-llm-x500-r04",
-      "source_sha256": "33ec38d78c9bc95b06ecd40c45242e063cb243be865cec9acd93dbf3aa8432ce",
-      "task": "tier3/task18",
-      "wandb_url": "https://wandb.ai/sathvikbhagavan-epfl/LLM-Task18_tier3/runs/v5zgu5vv"
-    },
-    {
-      "extracted_prediction_count": 0,
-      "parsed_metric_count": 1,
-      "reason": "prediction-underdetermined-or-validation-failed",
-      "resolved_question_count": 0,
-      "run_id": "full-gemini-3.7-flash-tier3-task18-llm-x500-r05",
-      "source_sha256": "ee8652edec8f9e773b46f12139f071d5dd8dc57e2c69eac9a33438b9e3766108",
-      "task": "tier3/task18",
-      "wandb_url": "https://wandb.ai/sathvikbhagavan-epfl/LLM-Task18_tier3/runs/wj8qihtk"
     },
     {
       "extracted_prediction_count": 0,
@@ -81544,150 +82234,10 @@
       "parsed_metric_count": 1,
       "reason": "prediction-underdetermined-or-validation-failed",
       "resolved_question_count": 0,
-      "run_id": "full-qwen3.5-397b-tier3-task18-llm-x100-r01",
-      "source_sha256": "44ee874fbfdc7343afdfcd50192a92bfbec3bd86ad37aa2cf2bed8739d9114d9",
-      "task": "tier3/task18",
-      "wandb_url": "https://wandb.ai/sathvikbhagavan-epfl/LLM-Task18_tier3/runs/eyf0c478"
-    },
-    {
-      "extracted_prediction_count": 0,
-      "parsed_metric_count": 1,
-      "reason": "prediction-underdetermined-or-validation-failed",
-      "resolved_question_count": 0,
-      "run_id": "full-qwen3.5-397b-tier3-task18-llm-x100-r02",
-      "source_sha256": "cf22a6829d4c849e27c6a855e90d4ec78d28d9c76dcc9d98945af988ab877aa7",
-      "task": "tier3/task18",
-      "wandb_url": "https://wandb.ai/sathvikbhagavan-epfl/LLM-Task18_tier3/runs/nqtaeo4e"
-    },
-    {
-      "extracted_prediction_count": 0,
-      "parsed_metric_count": 1,
-      "reason": "prediction-underdetermined-or-validation-failed",
-      "resolved_question_count": 0,
-      "run_id": "full-qwen3.5-397b-tier3-task18-llm-x100-r03",
-      "source_sha256": "63dd5694cd0ff2cf1e109be6c4d3aea581c59ce29966a67025f9d00f1fde46bd",
-      "task": "tier3/task18",
-      "wandb_url": "https://wandb.ai/sathvikbhagavan-epfl/LLM-Task18_tier3/runs/mt30sheu"
-    },
-    {
-      "extracted_prediction_count": 0,
-      "parsed_metric_count": 1,
-      "reason": "prediction-underdetermined-or-validation-failed",
-      "resolved_question_count": 0,
-      "run_id": "full-qwen3.5-397b-tier3-task18-llm-x100-r04",
-      "source_sha256": "9e29cb11bb95bcc1f05fa9524677f23367ef3fb9fb9a0a2c067a90683b668c32",
-      "task": "tier3/task18",
-      "wandb_url": "https://wandb.ai/sathvikbhagavan-epfl/LLM-Task18_tier3/runs/gou9zagd"
-    },
-    {
-      "extracted_prediction_count": 0,
-      "parsed_metric_count": 1,
-      "reason": "prediction-underdetermined-or-validation-failed",
-      "resolved_question_count": 0,
-      "run_id": "full-qwen3.5-397b-tier3-task18-llm-x100-r05",
-      "source_sha256": "fd4661126dbf1654ad6efc5fa0742772c18be7950b9c62740c67556aa055d7f2",
-      "task": "tier3/task18",
-      "wandb_url": "https://wandb.ai/sathvikbhagavan-epfl/LLM-Task18_tier3/runs/67618ldj"
-    },
-    {
-      "extracted_prediction_count": 0,
-      "parsed_metric_count": 1,
-      "reason": "prediction-underdetermined-or-validation-failed",
-      "resolved_question_count": 0,
-      "run_id": "full-qwen3.5-397b-tier3-task18-rlm-x100-r01",
-      "source_sha256": "47be7d875375dbf24bb34e19fd0d658c4f3a251feee79ca99b345d18d22df823",
-      "task": "tier3/task18",
-      "wandb_url": "https://wandb.ai/sathvikbhagavan-epfl/RLMs-Task18_tier3/runs/tqubku7l"
-    },
-    {
-      "extracted_prediction_count": 0,
-      "parsed_metric_count": 1,
-      "reason": "prediction-underdetermined-or-validation-failed",
-      "resolved_question_count": 0,
-      "run_id": "full-qwen3.5-397b-tier3-task18-rlm-x100-r02",
-      "source_sha256": "8ae1d7f6ad3c7be46d2567ff03d055fe298dc5a72dc46d44f58d7e8862093e28",
-      "task": "tier3/task18",
-      "wandb_url": "https://wandb.ai/sathvikbhagavan-epfl/RLMs-Task18_tier3/runs/kc43lot3"
-    },
-    {
-      "extracted_prediction_count": 0,
-      "parsed_metric_count": 1,
-      "reason": "prediction-underdetermined-or-validation-failed",
-      "resolved_question_count": 0,
-      "run_id": "full-qwen3.5-397b-tier3-task18-rlm-x100-r03",
-      "source_sha256": "4b2ca259081898aa0d3c97726b8dfafe50a1bb47707d08613c07abf0347f83ff",
-      "task": "tier3/task18",
-      "wandb_url": "https://wandb.ai/sathvikbhagavan-epfl/RLMs-Task18_tier3/runs/pfvqoh8i"
-    },
-    {
-      "extracted_prediction_count": 0,
-      "parsed_metric_count": 1,
-      "reason": "prediction-underdetermined-or-validation-failed",
-      "resolved_question_count": 0,
       "run_id": "full-qwen3.5-397b-tier3-task18-rlm-x100-r04",
       "source_sha256": "42b7db6908724e784e3071f358372a7f6b754cdfa90b8d554745f6e47e3dc152",
       "task": "tier3/task18",
       "wandb_url": "https://wandb.ai/sathvikbhagavan-epfl/RLMs-Task18_tier3/runs/psi9z6hy"
-    },
-    {
-      "extracted_prediction_count": 0,
-      "parsed_metric_count": 1,
-      "reason": "prediction-underdetermined-or-validation-failed",
-      "resolved_question_count": 0,
-      "run_id": "full-qwen3.5-397b-tier3-task18-rlm-x100-r05",
-      "source_sha256": "8ae1d7f6ad3c7be46d2567ff03d055fe298dc5a72dc46d44f58d7e8862093e28",
-      "task": "tier3/task18",
-      "wandb_url": "https://wandb.ai/sathvikbhagavan-epfl/RLMs-Task18_tier3/runs/cnowk8ol"
-    },
-    {
-      "extracted_prediction_count": 0,
-      "parsed_metric_count": 1,
-      "reason": "prediction-underdetermined-or-validation-failed",
-      "resolved_question_count": 0,
-      "run_id": "full-qwen3.5-397b-tier3-task18-rlm-x500-r01",
-      "source_sha256": "64e4c90b6d29fd8f4a757e897bb465b3998b5193c9ff65a0cf06f1845bbe5728",
-      "task": "tier3/task18",
-      "wandb_url": "https://wandb.ai/sathvikbhagavan-epfl/RLMs-Task18_tier3/runs/1grb7p8q"
-    },
-    {
-      "extracted_prediction_count": 0,
-      "parsed_metric_count": 1,
-      "reason": "prediction-underdetermined-or-validation-failed",
-      "resolved_question_count": 0,
-      "run_id": "full-qwen3.5-397b-tier3-task18-rlm-x500-r02",
-      "source_sha256": "8d38fb89fc0fdfeb4a4a800feb477e95d5f4d3832d170fc2d88ccb1cccbd832c",
-      "task": "tier3/task18",
-      "wandb_url": "https://wandb.ai/sathvikbhagavan-epfl/RLMs-Task18_tier3/runs/t9kimwek"
-    },
-    {
-      "extracted_prediction_count": 0,
-      "parsed_metric_count": 1,
-      "reason": "prediction-underdetermined-or-validation-failed",
-      "resolved_question_count": 0,
-      "run_id": "full-qwen3.5-397b-tier3-task18-rlm-x500-r03",
-      "source_sha256": "a5567eb27c22f08f86b265bdd5d26035c5e54b9c4823868313ba06af7132150b",
-      "task": "tier3/task18",
-      "wandb_url": "https://wandb.ai/sathvikbhagavan-epfl/RLMs-Task18_tier3/runs/5xvk11sa"
-    },
-    {
-      "extracted_prediction_count": 0,
-      "parsed_metric_count": 1,
-      "reason": "prediction-underdetermined-or-validation-failed",
-      "resolved_question_count": 0,
-      "run_id": "full-qwen3.5-397b-tier3-task18-rlm-x500-r04",
-      "source_sha256": "0279e06efa8acc4f8cec6dc224b1876ab65a1b9a2fdc159257dd3459312323ec",
-      "task": "tier3/task18",
-      "wandb_url": "https://wandb.ai/sathvikbhagavan-epfl/RLMs-Task18_tier3/runs/27y6hzpi"
-    },
-    {
-      "extracted_prediction_count": 0,
-      "parsed_metric_count": 1,
-      "reason": "prediction-underdetermined-or-validation-failed",
-      "resolved_question_count": 0,
-      "run_id": "full-qwen3.5-397b-tier3-task18-rlm-x500-r05",
-      "source_sha256": "d00be4d214fd4303a860513de1ddd8c71bfca452316cd4e5b723afa46bcff454",
-      "task": "tier3/task18",
-      "wandb_url": "https://wandb.ai/sathvikbhagavan-epfl/RLMs-Task18_tier3/runs/3u52rlo4"
     },
     {
       "extracted_prediction_count": 0,

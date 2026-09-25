@@ -29,7 +29,8 @@ logs before rebuilding the tables:
 WANDB_API_KEY=... uv run python \
   paper_plots/scripts/recover_corrected_scores.py \
   --snapshot-dir artifacts/control-room/shared \
-  --artifact-tar /path/to/campaign-artifacts.tar
+  --artifact-tar /path/to/campaign-artifacts.tar \
+  --phoenix-db /path/to/phoenix.db
 uv run python paper_plots/scripts/build_gold_results.py
 uv run python paper_plots/scripts/build_causal_controls.py
 ```
@@ -42,6 +43,12 @@ logged count and four-decimal precision/recall/F1 has the same corrected score.
 Artifact tars are read in place without filesystem extraction; successful attempts
 are selected by the W&B URL recorded in metadata, and duplicate backup copies must
 be byte-identical.
+When `--phoenix-db` is supplied, the database is opened in immutable read-only mode.
+Execution windows from the selected artifact attempts are matched to exactly one
+Phoenix task project and model before a retained answer is accepted. The recorded
+prediction count and historical score must still validate. The database itself is
+never copied into the repository; the recovery manifest records its checksum, size,
+match diagnostics, and hashes of the extracted answers.
 It writes an exact-rescore manifest and a separate prediction ledger under
 `paper_plots/gold/`; neither contains credentials. Retrieved console logs stay
 in the ignored local cache `artifacts/score-recovery/`. A completed recovery

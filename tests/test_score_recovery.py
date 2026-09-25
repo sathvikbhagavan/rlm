@@ -2,16 +2,24 @@ from __future__ import annotations
 
 import json
 import random
+import sqlite3
 import tarfile
 from io import BytesIO
 
 import pytest
 
 from paper_plots.scripts.recover_corrected_scores import (
+    load_artifact_run_windows,
     load_artifact_tar_logs,
     load_targets,
 )
 from rlm.codeact_helpers import RandomContextPipeline
+from rxnhaystack.phoenix_recovery import (
+    PhoenixRunWindow,
+    matching_session,
+    root_chat_spans,
+    select_prediction_candidate,
+)
 from rxnhaystack.score_recovery import (
     ExtractedPrediction,
     SampleMetric,
@@ -316,7 +324,16 @@ def test_artifact_tar_selects_dashboard_attempt_and_deduplicates_backups(tmp_pat
         for root in ("artifacts/current", "artifacts/backup"):
             base = f"{root}/runs/{run_id}/attempt-001"
             metadata = {
-                "run": {"run_id": run_id},
+                "execution": {
+                    "started_at": "2026-09-15T12:00:00+00:00",
+                    "finished_at": "2026-09-15T12:01:00+00:00",
+                },
+                "run": {
+                    "run_id": run_id,
+                    "task": "tier3/task23",
+                    "method": "rlm",
+                    "model": "model-a",
+                },
                 "result": {
                     "status": "succeeded",
                     "metrics": {"wandb_url": selected_url},
@@ -326,7 +343,16 @@ def test_artifact_tar_selects_dashboard_attempt_and_deduplicates_backups(tmp_pat
             add(archive, f"{base}/stdout.log", "preserved prediction\n")
         base = f"artifacts/current/runs/{run_id}/attempt-002"
         metadata = {
-            "run": {"run_id": run_id},
+            "execution": {
+                "started_at": "2026-09-15T13:00:00+00:00",
+                "finished_at": "2026-09-15T13:01:00+00:00",
+            },
+            "run": {
+                "run_id": run_id,
+                "task": "tier3/task23",
+                "method": "rlm",
+                "model": "model-a",
+            },
             "result": {
                 "status": "succeeded",
                 "metrics": {"wandb_url": "https://wandb.ai/entity/project/runs/other"},
@@ -343,6 +369,117 @@ def test_artifact_tar_selects_dashboard_attempt_and_deduplicates_backups(tmp_pat
 
     assert logs == {run_id: b"preserved prediction\n"}
     assert status == {run_id: "artifact-tar"}
+
+    windows = load_artifact_run_windows(
+        path=path,
+        target_run_ids={run_id},
+        wandb_urls={run_id: selected_url},
+    )
+    assert windows[run_id] == PhoenixRunWindow(
+        run_id=run_id,
+        task="tier3/task23",
+        method="rlm",
+        model="model-a",
+        started_at="2026-09-15T12:00:00+00:00",
+        finished_at="2026-09-15T12:01:00+00:00",
+    )
+
+
+def test_phoenix_prediction_selection_uses_latest_count_validated_answer() -> None:
+    direct = {"output": {"value": json.dumps({"choices": [{"message": {"content": "9, 4, 2"}}]})}}
+    assert select_prediction_candidate(
+        method="llm", root_chat_attributes=[direct], expected_count=3
+    )[:2] == ((9, 4, 2), "phoenix-direct-output")
+
+    rlm = {
+        "llm": {
+            "input_messages": [
+                {"message": {"role": "user", "content": "Answer: 1,2"}},
+                {
+                    "message": {
+                        "role": "user",
+                        "content": "REPL output:\nAll indices: 7, 3, 5",
+                    }
+                },
+            ]
+        }
+    }
+    selected = select_prediction_candidate(
+        method="rlm", root_chat_attributes=[rlm], expected_count=3
+    )
+    assert selected is not None
+    assert selected[:2] == ((7, 3, 5), "phoenix-rlm-message-1-answer-line")
+
+
+def test_phoenix_session_matching_is_strict_and_root_depth_only(tmp_path) -> None:
+    database = tmp_path / "phoenix.db"
+    connection = sqlite3.connect(database)
+    connection.executescript(
+        """
+        CREATE TABLE projects (id INTEGER PRIMARY KEY, name TEXT NOT NULL);
+        CREATE TABLE project_sessions (
+            id INTEGER PRIMARY KEY,
+            session_id TEXT NOT NULL,
+            project_id INTEGER NOT NULL,
+            start_time TEXT NOT NULL,
+            end_time TEXT NOT NULL
+        );
+        CREATE TABLE traces (
+            id INTEGER PRIMARY KEY,
+            project_session_rowid INTEGER NOT NULL
+        );
+        CREATE TABLE spans (
+            id INTEGER PRIMARY KEY,
+            trace_rowid INTEGER NOT NULL,
+            span_id TEXT NOT NULL,
+            name TEXT NOT NULL,
+            span_kind TEXT NOT NULL,
+            start_time TEXT NOT NULL,
+            attributes TEXT NOT NULL
+        );
+        INSERT INTO projects VALUES (1, 'RLMs-Task18_tier3');
+        INSERT INTO project_sessions VALUES (
+            1, 'session-a', 1,
+            '2026-09-15 12:00:05', '2026-09-15 12:00:55'
+        );
+        INSERT INTO traces VALUES (1, 1);
+        """
+    )
+    root_attributes = {
+        "metadata": {"depth": 0},
+        "llm": {"model_name": "model-a", "input_messages": []},
+    }
+    child_attributes = {
+        "metadata": {"depth": 1},
+        "llm": {"model_name": "model-a", "input_messages": []},
+    }
+    connection.executemany(
+        "INSERT INTO spans VALUES (?, 1, ?, 'ChatCompletion', 'LLM', ?, ?)",
+        [
+            (1, "root", "2026-09-15 12:00:10", json.dumps(root_attributes)),
+            (2, "child", "2026-09-15 12:00:20", json.dumps(child_attributes)),
+        ],
+    )
+    connection.commit()
+
+    window = PhoenixRunWindow(
+        run_id="run-a",
+        task="tier3/task18",
+        method="rlm",
+        model="model-a",
+        started_at="2026-09-15T12:00:00+00:00",
+        finished_at="2026-09-15T12:01:00+00:00",
+    )
+    assert matching_session(connection, window=window) == (
+        "session-a",
+        "RLMs-Task18_tier3",
+    )
+    assert [
+        span_id for span_id, _attributes in root_chat_spans(connection, session_id="session-a")
+    ] == ["root"]
+
+    wrong_model = PhoenixRunWindow(**{**window.__dict__, "model": "model-b"})
+    assert matching_session(connection, window=wrong_model) is None
 
 
 @pytest.mark.parametrize(

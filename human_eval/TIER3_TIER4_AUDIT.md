@@ -173,8 +173,8 @@ per-question and macro scores. Tier-4 Task 15 is checked against the historical 
 sets before its expanded alternatives are scored. The nine affected deterministic
 executor cells are rerun against the corrected predicates rather than assumed correct.
 
-`paper_plots/gold/corrected_score_recoveries.json` now freezes 1,518 unique exact
-rescores. These restore 1,013 main-benchmark rows, 79 CodeAct-x1000 rows, 51 RLM-x1000
+`paper_plots/gold/corrected_score_recoveries.json` now freezes 1,542 unique exact
+rescores. These restore 1,037 main-benchmark rows, 79 CodeAct-x1000 rows, 51 RLM-x1000
 rows, 322 completed causal-control rows, and 133 provisional Qwen control rows. Some
 run IDs occur in both the main and control tables, so table applications intentionally
 outnumber unique recoveries. Restored rows are labeled `corrected_exact_rescore`, keep
@@ -182,19 +182,22 @@ their historical value in `original_f1`, and carry the recovery ID in `sources`.
 
 Sathvik's checksummed campaign-artifact tar supplied all 480 formerly access-blocked
 stdout logs. It produced 413 additional exact rescores; the remaining 67 have the same
-retention limitation as the accessible logs. Of 1,743 unique affected runs, 225 remain
-unresolved: 158 under the `liac` W&B entity and 67 under
-`sathvikbhagavan-epfl`. These logs do not preserve enough prediction detail to
-determine the corrected overlap. The recovery additionally uses historical parser
+retention limitation as the accessible logs. The subsequently supplied full Phoenix
+database retained 39 final prediction sets that pass exact historical-score validation;
+15 were already recoverable from aggregate evidence and 24 produced new exact rescores.
+Of 1,743 unique affected runs, 201 remain unresolved: 158 under the `liac` W&B entity
+and 43 under `sathvikbhagavan-epfl`. These logs and traces do not preserve enough
+prediction detail to determine the corrected overlap. The recovery additionally uses
+historical parser
 semantics and exact contingency-table bounds when every compatible prediction has the
-same corrected score; no corrected score is guessed or imputed. Consequently, 170
+same corrected score; no corrected score is guessed or imputed. Consequently, 146
 main-benchmark, 0 CodeAct-x1000, 6 RLM-x1000, 42 completed control, and 17
 provisional Qwen control rows remain `historical_score_invalidated`; the respective
 tables also contain 77, 41, 3, 0, and 25 affected jobs without a historical score.
 Status, cost, token, timing, and memory evidence remains valid. The cached source logs,
 extracted prediction ledger, historical Task-15 chain pack, campaign-tar checksum, and
 all input/output checksums make the completed recovery reproducible without exposing
-credentials or committing the 4.6 GB tar.
+credentials or committing the 4.6 GB tar or 5.9 GB Phoenix database.
 
 ## Reviewer-source audit
 

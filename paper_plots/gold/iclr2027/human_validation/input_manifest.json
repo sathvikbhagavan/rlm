@@ -25,8 +25,8 @@
       "sha256": "01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b"
     },
     "human_model_tier_comparison.csv": {
-      "bytes": 1451,
-      "sha256": "e015d9486379f44fe384e764e3435b1f7d579e67bfde0a596fd967eaa2cbcbf0"
+      "bytes": 1404,
+      "sha256": "95ad90b5bac6f043980f23906a296c2a9e0bac63d3b94e069dd9ffc1422063c9"
     },
     "item_metrics.csv": {
       "bytes": 6905,
@@ -85,7 +85,7 @@
   "model_comparison_source": {
     "note": "Corrected historical scores marked unavailable are excluded; coverage is explicit.",
     "path": "paper_plots/gold/iclr2027/full_benchmark_records.csv",
-    "sha256": "599dddce39dff4afe404e59e0204bb0ffd45aa8f98657a409d10d46144bfae15"
+    "sha256": "a861d0ea4d8fc4af29383e3234abacc8ae3eb030862f755c58358e72870eb76b"
   },
   "schema_version": 1
 }

@@ -27,9 +27,18 @@ from rxnhaystack.control_room import (
     merge_snapshots,
     scientific_dashboard_view,
 )
+from rxnhaystack.phoenix_recovery import (
+    PhoenixPrediction,
+    PhoenixRunWindow,
+    matching_session,
+    open_phoenix_read_only,
+    root_chat_spans,
+    select_prediction_candidate,
+)
 from rxnhaystack.score_recovery import (
     ANSI_ESCAPE_RE,
     TASK_QUESTION_IDS,
+    ExtractedPrediction,
     context_indices,
     context_size_from_label,
     extract_tier3_predictions,
@@ -263,6 +272,109 @@ def load_artifact_tar_logs(
         logs[run_id] = copies[0][1]
         status[run_id] = "artifact-tar"
     return logs, status
+
+
+def load_artifact_run_windows(
+    *,
+    path: Path,
+    target_run_ids: set[str],
+    wandb_urls: dict[str, str],
+) -> dict[str, PhoenixRunWindow]:
+    """Load authoritative execution windows used to match Phoenix sessions."""
+
+    candidates: dict[str, list[PhoenixRunWindow]] = {}
+    with tarfile.open(path) as archive:
+        for member in archive.getmembers():
+            if not member.isfile() or not member.name.endswith("/metadata.json"):
+                continue
+            matching_ids = target_run_ids.intersection(member.name.split("/"))
+            if not matching_ids:
+                continue
+            stream = archive.extractfile(member)
+            if stream is None:
+                raise ValueError(f"Could not read artifact metadata: {member.name}")
+            metadata = json.load(stream)
+            run = metadata.get("run") or {}
+            result = metadata.get("result") or {}
+            execution = metadata.get("execution") or {}
+            run_id = str(run.get("run_id", ""))
+            if run_id not in matching_ids or result.get("status") != "succeeded":
+                continue
+            recorded_url = str((result.get("metrics") or {}).get("wandb_url") or "")
+            expected_url = wandb_urls.get(run_id, "")
+            if expected_url and recorded_url != expected_url:
+                continue
+            values = {
+                "task": run.get("task"),
+                "method": run.get("method"),
+                "model": run.get("model"),
+                "started_at": execution.get("started_at"),
+                "finished_at": execution.get("finished_at"),
+            }
+            if not all(isinstance(value, str) and value for value in values.values()):
+                raise ValueError(f"Incomplete execution window in {member.name}")
+            candidates.setdefault(run_id, []).append(PhoenixRunWindow(run_id=run_id, **values))
+
+    output: dict[str, PhoenixRunWindow] = {}
+    for run_id, copies in candidates.items():
+        unique = set(copies)
+        if len(unique) != 1:
+            raise ValueError(f"Conflicting artifact execution windows for {run_id}")
+        output[run_id] = next(iter(unique))
+    return output
+
+
+def recover_phoenix_predictions(
+    *,
+    database: Path,
+    windows: dict[str, PhoenixRunWindow],
+    logs: dict[str, bytes],
+) -> tuple[dict[str, PhoenixPrediction], dict[str, Any]]:
+    """Recover exact final answers without exposing unrelated Phoenix payloads."""
+
+    predictions: dict[str, PhoenixPrediction] = {}
+    status: Counter[str] = Counter()
+    connection = open_phoenix_read_only(database)
+    try:
+        for run_id, window in sorted(windows.items()):
+            content = logs.get(run_id)
+            if content is None:
+                status["no-preserved-evaluator-log"] += 1
+                continue
+            metrics = parse_sample_metrics(content.decode("utf-8", errors="replace"))
+            question_ids = TASK_QUESTION_IDS.get(window.task, ())
+            if len(metrics) != 1 or len(question_ids) != 1:
+                status["not-single-question"] += 1
+                continue
+            matched = matching_session(connection, window=window)
+            if matched is None:
+                status["no-unique-session"] += 1
+                continue
+            session_id, project = matched
+            chat_spans = root_chat_spans(connection, session_id=session_id)
+            selected = select_prediction_candidate(
+                method=window.method,
+                root_chat_attributes=[attributes for _span_id, attributes in chat_spans],
+                expected_count=next(iter(metrics.values())).predicted_count,
+            )
+            if selected is None:
+                status["answer-not-retained-or-count-mismatch"] += 1
+                continue
+            indices, extraction_method, answer_sha256 = selected
+            predictions[run_id] = PhoenixPrediction(
+                run_id=run_id,
+                question_id=question_ids[0],
+                indices=indices,
+                session_id=session_id,
+                project=project,
+                span_id=chat_spans[-1][0],
+                extraction_method=extraction_method,
+                answer_sha256=answer_sha256,
+            )
+            status["recovered"] += 1
+    finally:
+        connection.close()
+    return predictions, dict(status)
 
 
 def original_score(target: dict[str, Any]) -> float:
@@ -516,6 +628,11 @@ def main() -> int:
         default=[],
         help="Campaign artifact tar containing metadata.json and stdout.log files.",
     )
+    parser.add_argument(
+        "--phoenix-db",
+        type=Path,
+        help="Read-only Phoenix SQLite database retaining final model outputs.",
+    )
     parser.add_argument("--workers", type=int, default=16)
     parser.add_argument("--skip-task15", action="store_true")
     parser.add_argument("--allow-recovery-regression", action="store_true")
@@ -534,6 +651,7 @@ def main() -> int:
         workers=args.workers,
     )
     artifact_tar_inputs: list[dict[str, Any]] = []
+    phoenix_windows: dict[str, PhoenixRunWindow] = {}
     for artifact_tar in args.artifact_tar:
         artifact_logs, artifact_status = load_artifact_tar_logs(
             path=artifact_tar,
@@ -542,14 +660,41 @@ def main() -> int:
         )
         logs.update(artifact_logs)
         fetch_status.update(artifact_status)
+        artifact_windows = load_artifact_run_windows(
+            path=artifact_tar,
+            target_run_ids=set(targets),
+            wandb_urls=urls,
+        )
+        for run_id, window in artifact_windows.items():
+            existing = phoenix_windows.get(run_id)
+            if existing is not None and existing != window:
+                raise ValueError(f"Conflicting Phoenix run windows for {run_id}")
+            phoenix_windows[run_id] = window
         artifact_tar_inputs.append(
             {
                 "path": str(artifact_tar),
                 "sha256": sha256_file(artifact_tar),
                 "bytes": artifact_tar.stat().st_size,
                 "matched_run_count": len(artifact_logs),
+                "execution_window_count": len(artifact_windows),
             }
         )
+    phoenix_predictions: dict[str, PhoenixPrediction] = {}
+    phoenix_status: dict[str, Any] = {}
+    phoenix_input: dict[str, Any] | None = None
+    if args.phoenix_db is not None:
+        phoenix_predictions, phoenix_status = recover_phoenix_predictions(
+            database=args.phoenix_db,
+            windows=phoenix_windows,
+            logs=logs,
+        )
+        phoenix_input = {
+            "path": str(args.phoenix_db),
+            "sha256": sha256_file(args.phoenix_db),
+            "bytes": args.phoenix_db.stat().st_size,
+            "matched_prediction_count": len(phoenix_predictions),
+            "status": phoenix_status,
+        }
     historical = load_ground_truth(args.historical_ground_truth)
     corrected = load_ground_truth(args.corrected_ground_truth)
     dataset_size = sum(1 for line in args.dataset.open() if line.strip())
@@ -669,11 +814,21 @@ def main() -> int:
                 )
         else:
             metrics = parse_sample_metrics(log_text)
-            extracted = (
-                extract_tier3_predictions(log_text, task=task, method=method)
-                if method in {"codeact", "rlm"}
-                else {}
-            )
+            phoenix_prediction = phoenix_predictions.get(run_id)
+            if phoenix_prediction is not None:
+                extracted = {
+                    phoenix_prediction.question_id: ExtractedPrediction(
+                        question_id=phoenix_prediction.question_id,
+                        indices=phoenix_prediction.indices,
+                        extraction_method=phoenix_prediction.extraction_method,
+                    )
+                }
+            else:
+                extracted = (
+                    extract_tier3_predictions(log_text, task=task, method=method)
+                    if method in {"codeact", "rlm"}
+                    else {}
+                )
             context_size = context_size_from_label(str(target["context"]))
             cardinality = positive_cardinality_from_condition(str(target.get("condition", "")))
             minimum_positives = historical_min_selected_ground_truth(task=task, method=method)
@@ -701,17 +856,26 @@ def main() -> int:
                 "resolved_question_count": len(question_scores),
             }
             for question_id, prediction in extracted.items():
-                prediction_rows.append(
-                    {
-                        "run_id": run_id,
-                        "task": task,
-                        "question_id": question_id,
-                        "predicted_indices": list(prediction.indices),
-                        "source": fetch_status[run_id],
-                        "source_sha256": log_sha256,
-                        "extraction_method": prediction.extraction_method,
-                    }
-                )
+                prediction_row = {
+                    "run_id": run_id,
+                    "task": task,
+                    "question_id": question_id,
+                    "predicted_indices": list(prediction.indices),
+                    "source": "phoenix-db" if phoenix_prediction else fetch_status[run_id],
+                    "source_sha256": (
+                        phoenix_prediction.answer_sha256 if phoenix_prediction else log_sha256
+                    ),
+                    "extraction_method": prediction.extraction_method,
+                }
+                if phoenix_prediction is not None:
+                    prediction_row.update(
+                        {
+                            "phoenix_session_id": phoenix_prediction.session_id,
+                            "phoenix_project": phoenix_prediction.project,
+                            "phoenix_span_id": phoenix_prediction.span_id,
+                        }
+                    )
+                prediction_rows.append(prediction_row)
         if corrected_score is None:
             unresolved.append(
                 {
@@ -749,9 +913,24 @@ def main() -> int:
                 "historical_score": historical_score,
                 "recomputed_historical_score": validation_score,
                 "question_scores": question_scores,
-                "prediction_source": fetch_status[run_id],
-                "source_sha256": log_sha256,
+                "prediction_source": (
+                    "phoenix-db" if run_id in phoenix_predictions else fetch_status[run_id]
+                ),
+                "source_sha256": (
+                    phoenix_predictions[run_id].answer_sha256
+                    if run_id in phoenix_predictions
+                    else log_sha256
+                ),
                 "wandb_url": urls.get(run_id, ""),
+                **(
+                    {
+                        "phoenix_session_id": phoenix_predictions[run_id].session_id,
+                        "phoenix_project": phoenix_predictions[run_id].project,
+                        "phoenix_span_id": phoenix_predictions[run_id].span_id,
+                    }
+                    if run_id in phoenix_predictions
+                    else {}
+                ),
             }
         )
 
@@ -768,7 +947,7 @@ def main() -> int:
     atomic_write_text(args.predictions_output, prediction_content)
     payload = {
         "schema_version": 1,
-        "recovery_id": "rxnhaystack-corrected-score-recovery-2026-09-25-v1",
+        "recovery_id": "rxnhaystack-corrected-score-recovery-2026-09-25-v2",
         "generated_at": datetime.now(UTC).isoformat(),
         "historical_bundle": "rxnhaystack-human-1.3.0",
         "corrected_bundle": "rxnhaystack-human-1.6.0",
@@ -795,12 +974,14 @@ def main() -> int:
                 "sha256": sha256_file(args.predictions_output),
             },
             "artifact_tars": artifact_tar_inputs,
+            "phoenix_database": phoenix_input,
         },
         "counts": {
             "unique_affected_runs": len(targets),
             "recovered": len(recoveries),
             "unresolved": len(unresolved),
             "fetch_status": dict(Counter(fetch_status.values())),
+            "phoenix_status": phoenix_status,
             "recovered_by_task": dict(Counter(row["task"] for row in recoveries)),
             "unresolved_by_reason": dict(Counter(row["reason"] for row in unresolved)),
         },

@@ -8,10 +8,10 @@ mean_f1,observations,population,score_coverage,tier,unit
 0.7985020617696919,200,model_codeact,1.0,2,successful task-context-repetition run
 0.9177241864721529,360,model_rlm,1.0,2,successful task-context-repetition run
 0.9250143054036402,16,human_assigned_items,1.0,3,first submitted non-abstained question answer
-0.37684458191278647,660,model_llm,0.6875,3,successful task-context-repetition run
-0.7867391236797973,547,model_codeact,0.6924050632911393,3,successful task-context-repetition run
-0.7492912738513166,977,model_rlm,0.6889985895627645,3,successful task-context-repetition run
+0.37828731690452766,901,model_llm,0.9385416666666667,3,successful task-context-repetition run
+0.7874986864108705,790,model_codeact,1.0,3,successful task-context-repetition run
+0.7296056347234339,1331,model_rlm,0.9386459802538787,3,successful task-context-repetition run
 0.6799408549577999,16,human_assigned_items,1.0,4,first submitted non-abstained question answer
-0.23347019619593012,480,model_llm,0.8888888888888888,4,successful task-context-repetition run
-0.6362950147951391,379,model_codeact,0.8834498834498834,4,successful task-context-repetition run
-0.6245402425901586,673,model_rlm,0.8832020997375328,4,successful task-context-repetition run
+0.22754154021193937,540,model_llm,1.0,4,successful task-context-repetition run
+0.6397560646363203,429,model_codeact,1.0,4,successful task-context-repetition run
+0.6346278433025067,762,model_rlm,1.0,4,successful task-context-repetition run

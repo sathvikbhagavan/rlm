@@ -2,13 +2,13 @@
   "corrected_score_recoveries": {
     "applied_final": 322,
     "applied_provisional": 133,
-    "available": 1518,
+    "available": 1542,
     "path": "paper_plots/gold/corrected_score_recoveries.json",
-    "recovery_id": "rxnhaystack-corrected-score-recovery-2026-09-25-v1",
-    "sha256": "4d07ee6d1383debeda89cc5841181a12987a92beeb132ef8c26ecd4885ecebdd"
+    "recovery_id": "rxnhaystack-corrected-score-recovery-2026-09-25-v2",
+    "sha256": "96b580071f441cb2a69c929b4e0506e2006614c2bc209f077499737bd010fa20"
   },
-  "generated_at": "2026-09-25T19:03:06.461530+00:00",
-  "git_commit": "64561463a5caa8cf88918501b0c0cb623d27c0eb",
+  "generated_at": "2026-09-25T20:19:22.715113+00:00",
+  "git_commit": "39123403623ff610fac04c864cfe5daa8e0c917d",
   "ground_truth_corrections": {
     "corrected_bundle": "rxnhaystack-human-1.6.0",
     "correction_id": "rxnhaystack-ground-truth-2026-09-25-v2",
@@ -27,9 +27,9 @@
     },
     "sha256": "0eb1ce1f4501299110fffbaf4f78c66bde440f0bb412be1121a337014d27c480"
   },
-  "matched_qwen_provisional_sha256": "ff65a399a583fe5d1c44923b4484b76250cdbc85a11eb2e7c3f847d34b0a9d0c",
+  "matched_qwen_provisional_sha256": "2d0143b4905bb41f0577860fd890b98725fe55336d1ffb7be0be7e4ac8d26a3d",
   "record_count": 1040,
-  "records_sha256": "983ea68bc940236ba8ec3a80d106982f5a9c9753af7d4b6fb6df401587c36b65",
+  "records_sha256": "a3dbb48c581fd2375688cc0056a90d9e403b391913389ab14e76d6777a3c3928",
   "selection": {
     "deterministic_executor": "15/15 succeeded",
     "excluded_from_final_inference": "unfinished Qwen matched-cardinality arm",
@@ -49,7 +49,7 @@
     "/home/amin/rlm_dashboard/artifacts/control-room/shared/jed-oracle-executor-v1.json": "c4193a9820c94a698459654316102c238dd0f9ce0d9aaf4199db4694a62b0554",
     "/home/amin/rlm_dashboard/artifacts/control-room/shared/jed-oracle-predicate-v1-278d9c47.json": "b94c1071fb482b24b589b1d122dc1904027147c8ebe47b0697b0d61c33c52fdd",
     "/home/amin/rlm_dashboard/artifacts/control-room/shared/jed19-credit-oracle-predicate-r01.json": "0178a37f635cd2a65cff2a5810f241c1b100d026900e4b72ab93afa8137d89b8",
-    "/home/amin/rlm_dashboard/artifacts/control-room/shared/jed19-credit2-oracle-predicate-r01.json": "032697b318e06a4c64fafb3ae524e07f42b54f964566e0f6c85cadbfca0967dc",
+    "/home/amin/rlm_dashboard/artifacts/control-room/shared/jed19-credit2-oracle-predicate-r01.json": "975a4ce0ce221278c7e45425aab1d500cc162dcbc7bafe915cc1d80f0518ad68",
     "/home/amin/rlm_dashboard/artifacts/control-room/shared/jed25-claude-rlm-repair-s1.json": "15492425b0e85660bbbfbf3c04f4e5dca508ac4dc307644bcec40f311773a50a",
     "/home/amin/rlm_dashboard/artifacts/control-room/shared/jed25-claude-rlm-repair-s2.json": "69ca296cafd3ab45b708e11b8678aa22cf9e4829c07aed5f109cd2ec4ee0155b",
     "/home/amin/rlm_dashboard/artifacts/control-room/shared/jed25-claude-rlm-repair-s3.json": "5d14355ae77d54dd06a22c69f19ebd45e16cac72708a5b8938b1a980e1926cb8",
@@ -75,12 +75,12 @@
     "/home/amin/rlm_dashboard/artifacts/control-room/shared/jed25-r2-oracle-predicate-repair-qwen-x500.json": "2f7c38ea35544f42c2da43b91666401fee8f959b218bb88b4c1dbae805e56417",
     "/home/amin/rlm_dashboard/artifacts/control-room/shared/jed25-r2-oracle-predicate-repair-qwen-xfull.json": "7065bad6306f5e5b61701c356ea3969d1fbb9e67d40cb938ba1de0cb108fe588",
     "/home/amin/rlm_dashboard/artifacts/control-room/shared/jed25-r3-oracle-predicate-qwen-xfull-failed.json": "18b16d99ac7d87bdc04382f0d2b1d99d54b2c1f2ed765d5381469956778bf2b6",
-    "/home/amin/rlm_dashboard/artifacts/control-room/shared/kuma-claude-rlm-v34.json": "d18f7268e6a76e58e288fd09ca337217fe972bbd2bd311af62d73be63795ff99",
-    "/home/amin/rlm_dashboard/artifacts/control-room/shared/kuma-full-v34-4644942a.json": "1d7efae71c80acbdfc4837c472e401638e354ca272132c70f637446669f15ce7",
+    "/home/amin/rlm_dashboard/artifacts/control-room/shared/kuma-claude-rlm-v34.json": "c6747dacd50b3ca963738cd0a3fe07560f50d990fbba7569617bf20852f349c5",
+    "/home/amin/rlm_dashboard/artifacts/control-room/shared/kuma-full-v34-4644942a.json": "705efc304aa67f9e6a59fd65b9c0a2eec2290fa16d7997fdb3d8151db5b96b1d",
     "/home/amin/rlm_dashboard/artifacts/control-room/shared/kuma-gpt-matched-v7.json": "aaf2327305ad0d8c2c8d533f4ed41f4856f65844c9edc3474495885212079df3",
-    "/home/amin/rlm_dashboard/artifacts/control-room/shared/kuma-matched-v7-f95a2ee9.json": "cf421e25815a7b0648d020baf2e8c451d4de4b332dc23741979b763c622d95a2",
+    "/home/amin/rlm_dashboard/artifacts/control-room/shared/kuma-matched-v7-f95a2ee9.json": "d77c41cad4811aaf69e4d87642ca6fce9acfcf08c4684c0449398ab48c5ea7c0",
     "/home/amin/rlm_dashboard/artifacts/control-room/shared/liacpc14-oracle-pilots-v1.json": "374d052105df156772990ec11bd96d19b7ab29cbaf6559d58d833aee899959e3",
-    "/home/amin/rlm_dashboard/artifacts/control-room/shared/liacpc14-oracle-predicate-v1-fd683653.json": "a5275712df7014ae09881f7c9abe830b1ca21c16383eb4c41540f4129150b470",
+    "/home/amin/rlm_dashboard/artifacts/control-room/shared/liacpc14-oracle-predicate-v1-fd683653.json": "ce43c470a58cc3447ec767d60392db8bfd12d4e883bd6cf252bfe270eb0cc6e9",
     "/home/amin/rlm_dashboard/artifacts/control-room/shared/liacpc15-full-v34-succeeded-pack.json": "4f5bf8b7661d04f930c6af2d49c53e70993d803617d87a8599ece903a6d31e4a"
   }
 }
