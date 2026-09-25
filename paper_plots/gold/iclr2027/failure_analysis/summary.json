@@ -1,22 +1,22 @@
 {
-  "excluded_pending_corrected_rescores": 1179,
-  "frozen_jobs": 6150,
-  "generated_at": "2026-09-25T21:15:30.883040+00:00",
+  "excluded_pending_corrected_rescores": 121,
+  "frozen_jobs": 6300,
+  "generated_at": "2026-09-25T23:52:08.168069+00:00",
   "ground_truth_version": "rxnhaystack-human-1.6.0",
   "inputs": {
     "paper_plots/gold/corrected_score_recoveries.json": "96b580071f441cb2a69c929b4e0506e2006614c2bc209f077499737bd010fa20",
-    "paper_plots/gold/iclr2027/final_arm_records.csv": "1195fdca611ac61582f6b62072f23254a3c9495086fb2fdfd3d41cd9de198fba",
-    "paper_plots/gold/iclr2027/post_submission/pending_corrected_rescores.csv": "3002fc7cc96aa0adb4370284d227c697578dc0853d68d40503b648545a2f27c7"
+    "paper_plots/gold/iclr2027/final_arm_records.csv": "966a39a45713208d86c90e9f13d9c946052f514c0389a58479cf8168ceb26c41",
+    "paper_plots/gold/iclr2027/post_submission/pending_corrected_rescores.csv": "c86bda8d4c3cb5980d5d975cd2f5fdf5d47f4bdee520e54fa68bdce7a4e09dbf"
   },
   "interpretation": {
     "job_outcomes": "All valid final-arm jobs after mandatory pending-rescore exclusion.",
     "trace_signatures": "Corrected-task question outputs with retained predictions and exact corrected precision/recall. Signatures describe set errors, not inferred chemical causes."
   },
   "outputs": {
-    "paper_plots/gold/iclr2027/failure_analysis/job_outcomes.csv": "40f4492931e0ba3343622848646b950b4c66e710367ffb25e06dc29be58c1236",
-    "paper_plots/gold/iclr2027/failure_analysis/task_error_signatures.csv": "fef2edec6e16ba48040dfd1505beb1f97717d6174c45371173169f41e8308d2b",
-    "paper_plots/gold/iclr2027/failure_analysis/trace_error_records.csv": "89880f2e9885018b975c43e9c994c73f8ee11d52c3a920dacaec9d7f4ef11466",
-    "paper_plots/gold/iclr2027/failure_analysis/trace_error_signatures.csv": "be1c62a02dcce7102ac68dbebba3372e8d9e8cbf5ff7483d94fb5088d79f4201"
+    "paper_plots/gold/iclr2027/failure_analysis/job_outcomes.csv": "fef4701c4287c3bc755ded9c365069f07ffb2c3b21fc3532631354f7524cf7b4",
+    "paper_plots/gold/iclr2027/failure_analysis/task_error_signatures.csv": "caf6bdaebdc49442691f84f7523d099be83249b38514b8121ddc251519b8c61c",
+    "paper_plots/gold/iclr2027/failure_analysis/trace_error_records.csv": "874c2b15133246331cc297f271d7a4f7376a275ad3522fc94e083d6a66763982",
+    "paper_plots/gold/iclr2027/failure_analysis/trace_error_signatures.csv": "e43866c5779b39564983a84199ae1884c436bf3464f6029ca7da4a9f4aa50cfd"
   },
   "paper_models": [
     "Claude Haiku 4.5",
@@ -26,9 +26,15 @@
     "Qwen 3.5"
   ],
   "schema_version": 1,
-  "trace_classifiable_question_outputs": 0,
-  "trace_outputs_without_exact_precision_recall": 0,
-  "trace_tasks": [],
-  "valid_expected_trajectories": 16601,
-  "valid_jobs": 4971
+  "trace_classifiable_question_outputs": 2229,
+  "trace_outputs_without_exact_precision_recall": 1441,
+  "trace_tasks": [
+    "tier3/task10",
+    "tier3/task18",
+    "tier3/task23",
+    "tier3/task6",
+    "tier3/task7"
+  ],
+  "valid_expected_trajectories": 20771,
+  "valid_jobs": 6179
 }

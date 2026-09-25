@@ -80,15 +80,15 @@ deepseek-v4-flash,3,tier3/task17,T3.4 Fused heterocycle (1Q),rlm,100,5,5,0,5,1.0
 deepseek-v4-flash,3,tier3/task17,T3.4 Fused heterocycle (1Q),rlm,500,5,5,0,5,1.0,0.4,0.3265986323710904
 deepseek-v4-flash,3,tier3/task17,T3.4 Fused heterocycle (1Q),rlm,1000,5,5,0,5,1.0,0.2797487603305785,0.34269633994413456
 deepseek-v4-flash,3,tier3/task17,T3.4 Fused heterocycle (1Q),rlm,full,5,5,0,5,1.0,0.676288871672733,1.733829515511154e-05
-deepseek-v4-flash,3,tier3/task18,T3.5 New ring system (1Q),llm,100,5,5,0,0,0.0,,
-deepseek-v4-flash,3,tier3/task18,T3.5 New ring system (1Q),llm,500,5,5,0,0,0.0,,
-deepseek-v4-flash,3,tier3/task18,T3.5 New ring system (1Q),codeact,100,5,5,0,0,0.0,,
-deepseek-v4-flash,3,tier3/task18,T3.5 New ring system (1Q),codeact,500,5,5,0,0,0.0,,
-deepseek-v4-flash,3,tier3/task18,T3.5 New ring system (1Q),codeact,1000,5,5,0,0,0.0,,
-deepseek-v4-flash,3,tier3/task18,T3.5 New ring system (1Q),rlm,100,5,5,0,0,0.0,,
-deepseek-v4-flash,3,tier3/task18,T3.5 New ring system (1Q),rlm,500,5,5,0,0,0.0,,
-deepseek-v4-flash,3,tier3/task18,T3.5 New ring system (1Q),rlm,1000,5,5,0,0,0.0,,
-deepseek-v4-flash,3,tier3/task18,T3.5 New ring system (1Q),rlm,full,5,5,0,0,0.0,,
+deepseek-v4-flash,3,tier3/task18,T3.5 New ring system (1Q),llm,100,5,5,0,5,1.0,0.24561403508771926,0.0
+deepseek-v4-flash,3,tier3/task18,T3.5 New ring system (1Q),llm,500,5,5,0,5,1.0,0.0019088016967126194,0.001558530059034896
+deepseek-v4-flash,3,tier3/task18,T3.5 New ring system (1Q),codeact,100,5,5,0,5,1.0,0.7965911330049261,0.04465528952079397
+deepseek-v4-flash,3,tier3/task18,T3.5 New ring system (1Q),codeact,500,5,5,0,5,1.0,0.6838822217850351,0.20605108500944253
+deepseek-v4-flash,3,tier3/task18,T3.5 New ring system (1Q),codeact,1000,5,5,0,5,1.0,0.6521978411762728,0.32614674844350144
+deepseek-v4-flash,3,tier3/task18,T3.5 New ring system (1Q),rlm,100,5,5,0,5,1.0,0.0,0.0
+deepseek-v4-flash,3,tier3/task18,T3.5 New ring system (1Q),rlm,500,5,5,0,5,1.0,0.3890526315789473,0.3194913162181594
+deepseek-v4-flash,3,tier3/task18,T3.5 New ring system (1Q),rlm,1000,5,5,0,5,1.0,0.3324174928496273,0.2749436485238294
+deepseek-v4-flash,3,tier3/task18,T3.5 New ring system (1Q),rlm,full,5,5,0,5,1.0,0.22228319271373617,0.2722434707216207
 deepseek-v4-flash,3,tier3/task20,T3.6 Fused-ring construction (1Q),llm,100,5,5,0,5,1.0,0.05347985347985348,0.04417527745547644
 deepseek-v4-flash,3,tier3/task20,T3.6 Fused-ring construction (1Q),llm,500,5,5,0,5,1.0,0.07321772639691715,0.0
 deepseek-v4-flash,3,tier3/task20,T3.6 Fused-ring construction (1Q),codeact,100,5,5,0,5,1.0,1.0,0.0
@@ -116,15 +116,15 @@ deepseek-v4-flash,3,tier3/task22,T3.8 HATU / T3P reagent (1Q),rlm,100,5,5,0,5,1.
 deepseek-v4-flash,3,tier3/task22,T3.8 HATU / T3P reagent (1Q),rlm,500,5,5,0,5,1.0,1.0,0.0
 deepseek-v4-flash,3,tier3/task22,T3.8 HATU / T3P reagent (1Q),rlm,1000,5,5,0,5,1.0,0.6,0.4898979485566356
 deepseek-v4-flash,3,tier3/task22,T3.8 HATU / T3P reagent (1Q),rlm,full,5,5,0,5,1.0,0.2,0.4
-deepseek-v4-flash,3,tier3/task23,T3.9 New stereocenter (1Q),llm,100,5,5,0,0,0.0,,
-deepseek-v4-flash,3,tier3/task23,T3.9 New stereocenter (1Q),llm,500,5,5,0,0,0.0,,
-deepseek-v4-flash,3,tier3/task23,T3.9 New stereocenter (1Q),codeact,100,5,5,0,0,0.0,,
-deepseek-v4-flash,3,tier3/task23,T3.9 New stereocenter (1Q),codeact,500,5,5,0,0,0.0,,
-deepseek-v4-flash,3,tier3/task23,T3.9 New stereocenter (1Q),codeact,1000,5,3,2,2,0.4,0.0,0.0
-deepseek-v4-flash,3,tier3/task23,T3.9 New stereocenter (1Q),rlm,100,5,5,0,0,0.0,,
-deepseek-v4-flash,3,tier3/task23,T3.9 New stereocenter (1Q),rlm,500,5,5,0,0,0.0,,
-deepseek-v4-flash,3,tier3/task23,T3.9 New stereocenter (1Q),rlm,1000,5,5,0,0,0.0,,
-deepseek-v4-flash,3,tier3/task23,T3.9 New stereocenter (1Q),rlm,full,5,5,0,0,0.0,,
+deepseek-v4-flash,3,tier3/task23,T3.9 New stereocenter (1Q),llm,100,5,5,0,5,1.0,0.0952,0.0
+deepseek-v4-flash,3,tier3/task23,T3.9 New stereocenter (1Q),llm,500,5,5,0,5,1.0,0.01584,0.00792
+deepseek-v4-flash,3,tier3/task23,T3.9 New stereocenter (1Q),codeact,100,5,5,0,5,1.0,1.0,0.0
+deepseek-v4-flash,3,tier3/task23,T3.9 New stereocenter (1Q),codeact,500,5,5,0,5,1.0,1.0,0.0
+deepseek-v4-flash,3,tier3/task23,T3.9 New stereocenter (1Q),codeact,1000,5,3,2,5,1.0,0.0,0.0
+deepseek-v4-flash,3,tier3/task23,T3.9 New stereocenter (1Q),rlm,100,5,5,0,5,1.0,0.8,0.4
+deepseek-v4-flash,3,tier3/task23,T3.9 New stereocenter (1Q),rlm,500,5,5,0,5,1.0,1.0,0.0
+deepseek-v4-flash,3,tier3/task23,T3.9 New stereocenter (1Q),rlm,1000,5,5,0,5,1.0,1.0,0.0
+deepseek-v4-flash,3,tier3/task23,T3.9 New stereocenter (1Q),rlm,full,5,5,0,5,1.0,0.7991420982145699,0.3918452203466571
 deepseek-v4-flash,3,tier3/task24,T3.10 E-alkene formation (1Q),llm,100,5,5,0,5,1.0,0.05714285714285715,0.1142857142857143
 deepseek-v4-flash,3,tier3/task24,T3.10 E-alkene formation (1Q),llm,500,5,5,0,5,1.0,0.05850585058505851,0.10738492533462321
 deepseek-v4-flash,3,tier3/task24,T3.10 E-alkene formation (1Q),codeact,100,5,5,0,5,1.0,1.0,0.0
@@ -134,24 +134,24 @@ deepseek-v4-flash,3,tier3/task24,T3.10 E-alkene formation (1Q),rlm,100,5,5,0,5,1
 deepseek-v4-flash,3,tier3/task24,T3.10 E-alkene formation (1Q),rlm,500,5,5,0,5,1.0,0.4,0.4898979485566356
 deepseek-v4-flash,3,tier3/task24,T3.10 E-alkene formation (1Q),rlm,1000,5,5,0,5,1.0,0.8,0.4
 deepseek-v4-flash,3,tier3/task24,T3.10 E-alkene formation (1Q),rlm,full,5,5,0,5,1.0,0.37333333333333335,0.45917800953926835
-deepseek-v4-flash,3,tier3/task6,T3.11-14 Amide couplings (4Q),llm,100,5,5,0,0,0.0,,
-deepseek-v4-flash,3,tier3/task6,T3.11-14 Amide couplings (4Q),llm,500,5,5,0,0,0.0,,
-deepseek-v4-flash,3,tier3/task6,T3.11-14 Amide couplings (4Q),codeact,100,5,5,0,0,0.0,,
-deepseek-v4-flash,3,tier3/task6,T3.11-14 Amide couplings (4Q),codeact,500,5,4,1,1,0.2,0.0,0.0
+deepseek-v4-flash,3,tier3/task6,T3.11-14 Amide couplings (4Q),llm,100,5,5,0,5,1.0,0.01476,0.00011999999999999996
+deepseek-v4-flash,3,tier3/task6,T3.11-14 Amide couplings (4Q),llm,500,5,5,0,5,1.0,0.039490000000000004,0.0533897616589548
+deepseek-v4-flash,3,tier3/task6,T3.11-14 Amide couplings (4Q),codeact,100,5,5,0,5,1.0,0.8215584415584416,0.0217662980525993
+deepseek-v4-flash,3,tier3/task6,T3.11-14 Amide couplings (4Q),codeact,500,5,4,1,5,1.0,0.5415663706999498,0.27271717314678984
 deepseek-v4-flash,3,tier3/task6,T3.11-14 Amide couplings (4Q),codeact,1000,5,0,5,5,1.0,0.0,0.0
-deepseek-v4-flash,3,tier3/task6,T3.11-14 Amide couplings (4Q),rlm,100,5,5,0,0,0.0,,
-deepseek-v4-flash,3,tier3/task6,T3.11-14 Amide couplings (4Q),rlm,500,5,5,0,0,0.0,,
-deepseek-v4-flash,3,tier3/task6,T3.11-14 Amide couplings (4Q),rlm,1000,5,5,0,0,0.0,,
-deepseek-v4-flash,3,tier3/task6,T3.11-14 Amide couplings (4Q),rlm,full,5,5,0,0,0.0,,
-deepseek-v4-flash,3,tier3/task7,T3.15-19 Group transformations (5Q),llm,100,5,5,0,0,0.0,,
-deepseek-v4-flash,3,tier3/task7,T3.15-19 Group transformations (5Q),llm,500,5,5,0,0,0.0,,
-deepseek-v4-flash,3,tier3/task7,T3.15-19 Group transformations (5Q),codeact,100,5,5,0,0,0.0,,
-deepseek-v4-flash,3,tier3/task7,T3.15-19 Group transformations (5Q),codeact,500,5,4,1,1,0.2,0.0,0.0
-deepseek-v4-flash,3,tier3/task7,T3.15-19 Group transformations (5Q),codeact,1000,5,1,4,4,0.8,0.0,0.0
-deepseek-v4-flash,3,tier3/task7,T3.15-19 Group transformations (5Q),rlm,100,5,5,0,0,0.0,,
-deepseek-v4-flash,3,tier3/task7,T3.15-19 Group transformations (5Q),rlm,500,5,5,0,0,0.0,,
-deepseek-v4-flash,3,tier3/task7,T3.15-19 Group transformations (5Q),rlm,1000,5,5,0,0,0.0,,
-deepseek-v4-flash,3,tier3/task7,T3.15-19 Group transformations (5Q),rlm,full,5,5,0,0,0.0,,
+deepseek-v4-flash,3,tier3/task6,T3.11-14 Amide couplings (4Q),rlm,100,5,5,0,5,1.0,0.6827583527583527,0.14570611102870726
+deepseek-v4-flash,3,tier3/task6,T3.11-14 Amide couplings (4Q),rlm,500,5,5,0,5,1.0,0.5309603174603175,0.16651989077489676
+deepseek-v4-flash,3,tier3/task6,T3.11-14 Amide couplings (4Q),rlm,1000,5,5,0,5,1.0,0.20240829346092504,0.17076282055688896
+deepseek-v4-flash,3,tier3/task6,T3.11-14 Amide couplings (4Q),rlm,full,5,5,0,5,1.0,0.46235032992812053,0.030980634692745913
+deepseek-v4-flash,3,tier3/task7,T3.15-19 Group transformations (5Q),llm,100,5,5,0,5,1.0,0.7348560000000001,0.02838462231561312
+deepseek-v4-flash,3,tier3/task7,T3.15-19 Group transformations (5Q),llm,500,5,5,0,5,1.0,0.33262685714285717,0.026507467325265162
+deepseek-v4-flash,3,tier3/task7,T3.15-19 Group transformations (5Q),codeact,100,5,5,0,5,1.0,0.9318181818181819,0.0
+deepseek-v4-flash,3,tier3/task7,T3.15-19 Group transformations (5Q),codeact,500,5,4,1,5,1.0,0.7098383838383838,0.3643564116839871
+deepseek-v4-flash,3,tier3/task7,T3.15-19 Group transformations (5Q),codeact,1000,5,1,4,5,1.0,0.10778947368421052,0.21557894736842104
+deepseek-v4-flash,3,tier3/task7,T3.15-19 Group transformations (5Q),rlm,100,5,5,0,5,1.0,0.7854545454545454,0.12883457264041367
+deepseek-v4-flash,3,tier3/task7,T3.15-19 Group transformations (5Q),rlm,500,5,5,0,5,1.0,0.9243636363636364,0.0826151087776752
+deepseek-v4-flash,3,tier3/task7,T3.15-19 Group transformations (5Q),rlm,1000,5,5,0,5,1.0,0.43832614991028124,0.10524905336333194
+deepseek-v4-flash,3,tier3/task7,T3.15-19 Group transformations (5Q),rlm,full,5,5,0,5,1.0,0.760795994930982,0.1325834036724646
 deepseek-v4-flash,3,tier3/task8,T3.20-21 Protecting groups (2Q),llm,100,5,5,0,5,1.0,0.44761904761904764,0.2
 deepseek-v4-flash,3,tier3/task8,T3.20-21 Protecting groups (2Q),llm,500,5,5,0,5,1.0,0.009301970659493695,0.01860394131898739
 deepseek-v4-flash,3,tier3/task8,T3.20-21 Protecting groups (2Q),codeact,100,5,5,0,5,1.0,0.9360606060606061,0.023244616861533448
@@ -170,15 +170,15 @@ deepseek-v4-flash,3,tier3/task9,T3.22-25 Named reactions (4Q),rlm,100,5,5,0,5,1.
 deepseek-v4-flash,3,tier3/task9,T3.22-25 Named reactions (4Q),rlm,500,5,5,0,5,1.0,0.9255856363316317,0.060869059581716504
 deepseek-v4-flash,3,tier3/task9,T3.22-25 Named reactions (4Q),rlm,1000,5,5,0,5,1.0,0.26882665707905107,0.1517420181721467
 deepseek-v4-flash,3,tier3/task9,T3.22-25 Named reactions (4Q),rlm,full,5,5,0,5,1.0,0.4638704179274181,0.30082747865912973
-deepseek-v4-flash,3,tier3/task10,T3.26-30 Mechanisms I (5Q),llm,100,5,5,0,0,0.0,,
-deepseek-v4-flash,3,tier3/task10,T3.26-30 Mechanisms I (5Q),llm,500,5,5,0,0,0.0,,
-deepseek-v4-flash,3,tier3/task10,T3.26-30 Mechanisms I (5Q),codeact,100,5,4,1,1,0.2,0.0,0.0
-deepseek-v4-flash,3,tier3/task10,T3.26-30 Mechanisms I (5Q),codeact,500,5,1,4,4,0.8,0.0,0.0
-deepseek-v4-flash,3,tier3/task10,T3.26-30 Mechanisms I (5Q),codeact,1000,5,1,4,4,0.8,0.0,0.0
-deepseek-v4-flash,3,tier3/task10,T3.26-30 Mechanisms I (5Q),rlm,100,5,5,0,0,0.0,,
-deepseek-v4-flash,3,tier3/task10,T3.26-30 Mechanisms I (5Q),rlm,500,5,5,0,0,0.0,,
-deepseek-v4-flash,3,tier3/task10,T3.26-30 Mechanisms I (5Q),rlm,1000,5,5,0,0,0.0,,
-deepseek-v4-flash,3,tier3/task10,T3.26-30 Mechanisms I (5Q),rlm,full,5,5,0,0,0.0,,
+deepseek-v4-flash,3,tier3/task10,T3.26-30 Mechanisms I (5Q),llm,100,5,5,0,5,1.0,0.25095999999999996,0.016758128773821972
+deepseek-v4-flash,3,tier3/task10,T3.26-30 Mechanisms I (5Q),llm,500,5,5,0,5,1.0,0.205992,0.061330674348159586
+deepseek-v4-flash,3,tier3/task10,T3.26-30 Mechanisms I (5Q),codeact,100,5,4,1,5,1.0,0.6846464646464646,0.3749847597488104
+deepseek-v4-flash,3,tier3/task10,T3.26-30 Mechanisms I (5Q),codeact,500,5,1,4,5,1.0,0.19426523297491038,0.38853046594982077
+deepseek-v4-flash,3,tier3/task10,T3.26-30 Mechanisms I (5Q),codeact,1000,5,1,4,5,1.0,0.10761904761904761,0.21523809523809523
+deepseek-v4-flash,3,tier3/task10,T3.26-30 Mechanisms I (5Q),rlm,100,5,5,0,5,1.0,0.9547474747474748,0.03343052863585872
+deepseek-v4-flash,3,tier3/task10,T3.26-30 Mechanisms I (5Q),rlm,500,5,5,0,5,1.0,0.8176340887870299,0.1626219131586185
+deepseek-v4-flash,3,tier3/task10,T3.26-30 Mechanisms I (5Q),rlm,1000,5,5,0,5,1.0,0.41241918865448274,0.20564824643862026
+deepseek-v4-flash,3,tier3/task10,T3.26-30 Mechanisms I (5Q),rlm,full,5,5,0,5,1.0,0.40109616088766253,0.14956086517717096
 deepseek-v4-flash,3,tier3/task10b,T3.31-35 Mechanisms II (5Q),llm,100,5,5,0,5,1.0,0.39273015873015876,0.07871258124312888
 deepseek-v4-flash,3,tier3/task10b,T3.31-35 Mechanisms II (5Q),llm,500,5,5,0,5,1.0,0.27806509907677474,0.026226330259659265
 deepseek-v4-flash,3,tier3/task10b,T3.31-35 Mechanisms II (5Q),codeact,100,5,5,0,5,1.0,0.7827070707070707,0.036150576724733784
@@ -233,15 +233,15 @@ deepseek-v4-flash,4,tier4/task14,T4.10-11 Protecting-group pairs (2Q),rlm,100,5,
 deepseek-v4-flash,4,tier4/task14,T4.10-11 Protecting-group pairs (2Q),rlm,500,5,5,0,5,1.0,0.34285714285714286,0.2835633320182744
 deepseek-v4-flash,4,tier4/task14,T4.10-11 Protecting-group pairs (2Q),rlm,1000,5,5,0,5,1.0,0.4,0.2
 deepseek-v4-flash,4,tier4/task14,T4.10-11 Protecting-group pairs (2Q),rlm,full,5,5,0,5,1.0,0.08571428571428572,0.17142857142857143
-deepseek-v4-flash,4,tier4/task15,T4.12-15 Ring-construction chains (4Q),llm,100,5,5,0,0,0.0,,
-deepseek-v4-flash,4,tier4/task15,T4.12-15 Ring-construction chains (4Q),llm,500,5,5,0,0,0.0,,
-deepseek-v4-flash,4,tier4/task15,T4.12-15 Ring-construction chains (4Q),codeact,100,5,5,0,0,0.0,,
-deepseek-v4-flash,4,tier4/task15,T4.12-15 Ring-construction chains (4Q),codeact,500,5,5,0,0,0.0,,
+deepseek-v4-flash,4,tier4/task15,T4.12-15 Ring-construction chains (4Q),llm,100,5,5,0,5,1.0,0.0,0.0
+deepseek-v4-flash,4,tier4/task15,T4.12-15 Ring-construction chains (4Q),llm,500,5,5,0,5,1.0,0.0,0.0
+deepseek-v4-flash,4,tier4/task15,T4.12-15 Ring-construction chains (4Q),codeact,100,5,5,0,5,1.0,0.5238516666666667,0.15485806381256928
+deepseek-v4-flash,4,tier4/task15,T4.12-15 Ring-construction chains (4Q),codeact,500,5,5,0,5,1.0,0.4162046562261269,0.061782374025401196
 deepseek-v4-flash,4,tier4/task15,T4.12-15 Ring-construction chains (4Q),codeact,1000,5,0,5,5,1.0,0.0,0.0
-deepseek-v4-flash,4,tier4/task15,T4.12-15 Ring-construction chains (4Q),rlm,100,5,5,0,0,0.0,,
-deepseek-v4-flash,4,tier4/task15,T4.12-15 Ring-construction chains (4Q),rlm,500,5,5,0,0,0.0,,
-deepseek-v4-flash,4,tier4/task15,T4.12-15 Ring-construction chains (4Q),rlm,1000,5,5,0,0,0.0,,
-deepseek-v4-flash,4,tier4/task15,T4.12-15 Ring-construction chains (4Q),rlm,full,5,5,0,0,0.0,,
+deepseek-v4-flash,4,tier4/task15,T4.12-15 Ring-construction chains (4Q),rlm,100,5,5,0,5,1.0,0.0,0.0
+deepseek-v4-flash,4,tier4/task15,T4.12-15 Ring-construction chains (4Q),rlm,500,5,5,0,5,1.0,0.2,0.18708286933869708
+deepseek-v4-flash,4,tier4/task15,T4.12-15 Ring-construction chains (4Q),rlm,1000,5,5,0,5,1.0,0.7,0.2449489742783178
+deepseek-v4-flash,4,tier4/task15,T4.12-15 Ring-construction chains (4Q),rlm,full,5,5,0,5,1.0,0.45,0.29154759474226505
 deepseek-v4-flash,4,tier4/task16,T4.16-25 Truncated routes (10Q),llm,100,5,5,0,5,1.0,0.13999999999999999,0.058309518948452994
 deepseek-v4-flash,4,tier4/task16,T4.16-25 Truncated routes (10Q),llm,500,5,5,0,5,1.0,0.05,0.04944132324730442
 deepseek-v4-flash,4,tier4/task16,T4.16-25 Truncated routes (10Q),codeact,100,5,0,5,5,1.0,0.0,0.0

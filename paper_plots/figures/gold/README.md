@@ -18,7 +18,7 @@ rerun the gold-data builder, and then regenerate the plots.
 | [`efficiency_frontier.pdf`](efficiency_frontier.pdf) | Cross-model macro-F1 against recorded USD cost per question trajectory for the three complete paid-API model arms | [`plot_main_results.py`](../../scripts/plot_main_results.py) | [`full_benchmark_records.csv`](../../gold/iclr2027/full_benchmark_records.csv) |
 | [`efficiency_frontier_by_model.pdf`](efficiency_frontier_by_model.pdf) | The same accuracy--cost frontier separated into Gemini, GPT-5 mini, and Claude rows | [`plot_main_results.py`](../../scripts/plot_main_results.py) | [`full_benchmark_records.csv`](../../gold/iclr2027/full_benchmark_records.csv) |
 | [`scaling_by_tier_all_models.pdf`](scaling_by_tier_all_models.pdf) | Main performance summary: unweighted mean and SEM across terminal model arms for LLM, CodeAct, and RLM | [`plot_gold_scaling_by_tier.py`](../../scripts/plot_gold_scaling_by_tier.py) | [`tier_scaling_across_models.csv`](../../gold/iclr2027/tier_scaling_across_models.csv) |
-| [`rlm_tier_scaling_gold.pdf`](rlm_tier_scaling_gold.pdf) | RLM-only scaling for all six models; closest gold replacement for the earlier `rlm_tier_scaling.pdf` | [`plot_gold_scaling_by_tier.py`](../../scripts/plot_gold_scaling_by_tier.py) | [`tier_scaling.csv`](../../gold/iclr2027/tier_scaling.csv) |
+| [`rlm_tier_scaling_gold.pdf`](rlm_tier_scaling_gold.pdf) | RLM-only diagnostic for all six tracked arms; the five complete paper models are identified separately from unfinished GLM | [`plot_gold_scaling_by_tier.py`](../../scripts/plot_gold_scaling_by_tier.py) | [`tier_scaling.csv`](../../gold/iclr2027/tier_scaling.csv) |
 | [`scaling_by_tier_all_model_curves.pdf`](scaling_by_tier_all_model_curves.pdf) | Diagnostic overlay of every model/interface curve; useful for checking heterogeneity, not recommended as the main paper figure | [`plot_gold_scaling_by_tier.py`](../../scripts/plot_gold_scaling_by_tier.py) | [`tier_scaling.csv`](../../gold/iclr2027/tier_scaling.csv) |
 | [`scaling_by_tier_individual_models.pdf`](scaling_by_tier_individual_models.pdf) | Multipage diagnostic with one four-tier figure per model | [`plot_gold_scaling_by_tier.py`](../../scripts/plot_gold_scaling_by_tier.py) | [`tier_scaling.csv`](../../gold/iclr2027/tier_scaling.csv) |
 | [`cost_by_tier_across_models.pdf`](cost_by_tier_across_models.pdf) | Recorded billed cost per successful trajectory, averaged over paid models only | [`plot_gold_efficiency_by_tier.py`](../../scripts/plot_gold_efficiency_by_tier.py) | [`tier_efficiency_across_models.csv`](../../gold/iclr2027/tier_efficiency_across_models.csv) |
@@ -45,9 +45,10 @@ figures.
 ### Performance
 
 - A successful job contributes its measured task score.
-- If exact corrected rescoring is still pending, the frozen submission plot
-  carries the preserved historical score while retaining that run in the
-  internal post-submission queue.
+- Exact corrected rescores replace historical values where recoverable. For
+  the 201 unresolved identities, the frozen submission carries the preserved
+  historical score under an explicit internal status marker; these rows remain
+  in the post-submission queue.
 - A terminal failed job is a wrong answer and contributes zero.
 - Running, stale, and pending jobs are not assigned zero. They are excluded
   until resolved, and the affected arm is marked provisional with `*` and/or a
@@ -63,8 +64,8 @@ figures.
 - Cost averages include only models for which we paid: Gemini 3.7 Flash,
   GPT-5 mini, and Claude Haiku 4.5. Free SwissAI Qwen, DeepSeek, and GLM calls
   are excluded rather than entered as zero.
-- The CodeAct `x=1000` cost point currently has only Gemini (`n=1`). Add GPT
-  when its result pack becomes available.
+- The CodeAct `x=1000` extension includes Qwen, DeepSeek, Gemini, and GPT;
+  paid-cost summaries use the paid models with recorded billing data.
 - Token and wall-time summaries use successful jobs only. Failed jobs enter
   performance as zero but do not enter resource numerators or denominators.
 - Provider token and cost metadata were not preserved for failed attempts.
@@ -90,8 +91,9 @@ at full-corpus scale. The defensible wording is **high and stable**, not
 universally **near-perfect**, because absolute performance remains
 model-dependent.
 
-DeepSeek CodeAct/RLM and GLM CodeAct/RLM remain provisional in this snapshot.
-Always consult [`arm_status.csv`](../../gold/iclr2027/arm_status.csv) rather than
+The five paper-model arms and their declared extensions are terminal. GLM
+remains a separate provisional diagnostic outside the paper comparison. Always
+consult [`arm_status.csv`](../../gold/iclr2027/arm_status.csv) rather than
 copying these counts into new prose.
 
 ## Regenerating everything

@@ -6,28 +6,28 @@
     "included": "successful scored jobs from terminal model/method arms",
     "peak_memory": "mean peak combined host-process-tree plus Docker memory per job"
   },
-  "generated_at": "2026-09-25T21:11:34.327691+00:00",
+  "generated_at": "2026-09-25T23:49:33.239718+00:00",
   "outputs": [
     {
       "path": "per_model.csv",
-      "sha256": "f3f59e9ad600c546f15f84d39a368d1fa0d116a131eb05278161ba01f290e171"
+      "sha256": "fc02fad1718efe0fa829fef0b16d240420229510eebcb9210c2142e1330693c2"
     },
     {
       "path": "across_models.csv",
-      "sha256": "5cedee762ad493f38d137f0cf8a1a0e486b3101337616025c2fbf25fc436fe26"
+      "sha256": "10f738df4a6b46fa601b7f07d42981f2617551df9cea7f5e4e04e33335183970"
     }
   ],
   "schema_version": 1,
-  "source_repository_commit": "37fde6de381bc0ddc0a0226ea0b156d7bcfafed5",
-  "source_snapshot_as_of": "2026-09-25T21:08:00.402095+00:00",
+  "source_repository_commit": "213f91c80c391ad9e186a4e4faaeb7690b952d0f",
+  "source_snapshot_as_of": "2026-09-25T23:35:48.482158+00:00",
   "sources": [
     {
       "path": "paper_plots/gold/iclr2027/full_benchmark_records.csv",
-      "sha256": "599dddce39dff4afe404e59e0204bb0ffd45aa8f98657a409d10d46144bfae15"
+      "sha256": "cffff19a9dad878cd3dd5e70f2c38a49dd64f63460cca0780ab65ac8d6dbd1a6"
     },
     {
       "path": "paper_plots/gold/iclr2027/source_manifest.json",
-      "sha256": "9b12e17c0fdefa81e44245bca0071b79f351a51a3ed2a42ebb3b9bf159d04862"
+      "sha256": "7e7aee7127dae9436f7ddd0e743b5e1b793c04f0d95129fc2b9d18b90c5d7e3d"
     }
   ]
 }

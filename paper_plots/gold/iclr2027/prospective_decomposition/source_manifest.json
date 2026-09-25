@@ -1,13 +1,13 @@
 {
   "aggregates_sha256": "23d900211dcefe7938ca6e20f6c0a402cb107c110ee5ecf308172432f361fd7c",
   "campaign": "iclr2027-task16-prospective-decomposition-v1",
-  "generated_at": "2026-09-25T20:38:45.820757+00:00",
-  "git_commit": "5de4dc3aa377cc7142816f2edc7626a8fdf395b7",
+  "generated_at": "2026-09-25T23:49:35.409806+00:00",
+  "git_commit": "213f91c80c391ad9e186a4e4faaeb7690b952d0f",
   "jobs": 30,
   "records_sha256": "7190b810c8f073e1d1eb0085c1207fee48eb3d8d63a71334fd1da37fb5e1b6a3",
   "selection": "Qwen and Claude; three conditions; five repetitions; three targets",
   "snapshot_files": {
-    "/home/amin/rlm_dashboard/artifacts/control-room/shared/liacpc14-prospective-v1-e1cb6c67.json": "6cf7776e7cde9f9ff1eadeaeb7de81fc787e83d924a7e5b7ea34b8cc92ee55e4"
+    "/home/amin/rlm_dashboard/artifacts/control-room/shared/liacpc14-prospective-v1-e1cb6c67.json": "98fa10ace85df2fbc4e5d321c8556ab1c7d2d069516a724f146b4106f8e190da"
   },
   "target_records_sha256": "33b5ccbaaf88932267edebe7b15ade9d5604cbf387423001ead2520137e2e0df",
   "target_score_pack": {

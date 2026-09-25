@@ -1,10 +1,10 @@
 # Post-submission score audit
 
 This internal checklist is deliberately separate from manuscript prose. The
-submission freeze describes the benchmark as the complete 100-question suite,
-but excludes model scores for task configurations whose references, prompts,
-or evaluators changed. The frozen run identities and historical values remain
-available solely to reproduce and complete the audit.
+submission freeze describes the benchmark as the complete 100-question suite.
+It uses exact corrected rescores wherever archived predictions permit them and
+carries the preserved historical score only for unresolved rows, with an
+explicit internal status marker.
 
 ## Required rescoring
 
@@ -12,14 +12,14 @@ available solely to reproduce and complete the audit.
   Tier-4 Task 15.
 - Audit every affected run listed in
   `paper_plots/gold/iclr2027/post_submission/pending_corrected_rescores.csv`.
-- Do not restore a partially recovered or historical score to a paper aggregate
-  until the complete affected arm has been checked under one frozen policy.
+- Replace a carried historical score only with an exact corrected rescore.
 - Regenerate all gold tables, figures, manuscript numbers, and the submission
   manifest after the audit; compare every changed claim with the frozen PDF.
 
-The current queue contains all 1,743 affected run identities. The gold builders
-set `score_available=false` for these cells and preserve `original_f1` only as
-internal evidence.
+The current queue contains the 201 unresolved identities. The other 1,542 of
+1,743 affected runs have exact corrected rescores. The builders preserve
+`original_f1` for audit and mark unresolved carried values as
+`historical_score_invalidated` until exact recovery or rerunning is complete.
 
 ## Items that do not invalidate model scores
 
@@ -41,4 +41,6 @@ internal evidence.
   failures out of 300.
 - DeepSeek V4 Flash RLM at x1000: 150/150 successful, including the 15 Docker
   cells from Sathvik's result pack.
-
+- GPT-5 mini RLM at x1000: 150/150 successful. The 135 Jed and 15 Docker jobs
+  are merged canonically; the one dashboard row missing `macro_f1` is restored
+  from checksum-verified W&B summary `hqwpwv2t`.

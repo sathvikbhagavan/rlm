@@ -10,9 +10,9 @@ failure analysis after the chemistry-aware human audit and corrected rescoring.
 - GLM-5.2 belongs to the six-model campaign inventory but is **outside the
   five-model paper analysis** because only its LLM arms are terminal.
 - Canonical paper input: `paper_plots/gold/iclr2027/final_arm_records.csv`.
-- Frozen scope: 6,150 jobs and **20,500 expected question trajectories**. This
+- Frozen scope: 6,300 jobs and **21,000 expected question trajectories**. This
   is the designed denominator of the included arms, not the number of successful
-  trajectories. There are 19,687 successful trajectories; 174 terminal failed
+  trajectories. There are 20,187 successful trajectories; 174 terminal failed
   jobs remain in the denominator as zero-score outcomes.
 
 ## Mandatory exclusions
@@ -59,6 +59,11 @@ Recovered predictions and per-question corrected scores are retained in:
 - `paper_plots/gold/iclr2027/codeact_x1000_records.csv`
 - `paper_plots/gold/iclr2027/rlm_x1000_records.csv`
 - `paper_plots/gold/iclr2027/causal_controls/records.csv`
+
+The final-arm frequency analysis therefore contains 6,179 jobs and 20,771
+expected question trajectories after removing the 121 unresolved paper-arm
+rows. The retained-prediction cohort contains 2,229 classifiable question
+outputs.
 
 The exact extraction validated reconstructed predictions against the historical
 per-question or macro score before applying the corrected oracle. Do not infer a

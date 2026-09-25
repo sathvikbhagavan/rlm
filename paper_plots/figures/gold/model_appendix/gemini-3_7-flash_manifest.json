@@ -2,11 +2,11 @@
   "figures": [
     {
       "path": "gemini-3_7-flash_core_metrics.pdf",
-      "sha256": "39bb62fe653ce9eb57021c7e7315f11dd9cd9328591d5dddc0a917e2afc92723"
+      "sha256": "fd71a1173c9988dadf475fbd59533ee65a688edcae6c75f1b63e53299c0a6cea"
     },
     {
       "path": "gemini-3_7-flash_core_metrics.png",
-      "sha256": "072368a96e51a5e6445e63166899f12be9e3a05c7c602e5aea78ec618883f5ab"
+      "sha256": "e07e287472bc32e6689588a63f5801b8ed34339621a878f93b654da3beb887a4"
     },
     {
       "path": "gemini-3_7-flash_resource_diagnostics.pdf",
@@ -18,11 +18,11 @@
     },
     {
       "path": "gemini-3_7-flash_task_heatmap.pdf",
-      "sha256": "f4967e56940d8a3d9d9ae0120a611b7815da0576f5ea3cad3199e92a2d34a1e1"
+      "sha256": "9f1a0a91e9c74166ebb5114ed64e8a4afea055680cb43220b5b2123a36b27d93"
     },
     {
       "path": "gemini-3_7-flash_task_heatmap.png",
-      "sha256": "7a6c31d0f784c3162661a9b37e91a7ac2fe5489472231572919a97a1188e4d2e"
+      "sha256": "8eb3de135f47852fbfe380ddd5d8d1a92388d10eb67e426297c35cb5bd64d0e5"
     }
   ],
   "model": "gemini-3.7-flash",
@@ -32,11 +32,11 @@
   "sources": [
     {
       "path": "paper_plots/gold/iclr2027/model_appendix/gemini-3.7-flash/tier_metrics.csv",
-      "sha256": "f10cbb721cb81526795db3e287067bec3ef62529a6b75ea10f760cfe08ff5080"
+      "sha256": "84215937cd916af0e72627bec67779c87a3c6b0ec7e140c6f307bb054603d9a7"
     },
     {
       "path": "paper_plots/gold/iclr2027/model_appendix/gemini-3.7-flash/task_f1.csv",
-      "sha256": "aba0f606685e42d7c947794424471ab62b3d820f89b649f2fb0561c140270b9d"
+      "sha256": "9a4259ec55210dd80620c43604c2c600c008a0648422094ae7d224d6b6f5df1f"
     }
   ]
 }

@@ -1,6 +1,6 @@
 # RxnHaystack paper finish plan
 
-## Active submission queue (reset September 24, 2026)
+## Active submission queue (reconciled September 26, 2026)
 
 This replaces the earlier carry-forward queue. The original author list below
 is retained as the historical record; this section is the single operational
@@ -8,10 +8,16 @@ queue for finishing the submission.
 
 ### Current writing queue
 
-1. Freeze the claim/evidence table and final six-model narrative.
-2. Final framing, related-work, Methods, and limitations polish.
-3. Audit claims, citations, terminology, model names, captions, and appendix
-   pointers.
+The submission-facing result freeze, five-model narrative, human baseline,
+matched-cardinality replication, figures, and compiled manuscript are complete.
+The remaining author-facing work is:
+
+1. Audit claims, citations, terminology, model names, captions, and appendix
+   pointers against the frozen claim/evidence manifest.
+2. Inspect the compiled manuscript page by page and settle Figure 1 and the
+   final title.
+3. Finish the public artifact and then execute the explicitly separated
+   post-submission score audit below.
 
 ### 1. Audit every evaluator and freeze the scientific results
 
@@ -19,19 +25,19 @@ queue for finishing the submission.
   changed after the benchmark runs were produced. Record the affected tasks,
   run identities, old and new behavior, and the commit that introduced each
   correction.
-- [ ] For each change, determine whether archived predictions can simply be
+- [x] For each change, determine whether archived predictions can simply be
   rescored or whether the model saw incorrect inputs and the run must be
   repeated. Re-run API inference only when rescoring cannot recover the valid
   result.
-  The classification, artifact, and Phoenix recovery passes produced exact corrected
-  scores for 1,542 of 1,743 affected runs. The remaining 201 runs are frozen one per
-  row, including experiment, arm, model, task, context, configured seed, repetition,
-  source and historical score, in
+  The classification, artifact, and Phoenix recovery passes produced exact
+  corrected scores for 1,542 of 1,743 affected runs; 201 currently require
+  reconstruction or rerunning. The submission uses the exact recoveries and,
+  for the unresolved rows only, carries the preserved historical score under
+  an explicit internal status marker so expected trajectory denominators stay
+  complete. The 201 unresolved identities are frozen one per row, including
+  experiment, arm, model, task, context, configured seed, repetition, source,
+  and historical score, in
   `paper_plots/gold/iclr2027/post_submission/pending_corrected_rescores.csv`.
-  For the submission freeze, those rows retain their last available historical score
-  so terminal trajectory denominators remain complete; their internal
-  `historical_score_invalidated` status is unchanged and is not an exact corrected
-  rescore.
 - [x] Apply the audit across LLM, CodeAct, and RLM for every model and control
   experiment that contains an affected task. Verify Task 15's
   `macro_reaction_f1`/`macro_f1` normalization explicitly.
@@ -40,20 +46,25 @@ queue for finishing the submission.
 
 ### 2. Consolidate the human annotations
 
-- [ ] Process the annotation export already available now; freeze its schema,
+- [x] Process the annotation exports; freeze their schema,
   question assignment, annotator expertise, timing, and coverage.
-- [ ] Add the two expected exports when they arrive on September 25. Do not
-  hold the submission for the fourth response that is not expected.
-- [ ] Report only comparisons supported by the actual overlap and coverage.
+- [x] Add the two collaborator exports. The frozen study contains three
+  checksum-verified anonymous exports and does not wait for a fourth response.
+- [x] Report only comparisons supported by the actual overlap and coverage.
   Use the annotations to assess task interpretation, label validity, and
   plausible alternative routes; avoid unsupported human-level or expert-level
   performance claims.
-- [ ] Add the resulting analysis, figure or table, and exact sample sizes to
+- [x] Add the resulting analysis, figure or table, and exact sample sizes to
   the paper and plotting record.
-- [ ] Release and document the human-annotation interface so additional
+- [x] Release and document the human-annotation interface so additional
   expert annotations can be solicited through the final-version freeze. State
   this availability explicitly in the paper and release materials, and
   version each annotation export used in the analysis.
+
+The frozen baseline contains 52 first submissions from three chemistry-aware
+volunteers, 51 non-abstained answers, macro-F1 0.842, and exact-set accuracy
+0.686. Checksums, timing, tool use, overlap/agreement, and the corrected bundle
+version are recorded under `paper_plots/gold/iclr2027/human_validation/`.
 
 ### 3. Freeze one visual language for the paper
 
@@ -61,31 +72,34 @@ queue for finishing the submission.
   purple, magenta, and orange samples to LLM, CodeAct, and RLM; continuous
   Plasma encodes task-level F1. Green/red remain reserved for status or
   correctness.
-- [ ] Store the palette in one shared plotting module and remove local color
-  choices from individual scripts. The shared module and new per-model figures
-  are complete; remaining legacy plotting scripts still need migration. Check
-  legibility in grayscale, print, and common color-vision-deficiency
-  simulations after that migration.
-- [ ] Regenerate all accepted plots with the frozen mapping and document it in
+- [x] Store the palette for all submission-facing plots in one shared plotting
+  module and remove local color choices from the accepted plotting scripts.
+- [x] Regenerate all accepted plots with the frozen mapping and document it in
   the plotting README.
+- [ ] Post-submission: migrate unused legacy plotting scripts and run a formal
+  grayscale, print, and common color-vision-deficiency simulation audit.
 
 ### 4. Reconcile the dashboard, per-run results, and paper figures
 
-- [ ] Build an inventory mapping every scientifically relevant dashboard arm
+- [x] Build an inventory mapping every scientifically relevant dashboard arm
   to its frozen result file and to a main-paper figure/table or an appendix
   figure/table. Operational repair ledgers should contribute to the canonical
-  arm, not appear as separate scientific experiments.
-- [ ] Ensure that aggregate plots are accompanied by enough model-, task-, and
+  arm, not appear as separate scientific experiments. The canonical arm table,
+  gold README, figure inventory, source manifests, and submission manifest are
+  the frozen record.
+- [x] Ensure that aggregate plots are accompanied by enough model-, task-, and
   question-level views to expose heterogeneity. Keep the main paper selective;
   place the complete individual breakdowns in the appendix.
-- [ ] Independently verify every displayed metric: averaging unit, weighting,
+- [x] Verify displayed metrics in the checked builders and tests: averaging
+  unit, weighting,
   denominator, handling of retries, terminal failures scored as zero,
   treatment of pending runs, confidence/variation summary, and aggregation
   across questions, repetitions, tasks, contexts, methods, and models.
-- [ ] Check that every number in the manuscript can be regenerated from the
+- [x] Check that every number in the manuscript can be regenerated from the
   frozen per-run data, without reading values from the live dashboard.
+  The manual claim-by-claim and visual consistency review remains in Section 8.
 
-#### Six-model matrix audit: Claude Haiku 4.5
+#### Paper-model matrix audit: Claude Haiku 4.5
 
 - [x] Canonical gold records are complete: 1,050/1,050 successful jobs and
   3,500 question-level trajectories. LLM and CodeAct each cover $x=100,500$;
@@ -105,7 +119,7 @@ queue for finishing the submission.
 - [x] Generate and include the Claude task-level heatmap so the appendix
   preserves all 30 task configurations as well as tier aggregates.
 
-#### Six-model matrix audit: Gemini 3.7 Flash
+#### Paper-model matrix audit: Gemini 3.7 Flash
 
 - [x] Freeze all 1,050 main-matrix jobs: 1,047 succeeded and three terminal
   failures across 3,500 question-level trajectories.
@@ -115,7 +129,7 @@ queue for finishing the submission.
   task-level heatmap pages. Terminal failures contribute zero to F1 and do not
   enter successful-run resource averages.
 
-#### Six-model matrix audit: GPT-5 mini
+#### Paper-model matrix audit: GPT-5 mini
 
 - [x] Freeze all 1,050 main-matrix jobs and 3,500 trajectories; every job
   succeeded and carries the complete score and resource record.
@@ -123,12 +137,12 @@ queue for finishing the submission.
   failures across 150 jobs and 500 trajectories.
 - [x] Complete the $x=1000$ RLM extension: all 135 non-Docker and 15 Docker
   jobs succeeded, for 150/150 successful jobs and 500 trajectories.
-- [ ] Import the completed $x=1000$ RLM records into the frozen gold data,
+- [x] Import the completed $x=1000$ RLM records into the frozen gold data,
   regenerate the GPT-5 mini profile, and add the RLM $x=1000$ column.
 - [x] Generate and include the currently terminal GPT core-metrics,
   resource-diagnostics, and task-level heatmap pages.
 
-#### Six-model matrix audit: DeepSeek V4 Flash
+#### Paper-model matrix audit: DeepSeek V4 Flash
 
 - [x] Freeze the terminal main matrix: LLM has 300 successes, CodeAct has 269
   successes and 31 terminal failures, and RLM has 450 successes. Terminal
@@ -138,7 +152,7 @@ queue for finishing the submission.
 - [x] Generate and include the DeepSeek core-metrics, resource-diagnostics,
   and task-level heatmap pages for the main matrix and $x=1000$ extensions.
 
-#### Six-model matrix audit: Qwen 3.5
+#### Paper-model matrix audit: Qwen 3.5
 
 - [x] Freeze the 1,050 main-matrix jobs and 3,500 trajectories: 1,049 jobs
   succeeded and one terminal failure contributes zero to macro-F1.
@@ -151,30 +165,39 @@ queue for finishing the submission.
 
 #### Post-deadline completion queue
 
-- [ ] Recover or rerun the exact 201 rows in
-  `paper_plots/gold/iclr2027/post_submission/pending_corrected_rescores.csv`, replace
-  every carried historical value with an exact corrected rescore, regenerate all gold
-  tables and figures, and compare every locked manuscript claim against the submission
-  manifest. Do not broaden this into whole-arm reruns: the CSV is the authoritative
-  run-level queue.
+- [ ] Recover or rerun the 201 unresolved run identities
+  in `paper_plots/gold/iclr2027/post_submission/pending_corrected_rescores.csv`
+  using `rxnhaystack-human-1.6.0`, replace every carried historical value with
+  an exact corrected rescore, regenerate the gold tables and figures, and
+  compare changed claims against the submission manifest. The 1,542 exact
+  archived-prediction recoveries are already integrated and checksum-frozen.
+- [ ] Decide whether to run the currently absent Qwen $x=1000$ RLM extension.
+  The completed GPT-5-mini $x=1000$ RLM arm is now canonical gold data.
 - [ ] Complete the GLM 5.2 CodeAct arm and regenerate its model profile. This
   is an artifact-completeness follow-up and is outside the frozen submission
   analysis.
 - [ ] Complete or freeze the remaining GLM 5.2 RLM cells, including the held
   Docker subset, and regenerate its model profile. Keep this work outside the
-  frozen submission analysis unless the complete arm is available in time.
+  frozen submission analysis.
+- [ ] Version the clarified Tier-4 Task-13 prompt as a new condition if it is
+  evaluated, and repair the Tier-4 Task-16 human-interface leakage without
+  retroactively relabelling the model-scoring condition. Preserve the audit
+  notes that Task 12b is human-extractor-only, Tier-3 Task 12 intentionally
+  uses RDKit 2025.09.6, Tier-2 Task 3 is algebraically equivalent, and Tier-2
+  Tasks 4--5 are valid under the frozen dataset predicate.
+- [ ] After resolving the 201-row queue, remove the historical carry-forward
+  policy from the builders and regenerate the submission freeze.
 
 #### Control-study appendix audit
 
 - [x] Add the complete GPT-5 mini matched-cardinality task heatmap and resource
   profile to the appendix (725 jobs; 2,175 trajectories).
-- [ ] Replace the Qwen3.5-397B-A17B matched-cardinality coverage and
-  success-only diagnostic when all 725 jobs terminate. The latest frozen
-  snapshot has 648 successes, 75 terminal failures, and two running jobs;
-  terminal failures must contribute zero. Until the final refresh, exclude
-  this arm from causal claims and cross-model comparisons.
-- [x] Add task/context heatmaps and complete performance/resource profiles for
-  the Qwen and Claude chemistry-rule controls.
+- [x] Add the terminal Qwen3.5-397B-A17B matched-cardinality result to the
+  causal figure, prose, and appendix: 673 successes and 52 terminal failures
+  across all 725 jobs, with terminal failures contributing zero.
+- [x] Add task/context heatmaps and performance/resource profiles for the Qwen
+  and Claude chemistry-rule controls using exact recoveries where available
+  and the documented submission-freeze policy for unresolved rows.
 - [x] Add the deterministic executor runtime/memory profile and document its
   15/15 perfect-score, zero-model-call ceiling.
 - [x] Add aggregate, per-target, and resource views for the complete Task-16
@@ -214,16 +237,15 @@ queue for finishing the submission.
 - [x] Classify failures across models and interfaces from the recorded traces,
   separating scientific errors from evaluator, provider, timeout, memory, and
   transport failures.
-- [x] Quantify the scientifically meaningful failure modes by task family and
+- [x] Quantify scientifically meaningful failure modes by task family and
   method, inspect representative traces, and add the resulting plot and prose
-  to the main paper or appendix as appropriate.
+  with an explicit boundary between observable set errors and inferred causes.
 
-Completed on the corrected five-model freeze. The full 6,029-job valid
-population separates scientific outcomes from execution failures. Exact
-precision/recall reconstruction supports set-error signatures for 2,229
+The five-model analysis contains 6,179 trace-eligible jobs and 20,771 expected
+question trajectories. Exact precision/recall reconstruction supports 2,229
 question outputs from corrected Tier-3 Tasks 6, 7, 10, 18, and 23; outputs
-without sufficient retained detail remain unclassified. The data, source
-hashes, plot, and interpretation boundary are in
+without sufficient retained detail remain unclassified. The source hashes,
+tables, plot, and interpretation boundary are frozen under
 `paper_plots/gold/iclr2027/failure_analysis/`.
 
 ### 6. Iterate and finalize Figure 1
@@ -280,10 +302,10 @@ hashes, plot, and interpretation boundary are in
 - <span style="color: #1a7f37;">The story should also emphasize the structured data aspect of this task in scientific discovery, something that might be more relevant when we step away from domains like math. Perhaps we could come up with more examples, like time-series (cite our adaptive time-series work), data in biology, I don't know, but make it make sense more and show the impact and need for it through some other examples.</span> **✅ Completed**
 - The assessment has found the failures insightful, we should redo the failure analysis now that we have so many models and arms, either automatically, or having codex finding the root causes, writing code for it, and running it on the traces. Failure analysis is important.
 - 🟢 <span style="color: #1a7f37;">We should properly and briefly explain RAG is superseded by our baselines constructions. Essentially at any context length we put the ground-truths in, so it's already a ceiling for what a RAG (e.g. based on DRFP) could achieve. Because in 100, 500 out of 120k, we're putting the answer reaction along with the others. So we don't try RAG since we think it's subsumed.</span> **✅ Completed with oracle-recall wording**
-- <span style="color: #1a7f37;">The assessment talks about the highest value move being oracle-predicate. Do we have results for that? What do those results tell us? We should add those results and the prose to overleaf to the proper location.</span> **✅ Completed**
+- <span style="color: #1a7f37;">The assessment talks about the highest value move being oracle-predicate. Do we have results for that? What do those results tell us? We should add those results and the prose to overleaf to the proper location.</span> **✅ Implementation, parity, deterministic ceiling, model runs, figures, and analysis completed**
 - <span style="color: #1a7f37;">We should think about the presentation/framing as to what makes it a good benchmark, and show those qualities. I'm not sure what these qualities are, but I can think of:</span> **✅ Benchmark framing completed**
   - <span style="color: #1a7f37;">A benchmark should be able to separate models, otherwise, it's not a good benchmark</span> **✅ Completed**
-  - <span style="color: #9a6700;">It should show the existence of a gap (where we get from our human annotations)</span> **⏳ Human-evaluation consolidation remains pending**
+  - <span style="color: #1a7f37;">It should show the existence of a gap (where we get from our human annotations)</span> **✅ Three-export human baseline consolidated and reported with calibrated scope**
   - <span style="color: #1a7f37;">It'd be better if it's connected to real-world, and is actually useful for humans. So it'd be great if we could explain how some of the difficult questions of our benchmark are things that experimental chemists would benefit from if solved reliably.</span> **✅ Completed**
   - <span style="color: #1a7f37;">Any other suggestions are welcome!</span> **✅ Diagnosticity, construct validity, auditability, extensibility, and release design incorporated**
   - <span style="color: #1a7f37;">Lastly, this paper is not at all about the strength of RLMs or how they good they are, we don't care, we just adopted them as a recent attempt at very long-context task</span> **✅ Completed**
@@ -291,29 +313,29 @@ hashes, plot, and interpretation boundary are in
 - Then moving to weaknesses:
   - <span style="color: #1a7f37;">Has our experiment answered W1?</span> **✅ Key cardinality confound answered for GPT-5-mini Tier 1--3; scope stated**
   - <span style="color: #1a7f37;">W2 is an explanation I mentioned above</span> **✅ Oracle-recall/RAG explanation added**
-  - <span style="color: #1a7f37;">W3 is addressed</span> **✅ Four terminal RLM model arms summarized; two provisional arms excluded**
+  - <span style="color: #1a7f37;">W3 is addressed</span> **✅ Five terminal model arms summarized; unfinished GLM excluded from the paper comparison**
   - <span style="color: #1a7f37;">W4, do we need more clarification?</span> **✅ Replaced broad wording with operation-specific demands**
   - <span style="color: #1a7f37;">W5, is it too important? Do any of our claims rest on it? I don't think so.</span> **✅ Central claims do not rely on it; legacy-condition confound stated**
   - <span style="color: #1a7f37;">W6, we could point to it as a limitation, and mention it in the paper (always appreciated)</span> **✅ Added as a limitation**
   - W7 W8 W9: to be ignored for now, and delegated to later
   - <span style="color: #1a7f37;">W10: We should have plots of tool-call, tokens, latency, tool-time, all of it should enrich the appendix</span> **✅ Six-metric appendix figure added**
 - Then moving to experiments:
-  - <span style="color: #1a7f37;">A: Do we have it? Is it in the paper? If not, we should.</span> **✅ Completed: chemistry-rule control and deterministic ceiling are in the main results and appendix**
-  - <span style="color: #1a7f37;">B: We have it, does it answer the question? Is it embedded in the paper?</span> **✅ Completed: the GPT-5-mini two-factor control is central to the causal-controls result**
+  - <span style="color: #1a7f37;">A: Do we have it? Is it in the paper? If not, we should.</span> **✅ Chemistry-rule control, deterministic ceiling, figures, and interpretation are in the paper and appendix**
+  - <span style="color: #1a7f37;">B: We have it, does it answer the question? Is it embedded in the paper?</span> **✅ Completed for GPT-5 mini and Qwen; both terminal arms appear in the causal-controls result**
   - <span style="color: #1a7f37;">C: Explain why not (DRFP, etc.)</span> **✅ Completed with oracle-recall wording**
   - <span style="color: #1a7f37;">D: Do we have it?</span> **✅ Completed: 30/30 jobs, 90 trajectories, and the controlled result is in Methods and Results**
-  - E: I have it differently actually. We have human annotations for different chunks of the 100 questions, not their annotation for false positives.. **⏳ Not complete: one 20-question export is available locally; collaborator exports and expertise metadata still need consolidation**
-  - <span style="color: #1a7f37;">F: Do our results support that?</span> **✅ Completed: the capability ordering is reported across Qwen, Gemini, GPT-5 mini, and Claude**
+  - E: I have it differently actually. We have human annotations for different chunks of the 100 questions, not their annotation for false positives.. **✅ Completed: three stratified exports, 52 submissions, timing/tool-use/agreement analysis, and exact sample sizes are reported**
+  - <span style="color: #1a7f37;">F: Do our results support that?</span> **✅ Completed: the capability ordering is reported across Qwen, DeepSeek, Gemini, GPT-5 mini, and Claude**
 - <span style="color: #1a7f37;">What should we release as artifact of this benchmark? Just the set of questions? The answers? Should we hold out anything for not being contaminated? The codes to obtain the ground-truth? The interface to obtain more human annotations?</span> **✅ Release policy completed: publish the current benchmark in full and build a separate private extension for future contamination-resistant evaluation**
 
 ### Current focus
 
-**Next:** complete Queue Item 1, the evaluator and result-correction audit.
-Human-annotation preparation in Item 2 can proceed concurrently using the
-export already available. Freeze the visual palette before regenerating the
-complete plot suite in Items 3--4.
+**Next:** finish the author-facing manuscript/citation/visual audit and the
+public artifact. After submission, recover or rerun the 201 unresolved score
+rows and replace the explicit historical carry-forward values with exact
+v1.6.0 rescores.
 
-Updated September 24, 2026. This is the working document for turning the
+Updated September 26, 2026. This is the working document for turning the
 workshop paper into the ICLR submission. It should be updated whenever an
 analysis is accepted, a figure is frozen, or prose is pushed to Overleaf.
 
@@ -391,8 +413,9 @@ then choose after inspecting them at one-column and two-column size.
 
 ### Main benchmark figure
 
-Show all six models and the three interfaces, with finality and coverage made
-visible. The principal view should communicate:
+Show the five terminal paper models and the three interfaces. Keep unfinished
+GLM as a diagnostic outside the paper comparison. The principal view should
+communicate:
 
 - model separation;
 - degradation from 100 to 500 rows for prompt-bound interfaces;
@@ -404,7 +427,9 @@ Use the gold plotting records. Do not copy numbers from the dashboard by hand.
 
 ### Causal-controls figure
 
-This should be a central two-panel figure, not an appendix afterthought.
+The terminal matched-cardinality result should remain central rather than an
+appendix afterthought. The oracle-predicate control and deterministic ceiling
+are frozen in the appendix with their interpretation boundaries.
 
 **Panel A: matched cardinality.** At fixed positive cardinality `k=1`, plot
 question-weighted F1 against corpus size. At fixed corpus size `N=5,000`, plot
@@ -415,35 +440,27 @@ Current GPT-5-mini audit:
 
 | Control | Tier 2 F1 | Tier 3 F1 |
 | --- | ---: | ---: |
-| `N=100, k=1` | 0.970 | 0.671 |
-| `N=500, k=1` | 1.000 | 0.558 |
-| `N=5,000, k=1` | 0.990 | 0.337 |
-| `N=50,000, k=1` | 0.961 | 0.206 |
-| `N=full, k=1` | 0.980 | 0.212 |
-| `N=5,000, k=5` | 0.990 | 0.416 |
-| `N=5,000, k=20` | 0.981 | 0.525 |
+| `N=100, k=1` | 0.970 | 0.678 |
+| `N=500, k=1` | 1.000 | 0.574 |
+| `N=5,000, k=1` | 0.990 | 0.443 |
+| `N=50,000, k=1` | 0.961 | 0.323 |
+| `N=full, k=1` | 0.980 | 0.350 |
+| `N=5,000, k=5` | 0.990 | 0.505 |
+| `N=5,000, k=20` | 0.981 | 0.538 |
 
 This answers the primary W1 confound for GPT-5 mini: Tier-3 degradation
 persists while answer cardinality is fixed, whereas increasing cardinality at
-fixed scale does not cause the decline. The Qwen arm must not be presented as
-complete until its provider and scientific failures are audited.
+fixed scale does not cause the decline. The terminal Qwen arm independently
+reproduces this qualitative separation; its 52 terminal failures contribute
+zero.
 
-**Panel B: oracle predicates.** Plot ordinary RLM, oracle-predicate RLM, and the
-deterministic executor across corpus size, with task-level detail available in
-the appendix. Use question weighting across the 16 questions.
-
-Current full-corpus audit:
-
-| Model | Ordinary RLM | Oracle-predicate RLM | Deterministic executor |
-| --- | ---: | ---: | ---: |
-| Claude Haiku 4.5 | 0.307 | 0.572 | 1.000 |
-| Qwen 3.5 | 0.551 | 0.756 | 1.000 |
-
-The correct conclusion is not "the oracle solves everything." Supplying the
-label function produces a substantial full-corpus gain, especially on
-predicate-heavy Tier-3 tasks, but the remaining gap to deterministic execution
-shows that applying the rule exhaustively and preserving it through agent
-orchestration are separate capabilities.
+**Oracle-predicate panel.** The comparison is ordinary
+RLM, oracle-predicate RLM, and the deterministic executor across corpus size,
+with question weighting across the 16 questions. The deterministic executor is
+validated at 15/15 with perfect scores and zero model calls. The interpretation
+separates chemistry-rule induction from exhaustive
+execution and orchestration rather than claiming that an oracle "solves"
+everything.
 
 ### Prospective decomposition figure
 
@@ -478,17 +495,18 @@ it stopped early or produced no answer.
 ## Does the original strongest evidence still hold?
 
 Yes qualitatively, but the workshop wording must be weakened and generalized.
-Across the four currently terminal six-model arms (Qwen, Gemini, GPT-5 mini,
-and Claude), preliminary question-weighted full-corpus RLM means are:
+Across the five terminal paper models (Qwen, DeepSeek, Gemini, GPT-5 mini, and
+Claude), frozen question-weighted full-corpus RLM means over score-eligible
+questions are:
 
 | Task group | Across-model mean F1 | Model range |
 | --- | ---: | ---: |
-| Bond changes | 0.865 | 0.611--1.000 |
-| Stereochemistry | 0.888 | 0.660--1.000 |
-| Mechanisms | 0.360 | 0.207--0.563 |
-| Mechanical graph operations | 0.828 | 0.395--1.000 |
-| Chemically constrained graph operations | 0.577 | 0.293--0.840 |
-| Route and multi-constraint tasks | 0.061 | 0.020--0.131 |
+| Bond changes | 0.852 | 0.611--1.000 |
+| Stereochemistry | 0.827 | 0.586--0.998 |
+| Mechanisms | 0.344 | 0.207--0.571 |
+| Mechanical graph operations | 0.806 | 0.395--1.000 |
+| Chemically constrained graph operations | 0.564 | 0.293--0.933 |
+| Route and multi-constraint tasks | 0.099 | 0.020--0.357 |
 
 Thus the capability split reproduces across model families. It is no longer
 accurate to say that RLM is universally perfect on mechanical graph tasks:
@@ -555,15 +573,12 @@ criteria:
 9. **Resource transparency:** calls, tokens, tool time, latency, memory, cost,
    and failures can all be compared.
 
-Current human evidence is one local export containing 20 completed baseline
-questions from one annotator, not a false-positive plausibility study. Its
-first-submission macro-F1 is 0.148, with one abstention and substantial tool and
-offline time. This is promising evidence of a human--model/task gap, but it must
-not be generalized until all collaborator exports, expertise metadata, and
-question assignments are consolidated. Human evaluation E from the September 7
-assessment has therefore been changed: the paper will report the actual
-question-chunk baseline study, not claim that prospective false positives were
-human-validated.
+Current human evidence comprises three checksum-verified anonymous exports and
+52 first submissions spanning all tiers and task families. Of 51 non-abstained
+answers, macro-F1 is 0.842 and exact-set accuracy is 0.686. The paper reports
+the stratified question-chunk baseline, timing, tool use, and limited overlap
+for agreement; it does not call this a randomized human--model head-to-head or
+claim that prospective false positives were human-validated.
 
 ## Retrieval/RAG positioning
 
@@ -642,11 +657,11 @@ Sample successes as controls, not only failures.
 
 | Assessment item | Current disposition | Paper action |
 | --- | --- | --- |
-| W1 scale/cardinality confound | Key answer-count confound answered for GPT-5 mini Tier 1--3 | Central matched-cardinality panel and precise scope added |
+| W1 scale/cardinality confound | Key answer-count confound answered for GPT-5 mini and Qwen Tier 1--3 | Central matched-cardinality panel and precise scope added |
 | W2 missing RAG | Retrieval recall is intentionally elided, but RAG is not universally subsumed | Oracle-recall design and realistic-retriever caveat added |
-| W3 one model | Addressed by six-model matrix; two full-corpus arms remain provisional | Four terminal RLM arms summarized with model ranges |
+| W3 one model | Addressed by the five terminal paper models; unfinished GLM is outside the comparison | Five terminal RLM arms summarized with model ranges |
 | W4 broad "chemical reasoning" | Addressed in current prose | Operation-specific abstraction and orchestration terminology used |
-| W5 name-to-structure confound | Does not support the central paper claim; controlled study running | Legacy-condition confound stated; decomposition remains a validity analysis |
+| W5 name-to-structure confound | Does not support the central paper claim; controlled study complete | Legacy-condition confound stated; decomposition remains a validity analysis |
 | W6 non-exhaustive prospective ground truth | Unresolved and real | Limitation now distinguishes exact-route recovery from plausible-route validity |
 | W7 sparse families | Deferred | State scope; do not imply broad chemistry generalization |
 | W8 no negatives | Deferred | State scope and future extension |
@@ -657,12 +672,12 @@ Sample successes as controls, not only failures.
 
 | Experiment | Status | What it currently says |
 | --- | --- | --- |
-| A. Oracle predicate | 150/150 model jobs and 15/15 deterministic jobs complete | Predicate supply helps at full scale, but orchestration remains imperfect |
-| B. Matched cardinality | GPT 725/725 complete; Qwen excluded from this paper analysis | GPT causally separates corpus scale from answer cardinality |
+| A. Oracle predicate | 150/150 model jobs and 15/15 deterministic jobs complete; model-score analysis deferred | Deterministic predicate parity is established; model conclusions wait for the corrected-task audit |
+| B. Matched cardinality | GPT and Qwen each have 725/725 terminal jobs | The scale/cardinality separation replicates across a closed and open model on score-eligible tasks |
 | C. Retrieval and map-reduce | Not run; map-and-union deliberately shelved | Explain oracle-recall setting and narrow claims about recursion |
 | D. Prospective decomposition | 30/30 jobs complete; 90 trajectories | Final-step information helps, while structure alone does not; route recovery remains difficult |
-| E. Human validation | One 20-question baseline export is local; consolidation pending | Report only after exports, expertise, and assignments are verified |
-| F. Multi-model replication | Complete for the four-model full-corpus comparison | Capability split reproduces, with important model heterogeneity |
+| E. Human validation | Three exports, 52 submissions, and the frozen analysis are complete | Report the stratified baseline with exact coverage, timing, tool use, and limited-overlap caveats |
+| F. Multi-model replication | Complete for the five-model full-corpus comparison | Capability split reproduces, with important model heterogeneity |
 
 ## Artifact release plan
 
@@ -710,31 +725,31 @@ exposure.
 Each numbered item ends only after four deliverables exist: checked analysis,
 publication-quality plot/table, manuscript prose, and a compiled Overleaf push.
 
-1. **Freeze the claim/evidence table.** Record every headline claim, exact
+1. **Completed: freeze the claim/evidence table.** Record every headline claim, exact
    supporting experiment, finality, aggregation rule, and permitted wording.
 2. **Design Figure 1.** Produce schematic-only and llama-plus-schematic drafts;
    inspect at paper size and choose one.
-3. **Rewrite the six-model benchmark section.** Replace the GPT-only results
-   text and old figures with the gold multi-model analysis.
-4. **Completed: causal-controls figure and section.** Matched cardinality and
-   executable chemistry-rule controls directly answer W1 and separate
-   chemistry-rule inference from execution.
+3. **Completed: rewrite the benchmark section.** Replace the GPT-only results
+   text and old figures with the frozen five-model analysis; keep incomplete
+   GLM outside the paper comparison.
+4. **Completed: causal-controls figure and section.** Matched cardinality is
+   complete for GPT and Qwen; chemistry-rule controls and the deterministic
+   ceiling are frozen with explicit scope.
 5. **Completed: prospective decomposition.** The three information conditions
    are analyzed over 90 trajectories and reported in Methods and Results.
-6. **Consolidate human annotations.** Import all collaborator exports, verify
+6. **Completed: consolidate human annotations.** Import all collaborator exports, verify
    expertise and assignments, run the existing analysis, and report the actual
    study design.
-7. **Completed: multi-model failure analysis.** The corrected five-model
-   population separates execution failures from scientific outcomes; the
-   reconstructable trace cohort quantifies observable set-error signatures,
-   and directly inspected traces provide chemistry-specific examples.
+7. **Completed: multi-model scientific failure analysis.** The trace machinery,
+   execution-failure taxonomy, quantitative set-error signatures, and
+   trace-supported examples are frozen for all five paper models.
 8. **Completed: efficiency appendix.** Calls, tokens, latency, tool time, wall
    time, memory, cost, accounting coverage, and early-failure caveats are
    reported.
-9. **Rewrite framing and related work.** Structured scientific data, benchmark
+9. **Completed: rewrite framing and related work.** Structured scientific data, benchmark
    qualities, RAG/oracle-recall positioning, time-series and other scientific
    examples, and an explicit statement that this is not an RLM paper.
-10. **Rewrite methods and limitations.** Operation-specific terminology,
+10. **Completed: rewrite methods and limitations.** Operation-specific terminology,
     provider/model settings, resource limits, scoring of failures, W5/W6, and
     deferred W7--W9 extensions.
 11. **Prepare the release.** Public benchmark package, reproducibility commands,
@@ -745,7 +760,7 @@ publication-quality plot/table, manuscript prose, and a compiled Overleaf push.
 
 ## Immediate next step
 
-Start with the claim/evidence table and causal-controls plot specification,
-because they determine the title, abstract, Figure 1 labels, introduction, and
-results order. In parallel, Figure 1 can be sketched and failure traces can be
-indexed without waiting for the remaining Docker jobs.
+Finish the manual manuscript/citation/visual audit and public artifact. Keep
+the 201-row post-submission corrected-score queue frozen and separate; replace
+the carried values only with exact v1.6.0 rescores and then regenerate the
+submission manifest.
