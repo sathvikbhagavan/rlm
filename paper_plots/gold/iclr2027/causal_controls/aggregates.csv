@@ -24,9 +24,9 @@ oracle_predicate,Claude Haiku 4.5,ordinary,ordinary,500,,0.3996462367216399,0.04
 oracle_predicate,Claude Haiku 4.5,predicate,predicate,500,,0.425,0.12022115038544591,5,80,80,1.0
 oracle_predicate,Claude Haiku 4.5,ordinary,ordinary,full,,0.279389064229299,0.07609631151173567,5,44,80,0.55
 oracle_predicate,Claude Haiku 4.5,predicate,predicate,full,,0.5630959280436638,0.07108624442751875,5,78,80,0.975
-oracle_predicate,Qwen 3.5,ordinary,ordinary,100,,0.8333333333333334,0.11785113019775793,5,30,80,0.375
+oracle_predicate,Qwen 3.5,ordinary,ordinary,100,,0.8022930541680541,0.06828638505612472,5,80,80,1.0
 oracle_predicate,Qwen 3.5,predicate,predicate,100,,0.6791666666666667,0.12893123705638168,5,80,80,1.0
-oracle_predicate,Qwen 3.5,ordinary,ordinary,500,,0.8355555555555556,0.1428112801160856,5,30,80,0.375
+oracle_predicate,Qwen 3.5,ordinary,ordinary,500,,0.7708801715849509,0.05344113411877508,5,80,80,1.0
 oracle_predicate,Qwen 3.5,predicate,predicate,500,,0.73,0.13422229695546117,5,80,80,1.0
-oracle_predicate,Qwen 3.5,ordinary,ordinary,full,,0.6464511966876189,0.1746193312526203,5,30,80,0.375
+oracle_predicate,Qwen 3.5,ordinary,ordinary,full,,0.6116159333452788,0.19345490656110775,5,44,80,0.55
 oracle_predicate,Qwen 3.5,predicate,predicate,full,,0.7324908587024848,0.10390942568363788,5,79,80,0.9875

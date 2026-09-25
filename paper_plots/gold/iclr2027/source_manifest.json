@@ -1,5 +1,5 @@
 {
-  "as_of": "2026-09-25T16:46:06.166345+00:00",
+  "as_of": "2026-09-25T17:32:17.702515+00:00",
   "campaigns": {
     "iclr2027-six-model-full-v34": {
       "counts": {
@@ -23,38 +23,38 @@
     }
   },
   "corrected_score_recoveries": {
-    "applied": 650,
-    "available": 931,
+    "applied": 1030,
+    "available": 1311,
     "path": "paper_plots/gold/corrected_score_recoveries.json",
     "recovery_id": "rxnhaystack-corrected-score-recovery-2026-09-25-v1",
-    "sha256": "c0fa4443ef2fed5e90d4068840fe62c9d0c4f3986326b52add2b8bc7642ac974"
+    "sha256": "95e71978b945628383971905be3ac66f40847fba31b3a66bcf87f2f088a1a1cf"
   },
-  "generated_at": "2026-09-25T17:03:51.767498+00:00",
+  "generated_at": "2026-09-25T17:42:18.998693+00:00",
   "gold_files": [
     {
       "bytes": 4948,
       "path": "README.md",
-      "sha256": "5f43992a9b5ace383ea94287ca462ac756a6288902c9b942c26bc1ba099b096e"
+      "sha256": "358636858c0b8f5544c2053218ec0ff988f8db4cc2051cf52aa58c1075b92e4f"
     },
     {
-      "bytes": 2721,
+      "bytes": 2717,
       "path": "arm_status.csv",
-      "sha256": "7e68584810dab83d4b7d4626a21a20632b319adc53dea7cbef535a2451aaa4ac"
+      "sha256": "d733767befef670a874a0eb3271478ad841263b073053d714f2ee26a4d3759ba"
     },
     {
-      "bytes": 254913,
+      "bytes": 259834,
       "path": "codeact_x1000_records.csv",
-      "sha256": "b08e735f96a8c9a97137f9eb846f1e49f16ea43c7b89a1ae7698b534e08d4d6b"
+      "sha256": "4c81d46fe95e010627ab7fe48fbc37d02082ae29ef668e83e53b696dee2d5be9"
     },
     {
-      "bytes": 2836843,
+      "bytes": 2867497,
       "path": "final_arm_records.csv",
-      "sha256": "211bde7635e0ad9bd392347bd39e49f7c0bb4386f5b54533a786ad79657bc852"
+      "sha256": "a3705b005deaf2e38867ef9c1af77da619cc431ca0c779c5cd49d7eb020db5ce"
     },
     {
-      "bytes": 2691233,
+      "bytes": 2716966,
       "path": "full_benchmark_records.csv",
-      "sha256": "6aa5f34157aa4e5f4c7abb33beb6191255cf2c3649cf639568eea0c976530020"
+      "sha256": "8cecac447bbafa9ec55bb3dc1a21cf53c7f1950eea477bc14c006c9d1e391ffd"
     },
     {
       "bytes": 243898,
@@ -77,14 +77,14 @@
       "sha256": "f56ea578606e90e0038772096eefbc9cd93c7f7ff183199cf0889b0df67c42c3"
     },
     {
-      "bytes": 35126,
+      "bytes": 34555,
       "path": "tier_scaling.csv",
-      "sha256": "d4ed3d5b21a25e816f3c0b3ce845918319e7284350248f6fae111d8b19e057f1"
+      "sha256": "e038acef75cafeac0096c5b2973c4c0454244d38728d36b1b8f2c0e9b3d8689b"
     },
     {
-      "bytes": 5748,
+      "bytes": 5752,
       "path": "tier_scaling_across_models.csv",
-      "sha256": "a558c2827e73001f6e4b97240c5e15755894e66cfc3179b684a8b33c1edb913c"
+      "sha256": "0c81cde2493484a5b178840b7e66155fea2c36205edb0062521df1863c2e2b02"
     }
   ],
   "ground_truth_corrections": {
@@ -101,7 +101,7 @@
     "path": "paper_plots/gold/ground_truth_corrections.json",
     "sha256": "0eb1ce1f4501299110fffbaf4f78c66bde440f0bb412be1121a337014d27c480"
   },
-  "repository_commit": "01218c371f03f8dc3c3a3c948d9e2d2cbe927801",
+  "repository_commit": "b568e24cbd3c509bc9ffc1b75462f1e130d43961",
   "result_packs": [
     {
       "bytes": 44843,
@@ -376,108 +376,108 @@
       "source_id": "jed-full-v34-f157c291"
     },
     {
-      "generated_at": "2026-09-25T16:19:25.933166+00:00",
+      "generated_at": "2026-09-25T17:06:30.982947+00:00",
       "path": "/home/amin/rlm_dashboard/artifacts/control-room/shared/jed-gemini-rlm-x1000-s01.json",
-      "sha256": "e6b464239e6f598c94b5f6a5589525bafd3d8c33e52a1175e55c741623ee55dc",
-      "snapshot_id": "73d5ebe7eb2bcc646391606eaa0dd28f4cc8a5df394460a4e2b039a058362284",
+      "sha256": "4adab3f9ec3eac555b448433ab97faca084e76a07836214afc035e0e5458babd",
+      "snapshot_id": "d527bd208bf107cbf04c3ef18088285558d95a2f3ce4af8fca7311bb22fce508",
       "source_id": "jed-gemini-rlm-x1000-s01"
     },
     {
-      "generated_at": "2026-09-25T16:19:44.014451+00:00",
+      "generated_at": "2026-09-25T17:24:58.470177+00:00",
       "path": "/home/amin/rlm_dashboard/artifacts/control-room/shared/jed-gemini-rlm-x1000-s02.json",
-      "sha256": "529ac1966277b046213ca72c886deb9e89ca434e04813e8db2234fd3af0cd664",
-      "snapshot_id": "96ef9221b38db059a97dbb5bcb16f326a48652a89048e642904e945e41fa3345",
+      "sha256": "ca8095fcfc82fccd39fbc6b9014eb5bf60ed024ed30f86867f317a5f02b858b7",
+      "snapshot_id": "8ccf2ec88ad5ad98cd2ec5d7139ac8d7a9424ba1af58d9c33768eb72ae1d27c2",
       "source_id": "jed-gemini-rlm-x1000-s02"
     },
     {
-      "generated_at": "2026-09-25T16:19:51.366523+00:00",
+      "generated_at": "2026-09-25T17:25:07.123308+00:00",
       "path": "/home/amin/rlm_dashboard/artifacts/control-room/shared/jed-gemini-rlm-x1000-s03.json",
-      "sha256": "9e4e61a5fb35185206b62658f9975e3d201c51227d870faabd31e50a3f604dad",
-      "snapshot_id": "de2ee4fab59155a7430e044b3514be35a70066dbd7103eb0e05d4b94722a378f",
+      "sha256": "0eb8dee9f2644163bfe2fbef85623c1fe0bb72509bf1b5f926d34d941516b9b1",
+      "snapshot_id": "b9c507032ca8d12107c2d144ad7fa8b882dd5083f097b992077855dac2108c81",
       "source_id": "jed-gemini-rlm-x1000-s03"
     },
     {
-      "generated_at": "2026-09-25T16:19:59.403869+00:00",
+      "generated_at": "2026-09-25T17:25:15.012205+00:00",
       "path": "/home/amin/rlm_dashboard/artifacts/control-room/shared/jed-gemini-rlm-x1000-s04.json",
-      "sha256": "d8c3c2b3f968090ca1788cb742f4a5946c7e3c0918d5b6dc9e5a78f6d7c13b17",
-      "snapshot_id": "e7d3864cfbce2c7bdc83db9d53e4a59cb16ec33f3a2f843b9220eb890fb11471",
+      "sha256": "2d40ad3c7d805a626fa5fb1a4df27a903c7c0245287607a17879d980deefdcb9",
+      "snapshot_id": "d3ef88ca27ceb485c983d6bca806e3f74387eecb04fabffd9bb17104bdc2d23e",
       "source_id": "jed-gemini-rlm-x1000-s04"
     },
     {
-      "generated_at": "2026-09-25T16:38:53.096648+00:00",
+      "generated_at": "2026-09-25T17:25:22.963364+00:00",
       "path": "/home/amin/rlm_dashboard/artifacts/control-room/shared/jed-gemini-rlm-x1000-s05.json",
-      "sha256": "6e16780410e02a5157692a280e9606bb11d6a80cfa972a02fc02a76aae8bfb53",
-      "snapshot_id": "c84814c89f3562f36f5efeca4281c6aad386dcb0b5076b12f572cf4f15e2a622",
+      "sha256": "fc6bf2f298e717758240c5812aabd0f3f03ceb8d4781e41dcaff3f0d859f120b",
+      "snapshot_id": "26f06b7c2aff00fcce851d954ce9dfe39eaca23ae427cb238b85f7fa7f4ae6d1",
       "source_id": "jed-gemini-rlm-x1000-s05"
     },
     {
-      "generated_at": "2026-09-25T16:39:02.116995+00:00",
+      "generated_at": "2026-09-25T17:25:31.173223+00:00",
       "path": "/home/amin/rlm_dashboard/artifacts/control-room/shared/jed-gemini-rlm-x1000-s06.json",
-      "sha256": "512c5cfcba0738c15041babd28cca00e3b30fdf548fbe3b6880b8e1daf8584de",
-      "snapshot_id": "57ef3681ed7cd2dd4f4f41fac93541365e2b2b987115014ea5cfbeed6451888e",
+      "sha256": "f3d1f673c91504062ebc759ac9c1e5903925642e1af8a91dbc195f7cedaeebb1",
+      "snapshot_id": "0d10403a48e712394617a6e21771f2be9b4ccaba73304b0da16ee6775d63e38f",
       "source_id": "jed-gemini-rlm-x1000-s06"
     },
     {
-      "generated_at": "2026-09-25T16:39:10.740373+00:00",
+      "generated_at": "2026-09-25T17:25:41.598070+00:00",
       "path": "/home/amin/rlm_dashboard/artifacts/control-room/shared/jed-gemini-rlm-x1000-s07.json",
-      "sha256": "7c3234215a282d151312e24e1cd7203d28773cd4e91357e86f87cac356a81e34",
-      "snapshot_id": "36bb7529e6992733eadff4e648e3ca09b0672e025c840c72cd14ac0d5e307454",
+      "sha256": "dc8df41320afc268b38831e0ce6761b504c99cb7bc6625f744e155aae2204cb5",
+      "snapshot_id": "cda46f6e753d1cf04c6e8d1b237342997a89db78c92da9c63b489da9119efe65",
       "source_id": "jed-gemini-rlm-x1000-s07"
     },
     {
-      "generated_at": "2026-09-25T16:39:18.810303+00:00",
+      "generated_at": "2026-09-25T17:25:49.647280+00:00",
       "path": "/home/amin/rlm_dashboard/artifacts/control-room/shared/jed-gemini-rlm-x1000-s08.json",
-      "sha256": "52e66283e17f287d12e9538c1849c408c7f79da2bb843d85e8c58abbd572e1af",
-      "snapshot_id": "76e7da9b6d95f5b87e7ba30a1a21e827e0b2a3ad908fcc71283cf952da432f42",
+      "sha256": "d086789c574ec5c30211891b4b1f6e8e9bf1f2a00d48671b6f3d0aaea3989c3e",
+      "snapshot_id": "59384de4b30210c162eee4f6a2697b63e561428e2f1ec5c9587cd3b8731e69bd",
       "source_id": "jed-gemini-rlm-x1000-s08"
     },
     {
-      "generated_at": "2026-09-25T16:39:27.739071+00:00",
+      "generated_at": "2026-09-25T17:25:58.614751+00:00",
       "path": "/home/amin/rlm_dashboard/artifacts/control-room/shared/jed-gemini-rlm-x1000-s09.json",
-      "sha256": "79663315cd11166ce3dfb6ae24072c9866feac401ce6066233144521a05d19dd",
-      "snapshot_id": "22c46ee8f8694884923cfb9f431edd4335e174d2fd1f1cbaa09e7efe11f3afba",
+      "sha256": "295a2518b1b4f390b3a8d06daa6bfc1d6c69e7e908be0807948c7a4162805718",
+      "snapshot_id": "23b1d15e28d4d72d837c7c1871c7b61f577e487b85a2aac9442f35957ca9fd92",
       "source_id": "jed-gemini-rlm-x1000-s09"
     },
     {
-      "generated_at": "2026-09-25T16:39:37.374189+00:00",
+      "generated_at": "2026-09-25T17:26:09.890179+00:00",
       "path": "/home/amin/rlm_dashboard/artifacts/control-room/shared/jed-gemini-rlm-x1000-s10.json",
-      "sha256": "f38e3086117f4ff93258072d354c65a4ecdd5901e547e768a3419c2a652ab481",
-      "snapshot_id": "e49a1fba9f75fda886edaad069bdea16fbfb976e3cff4e7b98ff5410e76c9882",
+      "sha256": "ada0a6d4b37bc06dde4824cfca388709d534c03702b59f31da9adce29d25460d",
+      "snapshot_id": "6523189a0125259723b18c70f9fce768df0e6618992c663367dddf88fda2b4c7",
       "source_id": "jed-gemini-rlm-x1000-s10"
     },
     {
-      "generated_at": "2026-09-25T16:39:45.079156+00:00",
+      "generated_at": "2026-09-25T17:26:18.377061+00:00",
       "path": "/home/amin/rlm_dashboard/artifacts/control-room/shared/jed-gemini-rlm-x1000-s11.json",
-      "sha256": "1a6997eccc3be89c687303767c97e526d9998188da92ee653f4f1be912378152",
-      "snapshot_id": "2deee532a3601142aa8af3dcfa3e036f9b1f206994cc2a196d3c535a27b8130c",
+      "sha256": "8f3b9688e4a2c65ed9bb1be4f7e741840e1f1e3bfeca50fcc34cacc413c6fee8",
+      "snapshot_id": "06e4494d7c6a16737b374c268d11ee841b7091b71b5905c656f0829ebac72c9b",
       "source_id": "jed-gemini-rlm-x1000-s11"
     },
     {
-      "generated_at": "2026-09-25T16:39:53.384971+00:00",
+      "generated_at": "2026-09-25T17:26:26.247511+00:00",
       "path": "/home/amin/rlm_dashboard/artifacts/control-room/shared/jed-gemini-rlm-x1000-s12.json",
-      "sha256": "ce11866318dfc8a2fd37eeaba2ffcd43c088a7430f12a3aaddb385c452e53f1a",
-      "snapshot_id": "2aeb83480a87ca2ca1e512a383fa40de2f6a87e0d8127c1d1ae511b9e605194c",
+      "sha256": "3e6ad98ead64022345704b7ddf2a68f45593229a9e4d5885d958e74bf9666eee",
+      "snapshot_id": "92c39f87f9323ff486fabc3664e57278065ada71885da366408404e78c99426d",
       "source_id": "jed-gemini-rlm-x1000-s12"
     },
     {
-      "generated_at": "2026-09-25T16:40:01.703046+00:00",
+      "generated_at": "2026-09-25T17:26:34.665799+00:00",
       "path": "/home/amin/rlm_dashboard/artifacts/control-room/shared/jed-gemini-rlm-x1000-s13.json",
-      "sha256": "ad8287b24ab93ad513d1977431feef6b995001faa68f05456f27500fb99e333b",
-      "snapshot_id": "c87fb3fcf338f046cd085d88c7e43dd7b351b2034739003394f79999fa57eb79",
+      "sha256": "b9e9e5367f1ef6d2fd5791025e1c9cb7a8a3865a75bf51fa3b477f849781b5c6",
+      "snapshot_id": "47df8106b3e3dd6782d41c0661b9f0f1b2bd9df7ba3a61d532c03d8e79f0d50b",
       "source_id": "jed-gemini-rlm-x1000-s13"
     },
     {
-      "generated_at": "2026-09-25T16:40:13.781310+00:00",
+      "generated_at": "2026-09-25T17:26:42.819405+00:00",
       "path": "/home/amin/rlm_dashboard/artifacts/control-room/shared/jed-gemini-rlm-x1000-s14.json",
-      "sha256": "2e59783e69bceebb8e35a306beda7ffbf7733f0d268df0d613932cbc63cf4468",
-      "snapshot_id": "3ef99a7352a19425f002a051900fa17d95bef8e27f4392f875ece501bbcc6e19",
+      "sha256": "a7a4a9f94571fa9bfbb665aacc6252ed09ee35dbbca813968de22b7376976199",
+      "snapshot_id": "ed47ea7b79e962ef793183acac2d92ad1e23f501666c406b2953a2b2c659544c",
       "source_id": "jed-gemini-rlm-x1000-s14"
     },
     {
-      "generated_at": "2026-09-25T16:40:22.386118+00:00",
+      "generated_at": "2026-09-25T17:26:50.897958+00:00",
       "path": "/home/amin/rlm_dashboard/artifacts/control-room/shared/jed-gemini-rlm-x1000-s15.json",
-      "sha256": "298dfa85a13719a3ebbb12fcbcd453420c51ead1b59f4ff1c5bcd52747229526",
-      "snapshot_id": "776f028b62e99ac5337f4cc8a2a31c68c3b8a95ca3fdf92a9f99b07bb5254e4c",
+      "sha256": "3e1817ace36c37b7aeaa970fe4e7e20df337db00a43ccae08e22bc1a381ce34a",
+      "snapshot_id": "4114c881006d453ca861ad205c808ed89f280900ec546fb6e65a643ecc923765",
       "source_id": "jed-gemini-rlm-x1000-s15"
     },
     {
@@ -488,325 +488,325 @@
       "source_id": "jed-glm-codeact-v34"
     },
     {
-      "generated_at": "2026-09-25T16:35:25.397087+00:00",
+      "generated_at": "2026-09-25T17:05:40.894748+00:00",
       "path": "/home/amin/rlm_dashboard/artifacts/control-room/shared/jed-glm-rlm-v34.json",
-      "sha256": "cfd80d7bf940a09dc5c42cb6e25e08b6b3be97475c1d4be3fa2fb440e2333051",
-      "snapshot_id": "2b8b6a16bcb8146c936c144c61a1a740169556cfc1065da2969181d6ebcc8b99",
+      "sha256": "bf62808e7988450dab6af0bb67ee42b7b528dd5b3b38e22b2d7338c318438969",
+      "snapshot_id": "31303ddb3e107a4df4518386caa4a9308c8614c4cb2d08f8cf4da11169ed0f2a",
       "source_id": "jed-glm-rlm-v34"
     },
     {
-      "generated_at": "2026-09-25T16:18:27.150183+00:00",
+      "generated_at": "2026-09-25T17:05:20.407496+00:00",
       "path": "/home/amin/rlm_dashboard/artifacts/control-room/shared/jed-gpt5mini-codeact-x1000-s01.json",
-      "sha256": "7f3275be1f9172829616f8c10261bcc49e71ea60d7b24deb162dc9ade524929a",
-      "snapshot_id": "915115c35377116c958288d957d4bb60f63acef22f6997abcaca575a3d0c1d0f",
+      "sha256": "40e179fdb6cbed252554a586fce14adb25b1f1f3de38e949d07145aff372ed62",
+      "snapshot_id": "1b18782c05f65403443e35a8d45cd86fd2907581ae43947d0f588846f67953d6",
       "source_id": "jed-gpt5mini-codeact-x1000-s01"
     },
     {
-      "generated_at": "2026-09-25T16:18:47.448103+00:00",
+      "generated_at": "2026-09-25T17:05:28.163407+00:00",
       "path": "/home/amin/rlm_dashboard/artifacts/control-room/shared/jed-gpt5mini-codeact-x1000-s02.json",
-      "sha256": "8d504803aba729a3b40c3f5277bcf497f2e49d942ed1ebae2b33e15821d3424d",
-      "snapshot_id": "36ba8c0d76f698ab948ac5206c143f58bfb24e0477be41484953eb2990b9f5a2",
+      "sha256": "f2ccf01d82970c36c0f10afbefe2e3a3cbc055e012e8157f83f6bf5fbc83ddc6",
+      "snapshot_id": "564d66aa11a2a058fa127d298ff0958ee5186e1fad2c828419433d8f159c080f",
       "source_id": "jed-gpt5mini-codeact-x1000-s02"
     },
     {
-      "generated_at": "2026-09-25T16:18:55.619464+00:00",
+      "generated_at": "2026-09-25T17:05:38.054438+00:00",
       "path": "/home/amin/rlm_dashboard/artifacts/control-room/shared/jed-gpt5mini-codeact-x1000-s03.json",
-      "sha256": "b1c73d84af4d147f0df94f7c93a3ead8accd5c819c8c777122d19e09d9792f1a",
-      "snapshot_id": "fdf2dca4169051b4e9ab0abd7f0c20b7e6f19514dbf1421dbfb5063fedb35cf5",
+      "sha256": "68622285268b99528c7c1d11376ba55621e7cd37bc37907be48892cba61a32af",
+      "snapshot_id": "e77a1f18a00a00e5d6768120ca5d4653fc45a8edc830f4781d5791feba02f144",
       "source_id": "jed-gpt5mini-codeact-x1000-s03"
     },
     {
-      "generated_at": "2026-09-25T16:19:03.329067+00:00",
+      "generated_at": "2026-09-25T17:05:47.567267+00:00",
       "path": "/home/amin/rlm_dashboard/artifacts/control-room/shared/jed-gpt5mini-codeact-x1000-s04.json",
-      "sha256": "3dcb65ce60170ffc1cf1216ad60b6b11ae4cf2b7af25d37952c714cb2c00bde2",
-      "snapshot_id": "480398553131a33f769108ec5eb036038a4ecf283dfc86f2626fe310c557478e",
+      "sha256": "a87f8ccaabf44ae9b0df1be965816feafa05719d309cc5811b9ee757616f8bd5",
+      "snapshot_id": "265849b0e0b2fa3699fada925581c946e4a329e7aaf3d1018375095692453061",
       "source_id": "jed-gpt5mini-codeact-x1000-s04"
     },
     {
-      "generated_at": "2026-09-25T16:19:11.153319+00:00",
+      "generated_at": "2026-09-25T17:05:55.188895+00:00",
       "path": "/home/amin/rlm_dashboard/artifacts/control-room/shared/jed-gpt5mini-codeact-x1000-s05.json",
-      "sha256": "89f07b4c1fd47b927c53dbbf88e0df7ff4912f39f9d4021e949321a8a9ece760",
-      "snapshot_id": "dd94cd7697a59c83d2e6aac6b4cd7e0dfcfe3eb85c5d85ee1fa6ae1eda51d858",
+      "sha256": "72d34a94528fb439a614341e366e2574bb064872074f24f763825b0c1d30243e",
+      "snapshot_id": "ee7373d9ba0789faef183238ca2a1d32d1c6b3370c699ef04b7c44894776e18d",
       "source_id": "jed-gpt5mini-codeact-x1000-s05"
     },
     {
-      "generated_at": "2026-09-25T16:19:18.690404+00:00",
+      "generated_at": "2026-09-25T17:06:02.219479+00:00",
       "path": "/home/amin/rlm_dashboard/artifacts/control-room/shared/jed-gpt5mini-codeact-x1000-s06.json",
-      "sha256": "2894cb34074879b188d5f769e741cfbd483643fcb7cf3ad673526fc5f853caed",
-      "snapshot_id": "80b4e7855bd88bf054d980b0639e049896af1478d7e00a401c57d5500b78a793",
+      "sha256": "201ccd03ca15ba61c8326ba90d0ce9354c15eecf047e033e64978ed318038d33",
+      "snapshot_id": "a299adc29b598493b38f0ef5285d427cf49175f7a342ca930858642a177fef93",
       "source_id": "jed-gpt5mini-codeact-x1000-s06"
     },
     {
-      "generated_at": "2026-09-25T16:19:25.811503+00:00",
+      "generated_at": "2026-09-25T17:06:09.351728+00:00",
       "path": "/home/amin/rlm_dashboard/artifacts/control-room/shared/jed-gpt5mini-codeact-x1000-s07.json",
-      "sha256": "d3ad18bac8fa415e367a72101e8bec0f7cf1fe267191f27df0c758546a1cd386",
-      "snapshot_id": "e9295d22fe2850463add8b708b1f89a054d1216b085bd0bcb59a2d8dafef912f",
+      "sha256": "1677e195e36d0aba4dbcb931b83947618cccaffef1453df3344660859b8fd6e6",
+      "snapshot_id": "1b95a78e725f9bee85470bd2a78d0701c96373bdf5b4b43e46ade5be6040b463",
       "source_id": "jed-gpt5mini-codeact-x1000-s07"
     },
     {
-      "generated_at": "2026-09-25T16:19:33.702007+00:00",
+      "generated_at": "2026-09-25T17:06:17.173416+00:00",
       "path": "/home/amin/rlm_dashboard/artifacts/control-room/shared/jed-gpt5mini-codeact-x1000-s08.json",
-      "sha256": "40613026afd546e57f0d61e03adfd692921864354622906de60277a99f429885",
-      "snapshot_id": "c6ec1361175e65dfc6319cc84b37bb944b4e6c21551e4b60c036db7c64a1fe47",
+      "sha256": "ff9822bac13f9d909542a064e5fed25582d9d2b6085725acdddf4c89d29cac05",
+      "snapshot_id": "b6361fa63bdef2fcceebb45c26b127f764f7ded09e8025a7e5e03c23f963027f",
       "source_id": "jed-gpt5mini-codeact-x1000-s08"
     },
     {
-      "generated_at": "2026-09-25T16:19:45.797952+00:00",
+      "generated_at": "2026-09-25T17:06:24.864076+00:00",
       "path": "/home/amin/rlm_dashboard/artifacts/control-room/shared/jed-gpt5mini-codeact-x1000-s09.json",
-      "sha256": "901c357712de660444413d504277b1f9ad18b0125ae9cbb783e2a05209be0b9d",
-      "snapshot_id": "1a0b303be54113bc231a2866aa2bbbe39755715efda85fd0d216277e70009fb5",
+      "sha256": "e236dd7f05c9576c088ef5471eb574a85cea95de15ed5095e3508e51b49a27be",
+      "snapshot_id": "7334138634c79d7eb7e9d5a9263bd7aa0964e32d379989ec74ece3bd9332635b",
       "source_id": "jed-gpt5mini-codeact-x1000-s09"
     },
     {
-      "generated_at": "2026-09-25T16:19:52.953446+00:00",
+      "generated_at": "2026-09-25T17:06:32.927544+00:00",
       "path": "/home/amin/rlm_dashboard/artifacts/control-room/shared/jed-gpt5mini-codeact-x1000-s10.json",
-      "sha256": "b6bdc9f160603911a26175a99b5b6ad6f2b1e607be2b06638f144338f1344a5e",
-      "snapshot_id": "60e0d66659e692409402982eaf07b7ec39c86245f5576cffb9ea7b426a353792",
+      "sha256": "a7329780feb54074f0b21990f72947f5bf7b3ed57a929f6cd1427f8e4b6162b6",
+      "snapshot_id": "14d8341aab30fd3326ccce14c16171f551e4a13c8455ceec21d6abb0bdb7afe6",
       "source_id": "jed-gpt5mini-codeact-x1000-s10"
     },
     {
-      "generated_at": "2026-09-25T16:38:47.915172+00:00",
+      "generated_at": "2026-09-25T17:06:41.849015+00:00",
       "path": "/home/amin/rlm_dashboard/artifacts/control-room/shared/jed-gpt5mini-codeact-x1000-s11.json",
-      "sha256": "e8af7674766e3678ced28587cad89203b69012fd6c9a853a2890128caf92c8ca",
-      "snapshot_id": "3e2add8fe68f02befe15950b9e0df3ddf5e475e19e2b4f70258f4970b6146850",
+      "sha256": "d0b61b9a31976fc1350f57e54a623c3a099de448b4ff931537ddfdc11268a7bc",
+      "snapshot_id": "af14422b9f5f14a9beed669f0d7ce93f222793f93ac64ad1ce03609e58ed9390",
       "source_id": "jed-gpt5mini-codeact-x1000-s11"
     },
     {
-      "generated_at": "2026-09-25T16:38:55.468656+00:00",
+      "generated_at": "2026-09-25T17:25:01.473273+00:00",
       "path": "/home/amin/rlm_dashboard/artifacts/control-room/shared/jed-gpt5mini-codeact-x1000-s12.json",
-      "sha256": "abe4218f621697b3363d9edbe34ae48f7d371a685da6bf7108ee79a5cb909e9e",
-      "snapshot_id": "9c4e33327095600cabf588ed5a0e7f266672f9e42d23fe191838c63824ca8527",
+      "sha256": "e33d2ff68e65ac9df60b58e763ede26aeb7c949775b5845caaaae8d84ba8430b",
+      "snapshot_id": "3bb645fbd75147382cbea643328d356d049370f88d17bb2f0ea4bb6107960bb4",
       "source_id": "jed-gpt5mini-codeact-x1000-s12"
     },
     {
-      "generated_at": "2026-09-25T16:39:03.448681+00:00",
+      "generated_at": "2026-09-25T17:25:12.268310+00:00",
       "path": "/home/amin/rlm_dashboard/artifacts/control-room/shared/jed-gpt5mini-codeact-x1000-s13.json",
-      "sha256": "6b6c2740cb36bea9e44efe48fe975923caa5303ad14c5c69a3944237509e0082",
-      "snapshot_id": "2f723a73780283f7b8e0001f1a9869bcd39059ecdb98fb4ea6b937fd9162a061",
+      "sha256": "aaf3cd0bf56f02955c3e51a1785af01c7230a1fab90cf3e782fe36cba90c3713",
+      "snapshot_id": "dfe40a175481fc8fdd10dbc410408e127e51b5b85407d89b13677950296002ba",
       "source_id": "jed-gpt5mini-codeact-x1000-s13"
     },
     {
-      "generated_at": "2026-09-25T16:39:11.944986+00:00",
+      "generated_at": "2026-09-25T17:25:20.326468+00:00",
       "path": "/home/amin/rlm_dashboard/artifacts/control-room/shared/jed-gpt5mini-codeact-x1000-s14.json",
-      "sha256": "ec4fb7ceb0634a2a3fe9733f27bdd66768995ff09cf206fd73201df681b55bf3",
-      "snapshot_id": "4b55e5a92f2b68d12b9e1c749656f64681af04d3b5f86ab862126bd351813879",
+      "sha256": "eb4da80e2c655b5bb9f37fab69baa3b17fb9ef63aef6b97daf8b16b6f01eb38d",
+      "snapshot_id": "6d807858f5fdafdfd00887c8fa6656d5613ff8438c7b3e2cb76c085c94c30a7b",
       "source_id": "jed-gpt5mini-codeact-x1000-s14"
     },
     {
-      "generated_at": "2026-09-25T16:39:20.280818+00:00",
+      "generated_at": "2026-09-25T17:25:27.732874+00:00",
       "path": "/home/amin/rlm_dashboard/artifacts/control-room/shared/jed-gpt5mini-codeact-x1000-s15.json",
-      "sha256": "139f527c7dd655567686ed5227921c1893e6f22e844764f65259208383669625",
-      "snapshot_id": "b6da18e2c05b1337045f4130ccb8757e1d1abeb4b0196f8fe450ccf373796295",
+      "sha256": "2baec3db174aaab2c5c1a7d2ae1c0f498ff0a574c6dcf65d26597c023b5ad6d4",
+      "snapshot_id": "4a2d03e02834b455099b192eaf401e942ba3ba2711327bb90192b4a6ab117e80",
       "source_id": "jed-gpt5mini-codeact-x1000-s15"
     },
     {
-      "generated_at": "2026-09-25T16:39:28.712191+00:00",
+      "generated_at": "2026-09-25T17:25:35.641310+00:00",
       "path": "/home/amin/rlm_dashboard/artifacts/control-room/shared/jed-gpt5mini-codeact-x1000-s16.json",
-      "sha256": "55867ebbbdb9c7ef23de604296b1de178eb612c0ad8713bcf605f1652b8dba01",
-      "snapshot_id": "ac91480fe9ff9d85b0f00a349f222ac26888f0ce835626347414004bfc3ccc65",
+      "sha256": "7c719d59e4388efaf47a756dfe21c021d458e44ccf2a9a78541e545cd3a9dad8",
+      "snapshot_id": "8173e755baf6465e899733883adc9dc6c9fa35c37b0e457c5cdd68a9fe33060b",
       "source_id": "jed-gpt5mini-codeact-x1000-s16"
     },
     {
-      "generated_at": "2026-09-25T16:39:36.399069+00:00",
+      "generated_at": "2026-09-25T17:25:43.327881+00:00",
       "path": "/home/amin/rlm_dashboard/artifacts/control-room/shared/jed-gpt5mini-codeact-x1000-s17.json",
-      "sha256": "bc1ccb49120b91cbabff7d9c5513a9761af4130188732000e487635136e4dc06",
-      "snapshot_id": "d3fa3ae11c64dc22b4062ab06fa8e2dad5bd29472c82db5467d51a1de6dee914",
+      "sha256": "1f519494eaac63e31a3fa751a626d597d6ff6c056a6aee203ece176e4bac1928",
+      "snapshot_id": "0a3b3aa4cb6669c2efbf3a81ac8f31087681a570f82ee4e9742d9d5e317a2326",
       "source_id": "jed-gpt5mini-codeact-x1000-s17"
     },
     {
-      "generated_at": "2026-09-25T16:39:45.182123+00:00",
+      "generated_at": "2026-09-25T17:25:51.584195+00:00",
       "path": "/home/amin/rlm_dashboard/artifacts/control-room/shared/jed-gpt5mini-codeact-x1000-s18.json",
-      "sha256": "43473c2a17a5940ff9387ea9e3de8deef9408eaca59f7d262802d17da6e6ca93",
-      "snapshot_id": "36ec67c164c513ee316e8d53ea4c6852fe04087e0243f64b947070afa5f612f6",
+      "sha256": "13c1769fab1ad47758371aab1d45c9986b96b440fe01bf18a28dacb3952ab35a",
+      "snapshot_id": "a54de27e3737c1326564c695d7f7ac0f720846c62a817422c29252965de41199",
       "source_id": "jed-gpt5mini-codeact-x1000-s18"
     },
     {
-      "generated_at": "2026-09-25T16:39:54.485715+00:00",
+      "generated_at": "2026-09-25T17:25:59.652259+00:00",
       "path": "/home/amin/rlm_dashboard/artifacts/control-room/shared/jed-gpt5mini-codeact-x1000-s19.json",
-      "sha256": "bc73df98096b9691542e669edb05a83ed791fd020b78d17da0891a16799963dc",
-      "snapshot_id": "b4b520ec7b3459f5b717779cbfb8fb407b01dcaad95349943e62773e318c1869",
+      "sha256": "c6b06066c4c958209eacfa02d1362add13cb22174a37bddaea07955582453c70",
+      "snapshot_id": "a252b1621d423a63575c9898d57851ea08aa15c93891026400de487f393fa7f1",
       "source_id": "jed-gpt5mini-codeact-x1000-s19"
     },
     {
-      "generated_at": "2026-09-25T16:40:03.342430+00:00",
+      "generated_at": "2026-09-25T17:26:12.234779+00:00",
       "path": "/home/amin/rlm_dashboard/artifacts/control-room/shared/jed-gpt5mini-codeact-x1000-s20.json",
-      "sha256": "e2a231ee7cb6ab14883294ad199d99766b909e2855fdf025d59a790a63ebb5ba",
-      "snapshot_id": "cd77442209dee3cae4ad3c0b1e3e71509a58d9fb7d01e5f082a19e7201b0af52",
+      "sha256": "fd8b98d8f16bc42c0c411638cf6f7d583b3cc17f4d7c12997ddf8e727841c314",
+      "snapshot_id": "2c799961224bcbe80ee657ee52472f7b77f51d2b6409e7ee3f35e0af59015e7b",
       "source_id": "jed-gpt5mini-codeact-x1000-s20"
     },
     {
-      "generated_at": "2026-09-25T16:40:13.976992+00:00",
+      "generated_at": "2026-09-25T17:26:21.311552+00:00",
       "path": "/home/amin/rlm_dashboard/artifacts/control-room/shared/jed-gpt5mini-codeact-x1000-s21.json",
-      "sha256": "d27ba8b6944143cbee8bc468b223f1ad82af39324cb7add85760412b18488e33",
-      "snapshot_id": "d363eddc6a2b39607433d30999b1a2cbddc8d80aacf94204e4260845f14d6b56",
+      "sha256": "34d44219357151e7d234120933313e0fc36a3797e05318ba97f28e933b560a61",
+      "snapshot_id": "40d8cc6208ff909f8f9cf9ce73b16690c1ea4a279e1c93997eae84615c5b52c7",
       "source_id": "jed-gpt5mini-codeact-x1000-s21"
     },
     {
-      "generated_at": "2026-09-25T16:40:22.347057+00:00",
+      "generated_at": "2026-09-25T17:26:30.019290+00:00",
       "path": "/home/amin/rlm_dashboard/artifacts/control-room/shared/jed-gpt5mini-codeact-x1000-s22.json",
-      "sha256": "86335fb98c03fc08c4b4f53dd55d0cd8396bab6633fdbba92856476ce29b8d78",
-      "snapshot_id": "ab6a877c1ddcbd75139323ec427ccf0e0a41618e784425f68c4cdf11bf66e02a",
+      "sha256": "957e088a3f25c2da42bd0e84fb886e1b2b4d59151cdbcbcc7520f4b03dc00f3b",
+      "snapshot_id": "09b266cb911295e9921ce11acf3bb482aa7a158d53d6aa422ec8aa0d0c33077f",
       "source_id": "jed-gpt5mini-codeact-x1000-s22"
     },
     {
-      "generated_at": "2026-09-25T16:40:30.640936+00:00",
+      "generated_at": "2026-09-25T17:26:39.484745+00:00",
       "path": "/home/amin/rlm_dashboard/artifacts/control-room/shared/jed-gpt5mini-codeact-x1000-s23.json",
-      "sha256": "51b6f625e884466fe3cdee6722275452b69f1666b4555d7dd673bccc075c0819",
-      "snapshot_id": "7d4f03244225945238784ba721211046816fad0aab446eac05cd438895c3b07f",
+      "sha256": "765d0242a712d2bf370a887d46d39d59ed99464471487cc24f94c63562e170dc",
+      "snapshot_id": "b2950e04493dd70774acb4532a0837a9127abfda260a657c55a6e14f07ab00ef",
       "source_id": "jed-gpt5mini-codeact-x1000-s23"
     },
     {
-      "generated_at": "2026-09-25T16:40:43.283273+00:00",
+      "generated_at": "2026-09-25T17:26:48.168351+00:00",
       "path": "/home/amin/rlm_dashboard/artifacts/control-room/shared/jed-gpt5mini-codeact-x1000-s24.json",
-      "sha256": "894af4a38ca0db921e7e73e9b8fe6f6414f8a8f905e641cf6f58dfce64d2cd1e",
-      "snapshot_id": "89d9cc9bb95db03163b70bfa2ba2fba805f4eb5d752ae12233ec295351d97eb9",
+      "sha256": "39a1e9930a4feda487e41b71b9cf37b03bb46c5e5730ab0ff1104484cbaab763",
+      "snapshot_id": "e0ee97ffa11f92de729a24c44e2cc70e51db8ec31f4c5dea3c8ab7e2552d70e3",
       "source_id": "jed-gpt5mini-codeact-x1000-s24"
     },
     {
-      "generated_at": "2026-09-25T16:40:51.898796+00:00",
+      "generated_at": "2026-09-25T17:26:56.661985+00:00",
       "path": "/home/amin/rlm_dashboard/artifacts/control-room/shared/jed-gpt5mini-codeact-x1000-s25.json",
-      "sha256": "d380397a7cb9f197767af1d317c600862678b66c78d152ba3cad7e82148706f7",
-      "snapshot_id": "7a31f1c34f3cd72c702bf5b097cb22b7b452ddde5c1121c25f996ef61a132505",
+      "sha256": "5b68d41bfd10555fd4b80dcd11337dbb6745080eee4bb5de5a492f99ca5e0101",
+      "snapshot_id": "e3356e28532b6842ab75d767b7b31da7e8cc562de59e4aee21e19ae44a0940fd",
       "source_id": "jed-gpt5mini-codeact-x1000-s25"
     },
     {
-      "generated_at": "2026-09-25T16:41:00.506768+00:00",
+      "generated_at": "2026-09-25T17:27:09.089100+00:00",
       "path": "/home/amin/rlm_dashboard/artifacts/control-room/shared/jed-gpt5mini-codeact-x1000-s26.json",
-      "sha256": "4177e45c89089ddaf589a97287aee61166beaf4622c28b4969ff943d3fd8b571",
-      "snapshot_id": "5df091cae690076036bb9a8ad38330306b3838f8cbf29f2b5e84f246eeaae0ea",
+      "sha256": "8bb7d03e205e13d86391820ece558b6b99c112ac3b4909721b23225252bfa98d",
+      "snapshot_id": "dd1e78b38eb715e62c1ed284907651442670346d86e4dc0abe661a7fabd93b18",
       "source_id": "jed-gpt5mini-codeact-x1000-s26"
     },
     {
-      "generated_at": "2026-09-25T16:41:13.359459+00:00",
+      "generated_at": "2026-09-25T17:27:18.740472+00:00",
       "path": "/home/amin/rlm_dashboard/artifacts/control-room/shared/jed-gpt5mini-codeact-x1000-s27.json",
-      "sha256": "c14ac7f4ee6419e7f877979fb5895371f50943a4cec7a91a93e5bca9a68021bb",
-      "snapshot_id": "bf8f32789f5c75a49bcac88fba6da70937739d393d6a70c196b7950e86c2c782",
+      "sha256": "ddcb616a37f154744963bbf674a5641d99214f182703eda3119c39c956b5adc6",
+      "snapshot_id": "cb74092516b2e7e1953d0c7d7d35c95ac300a0b3da7eed06b053589efe0aaebe",
       "source_id": "jed-gpt5mini-codeact-x1000-s27"
     },
     {
-      "generated_at": "2026-09-25T16:41:21.345346+00:00",
+      "generated_at": "2026-09-25T17:27:27.669769+00:00",
       "path": "/home/amin/rlm_dashboard/artifacts/control-room/shared/jed-gpt5mini-codeact-x1000-s28.json",
-      "sha256": "15151b51892c1d325816af4fcde830a6d44ba5eda588e3581c1270073d393a7d",
-      "snapshot_id": "983af12757a443a1f853ee7a8ef0a821b0c647f103171afc8b87c7d4c70e3bd9",
+      "sha256": "9c6ac5da967db697dc26e5e1abd1a203d57f45e60efb06d4f6426d8f61075cbe",
+      "snapshot_id": "2e1922c5e0f0fd609f76444ddbf3d7a97173f12c6f29f5d7c4237ed1573cbddd",
       "source_id": "jed-gpt5mini-codeact-x1000-s28"
     },
     {
-      "generated_at": "2026-09-25T16:41:29.784220+00:00",
+      "generated_at": "2026-09-25T17:27:36.763867+00:00",
       "path": "/home/amin/rlm_dashboard/artifacts/control-room/shared/jed-gpt5mini-codeact-x1000-s29.json",
-      "sha256": "4f29c0b4e5b350e66490d5cc625349b66abb945b0a760a50bb83cdc18726f687",
-      "snapshot_id": "baacd563f0a96283065e20aca67022fe124b09ea82a8abf33168eb7d33845d72",
+      "sha256": "c7e6e70a48f5e128c21f40a58d3735f17dfe700876e1bddb2ee8dd2675903a8c",
+      "snapshot_id": "45530bfbd1d160283144cc20302df803431275296c5b57cecbba97dd517118a6",
       "source_id": "jed-gpt5mini-codeact-x1000-s29"
     },
     {
-      "generated_at": "2026-09-25T16:41:37.477544+00:00",
+      "generated_at": "2026-09-25T17:27:46.491814+00:00",
       "path": "/home/amin/rlm_dashboard/artifacts/control-room/shared/jed-gpt5mini-codeact-x1000-s30.json",
-      "sha256": "cf47ab0e75d39c77bd777ce8c3a253242302163a0c0feaf2a80797af82b011e0",
-      "snapshot_id": "2c9378bd51dd841ac701ed598c7228b0954bc6b6ed3006a6fefab6ada80e0205",
+      "sha256": "7f7a5a78b47b6b077e72b71f4496b109cd6a0c0c027b6a1ec720d5e5aacd2fbc",
+      "snapshot_id": "8b2da0a305cc4ae89176a3f8a27d76662bf25ac7cb6fe94aed466f0052d0015b",
       "source_id": "jed-gpt5mini-codeact-x1000-s30"
     },
     {
-      "generated_at": "2026-09-25T16:40:31.979582+00:00",
+      "generated_at": "2026-09-25T17:26:59.042787+00:00",
       "path": "/home/amin/rlm_dashboard/artifacts/control-room/shared/jed-gpt5mini-rlm-x1000-s01.json",
-      "sha256": "352894a59d4e84c5de4b34ab3e62d758480056d4817d2b249c1b1e87303a8453",
-      "snapshot_id": "a60537b1a2a9a8b7f33865a3603fb4ffcfab2ca625554a93a7d6b1cd8f03231e",
+      "sha256": "f131af91a1b7e462b74baa103b1047cf503b5193ad53085b86d85035db4e46f9",
+      "snapshot_id": "dd51692991f07941df442c89742542adb6a50432dbee6ca49b7b6054aeb2d6f3",
       "source_id": "jed-gpt5mini-rlm-x1000-s01"
     },
     {
-      "generated_at": "2026-09-25T16:40:43.842250+00:00",
+      "generated_at": "2026-09-25T17:27:09.176063+00:00",
       "path": "/home/amin/rlm_dashboard/artifacts/control-room/shared/jed-gpt5mini-rlm-x1000-s02.json",
-      "sha256": "719dc334044d19066d83752dd8e62e3d401f6a6bb75d5283eb5811977c965229",
-      "snapshot_id": "1e9ed35f7def8271f2809ff37fdf106376c59f4ef906ea0daafd0e5b7dcba52c",
+      "sha256": "b5a01c18b9161307c9871131baf795a0d87e457deccbb7db1432512b92642ce4",
+      "snapshot_id": "a313ed5fbac7c4e6a2b7b4f1cdf2028c7b0664d3266e6ac6b8698956e996db02",
       "source_id": "jed-gpt5mini-rlm-x1000-s02"
     },
     {
-      "generated_at": "2026-09-25T16:40:52.078606+00:00",
+      "generated_at": "2026-09-25T17:27:19.804124+00:00",
       "path": "/home/amin/rlm_dashboard/artifacts/control-room/shared/jed-gpt5mini-rlm-x1000-s03.json",
-      "sha256": "25b17593f09f08f2a99fba86c81a879916f11879b54b38aac29bdf28788e94ef",
-      "snapshot_id": "5299581ff9b6cda3e24a69664056c77115cdad69d3add3f426d4ea92b792195e",
+      "sha256": "768dff7f11262592258d0fb92fbd562a851196612e47d8fa933f7b864a9ca3ff",
+      "snapshot_id": "ed5f268c5b79b45d427d441252e01e1aa95ec5f0102e5efe42e81894a002c9d5",
       "source_id": "jed-gpt5mini-rlm-x1000-s03"
     },
     {
-      "generated_at": "2026-09-25T16:41:00.568965+00:00",
+      "generated_at": "2026-09-25T17:27:28.776865+00:00",
       "path": "/home/amin/rlm_dashboard/artifacts/control-room/shared/jed-gpt5mini-rlm-x1000-s04.json",
-      "sha256": "28ba6d7d66ce7832cdf1650f017e08c7228c103c891ef94616df07ba5744da40",
-      "snapshot_id": "784dc2d2556ac10631777b8d68bdac227e05ace28c560eb0b97e7cb86a9be4e2",
+      "sha256": "63d99c7e83578dca917abbb02c8f6d051a9f6f89d3356be4ac384619189e0b77",
+      "snapshot_id": "0f2c498225daa568143a78dd3e1e0e0afd1bba63a890ce857076d851cac17ae0",
       "source_id": "jed-gpt5mini-rlm-x1000-s04"
     },
     {
-      "generated_at": "2026-09-25T16:41:12.156597+00:00",
+      "generated_at": "2026-09-25T17:27:36.673161+00:00",
       "path": "/home/amin/rlm_dashboard/artifacts/control-room/shared/jed-gpt5mini-rlm-x1000-s05.json",
-      "sha256": "f96d1d22c0dd55fc826d36f79239364100f738636dc855506e6f801271dbbe5d",
-      "snapshot_id": "899a58a806a48b904889f948bfab7e7c37d91d39b2e4a516af8ec13d84e9c7d1",
+      "sha256": "abfb734d9ef4708585b3358508b71d5225aa4b9178555d7a5e34e13975b4932b",
+      "snapshot_id": "8dd1f561eb1494500b209deb7b25157cedc9b61cfbe7b60ccfcde72446e14016",
       "source_id": "jed-gpt5mini-rlm-x1000-s05"
     },
     {
-      "generated_at": "2026-09-25T16:41:20.094175+00:00",
+      "generated_at": "2026-09-25T17:27:45.477030+00:00",
       "path": "/home/amin/rlm_dashboard/artifacts/control-room/shared/jed-gpt5mini-rlm-x1000-s06.json",
-      "sha256": "577d77d4b5b3a9f85b0252585267c5d816b6d4b19596ee6ec35756d0f55c27a8",
-      "snapshot_id": "8130fe0656833bf1aca40757a75ff1dd289bdf234d6b7a868c3c0b30c20a9b4e",
+      "sha256": "12e36038c9eb7fce0585b5cb9bff48219a755f0a8b34ffce17e45d49f7df0a8a",
+      "snapshot_id": "8dd3fafb9cf9df331781a5ab49ae9c3b03d01ff5912f561687f66ab0233fd6cf",
       "source_id": "jed-gpt5mini-rlm-x1000-s06"
     },
     {
-      "generated_at": "2026-09-25T16:41:28.311294+00:00",
+      "generated_at": "2026-09-25T17:27:54.011288+00:00",
       "path": "/home/amin/rlm_dashboard/artifacts/control-room/shared/jed-gpt5mini-rlm-x1000-s07.json",
-      "sha256": "5b4cefc9d3158326cfa16d5050775b6896486769b318921fd30c76ff2b34eec1",
-      "snapshot_id": "350759d8f5b709a91b0f330adf088d9931175fdbc8964b7bc95e4b8176c6f881",
+      "sha256": "ffd20deb36fb1bfcbdd00ee6cac9853562bddd11631da8b2444c206c04720ec7",
+      "snapshot_id": "66d3b917d6cd050e3d19014754ac44a6a2bf8fd8649e510cdeb0c42d6cc7f7c1",
       "source_id": "jed-gpt5mini-rlm-x1000-s07"
     },
     {
-      "generated_at": "2026-09-25T16:41:36.308626+00:00",
+      "generated_at": "2026-09-25T17:28:02.010851+00:00",
       "path": "/home/amin/rlm_dashboard/artifacts/control-room/shared/jed-gpt5mini-rlm-x1000-s08.json",
-      "sha256": "723d63a94bdf18f81da22da11f1444bd364d0838fa4136dfc40950c9e0c92f71",
-      "snapshot_id": "288a68f50070da9bedc0cce92de47c2b5b90ec8872de5377f15ee01f627f155f",
+      "sha256": "0030e85054e81be2036ce5e948025789b12287912725675064a58f4e51c756a4",
+      "snapshot_id": "c3cba0a1b5833f9a038f51cf4b933030f3e99edce5741ea6b18da7a720ceefd4",
       "source_id": "jed-gpt5mini-rlm-x1000-s08"
     },
     {
-      "generated_at": "2026-09-25T16:41:46.161512+00:00",
+      "generated_at": "2026-09-25T17:28:17.278468+00:00",
       "path": "/home/amin/rlm_dashboard/artifacts/control-room/shared/jed-gpt5mini-rlm-x1000-s09.json",
-      "sha256": "a48c3a27c85a45324e3e4210b7dc0557f032c48af4795c757d268aa0c61da30b",
-      "snapshot_id": "cf0f71086028532b61ebafdaa0f78d6f1f52b17a6483c4010de69f655b33b121",
+      "sha256": "45a60dce07589c857065a706de71c7fdeff602f3129f8751f3d9cb8631d2f7e0",
+      "snapshot_id": "4192fb6ef74dbd8d9b0458ea95e2be89830bc78ecc4fdc12a274f88a0744918c",
       "source_id": "jed-gpt5mini-rlm-x1000-s09"
     },
     {
-      "generated_at": "2026-09-25T16:41:53.815455+00:00",
+      "generated_at": "2026-09-25T17:28:24.490337+00:00",
       "path": "/home/amin/rlm_dashboard/artifacts/control-room/shared/jed-gpt5mini-rlm-x1000-s10.json",
-      "sha256": "a0a3f2ca17dd3593e6137af6ae72b87c09ea14f64bdaa366c4b4f616c85f6440",
-      "snapshot_id": "a52f4309d8499f8dec8deaf014c476d8a99fc65662227982dff96734b8c3adb4",
+      "sha256": "989cb30448b4c5b704cf0ed40078b9b850bf44fc44cad10ae06d8d21fab18ea1",
+      "snapshot_id": "5211b47cd37fa37e69be43e2abaf60ab5efdd7cb02dd1069832dfbf8ba4b3fa7",
       "source_id": "jed-gpt5mini-rlm-x1000-s10"
     },
     {
-      "generated_at": "2026-09-25T16:42:01.000834+00:00",
+      "generated_at": "2026-09-25T17:28:35.077140+00:00",
       "path": "/home/amin/rlm_dashboard/artifacts/control-room/shared/jed-gpt5mini-rlm-x1000-s11.json",
-      "sha256": "c91e15767f4adc9f34f1c16c3b62f7222580e5100d1106cbb0d4702ae63e89cf",
-      "snapshot_id": "8b623c6d044a0a114561863f711cd5f60465f8275a8f09539bec17612c0c4a67",
+      "sha256": "18526e4e97dce38af21e13f98ea0189d754ad5ce1db72fb867032999bc69e81d",
+      "snapshot_id": "5272da110697c11b927b0f848c820459082bbdec5cd10ff1534f491f8cdce0c5",
       "source_id": "jed-gpt5mini-rlm-x1000-s11"
     },
     {
-      "generated_at": "2026-09-25T16:42:09.870579+00:00",
+      "generated_at": "2026-09-25T17:28:42.619136+00:00",
       "path": "/home/amin/rlm_dashboard/artifacts/control-room/shared/jed-gpt5mini-rlm-x1000-s12.json",
-      "sha256": "5bda7a7431c965683de77a86b7594cb692815bf2324229277d12b8ba20d176ee",
-      "snapshot_id": "0a77c88e827912dd1b6f0a0f425b2236d81bd1a01f71727e9cc00cb70fb3b979",
+      "sha256": "efe5a6d7687c829efdf30387145805f2f9b183f84287745686f0871c69bf6fd0",
+      "snapshot_id": "d50116c6ae238343fa04608466743e28370fc25ba246b44121c8fb4fba9c7d50",
       "source_id": "jed-gpt5mini-rlm-x1000-s12"
     },
     {
-      "generated_at": "2026-09-25T16:42:17.704708+00:00",
+      "generated_at": "2026-09-25T17:28:49.669703+00:00",
       "path": "/home/amin/rlm_dashboard/artifacts/control-room/shared/jed-gpt5mini-rlm-x1000-s13.json",
-      "sha256": "bb0290965aa2102594213a81637a8e8bcbeb921781290509fc80ca74b7461c2b",
-      "snapshot_id": "131b0f497979c5b0801b61a16b1e7e9903151a6f042adb8373992f7f478c9027",
+      "sha256": "b90c3fc900bc4f9b0dd811dc8bb0dcd03e1c947a8943a217a67558bee870bc90",
+      "snapshot_id": "525e014cbd7c5fb070e83826b7b871f2df3e85229b9b1b2614a3ebdc113c1883",
       "source_id": "jed-gpt5mini-rlm-x1000-s13"
     },
     {
-      "generated_at": "2026-09-25T16:42:24.981524+00:00",
+      "generated_at": "2026-09-25T17:28:57.475802+00:00",
       "path": "/home/amin/rlm_dashboard/artifacts/control-room/shared/jed-gpt5mini-rlm-x1000-s14.json",
-      "sha256": "878a61ddf071be24342edd457368cc19ff8afc609e54f09f0da377518f5ca628",
-      "snapshot_id": "818a2c2463e25f52590c39abcc8cbbf9d67f9ec6e2e6d75747534b13a44df119",
+      "sha256": "33677937980402cc81c839df5d383fad286cc44be71c790994273b6940352d49",
+      "snapshot_id": "06b703c53214f9de0c2eaafc25b5c490daea2626ec90558586ccf933c18b6234",
       "source_id": "jed-gpt5mini-rlm-x1000-s14"
     },
     {
-      "generated_at": "2026-09-25T16:42:32.250261+00:00",
+      "generated_at": "2026-09-25T17:29:05.964645+00:00",
       "path": "/home/amin/rlm_dashboard/artifacts/control-room/shared/jed-gpt5mini-rlm-x1000-s15.json",
-      "sha256": "91a282b2325e205b9a045341646c9ff47f96ec89a49b7de2adab0e686e3ebbd6",
-      "snapshot_id": "2f8cd02af5f116efb09dbf16caa8c8b440bfb385929fe4ff0ab7baa862c9f923",
+      "sha256": "17afa81e8ae40fe5ed267fe4fbee51c70e461538f5c6fda299192854554a059f",
+      "snapshot_id": "5ae9cc7bc545db333496aebf3ba6cf333ec92d2c82754ede4603e7b4010211ab",
       "source_id": "jed-gpt5mini-rlm-x1000-s15"
     },
     {
@@ -817,59 +817,59 @@
       "source_id": "jed-preflight-v34"
     },
     {
-      "generated_at": "2026-09-25T16:30:26.566764+00:00",
+      "generated_at": "2026-09-25T17:30:39.938868+00:00",
       "path": "/home/amin/rlm_dashboard/artifacts/control-room/shared/jed13-final-credit-deepseek-codeact-repair-r01.json",
-      "sha256": "52d49090890563e8c2a1de92fb0074ae291139b20792b836af32a7c80a4a5787",
-      "snapshot_id": "46998dcee96e272707e8d2b4c205a67383ac846d1d1b0cd8d4e685fc3b43ee9f",
+      "sha256": "8db6b9d5e83ed4c345932ed4e39bbd3c574ac909b919d268e82267c69ca23f9e",
+      "snapshot_id": "2b0e4fb4ca7f9c7d3f598451cc29499ec0ad9a3c186f40a377736096bf207be1",
       "source_id": "jed13-final-credit-deepseek-codeact-repair-r01"
     },
     {
-      "generated_at": "2026-09-25T16:30:26.745603+00:00",
+      "generated_at": "2026-09-25T17:30:39.934830+00:00",
       "path": "/home/amin/rlm_dashboard/artifacts/control-room/shared/jed13-final-credit-deepseek-codeact-repair-r02.json",
-      "sha256": "8f4f5269f975cb1227a3d1238c4ed4d0c0da483a84ce74cbccbc8a061816cc24",
-      "snapshot_id": "6529899bcc4f7ea1fd280c7f9ad22adf76c17568845dd35ac7c19c5e3fb605c6",
+      "sha256": "342044e02173f0645a41f18529c9399fe345c9eba830d13573f8a4c34b467903",
+      "snapshot_id": "984be4f7891c726304c9c2a57cf314b28729234f580c18ad5b6347ba3cf476cb",
       "source_id": "jed13-final-credit-deepseek-codeact-repair-r02"
     },
     {
-      "generated_at": "2026-09-25T16:40:31.476433+00:00",
+      "generated_at": "2026-09-25T17:10:37.887590+00:00",
       "path": "/home/amin/rlm_dashboard/artifacts/control-room/shared/jed13-final-credit-deepseek-codeact-repair-r03.json",
-      "sha256": "3a0881f43b5225456b722d4953e120149408974f6ea7bdbea777f132ad0affe6",
-      "snapshot_id": "fceb8e5f69df991b19fe676734cb548eb99fa0dea293d173cb81b6f8e7148adc",
+      "sha256": "2d8f15278789881b07cacd71f691910d2b29c636ecd4f8761ce292eb13fda960",
+      "snapshot_id": "3e7970fc726764e2beaabeec8d5ab97d0d635c9ebb19350daae8a269d4b2ab0a",
       "source_id": "jed13-final-credit-deepseek-codeact-repair-r03"
     },
     {
-      "generated_at": "2026-09-25T16:40:31.157382+00:00",
+      "generated_at": "2026-09-25T17:10:37.668168+00:00",
       "path": "/home/amin/rlm_dashboard/artifacts/control-room/shared/jed13-final-credit-deepseek-codeact-repair-r04.json",
-      "sha256": "c4a5e8ce30158585a8ddcc7689ecbc270b2b9ccb69310f6af8e9434f765b24f0",
-      "snapshot_id": "3cea3ae43a6c70675c8295bb9758169e318e28021ab064bc0bc5c785da2ec45c",
+      "sha256": "05b7d1ab7cf8f3275ff38fe62d692229f740fb79ad393c8faf09ba8b364b3d4b",
+      "snapshot_id": "8dcc574367393468da4160843abf78a2d7ace41761dc52b1bd92844386fab1a0",
       "source_id": "jed13-final-credit-deepseek-codeact-repair-r04"
     },
     {
-      "generated_at": "2026-09-25T16:40:32.078338+00:00",
+      "generated_at": "2026-09-25T17:10:37.886585+00:00",
       "path": "/home/amin/rlm_dashboard/artifacts/control-room/shared/jed13-final-credit-deepseek-rlm-accelerated-r01.json",
-      "sha256": "fddef6220d2b2e75a255af04d0a0ef1abd53f8b81fe857355ee3fea2f0ff0dec",
-      "snapshot_id": "ae4735fe1d6e1576a68461c72a691a4ba35da5a160f28d474ad793f24159c52a",
+      "sha256": "4cbb0ba6ed6376524e58def59b1dc57f0588e229a1546d4aee3c030fd81169e4",
+      "snapshot_id": "04a3c9752a2247429fdd6b049af8fa9cc3318e587bcce97fa6c2813296719801",
       "source_id": "jed13-final-credit-deepseek-rlm-accelerated-r01"
     },
     {
-      "generated_at": "2026-09-25T16:30:26.662427+00:00",
+      "generated_at": "2026-09-25T17:30:39.232375+00:00",
       "path": "/home/amin/rlm_dashboard/artifacts/control-room/shared/jed13-final-credit-deepseek-rlm-accelerated-r02.json",
-      "sha256": "d4354824a81c37d98f4c012ab485fc3e13f168c2bb9f7177a5af4b007abb71e6",
-      "snapshot_id": "c9a88a0d3a9de336c435d0213f5df57b2d0e12ee875a3fc06a39064be85d4e70",
+      "sha256": "d2de6164de24044946b5d2a800c5f767d06f913861f60716e2780c5024edf6dc",
+      "snapshot_id": "d829c13ccb809a1fb8ee1d358f40808ede207f3d8c4da34cab21fd796980a0f1",
       "source_id": "jed13-final-credit-deepseek-rlm-accelerated-r02"
     },
     {
-      "generated_at": "2026-09-25T16:44:30.366953+00:00",
+      "generated_at": "2026-09-25T17:14:36.492914+00:00",
       "path": "/home/amin/rlm_dashboard/artifacts/control-room/shared/jed13-final-credit-deepseek-rlm-accelerated-r03.json",
-      "sha256": "3026437f3002da58d71107b4436181564e97bea02a13609fcd13c4394d6552ba",
-      "snapshot_id": "d91f7d90679f0a48e290fd49a4964beffb3d08060ad7c779042fc8a6f2aed78c",
+      "sha256": "454f64e53a36fd7dbff12b7df9b30bf9f805d026099bbb64c9e441ecc1b2ea00",
+      "snapshot_id": "08780f6f55b7000f72e5dcbb04bc771c40ef8e4c44accea6c1d9c841b681585b",
       "source_id": "jed13-final-credit-deepseek-rlm-accelerated-r03"
     },
     {
-      "generated_at": "2026-09-25T16:45:28.508219+00:00",
+      "generated_at": "2026-09-25T17:15:33.615189+00:00",
       "path": "/home/amin/rlm_dashboard/artifacts/control-room/shared/jed13-final-credit-deepseek-rlm-accelerated-r04.json",
-      "sha256": "31d6bbe0916134ede0f0630ca7997c40382b52c8448bd4bdb27ac05429145759",
-      "snapshot_id": "358e9f3588cfb9d596a6a0c4654826e46c0f7f09c7f28b6d2ce74e1d550e882f",
+      "sha256": "e156b331252dbf5899cdd17f9bf328375205a93ca737c03cccbbe043ca40e2c2",
+      "snapshot_id": "85cb90a752882f1869a00319ba1a7ba2290f30187fc0e9880730da70fc8c9259",
       "source_id": "jed13-final-credit-deepseek-rlm-accelerated-r04"
     },
     {
@@ -1006,10 +1006,10 @@
       "source_id": "jed19-credit-deepseek-codeact-repair-r01"
     },
     {
-      "generated_at": "2026-09-25T16:36:26.557530+00:00",
+      "generated_at": "2026-09-25T17:06:32.370979+00:00",
       "path": "/home/amin/rlm_dashboard/artifacts/control-room/shared/jed19-credit-deepseek-codeact-repair-r02.json",
-      "sha256": "9cf14af3b8f4f0439d41876e68976c42f7b95ed0496a2b311214623027a0fa5c",
-      "snapshot_id": "5305c2259aac1e6ca7b319e71478f5fa9c6c624a708660b1a4e351a0ccb91bfa",
+      "sha256": "6230c0375b3165435c2e0088be0794f59ae77aa68f15db3cbbe2f575c894a6a1",
+      "snapshot_id": "429f929c3478f9f433ae9827826953338a18c7e374504138294a64321b6cae47",
       "source_id": "jed19-credit-deepseek-codeact-repair-r02"
     },
     {
@@ -1055,24 +1055,24 @@
       "source_id": "jed19-credit-deepseek-rlm-accelerated-r06"
     },
     {
-      "generated_at": "2026-09-25T16:26:08.778372+00:00",
+      "generated_at": "2026-09-25T17:26:19.761801+00:00",
       "path": "/home/amin/rlm_dashboard/artifacts/control-room/shared/jed19-credit-glm-openrouter-rlm-r01.json",
-      "sha256": "ce77882eefe2058ae6108e901d56ec8824df12b4a754e8156d6e9321f42a59d5",
-      "snapshot_id": "4d2fbded1657d29e39eee014a5ea8ff79c04890ddd9f933ea580cbb8b457384a",
+      "sha256": "2ff981ee8606fabf6ed8c693dc1b8e5fb0eed11c514bfb99cac4e33fe79b904a",
+      "snapshot_id": "42142c90c5bbc25c7d9185b3ea39e40ecfd27a809f1640ec1d59b1ba49b6cb3e",
       "source_id": "jed19-credit-glm-openrouter-rlm-r01"
     },
     {
-      "generated_at": "2026-09-25T16:26:09.971765+00:00",
+      "generated_at": "2026-09-25T17:26:22.273856+00:00",
       "path": "/home/amin/rlm_dashboard/artifacts/control-room/shared/jed19-credit-glm-openrouter-rlm-r02.json",
-      "sha256": "c7bb196b413121bb6e99365590a63f0b1f48632f687485cb34880583f8d4cd27",
-      "snapshot_id": "3636292d694a58aeabcd37e74cd3494e7f68fe11da3fa0d84609ea84a9387174",
+      "sha256": "981f5b663215c6e660370529f38e6dbd8574fff07df7fd3b3f3da5a1dc95b94c",
+      "snapshot_id": "63841c505688d9c2061e8bea20f296aca64e5bf9f3928115e87bd48882a40449",
       "source_id": "jed19-credit-glm-openrouter-rlm-r02"
     },
     {
-      "generated_at": "2026-09-25T16:26:08.792502+00:00",
+      "generated_at": "2026-09-25T17:26:20.311518+00:00",
       "path": "/home/amin/rlm_dashboard/artifacts/control-room/shared/jed19-credit-glm-openrouter-rlm-r03.json",
-      "sha256": "c3c4d3c8a113815e495a6754aa4872ca4a1a86c56af554fea6040260865748c4",
-      "snapshot_id": "31f0a5909cbfa1d3d16bd6dbc56640000c6823d9bb95328212bdb07eef7f8ded",
+      "sha256": "94f830e57ad71b8d2fc12ecbfb2183c4a6f6bc2ce180ad51fcab98189f6fd3f0",
+      "snapshot_id": "e6cb6e541a0bbef9690dd6eae08d889a315009421f40eeb932dbf9fcc0e57cc3",
       "source_id": "jed19-credit-glm-openrouter-rlm-r03"
     },
     {
@@ -1083,17 +1083,17 @@
       "source_id": "jed19-credit-glm-openrouter-rlm-r04"
     },
     {
-      "generated_at": "2026-09-25T16:26:08.780122+00:00",
+      "generated_at": "2026-09-25T17:26:20.664127+00:00",
       "path": "/home/amin/rlm_dashboard/artifacts/control-room/shared/jed19-credit2-glm-openrouter-rlm-r01.json",
-      "sha256": "d85460705f227a7cbaba964962150fa33b71c997283ea72d3b81c99596ff394f",
-      "snapshot_id": "0cf06dbe657c0aa7a13071b219d837924b2e6a8525b6ad00efe5694317bdb750",
+      "sha256": "b0f43d7d9a55247e686c57ca5951cd4e6378531741d1e236e9feb8a9195d53d6",
+      "snapshot_id": "025f6e116a9a85039b19b967fabf81264b6ea31bc0fa924ca444af1e6a3ee913",
       "source_id": "jed19-credit2-glm-openrouter-rlm-r01"
     },
     {
-      "generated_at": "2026-09-25T16:26:09.200260+00:00",
+      "generated_at": "2026-09-25T17:26:20.630553+00:00",
       "path": "/home/amin/rlm_dashboard/artifacts/control-room/shared/jed19-credit2-glm-openrouter-rlm-r02.json",
-      "sha256": "fdedb0ae26faee52b5cd7f7afad8e95e75880a1c8ca80b11d71cb575ff7611a8",
-      "snapshot_id": "14d133ceacde8d7ba6de3b12b8de223a600057e9b8800c6b2e7bae036c0c761b",
+      "sha256": "8c1407b7373d7553a78bfe5df51d771a2a52fdde410658b36defd80d487c1b30",
+      "snapshot_id": "cfbe6074212185fa3c179bdb58aac6075a864d8e0f44109549722e751cd44d89",
       "source_id": "jed19-credit2-glm-openrouter-rlm-r02"
     },
     {
@@ -1104,24 +1104,24 @@
       "source_id": "jed19-credit2-glm-openrouter-rlm-r03"
     },
     {
-      "generated_at": "2026-09-25T16:16:27.225494+00:00",
+      "generated_at": "2026-09-25T17:16:39.301599+00:00",
       "path": "/home/amin/rlm_dashboard/artifacts/control-room/shared/jed19-credit2-glm-openrouter-rlm-r04.json",
-      "sha256": "558bbbd860bc1e299b87f5d6478af2d6ee9ebb9050f67ade108cbfa74a1eaf8e",
-      "snapshot_id": "2910b47bee75f7d837b7f2ca98d19b80a363d16cf71b9fdde4cc66b5086c8ae3",
+      "sha256": "f85742a82be2eda1dc6e7c0058b5012bd0bc1bfa37711df1f423d306e07e7b4a",
+      "snapshot_id": "2214194135e4e2924a8f5a9e206622c964ebf47865c109dfe5f8f70d083fc126",
       "source_id": "jed19-credit2-glm-openrouter-rlm-r04"
     },
     {
-      "generated_at": "2026-09-25T16:39:14.149825+00:00",
+      "generated_at": "2026-09-25T17:09:20.042991+00:00",
       "path": "/home/amin/rlm_dashboard/artifacts/control-room/shared/jed19-glm-swiss-s01.json",
-      "sha256": "6fdf47a82dc5abdb724efc301e19422f95f186a24ba230fcb8aa2224d8f8d204",
-      "snapshot_id": "b3b0868cb6ef65bab635060b11d47bd50e5060067370980ec1935c8e435c6efd",
+      "sha256": "be497f5256c3944849a6a940dca2a87baf3f545924de90292e195581aa1291a5",
+      "snapshot_id": "cad73b436469115061645c2cfddf4eda8b654229e07786a3438ff2da5ebdd7fc",
       "source_id": "jed19-glm-swiss-s01"
     },
     {
-      "generated_at": "2026-09-25T16:30:29.262569+00:00",
+      "generated_at": "2026-09-25T17:30:49.224338+00:00",
       "path": "/home/amin/rlm_dashboard/artifacts/control-room/shared/jed19-overnight-deepseek-codeact-repair-r01.json",
-      "sha256": "0ee58c40fa4bd2149c4d93c3f33b00bdb7b8b4d0abbbddfff549654c5673947d",
-      "snapshot_id": "224ff04da69e674163d2748dfc3fcae4cd9797ec0623523eb2f1e4136362decf",
+      "sha256": "3c63c5ecb7beab1017ee10f629c5cd24695190c7d66db291d30a68af91d9f5df",
+      "snapshot_id": "04ed997cfad9c8009abe700f4c7fd5341c476933446024c31d190055a104c55f",
       "source_id": "jed19-overnight-deepseek-codeact-repair-r01"
     },
     {
@@ -1139,10 +1139,10 @@
       "source_id": "jed19-overnight-deepseek-rlm-accelerated-r01"
     },
     {
-      "generated_at": "2026-09-25T16:30:29.567532+00:00",
+      "generated_at": "2026-09-25T17:30:41.426300+00:00",
       "path": "/home/amin/rlm_dashboard/artifacts/control-room/shared/jed19-overnight-deepseek-rlm-accelerated-r03.json",
-      "sha256": "ffbd26518052ec77297889b2e9826cf9d93bd6acba7d763c6d0fadf0cdd7a937",
-      "snapshot_id": "1d032304200abac40b3ac2f89f9dead523a5396423e6293069b68599a60fc152",
+      "sha256": "4a99b5ef40d7ef0b810a2dde1ef321f7b033259f5dce7945af9200404e412a8b",
+      "snapshot_id": "7dbf5abdd5957b1a97c081314cbcfcc8392912acd8766234927d11b21f7ed867",
       "source_id": "jed19-overnight-deepseek-rlm-accelerated-r03"
     },
     {
@@ -1153,10 +1153,10 @@
       "source_id": "jed19-overnight-deepseek-rlm-accelerated-r04"
     },
     {
-      "generated_at": "2026-09-25T16:45:08.242437+00:00",
+      "generated_at": "2026-09-25T17:15:15.514144+00:00",
       "path": "/home/amin/rlm_dashboard/artifacts/control-room/shared/jed19-overnight-deepseek-rlm-accelerated-r06.json",
-      "sha256": "d51998985fe3b5478c616d2577730c7a3de98955a3c0f83a129c38a66a4febb5",
-      "snapshot_id": "c7ca00f488284d0e38784f3124fc9cdf1e9939c6a036fc3c75ac67b052afaedd",
+      "sha256": "f2a18704ae6ed35f5da94da566f36f174d48ffe569e10555db131f197bfdda52",
+      "snapshot_id": "28bc94a1af5e0d8c7604714a66410386d733a7e05baf4d4017010c4933d0758e",
       "source_id": "jed19-overnight-deepseek-rlm-accelerated-r06"
     },
     {
@@ -1258,31 +1258,31 @@
       "source_id": "jed25-r2-glm-openrouter-rlm-repair4"
     },
     {
-      "generated_at": "2026-09-25T16:28:52.700856+00:00",
+      "generated_at": "2026-09-25T17:29:07.290955+00:00",
       "path": "/home/amin/rlm_dashboard/artifacts/control-room/shared/jed4c-deepseek-codeact-x1000-s01.json",
-      "sha256": "2570de843da6271e6f9c1f7af2b3d3a239cf507a8580f4f437f1f91928e70144",
-      "snapshot_id": "b623f5823b30bc4bd2c35335254cb0910ec7f5ae9dc22eafc72831cc89009ca8",
+      "sha256": "8ddf2a97cf13222949331ebb2f27c25e7db948238e953a78a9858303ae000d1b",
+      "snapshot_id": "e32da5293431c180c841aa0b82f06bdcc1af7e2bdf0379f20a99e0bb4b1f8228",
       "source_id": "jed4c-deepseek-codeact-x1000-s01"
     },
     {
-      "generated_at": "2026-09-25T16:16:22.220514+00:00",
+      "generated_at": "2026-09-25T17:16:34.556366+00:00",
       "path": "/home/amin/rlm_dashboard/artifacts/control-room/shared/jed4c-deepseek-codeact-x1000-s02.json",
-      "sha256": "ad04b7852e5d4d91aabee6f399507cade04c4e65e53489274602eb36b0572a2d",
-      "snapshot_id": "dc42224e2eb000389181c8a52da045bb71cb8dbf23446bb2b4757f8a4b685f23",
+      "sha256": "eaafc231bb2157b973dd1f30d91e5dcb0319c428d22a7308b81cea2e296ac04d",
+      "snapshot_id": "f9b312e67020bdb27f75576d13f4cececf54944e227d0b20a9df317ab66ae56a",
       "source_id": "jed4c-deepseek-codeact-x1000-s02"
     },
     {
-      "generated_at": "2026-09-25T16:31:14.536139+00:00",
+      "generated_at": "2026-09-25T17:31:25.717213+00:00",
       "path": "/home/amin/rlm_dashboard/artifacts/control-room/shared/jed4c-deepseek-codeact-x1000-s03.json",
-      "sha256": "a6eb0231c6f71eb53b69cbd1c78c44070a2cb2855feedf3ae199b91b1fedd91e",
-      "snapshot_id": "9f8ab98b8bca314da04f34d41e415c324a0515f30aaf7e329250f423778c26d7",
+      "sha256": "cd64d7da09c8c16de716c686c8aa9c83b3059c5d1ebc1c4c85515c9472f49c06",
+      "snapshot_id": "dcafaf597197f12b3a19efc01b4dbefda371bbd13be4ed7617c02ef83e1e0d13",
       "source_id": "jed4c-deepseek-codeact-x1000-s03"
     },
     {
-      "generated_at": "2026-09-25T16:23:29.322180+00:00",
+      "generated_at": "2026-09-25T17:23:40.183155+00:00",
       "path": "/home/amin/rlm_dashboard/artifacts/control-room/shared/jed4c-deepseek-codeact-x1000-s04.json",
-      "sha256": "df4618087972b3d18afe6c9290a8652fa99250de104d66da90632fbb48ad2ca3",
-      "snapshot_id": "f6d821811243fbd35ce080fea85da35664ee11a4bfe793798792f23f660cffe9",
+      "sha256": "5bcca8ad6eaa20cb954df660f31acd5c7c5758ba8946c95d6d6dd437e61a2547",
+      "snapshot_id": "e72a976aaaa04013dd3bc4fdc88a0e401594822b919f1057d38131b85c0dfc9c",
       "source_id": "jed4c-deepseek-codeact-x1000-s04"
     },
     {
@@ -1321,24 +1321,24 @@
       "source_id": "jed4c-deepseek-codeact-x1000-s09"
     },
     {
-      "generated_at": "2026-09-25T16:20:04.958106+00:00",
+      "generated_at": "2026-09-25T17:20:17.070104+00:00",
       "path": "/home/amin/rlm_dashboard/artifacts/control-room/shared/jed4c-deepseek-codeact-x1000-s10.json",
-      "sha256": "d544edb92acb949fab8d8fd785b9e71ce2a6c218cacf5b25d5dbf7a028f927b0",
-      "snapshot_id": "2e64b357bc4e9aa82c703ba4a87f44cce5b4cc3d210c1d5332ef31edd0e89cb4",
+      "sha256": "d43f612af539f91114b72ea8ffb1f619be9fa5db5e6bbef5ecfbe59354c3c65c",
+      "snapshot_id": "cb33a015c7e0dc9f2a194791445de04a8c8968f922138c0c7cec36388448cf6b",
       "source_id": "jed4c-deepseek-codeact-x1000-s10"
     },
     {
-      "generated_at": "2026-09-25T16:16:22.045478+00:00",
+      "generated_at": "2026-09-25T17:16:34.456210+00:00",
       "path": "/home/amin/rlm_dashboard/artifacts/control-room/shared/jed4c-deepseek-codeact-x1000-s11.json",
-      "sha256": "70a1ac75a3c3c62d15221485b2f77ffdccca8e983b8c57f37978c6d5881db4f9",
-      "snapshot_id": "7e4f707f13d19cd44f688721061fdb12b4b0a792445b49da44b83f50397e0a05",
+      "sha256": "a2c35fbffcb03ffa0012634ae862cb89245e404d37b03874cc4e366ff091542d",
+      "snapshot_id": "866ca9898acb55e6c50c638dd316f01dafd12d3fe20dc43fae7e1c93d0f9636a",
       "source_id": "jed4c-deepseek-codeact-x1000-s11"
     },
     {
-      "generated_at": "2026-09-25T16:26:14.141423+00:00",
+      "generated_at": "2026-09-25T17:26:25.076340+00:00",
       "path": "/home/amin/rlm_dashboard/artifacts/control-room/shared/jed4c-deepseek-codeact-x1000-s12.json",
-      "sha256": "b4a8d189475e2e9fcfc1c172d6901bf26e8f44b4d2ac08727ab39b704aefcdd9",
-      "snapshot_id": "44e7778b815d597f45a47e330c3efd5ffd79eec9b67754497200f1f7e11bad3c",
+      "sha256": "d0425d3c4a4f652402bddb8b27ac4a7e9f864952eee6b1f86937613a41e1dbd3",
+      "snapshot_id": "31e7882eaf1f73b8c662b4892636f4ae037f58a1b2d74722ec66a07839115639",
       "source_id": "jed4c-deepseek-codeact-x1000-s12"
     },
     {
@@ -1349,10 +1349,10 @@
       "source_id": "jed4c-deepseek-codeact-x1000-s13"
     },
     {
-      "generated_at": "2026-09-25T16:18:50.551120+00:00",
+      "generated_at": "2026-09-25T17:19:02.799969+00:00",
       "path": "/home/amin/rlm_dashboard/artifacts/control-room/shared/jed4c-deepseek-codeact-x1000-s14.json",
-      "sha256": "7d8d9badd7d4b1b28c6e35b35949569de2acc89d4686fbbafd9829d26e946a2e",
-      "snapshot_id": "da734947e8300f7076ef1ade889bb27703983216fff8ca4027b0db0c882a8a3a",
+      "sha256": "49b6fddfb8c6647b4f8540a62e6e6307874d66c0021478fa7b2e0c968dc0ce75",
+      "snapshot_id": "f3b8313883ab09d942e11b10f6564ef2611835220e94c06c79074fcf53fd4139",
       "source_id": "jed4c-deepseek-codeact-x1000-s14"
     },
     {
@@ -1363,17 +1363,17 @@
       "source_id": "jed4c-deepseek-codeact-x1000-s15"
     },
     {
-      "generated_at": "2026-09-25T16:31:15.709565+00:00",
+      "generated_at": "2026-09-25T17:31:27.854123+00:00",
       "path": "/home/amin/rlm_dashboard/artifacts/control-room/shared/jed4c-deepseek-codeact-x1000-s16.json",
-      "sha256": "f087e7b607bb041d041460f7b00cabd054cb565f107f6832a522f425ac21846f",
-      "snapshot_id": "a160c208780482b744a99f165443f71f4e5b0ad08eec4d133e9e27f7bd1496db",
+      "sha256": "b323d6f4249e9abbb5b395f874c4371453b506a93cb98aa5cadba8a5322c8b52",
+      "snapshot_id": "708baa845105a89dfc3c88d20243d9de60a7ecbd12fe011ae5df094d9455f4f8",
       "source_id": "jed4c-deepseek-codeact-x1000-s16"
     },
     {
-      "generated_at": "2026-09-25T16:16:20.702215+00:00",
+      "generated_at": "2026-09-25T17:16:33.754640+00:00",
       "path": "/home/amin/rlm_dashboard/artifacts/control-room/shared/jed4c-deepseek-codeact-x1000-s17.json",
-      "sha256": "c2f8c4f178da8dbbcc06683e7ed80429badb7d38f3d6f60bc9d0086fa4cadbb9",
-      "snapshot_id": "d2744b915faa2b07fa55fe5ed863f18a1ae7cfe9d63d6baa21873e8e193b93c8",
+      "sha256": "d3ff53bb2b8a4d5c6bc9e071fb905d8200da6a8499e257fd1dc55e04d04b7f05",
+      "snapshot_id": "181d298a7f3cb15488126111cdb08e8e6deb21ef59cbedc7debc439698ac5038",
       "source_id": "jed4c-deepseek-codeact-x1000-s17"
     },
     {
@@ -1398,10 +1398,10 @@
       "source_id": "jed4c-deepseek-codeact-x1000-s20"
     },
     {
-      "generated_at": "2026-09-25T16:39:18.363944+00:00",
+      "generated_at": "2026-09-25T17:09:24.735474+00:00",
       "path": "/home/amin/rlm_dashboard/artifacts/control-room/shared/jed8705-deepseek-rlm-systemexit-repair-v1.json",
-      "sha256": "5aa0c7504d98c9207f2ffbd2d9dfc79948ccf411ebf9802c40a9ab43a12946a2",
-      "snapshot_id": "01ad095a458df4338982f71a529244258f2a1ba2cab06fff5aa832b2a69bcd3b",
+      "sha256": "8e52661a45d19bca697bacb47a89a4cc6e895baa8df1e8046202e03df3852f9e",
+      "snapshot_id": "4486a3214d0e2c99dfda1d664d79e52ccdc697538e5ff57755e6b8c5d352afc9",
       "source_id": "jed8705-deepseek-rlm-systemexit-repair-v1"
     },
     {
@@ -1419,66 +1419,66 @@
       "source_id": "kuma-claude-llm-v34"
     },
     {
-      "generated_at": "2026-09-25T16:35:25.397521+00:00",
+      "generated_at": "2026-09-25T17:05:40.894462+00:00",
       "path": "/home/amin/rlm_dashboard/artifacts/control-room/shared/kuma-claude-rlm-v34.json",
-      "sha256": "6248b3a3455df43c8dc0eaeabaff3ebcdb9002b53be3052c4859a5430f39e536",
-      "snapshot_id": "997c66d7d56042798924f89aaf9588528d3df0eb5f6a46bd208b4925c039abb7",
+      "sha256": "f30c04558c9c5b7abb603a8a27e8df8c3161324020eff869aead7124a386944b",
+      "snapshot_id": "33b38803478cbaf915755987af5697a9fb2cfbc3863cb4c47bff8c1bbd90529f",
       "source_id": "kuma-claude-rlm-v34"
     },
     {
-      "generated_at": "2026-09-25T16:34:22.967117+00:00",
+      "generated_at": "2026-09-25T17:04:35.928665+00:00",
       "path": "/home/amin/rlm_dashboard/artifacts/control-room/shared/kuma-full-v34-0bd5bd3b.json",
-      "sha256": "332c58cf8190030523889e481d3498c12587e5168b0154809b4f5c47cf0b293f",
-      "snapshot_id": "6f5cd2e84cd6ae88e81ea3c24a3961621a0d39645910b5e46544f945bfd83ad7",
+      "sha256": "35e7f0d37798c98291701ef6af8a2f7a73ce277b780b4dae15a280d010db17f9",
+      "snapshot_id": "54a48b0b8c101f7d5670bad7a71dea9035951e689b9e84af33c6328466d7659a",
       "source_id": "kuma-full-v34-0bd5bd3b"
     },
     {
-      "generated_at": "2026-09-25T16:43:33.085012+00:00",
+      "generated_at": "2026-09-25T17:13:47.640114+00:00",
       "path": "/home/amin/rlm_dashboard/artifacts/control-room/shared/kuma-full-v34-4644942a.json",
-      "sha256": "90f8d78381c8edc26c9dc702aa3b53e0a9999ccb997586679f7d52b79bd4c055",
-      "snapshot_id": "55962871ee06c565fbe148c09f8e1d3edc8c60e0779750965164d7dcbdc15a18",
+      "sha256": "160761d0dca6f40724c311e0b83f2cc0e2c8870ec218232635cccf474317a885",
+      "snapshot_id": "4f836bd504bf65fcc0927a704713cc1b15380d86248f026c640c01f2951f7882",
       "source_id": "kuma-full-v34-4644942a"
     },
     {
-      "generated_at": "2026-09-25T16:15:56.520941+00:00",
+      "generated_at": "2026-09-25T17:16:21.252688+00:00",
       "path": "/home/amin/rlm_dashboard/artifacts/control-room/shared/kuma-full-v34-5143aa8d.json",
-      "sha256": "0ba8034d8160cd99d495fb8904c02298251c6ec927a376937eece9dc9727a883",
-      "snapshot_id": "b5107b89696b6d11e9939550f0a1fa45723ef24ac83521e163de4816125bec47",
+      "sha256": "313410e8b22d6ff6b1ebcf15577e7179cbc1e217bc7e3a66cec866ffb8003a01",
+      "snapshot_id": "418a51e86f0c49642a07cab8dbe0141a4209a4db48486abd0a25c7e2ac7b9817",
       "source_id": "kuma-full-v34-5143aa8d"
     },
     {
-      "generated_at": "2026-09-25T16:46:06.166345+00:00",
+      "generated_at": "2026-09-25T17:16:18.398489+00:00",
       "path": "/home/amin/rlm_dashboard/artifacts/control-room/shared/kuma-full-v34-7b0e2342.json",
-      "sha256": "75341a65c6e2739407cf4f0ec58d411d4362b8cdacf424203dd5c4f703b1c14b",
-      "snapshot_id": "a3aa676428ce00f4da41d4c7b2a256f608ae0b15d545daa1b7df137283cd0a91",
+      "sha256": "85a5d84aed1888148d26aec3d4ffe1cb27305dead32b8ddbd52b55c13b30ecd5",
+      "snapshot_id": "0ba15ffb93d6fbe9ce67c595cecdbde6922e09e3cdd1675ecc9f20bf197e79eb",
       "source_id": "kuma-full-v34-7b0e2342"
     },
     {
-      "generated_at": "2026-09-25T16:45:51.428468+00:00",
+      "generated_at": "2026-09-25T17:16:04.245179+00:00",
       "path": "/home/amin/rlm_dashboard/artifacts/control-room/shared/kuma-full-v34-bced0692.json",
-      "sha256": "78925f8dc5815442642d00675d58167bdf7a763f630b77f080e39e3c4be5034d",
-      "snapshot_id": "2164c5ed4dc7a5d2a4e9debd0d0a39e682b6569cd78d93c02f780291e2b5b82f",
+      "sha256": "4839e2110f3eb3a565e0614a9f6672f9aad5b63edaec889dc12d6e08005e9bd3",
+      "snapshot_id": "15f69f9dab2f1fac619bfd70b49be3d457ad0d122a5237b3241df333b864721a",
       "source_id": "kuma-full-v34-bced0692"
     },
     {
-      "generated_at": "2026-09-25T16:34:23.854216+00:00",
+      "generated_at": "2026-09-25T17:04:36.515827+00:00",
       "path": "/home/amin/rlm_dashboard/artifacts/control-room/shared/kuma-full-v34-d50654b8.json",
-      "sha256": "ff2ff14bfb121cff33b43b0ebae76d02be2acd4f85feb7a6c5d2864b2b417fa5",
-      "snapshot_id": "961db2dc7d1e6e6df66a56cd4fdfa173ce5d526257389e22247cc270cdc95794",
+      "sha256": "128b80c1e9465c971d515ff38bac4d3e894f1a7b64534a1163ae6b7a06ceb72d",
+      "snapshot_id": "8a4d279b04786ef607e4c377c7a5739f8581ba9618a50c528de1a8ceeb859012",
       "source_id": "kuma-full-v34-d50654b8"
     },
     {
-      "generated_at": "2026-09-25T16:15:55.049713+00:00",
+      "generated_at": "2026-09-25T17:16:19.359527+00:00",
       "path": "/home/amin/rlm_dashboard/artifacts/control-room/shared/kuma-full-v34-dc2a28fe.json",
-      "sha256": "010cf1e6e335e0fe3efd1be45d58927649b4cac800eb5febbf527f77943f0f4c",
-      "snapshot_id": "f0e2456818a2c4cddda26db3410ecca69f261ad3fe5c13cbe976fb6180b4b8ce",
+      "sha256": "80d21a5a3824efb9bf528d798fdcd0551aeae1034e13d2bc8e38fb12ff974dce",
+      "snapshot_id": "1e5d19ddfaa067464edabbbb7c48b70c45e07d73c1d733f976cdbc79de9800b8",
       "source_id": "kuma-full-v34-dc2a28fe"
     },
     {
-      "generated_at": "2026-09-25T16:16:45.231345+00:00",
+      "generated_at": "2026-09-25T17:17:10.529719+00:00",
       "path": "/home/amin/rlm_dashboard/artifacts/control-room/shared/kuma-full-v34-f157c291.json",
-      "sha256": "734fa350ea49431f9bf4fcd2d9adeb3d969a844886272f7d7efeacbc9bc659a4",
-      "snapshot_id": "dc084127ad79cc63cb9c31fc256fb880199a3a5101d95efedb330d0106700540",
+      "sha256": "bbffabdbf7071caf839f2787252181802cf8158789041437f2cff4ccf42795a8",
+      "snapshot_id": "91227e58f0c22a99d90fda8f8d3e7b353547b66b6876c3006a3482b19b991721",
       "source_id": "kuma-full-v34-f157c291"
     },
     {
@@ -1510,10 +1510,10 @@
       "source_id": "liacpc14-deepseek-docker-queue-v1"
     },
     {
-      "generated_at": "2026-09-25T16:38:46.510628+00:00",
+      "generated_at": "2026-09-25T17:08:51.878985+00:00",
       "path": "/home/amin/rlm_dashboard/artifacts/control-room/shared/liacpc14-deepseek-paid-continuation-v1-96702403.json",
-      "sha256": "1c48a754cc2bb5174241fe3f3157c2f3588a947aba2c3cbefd588c7e7b950877",
-      "snapshot_id": "fb7534d7fed0205e4dd3ce9aea5f33f2929b447aaaa5927273248225936c38b2",
+      "sha256": "acb8020f781d51003ea3b2632c7611723378c74c487791395c1094b143956057",
+      "snapshot_id": "74321bbf7b5e90ad63b42ae662899c86bae89b37c876b3285b74efe4cdbcde2b",
       "source_id": "liacpc14-deepseek-paid-continuation-v1-96702403"
     },
     {
@@ -1524,17 +1524,17 @@
       "source_id": "liacpc14-deepseek-rlm-x1000-docker-sideworker-v1"
     },
     {
-      "generated_at": "2026-09-25T16:38:50.125450+00:00",
+      "generated_at": "2026-09-25T17:08:57.820788+00:00",
       "path": "/home/amin/rlm_dashboard/artifacts/control-room/shared/liacpc14-full-v34-4bef4ccd.json",
-      "sha256": "c33fd488b5bb78b14e9a32713ada26021a46058c90120eab1fc414df17873cd8",
-      "snapshot_id": "e8fe0f5232d24b1e913d7196f4a31491589cdd392ee9ee02b4525d725ec0c0cc",
+      "sha256": "2678139ad47c9db40b1cf54fec808c08d7822917255731aa59a7b2b9636b8378",
+      "snapshot_id": "04d482b3c60a456096733633923b3bb974ac45a44f4624141f5ad3527ecac277",
       "source_id": "liacpc14-full-v34-4bef4ccd"
     },
     {
-      "generated_at": "2026-09-25T16:37:02.102524+00:00",
+      "generated_at": "2026-09-25T17:07:08.955778+00:00",
       "path": "/home/amin/rlm_dashboard/artifacts/control-room/shared/liacpc14-full-v34-e3e3abcb.json",
-      "sha256": "fba03d22a3b2c96174680c7c1800ad30e2eda839e498efde67d3cfc84546a9d8",
-      "snapshot_id": "1fa474307a5e6a4b3d89334c0e8414d383926837740288cd07fbac9cf5a1f016",
+      "sha256": "ca718b2aac9845f9b0090b8be0454f2146f653475ddc4b4a1f85d5600e3da2fe",
+      "snapshot_id": "7aceda0b043ded6d881a00792517f4246de91c5d232aca67791578727eae57b7",
       "source_id": "liacpc14-full-v34-e3e3abcb"
     },
     {
@@ -1552,17 +1552,17 @@
       "source_id": "liacpc14-glm-docker-queue-v1"
     },
     {
-      "generated_at": "2026-09-25T16:24:16.724823+00:00",
+      "generated_at": "2026-09-25T17:24:27.824887+00:00",
       "path": "/home/amin/rlm_dashboard/artifacts/control-room/shared/liacpc14-glm-docker-x100-sideworker-v1.json",
-      "sha256": "9312d4ed71f351cbcdb6cfd2f6d2a61eb2f09e72098e0e83a4a525f63df20535",
-      "snapshot_id": "f79823419361fcb441ffc6f3eb803cf7ea1070a549f55129ff5bd5c77d774660",
+      "sha256": "542c0e9052bc380e3fb8aa6628dfbba21046ebee7cea5a2f4c697ad51b089fe9",
+      "snapshot_id": "71a0c190fc8748f39fb595ad431081f45a3683230423fb802cf9ff161c514bc5",
       "source_id": "liacpc14-glm-docker-x100-sideworker-v1"
     },
     {
-      "generated_at": "2026-09-25T16:41:06.008562+00:00",
+      "generated_at": "2026-09-25T17:11:12.864465+00:00",
       "path": "/home/amin/rlm_dashboard/artifacts/control-room/shared/liacpc14-glm-llm-v28-archive.json",
-      "sha256": "2db3030e59602a1cb2c33e6cb2f06a30af839073b81f7f809e32a988576b88a1",
-      "snapshot_id": "ec65ab6cfdb658dbb7e42372e0b5346a014327e31dee428fdea6b3ae26ead666",
+      "sha256": "9eada3d05b0ca01bf824c4c57d9ef548fc45923898969b57c10da6ebebaf494d",
+      "snapshot_id": "5cd370e3327e5c43f933308cc9c1a35a202feafa029f9fd101cef9d753dde01c",
       "source_id": "liacpc14-glm-llm-v28-archive"
     },
     {
@@ -1573,10 +1573,10 @@
       "source_id": "liacpc14-glm-llm-v28-archive-exact"
     },
     {
-      "generated_at": "2026-09-25T16:37:02.097193+00:00",
+      "generated_at": "2026-09-25T17:07:07.318455+00:00",
       "path": "/home/amin/rlm_dashboard/artifacts/control-room/shared/liacpc14-gpt-direct-docker-v1-13b56467.json",
-      "sha256": "dc162fa0f58fa1b923e09428025d1f56b0035d0521879fe39af796d5b946cc0f",
-      "snapshot_id": "302eca093268f9f0b154d9021a84a010f03fc9d6ef4b28a1808dbe26b1a350c4",
+      "sha256": "c778b06ed8dcc1c250e485344feb23df765cb335b59c63052f6c1d9332d2471f",
+      "snapshot_id": "fc1451eeaf07bf2d4ac8182cdfd514761f660454aa28d10c41a215b11069fc13",
       "source_id": "liacpc14-gpt-direct-docker-v1-13b56467"
     },
     {
@@ -1587,24 +1587,24 @@
       "source_id": "liacpc14-gpt-direct-docker-v1-ae21fd78"
     },
     {
-      "generated_at": "2026-09-25T16:37:13.893042+00:00",
+      "generated_at": "2026-09-25T17:07:19.017208+00:00",
       "path": "/home/amin/rlm_dashboard/artifacts/control-room/shared/liacpc14-gpt-direct-recovery-v1-ee6a971b.json",
-      "sha256": "2368dd3dd7f9dfc05f388d095eebd7763963575545f4a9c3307f8dbc288b007a",
-      "snapshot_id": "a5a81e3996185dc17f465c46f909015e1faa177080909e8dde670c821a2b9499",
+      "sha256": "c2b116b0a2c7f46bc884a3468a4b495c31b6773fa96074847c384c957781096c",
+      "snapshot_id": "a0f99e038f0142e14e2c13d1fd87b31814878ebbf36bc0612984e76a5aaacc8f",
       "source_id": "liacpc14-gpt-direct-recovery-v1-ee6a971b"
     },
     {
-      "generated_at": "2026-09-25T16:18:30.273305+00:00",
+      "generated_at": "2026-09-25T17:18:44.455444+00:00",
       "path": "/home/amin/rlm_dashboard/artifacts/control-room/shared/liacpc14-gpt-task15-highmem-v1.json",
-      "sha256": "e67e429d81ec38c489ffba6bbf2d6d6d04d18c4bb37f05f35870a505b069a847",
-      "snapshot_id": "e62970e24fd5644da2e3aeb200bd632a7a287619365a4d54397661e1ef3d757b",
+      "sha256": "36357f58a13567a124d670c6d4b4a41d3f95480d052cd6b1235bf6f14c898f05",
+      "snapshot_id": "47fb48da382e84b488dc7b082b6cc1efd0adb5d552bc648900edf672ca9535e2",
       "source_id": "liacpc14-gpt-task15-highmem-v1"
     },
     {
-      "generated_at": "2026-09-25T16:32:06.835133+00:00",
+      "generated_at": "2026-09-25T17:32:17.702515+00:00",
       "path": "/home/amin/rlm_dashboard/artifacts/control-room/shared/liacpc14-qwen-docker-repair-v1.json",
-      "sha256": "01d7e7647d278941931dc9bfa490e3a6b1163173a699a192b8ce2c3d70ddfb4e",
-      "snapshot_id": "63670872debf4a70b04e6ea882db43a8e07713e56b5d9983153f6a56bbf6f8d1",
+      "sha256": "5633c442c4d688977db754a3f3f114327812c5a56ec0377e4fd541604e185f34",
+      "snapshot_id": "3718b7fcc4f1391c3910abb71a7cc5c5a87b28aed6b29f671a0ad7958740abb3",
       "source_id": "liacpc14-qwen-docker-repair-v1"
     },
     {
