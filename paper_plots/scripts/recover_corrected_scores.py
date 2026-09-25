@@ -11,6 +11,7 @@ import json
 import os
 import re
 import sys
+import tarfile
 import tempfile
 from collections import Counter
 from concurrent.futures import ThreadPoolExecutor
@@ -202,6 +203,65 @@ def fetch_logs(
             status[run_id] = source
             if content is not None:
                 logs[run_id] = content
+    return logs, status
+
+
+def load_artifact_tar_logs(
+    *,
+    path: Path,
+    target_run_ids: set[str],
+    wandb_urls: dict[str, str],
+) -> tuple[dict[str, bytes], dict[str, str]]:
+    """Read authoritative successful stdout logs from a campaign artifact tar.
+
+    Backups may contain the same attempt more than once. The W&B URL recorded
+    in metadata identifies the successful attempt selected by the dashboard;
+    duplicate copies are accepted only when their stdout bytes are identical.
+    No archive member is extracted to the filesystem.
+    """
+
+    candidates: dict[str, list[tuple[str, bytes]]] = {}
+    with tarfile.open(path) as archive:
+        for member in archive.getmembers():
+            if not member.isfile() or not member.name.endswith("/metadata.json"):
+                continue
+            parts = member.name.split("/")
+            matching_ids = target_run_ids.intersection(parts)
+            if not matching_ids:
+                continue
+            stream = archive.extractfile(member)
+            if stream is None:
+                raise ValueError(f"Could not read artifact metadata: {member.name}")
+            metadata = json.load(stream)
+            run = metadata.get("run") or {}
+            result = metadata.get("result") or {}
+            run_id = str(run.get("run_id", ""))
+            if run_id not in matching_ids or result.get("status") != "succeeded":
+                continue
+            recorded_url = str((result.get("metrics") or {}).get("wandb_url") or "")
+            expected_url = wandb_urls.get(run_id, "")
+            if expected_url and recorded_url != expected_url:
+                continue
+            stdout_name = member.name.rsplit("/", 1)[0] + "/stdout.log"
+            try:
+                stdout_member = archive.getmember(stdout_name)
+            except KeyError as error:
+                raise ValueError(f"Missing stdout for successful artifact {member.name}") from error
+            stdout_stream = archive.extractfile(stdout_member)
+            if stdout_stream is None:
+                raise ValueError(f"Could not read artifact stdout: {stdout_name}")
+            content = stdout_stream.read()
+            candidates.setdefault(run_id, []).append((stdout_name, content))
+
+    logs: dict[str, bytes] = {}
+    status: dict[str, str] = {}
+    for run_id, copies in candidates.items():
+        hashes = {sha256_bytes(content) for _name, content in copies}
+        if len(hashes) != 1:
+            names = [name for name, _content in copies]
+            raise ValueError(f"Conflicting successful stdout copies for {run_id}: {names}")
+        logs[run_id] = copies[0][1]
+        status[run_id] = "artifact-tar"
     return logs, status
 
 
@@ -449,6 +509,13 @@ def main() -> int:
     parser.add_argument("--corrected-ground-truth", type=Path, default=DEFAULT_CORRECTED_GT)
     parser.add_argument("--historical-task15", type=Path, default=DEFAULT_HISTORICAL_TASK15)
     parser.add_argument("--dataset", type=Path, default=DEFAULT_DATASET)
+    parser.add_argument(
+        "--artifact-tar",
+        action="append",
+        type=Path,
+        default=[],
+        help="Campaign artifact tar containing metadata.json and stdout.log files.",
+    )
     parser.add_argument("--workers", type=int, default=16)
     parser.add_argument("--skip-task15", action="store_true")
     parser.add_argument("--allow-recovery-regression", action="store_true")
@@ -466,6 +533,23 @@ def main() -> int:
         cache_dir=args.cache_dir / "wandb-output",
         workers=args.workers,
     )
+    artifact_tar_inputs: list[dict[str, Any]] = []
+    for artifact_tar in args.artifact_tar:
+        artifact_logs, artifact_status = load_artifact_tar_logs(
+            path=artifact_tar,
+            target_run_ids=set(targets),
+            wandb_urls=urls,
+        )
+        logs.update(artifact_logs)
+        fetch_status.update(artifact_status)
+        artifact_tar_inputs.append(
+            {
+                "path": str(artifact_tar),
+                "sha256": sha256_file(artifact_tar),
+                "bytes": artifact_tar.stat().st_size,
+                "matched_run_count": len(artifact_logs),
+            }
+        )
     historical = load_ground_truth(args.historical_ground_truth)
     corrected = load_ground_truth(args.corrected_ground_truth)
     dataset_size = sum(1 for line in args.dataset.open() if line.strip())
@@ -710,6 +794,7 @@ def main() -> int:
                 "path": str(args.predictions_output),
                 "sha256": sha256_file(args.predictions_output),
             },
+            "artifact_tars": artifact_tar_inputs,
         },
         "counts": {
             "unique_affected_runs": len(targets),

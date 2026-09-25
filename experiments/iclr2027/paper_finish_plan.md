@@ -23,10 +23,11 @@ queue for finishing the submission.
   rescored or whether the model saw incorrect inputs and the run must be
   repeated. Re-run API inference only when rescoring cannot recover the valid
   result.
-  The classification and first recovery pass are complete: 931 unique affected
+  The classification and artifact recovery pass are complete: 1,311 unique affected
   runs have exact corrected scores from preserved logs or deterministic reruns.
-  Another 480 logs await access to Sathvik's W&B entity, and 332 accessible logs
-  lack sufficient retained prediction detail and still require a corrected rerun.
+  Sathvik's artifact tar resolved 380 of the 480 formerly access-blocked runs. The
+  remaining 432 logs (332 under `liac`, 100 under Sathvik's entity) lack sufficient
+  retained prediction detail and still require a corrected rerun.
   Scores still marked `historical_score_invalidated` remain excluded; exclusion
   is not a corrected score.
 - [x] Apply the audit across LLM, CodeAct, and RLM for every model and control

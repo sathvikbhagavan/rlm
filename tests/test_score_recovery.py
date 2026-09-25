@@ -2,10 +2,15 @@ from __future__ import annotations
 
 import json
 import random
+import tarfile
+from io import BytesIO
 
 import pytest
 
-from paper_plots.scripts.recover_corrected_scores import load_targets
+from paper_plots.scripts.recover_corrected_scores import (
+    load_artifact_tar_logs,
+    load_targets,
+)
 from rlm.codeact_helpers import RandomContextPipeline
 from rxnhaystack.score_recovery import (
     SampleMetric,
@@ -158,6 +163,50 @@ def test_recovery_targets_survive_a_gold_table_rebuild(tmp_path) -> None:
     targets = load_targets((path,))
 
     assert set(targets) == {"still-pending", "already-recovered"}
+
+
+def test_artifact_tar_selects_dashboard_attempt_and_deduplicates_backups(tmp_path) -> None:
+    path = tmp_path / "artifacts.tar"
+    run_id = "full-model-tier3-task23-rlm-x100-r01"
+    selected_url = "https://wandb.ai/entity/project/runs/selected"
+
+    def add(archive, name, content):
+        encoded = content.encode()
+        info = tarfile.TarInfo(name)
+        info.size = len(encoded)
+        archive.addfile(info, BytesIO(encoded))
+
+    with tarfile.open(path, "w") as archive:
+        for root in ("artifacts/current", "artifacts/backup"):
+            base = f"{root}/runs/{run_id}/attempt-001"
+            metadata = {
+                "run": {"run_id": run_id},
+                "result": {
+                    "status": "succeeded",
+                    "metrics": {"wandb_url": selected_url},
+                },
+            }
+            add(archive, f"{base}/metadata.json", json.dumps(metadata))
+            add(archive, f"{base}/stdout.log", "preserved prediction\n")
+        base = f"artifacts/current/runs/{run_id}/attempt-002"
+        metadata = {
+            "run": {"run_id": run_id},
+            "result": {
+                "status": "succeeded",
+                "metrics": {"wandb_url": "https://wandb.ai/entity/project/runs/other"},
+            },
+        }
+        add(archive, f"{base}/metadata.json", json.dumps(metadata))
+        add(archive, f"{base}/stdout.log", "wrong attempt\n")
+
+    logs, status = load_artifact_tar_logs(
+        path=path,
+        target_run_ids={run_id},
+        wandb_urls={run_id: selected_url},
+    )
+
+    assert logs == {run_id: b"preserved prediction\n"}
+    assert status == {run_id: "artifact-tar"}
 
 
 @pytest.mark.parametrize(

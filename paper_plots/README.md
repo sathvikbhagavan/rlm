@@ -28,13 +28,17 @@ logs before rebuilding the tables:
 ```sh
 WANDB_API_KEY=... uv run python \
   paper_plots/scripts/recover_corrected_scores.py \
-  --snapshot-dir artifacts/control-room/shared
+  --snapshot-dir artifacts/control-room/shared \
+  --artifact-tar /path/to/campaign-artifacts.tar
 uv run python paper_plots/scripts/build_gold_results.py
 uv run python paper_plots/scripts/build_causal_controls.py
 ```
 
 The recovery command reconstructs the original sampled context, validates the
 historical score, then scores the same prediction against the corrected answer.
+Artifact tars are read in place without filesystem extraction; successful attempts
+are selected by the W&B URL recorded in metadata, and duplicate backup copies must
+be byte-identical.
 It writes an exact-rescore manifest and a separate prediction ledger under
 `paper_plots/gold/`; neither contains credentials. Retrieved console logs stay
 in the ignored local cache `artifacts/score-recovery/`. A completed recovery
