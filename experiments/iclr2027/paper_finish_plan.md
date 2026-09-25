@@ -105,9 +105,10 @@ queue for finishing the submission.
   succeeded and carries the complete score and resource record.
 - [x] Freeze the $x=1000$ CodeAct extension: 89 successes and 61 terminal
   failures across 150 jobs and 500 trajectories.
-- [ ] Complete the $x=1000$ RLM extension. The 135 non-Docker jobs succeeded;
-  the 15 Docker jobs for Tasks 16, 17, and 17b are queued on liacpc14. Regenerate
-  the GPT profile and add the RLM $x=1000$ column only after all 15 terminate.
+- [x] Complete the $x=1000$ RLM extension: all 135 non-Docker and 15 Docker
+  jobs succeeded, for 150/150 successful jobs and 500 trajectories.
+- [ ] Import the completed $x=1000$ RLM records into the frozen gold data,
+  regenerate the GPT-5 mini profile, and add the RLM $x=1000$ column.
 - [x] Generate and include the currently terminal GPT core-metrics,
   resource-diagnostics, and task-level heatmap pages.
 
@@ -137,14 +138,19 @@ queue for finishing the submission.
 - [ ] Complete the GLM 5.2 CodeAct arm and regenerate its model profile. This
   is an artifact-completeness follow-up and is outside the frozen submission
   analysis.
+- [ ] Complete or freeze the remaining GLM 5.2 RLM cells, including the held
+  Docker subset, and regenerate its model profile. Keep this work outside the
+  frozen submission analysis unless the complete arm is available in time.
 
 #### Control-study appendix audit
 
 - [x] Add the complete GPT-5 mini matched-cardinality task heatmap and resource
   profile to the appendix (725 jobs; 2,175 trajectories).
-- [ ] Replace the provisional Qwen matched-cardinality coverage and success-only
-  diagnostic when all 725 jobs terminate. Until then, exclude it from causal
-  claims and cross-model comparisons.
+- [ ] Replace the Qwen3.5-397B-A17B matched-cardinality coverage and
+  success-only diagnostic when all 725 jobs terminate. The latest frozen
+  snapshot has 648 successes, 75 terminal failures, and two running jobs;
+  terminal failures must contribute zero. Until the final refresh, exclude
+  this arm from causal claims and cross-model comparisons.
 - [x] Add task/context heatmaps and complete performance/resource profiles for
   the Qwen and Claude chemistry-rule controls.
 - [x] Add the deterministic executor runtime/memory profile and document its
