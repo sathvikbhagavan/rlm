@@ -1,6 +1,6 @@
 # Gold ICLR 2027 plotting results
 
-Frozen from the shared experiment dashboard at `2026-09-25T14:23:55.984574+00:00`.
+Frozen from the shared experiment dashboard at `2026-09-25T16:46:06.166345+00:00`.
 
 Gold means that the plotting input is frozen, auditable, and provenance-recorded. It does not mean every experiment arm is finished. `arm_status.csv` and the `arm_final` columns distinguish terminal arms from provisional ones.
 
@@ -37,7 +37,7 @@ All plotting aggregates score terminal failed jobs as zero. Running, stale, and 
 ## Causal controls
 
 The `causal_controls/` directory freezes the completed GPT-5-mini matched-cardinality arm, Qwen/Claude chemistry-rule controls and their ordinary RLM counterparts, and the deterministic executor ceiling. Its record tables and source manifest preserve the aggregation rules and contributing snapshots. The directory also stores a status-explicit provisional Qwen matched-cardinality snapshot, which is excluded from final inference until all 725 cells terminate.
-Ground-truth-invalidated control scores are excluded exactly as in the main benchmark tables; the causal-control aggregates report their score coverage, while retaining all measured resource fields.
+Exact corrected rescores are included and labeled `corrected_exact_rescore`. Remaining ground-truth-invalidated control scores are excluded exactly as in the main benchmark tables; the causal-control aggregates report their score coverage while retaining all measured resource fields.
 
 ## Prospective-route control
 
