@@ -34,6 +34,10 @@ queue for finishing the submission.
   performance claims.
 - [ ] Add the resulting analysis, figure or table, and exact sample sizes to
   the paper and plotting record.
+- [ ] Release and document the human-annotation interface so additional
+  expert annotations can be solicited through the final-version freeze. State
+  this availability explicitly in the paper and release materials, and
+  version each annotation export used in the analysis.
 
 ### 3. Freeze one visual language for the paper
 
@@ -109,12 +113,13 @@ queue for finishing the submission.
 
 #### Six-model matrix audit: DeepSeek V4 Flash
 
-- [ ] Freeze the main RLM arm after its final two Task-17b full-corpus jobs
-  terminate. Do not publish a provisional DeepSeek per-model profile.
+- [x] Freeze the terminal main matrix: LLM has 300 successes, CodeAct has 269
+  successes and 31 terminal failures, and RLM has 450 successes. Terminal
+  failures contribute zero to macro-F1.
 - [x] Freeze the terminal $x=1000$ CodeAct and RLM extensions, including the
   local Docker result pack and the provenance-recorded recovered score.
-- [ ] Generate and include the DeepSeek core-metrics, resource-diagnostics,
-  and task-level heatmap pages after the main arm becomes terminal.
+- [x] Generate and include the DeepSeek core-metrics, resource-diagnostics,
+  and task-level heatmap pages for the main matrix and $x=1000$ extensions.
 
 #### Six-model matrix audit: Qwen 3.5
 
