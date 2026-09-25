@@ -59,6 +59,48 @@ def test_main_capability_matrix_weights_questions_and_scores_failures_zero() -> 
     assert matrix[0, 6] == pytest.approx(0.25)
 
 
+def test_human_tier_reference_requires_one_row_per_tier() -> None:
+    pytest.importorskip("matplotlib")
+    from paper_plots.scripts.plot_main_results import human_tier_f1
+
+    rows = [
+        {
+            "population": "human_assigned_items",
+            "tier": str(tier),
+            "mean_f1": str(tier / 4),
+        }
+        for tier in range(1, 5)
+    ]
+
+    assert human_tier_f1(rows) == {1: 0.25, 2: 0.5, 3: 0.75, 4: 1.0}
+    with pytest.raises(ValueError, match="one human-assigned result"):
+        human_tier_f1(rows[:-1])
+
+
+def test_human_tier_summary_keeps_active_and_offline_time_separate() -> None:
+    pytest.importorskip("matplotlib")
+    from paper_plots.scripts.plot_main_results import human_tier_summary
+
+    rows = [
+        {
+            "tier": str(tier),
+            "submitted": "True",
+            "abstention": "",
+            "f1": "0.5",
+            "exact_match": "0.0",
+            "active": "120",
+            "offline_minutes": "5",
+        }
+        for tier in range(1, 5)
+    ]
+
+    summary = human_tier_summary(rows)
+
+    assert summary[1]["f1"] == 0.5
+    assert summary[1]["median_active_minutes"] == 2.0
+    assert summary[1]["median_offline_minutes"] == 5.0
+
+
 def test_efficiency_frontier_uses_usd_per_trajectory_and_scores_failures_zero() -> None:
     pytest.importorskip("matplotlib")
     from paper_plots.scripts.plot_main_results import efficiency_points

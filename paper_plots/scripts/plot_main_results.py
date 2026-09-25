@@ -180,7 +180,21 @@ def plot_performance(rows: list[dict[str, str]]) -> plt.Figure:
     return figure
 
 
-def plot_aggregate_performance(rows: list[dict[str, str]], *, kind: str = "line") -> plt.Figure:
+def human_tier_f1(rows: list[dict[str, str]]) -> dict[int, float]:
+    """Return the frozen first-submission human F1 reference for each tier."""
+    selected = [row for row in rows if row["population"] == "human_assigned_items"]
+    result = {int(row["tier"]): float(row["mean_f1"]) for row in selected}
+    if set(result) != set(TIER_NAMES) or len(selected) != len(result):
+        raise ValueError("Expected exactly one human-assigned result for each tier")
+    return result
+
+
+def plot_aggregate_performance(
+    rows: list[dict[str, str]],
+    *,
+    human_rows: list[dict[str, str]] | None = None,
+    kind: str = "line",
+) -> plt.Figure:
     """Plot the core benchmark mean across terminal model arms in four panels."""
     if kind not in {"line", "bar"}:
         raise ValueError(f"Unsupported aggregate plot kind: {kind}")
@@ -189,9 +203,18 @@ def plot_aggregate_performance(rows: list[dict[str, str]], *, kind: str = "line"
     positions = np.arange(len(CONTEXTS), dtype=float)
     offsets = {"llm": -0.23, "codeact": 0.0, "rlm": 0.23}
     figure, axes = plt.subplots(1, 4, figsize=(7.35, 2.55), sharex=True, sharey=True)
+    human_scores = human_tier_f1(human_rows) if human_rows is not None else {}
 
     for tier, axis in enumerate(axes, start=1):
         axis.axvspan(1.72, 2.28, color="#F1F3F5", zorder=0)
+        if tier in human_scores:
+            axis.axhline(
+                human_scores[tier],
+                color="#444444",
+                linestyle=(0, (4, 2.4)),
+                linewidth=1.15,
+                zorder=2,
+            )
         for method in METHODS:
             contexts = [context for context in CONTEXTS if (tier, method, context) in lookup]
             points = [lookup[(tier, method, context)] for context in contexts]
@@ -265,15 +288,112 @@ def plot_aggregate_performance(rows: list[dict[str, str]], *, kind: str = "line"
         )
         for method in METHODS
     ]
+    if human_scores:
+        handles.append(
+            Line2D(
+                [0],
+                [0],
+                color="#444444",
+                linestyle=(0, (4, 2.4)),
+                linewidth=1.15,
+                label="Human baseline",
+            )
+        )
     figure.legend(
         handles=handles,
         loc="upper center",
-        ncol=3,
+        ncol=len(handles),
         frameon=False,
         bbox_to_anchor=(0.5, 1.02),
         handlelength=2.0,
     )
     figure.subplots_adjust(left=0.07, right=0.995, top=0.76, bottom=0.19, wspace=0.17)
+    return figure
+
+
+def human_tier_summary(
+    item_rows: list[dict[str, str]],
+) -> dict[int, dict[str, float]]:
+    """Aggregate frozen human accuracy and non-additive timing summaries by tier."""
+    summary: dict[int, dict[str, float]] = {}
+    for tier in TIER_NAMES:
+        submitted = [
+            row for row in item_rows if int(row["tier"]) == tier and row["submitted"] == "True"
+        ]
+        scored = [row for row in submitted if not row["abstention"]]
+        summary[tier] = {
+            "f1": statistics.fmean(float(row["f1"]) for row in scored),
+            "exact_match": statistics.fmean(float(row["exact_match"]) for row in scored),
+            "median_active_minutes": statistics.median(
+                float(row["active"]) / 60 for row in submitted
+            ),
+            "median_offline_minutes": statistics.median(
+                float(row["offline_minutes"] or 0) for row in submitted
+            ),
+        }
+    return summary
+
+
+def plot_human_validation(item_rows: list[dict[str, str]]) -> plt.Figure:
+    """Plot per-tier human scores and separately recorded time summaries."""
+    summary = human_tier_summary(item_rows)
+    tiers = np.arange(1, 5, dtype=float)
+    width = 0.34
+    figure, axes = plt.subplots(1, 2, figsize=(7.1, 2.55))
+
+    axes[0].bar(
+        tiers - width / 2,
+        [summary[tier]["f1"] for tier in TIER_NAMES],
+        width,
+        color="#2A6F97",
+        label="Macro F1",
+    )
+    axes[0].bar(
+        tiers + width / 2,
+        [summary[tier]["exact_match"] for tier in TIER_NAMES],
+        width,
+        color="#90BE6D",
+        label="Exact set match",
+    )
+    axes[0].set_ylim(0, 1.06)
+    axes[0].set_ylabel("Score")
+    axes[0].set_title("(a) Human baseline by tier", loc="left")
+    axes[0].legend(
+        frameon=False,
+        loc="upper center",
+        bbox_to_anchor=(0.5, -0.16),
+        ncol=2,
+    )
+
+    axes[1].bar(
+        tiers - width / 2,
+        [summary[tier]["median_active_minutes"] for tier in TIER_NAMES],
+        width,
+        color="#577590",
+        label="Active browser time",
+    )
+    axes[1].bar(
+        tiers + width / 2,
+        [summary[tier]["median_offline_minutes"] for tier in TIER_NAMES],
+        width,
+        color="#F9C74F",
+        label="Self-reported offline time",
+    )
+    axes[1].set_ylabel("Median minutes / response")
+    axes[1].set_title("(b) Time recorded separately", loc="left")
+    axes[1].legend(
+        frameon=False,
+        loc="upper center",
+        bbox_to_anchor=(0.5, -0.16),
+        ncol=2,
+    )
+
+    for axis in axes:
+        axis.set_xticks(tiers, [f"Tier {tier}" for tier in TIER_NAMES])
+        axis.grid(axis="y", color="#D8DDE2", linewidth=0.5, zorder=0)
+        axis.spines[["top", "right"]].set_visible(False)
+        axis.tick_params(length=2.3, width=0.55)
+    figure.subplots_adjust(left=0.08, right=0.995, top=0.88, bottom=0.29, wspace=0.30)
     return figure
 
 
@@ -573,7 +693,15 @@ def main() -> None:
     args = parse_args()
     aggregate_scaling = read_csv(args.gold / "tier_scaling_across_models.csv")
     records = read_csv(args.gold / "full_benchmark_records.csv")
-    save(plot_aggregate_performance(aggregate_scaling), args.output, "performance_overview")
+    human_directory = args.gold / "human_validation"
+    human_comparison = read_csv(human_directory / "human_model_tier_comparison.csv")
+    human_items = read_csv(human_directory / "item_metrics.csv")
+    save(
+        plot_aggregate_performance(aggregate_scaling, human_rows=human_comparison),
+        args.output,
+        "performance_overview",
+    )
+    save(plot_human_validation(human_items), args.output, "human_validation_summary")
     save(plot_capabilities(records), args.output, "capability_map")
     save(plot_efficiency_frontier(records), args.output, "efficiency_frontier")
     save(
