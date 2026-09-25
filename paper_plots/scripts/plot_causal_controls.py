@@ -19,7 +19,10 @@ TIER_COLORS = {2: "#5302A3", 3: "#CB4679"}
 TIER_MARKERS = {2: "o", 3: "s"}
 ARM_COLORS = {"ordinary": "#5302A3", "predicate": "#CB4679", "executor": "#8A8F98"}
 ARM_MARKERS = {"ordinary": "o", "predicate": "D"}
-MODEL_SHORT_NAMES = {"Qwen 3.5": "Qwen", "Claude Haiku 4.5": "Claude"}
+MODEL_DISPLAY_NAMES = {
+    "Qwen 3.5": "Qwen3.5-397B-A17B",
+    "Claude Haiku 4.5": "Claude Haiku 4.5",
+}
 CONTEXTS = ("100", "500", "5000", "50000", "full")
 CONTEXT_LABELS = ("100", "500", "5k", "50k", "Full")
 
@@ -257,8 +260,13 @@ def plot_oracle(
     )
     axis.set_xticks(positions, ("100", "500", "Full"))
     axis.set_xlabel("Corpus size")
-    short_name = MODEL_SHORT_NAMES.get(model_label, model_label)
-    axis.set_title(f"({panel}) Rule supplied: {short_name}", loc="left", pad=5)
+    display_name = MODEL_DISPLAY_NAMES.get(model_label, model_label)
+    axis.set_title(
+        f"({panel}) Rule supplied\n{display_name}",
+        loc="left",
+        pad=4,
+        fontsize=8.0,
+    )
     style_axis(axis)
 
 

@@ -249,6 +249,10 @@ def oracle_heatmaps(rows: list[dict[str, str]]) -> plt.Figure:
         for context, arm in columns
     ]
     figure, axes = plt.subplots(2, 1, figsize=(7.25, 4.7), squeeze=False)
+    display_names = {
+        "Qwen 3.5": "Qwen3.5-397B-A17B",
+        "Claude Haiku 4.5": "Claude Haiku 4.5",
+    }
     for axis, model in zip(axes.ravel(), ("Qwen 3.5", "Claude Haiku 4.5"), strict=True):
         data = []
         for task in ORACLE_TASKS:
@@ -280,7 +284,7 @@ def oracle_heatmaps(rows: list[dict[str, str]]) -> plt.Figure:
                 )
         axis.set_yticks(range(len(ORACLE_TASKS)), [TASK_LABELS[task] for task in ORACLE_TASKS])
         axis.set_xticks(range(len(columns)), labels)
-        axis.set_title(model, loc="left")
+        axis.set_title(display_names[model], loc="left")
         axis.tick_params(length=0, labelsize=7)
         axis.axvline(2.5, color="white", linewidth=2)
         axis.axvline(5.5, color="white", linewidth=2)

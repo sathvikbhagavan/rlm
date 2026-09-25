@@ -17,6 +17,10 @@ CONDITION_LABELS = ("Target name", "Target structure", "Structure +\nfinal-step 
 MODELS = ("Qwen", "Claude")
 MODEL_COLORS = {"Qwen": "#5302A3", "Claude": "#CB4679"}
 MODEL_MARKERS = {"Qwen": "o", "Claude": "D"}
+MODEL_DISPLAY_NAMES = {
+    "Qwen": "Qwen3.5-397B-A17B",
+    "Claude": "Claude Haiku 4.5",
+}
 TARGETS = ("pyrimidine_piperazine", "lactam_dipeptide", "benzamide_pyrazole")
 TARGET_LABELS = {
     "pyrimidine_piperazine": "Pyrimidine--piperazine",
@@ -70,7 +74,7 @@ def aggregate_performance(rows: list[dict[str, str]]) -> plt.Figure:
                 marker=MODEL_MARKERS[model],
                 markersize=5,
                 capsize=2.5,
-                label=model,
+                label=MODEL_DISPLAY_NAMES[model],
             )
         axis.set_xticks(x, ("Name", "Structure", "+ step class"), rotation=22, ha="right")
         axis.set_title(label, loc="left", pad=5, fontsize=8.4)
@@ -123,7 +127,7 @@ def target_heatmaps(rows: list[dict[str, str]]) -> plt.Figure:
                 )
         axis.set_yticks(range(3), [TARGET_LABELS[target] for target in TARGETS])
         axis.set_xticks(range(3), CONDITION_LABELS)
-        axis.set_title(model, loc="left")
+        axis.set_title(MODEL_DISPLAY_NAMES[model], loc="left")
         axis.tick_params(length=0)
         for spine in axis.spines.values():
             spine.set_visible(False)
@@ -178,7 +182,7 @@ def resource_page(rows: list[dict[str, str]]) -> plt.Figure:
                 elinewidth=0.8,
                 capsize=1.8,
                 capthick=0.8,
-                label=model,
+                label=MODEL_DISPLAY_NAMES[model],
             )
         axis.set_title(label, loc="left", pad=4, fontsize=7.8)
         axis.set_xticks(x)
