@@ -1,6 +1,6 @@
 # Gold ICLR 2027 plotting results
 
-Frozen from the shared experiment dashboard at `2026-09-25T20:19:15.470567+00:00`.
+Frozen from the shared experiment dashboard at `2026-09-25T20:44:08.863360+00:00`.
 
 Gold means that the plotting input is frozen, auditable, and provenance-recorded. It does not mean every experiment arm is finished. `arm_status.csv` and the `arm_final` columns distinguish terminal arms from provisional ones.
 
@@ -23,11 +23,11 @@ All plotting aggregates score terminal failed jobs as zero. Running, stale, and 
 - `full_benchmark_records.csv`: every one of the 6,300 expected main-benchmark jobs.
 - `codeact_x1000_records.csv`: the final Qwen, DeepSeek, Gemini, and GPT-5-mini CodeAct x1000 extensions.
 - `rlm_x1000_records.csv`: terminal RLM x1000 extensions available at the freeze time.
-- `final_arm_records.csv`: records belonging to terminal arms.
-- `provisional_arm_records.csv`: records belonging to unfinished arms.
+- `final_arm_records.csv`: records in the five-model paper scope belonging to terminal arms.
+- `provisional_arm_records.csv`: unfinished arms and completed campaign records outside the five-model paper scope (currently GLM LLM).
 - `arm_status.csv`: the finality decision used for legend asterisks.
 - `tier_scaling.csv`: the faithful four-tier plotting aggregate.
-- `tier_scaling_across_models.csv`: unweighted means and standard errors across terminal model arms; terminal failed trajectories contribute zero.
+- `tier_scaling_across_models.csv`: unweighted means and standard errors across the five paper models; terminal failed trajectories contribute zero.
 - `tier_efficiency_by_model.csv`: recorded cost, tokens, and wall time per successfully answered trajectory for each model. Failed jobs do not enter resource averages.
 - `tier_efficiency_across_models.csv`: unweighted efficiency means and standard errors across terminal model arms. Cost averages include only paid Gemini, GPT-5-mini, and Claude models; free SwissAI access is excluded.
 - `capability_split/`: checked per-model and across-model full-corpus RLM summaries for the six operation-specific task groups.
