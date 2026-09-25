@@ -157,10 +157,9 @@ def plot_matched_scale(axis: plt.Axes, aggregates: list[dict[str, Any]]) -> None
             zorder=3,
         )
     axis.set_xticks(positions, CONTEXT_LABELS)
-    axis.set_xlabel("Corpus size $N$ (reactions)")
+    axis.set_xlabel("Corpus size $N$")
     axis.set_ylabel("Macro F1")
-    axis.set_title("(a) Scale at fixed cardinality ($K=1$)", loc="left", pad=5)
-    axis.legend(frameon=False, loc="lower left")
+    axis.set_title("(a) Scale ($K=1$)", loc="left", pad=5)
     style_axis(axis)
 
 
@@ -201,7 +200,7 @@ def plot_matched_cardinality(axis: plt.Axes, aggregates: list[dict[str, Any]]) -
         )
     axis.set_xticks(positions, [label for _, label in conditions])
     axis.set_xlabel("Positive reactions $K$")
-    axis.set_title("(b) Cardinality at fixed scale ($N=5{,}000$)", loc="left", pad=5)
+    axis.set_title("(b) Cardinality ($N=5{,}000$)", loc="left", pad=5)
     style_axis(axis)
 
 
@@ -235,7 +234,7 @@ def plot_oracle(
             markeredgewidth=0.45,
             capsize=2.2,
             elinewidth=0.8,
-            label="Ordinary RLM" if arm == "ordinary" else "Chemistry rule supplied",
+            label="Ordinary RLM" if arm == "ordinary" else "Rule-supplied RLM",
             zorder=3,
         )
     axis.axhline(
@@ -257,9 +256,9 @@ def plot_oracle(
         arrowprops={"arrowstyle": "->", "color": ARM_COLORS["predicate"], "lw": 0.8},
     )
     axis.set_xticks(positions, ("100", "500", "Full"))
-    axis.set_xlabel("Corpus size (reactions)")
+    axis.set_xlabel("Corpus size")
     short_name = MODEL_SHORT_NAMES.get(model_label, model_label)
-    axis.set_title(f"({panel}) Supplying chemistry rules: {short_name}", loc="left", pad=5)
+    axis.set_title(f"({panel}) Rule supplied: {short_name}", loc="left", pad=5)
     style_axis(axis)
 
 
@@ -296,14 +295,26 @@ def main() -> int:
     args.output_dir.mkdir(parents=True, exist_ok=True)
     write_aggregates(args.records.with_name("aggregates.csv"), aggregates)
 
-    figure, axes = plt.subplots(2, 2, figsize=(7.1, 5.0), sharey=True)
-    plot_matched_scale(axes[0, 0], aggregates)
-    plot_matched_cardinality(axes[0, 1], aggregates)
-    plot_oracle(axes[1, 0], aggregates, model_label="Qwen 3.5", panel="c")
-    plot_oracle(axes[1, 1], aggregates, model_label="Claude Haiku 4.5", panel="d")
-    axes[1, 0].set_ylabel("Macro F1")
-    axes[1, 0].legend(frameon=False, loc="lower left", ncol=1)
-    figure.subplots_adjust(left=0.09, right=0.99, bottom=0.09, top=0.98, wspace=0.18, hspace=0.36)
+    figure, axes = plt.subplots(1, 4, figsize=(7.1, 2.45), sharey=True)
+    plot_matched_scale(axes[0], aggregates)
+    plot_matched_cardinality(axes[1], aggregates)
+    plot_oracle(axes[2], aggregates, model_label="Qwen 3.5", panel="c")
+    plot_oracle(axes[3], aggregates, model_label="Claude Haiku 4.5", panel="d")
+    axes[1].set_ylabel("")
+
+    tier_handles, tier_labels = axes[0].get_legend_handles_labels()
+    rule_handles, rule_labels = axes[2].get_legend_handles_labels()
+    figure.legend(
+        tier_handles + rule_handles,
+        tier_labels + rule_labels,
+        loc="lower center",
+        bbox_to_anchor=(0.5, 0.01),
+        ncol=5,
+        frameon=False,
+        handlelength=1.8,
+        columnspacing=1.3,
+    )
+    figure.subplots_adjust(left=0.075, right=0.995, bottom=0.28, top=0.95, wspace=0.20)
 
     pdf_path = args.output_dir / "iclr_causal_controls.pdf"
     png_path = args.output_dir / "iclr_causal_controls.png"

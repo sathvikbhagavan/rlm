@@ -123,11 +123,12 @@ def plot_performance(rows: list[dict[str, str]]) -> plt.Figure:
                 yerr=[float(row["f1_std"]) for row in points],
                 color=METHOD_COLORS[method],
                 marker=METHOD_MARKERS[method],
-                markersize=4.4,
+                markersize=4.8,
                 markeredgecolor="white",
                 markeredgewidth=0.45,
-                capsize=2.2,
-                elinewidth=0.9,
+                capsize=3.4,
+                capthick=1.1,
+                elinewidth=1.15,
                 zorder=3,
             )
         axis.set_title(
