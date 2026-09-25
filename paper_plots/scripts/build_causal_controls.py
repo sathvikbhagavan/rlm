@@ -21,7 +21,11 @@ from rxnhaystack.control_room import (
     merge_snapshots,
     scientific_dashboard_view,
 )
-from rxnhaystack.score_recovery import apply_corrected_score_recoveries
+from rxnhaystack.score_recovery import (
+    SUBMISSION_SCORE_FREEZE_ID,
+    apply_corrected_score_recoveries,
+    carry_forward_pending_corrected_scores,
+)
 
 EXECUTOR_CAMPAIGN = "iclr2027-oracle-executor-v1"
 GPT = "openai/gpt-5-mini"
@@ -301,6 +305,8 @@ def main() -> int:
     _provisional_manifest, recovered_provisional = apply_corrected_score_recoveries(
         qwen_rows, args.corrected_score_recoveries
     )
+    carried_final = carry_forward_pending_corrected_scores(rows)
+    carried_provisional = carry_forward_pending_corrected_scores(qwen_rows)
     args.output_dir.mkdir(parents=True, exist_ok=True)
     records_path = args.output_dir / "records.csv"
     with records_path.open("w", newline="", encoding="utf-8") as stream:
@@ -345,6 +351,16 @@ def main() -> int:
             "available": len(recovery_manifest["recoveries"]),
             "applied_final": recovered_final,
             "applied_provisional": recovered_provisional,
+        },
+        "submission_score_freeze": {
+            "freeze_id": SUBMISSION_SCORE_FREEZE_ID,
+            "policy": (
+                "Use exact corrected rescores where available; otherwise carry forward the "
+                "preserved historical score while retaining historical_score_invalidated "
+                "status in the internal post-submission queue."
+            ),
+            "carried_final": carried_final,
+            "carried_provisional": carried_provisional,
         },
         "selection": {
             "matched_cardinality": "GPT-5 mini only; 725/725 succeeded",

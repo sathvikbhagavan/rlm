@@ -33,6 +33,7 @@ WANDB_API_KEY=... uv run python \
   --phoenix-db /path/to/phoenix.db
 uv run python paper_plots/scripts/build_gold_results.py
 uv run python paper_plots/scripts/build_causal_controls.py
+uv run python paper_plots/scripts/build_post_submission_queue.py
 ```
 
 The recovery command reconstructs the original sampled context and validates the
@@ -51,7 +52,10 @@ never copied into the repository; the recovery manifest records its checksum, si
 match diagnostics, and hashes of the extracted answers.
 It writes an exact-rescore manifest and a separate prediction ledger under
 `paper_plots/gold/`; neither contains credentials. Retrieved console logs stay
-in the ignored local cache `artifacts/score-recovery/`. A completed recovery
-ledger is replaced atomically and, by default, cannot be replaced by one with
-fewer recovered runs. Runs without sufficient retained prediction evidence
-remain explicitly invalidated rather than being imputed.
+in the ignored local cache `artifacts/score-recovery/`. The recovery ledger is
+replaced atomically and, by default, cannot be replaced by one with fewer
+recovered runs. It can then be joined to the frozen experiment tables by
+`build_post_submission_queue.py`, which records every still-pending run with
+its experiment, arm, model, task, context, configured seed, and repetition.
+Runs without sufficient retained prediction evidence remain explicitly queued
+rather than being classified as exact corrected rescores.

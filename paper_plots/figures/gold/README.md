@@ -2,7 +2,7 @@
 
 This directory contains the paper-plot candidates generated from the frozen,
 auditable result tables in [`paper_plots/gold/iclr2027`](../../gold/iclr2027/README.md).
-The current snapshot is dated **2026-09-22**. It contains final results where
+The current snapshot is dated **2026-09-25**. It contains final results where
 available and explicitly marks provisional arms; it is not a claim that every
 planned experiment has finished.
 
@@ -45,6 +45,9 @@ figures.
 ### Performance
 
 - A successful job contributes its measured task score.
+- If exact corrected rescoring is still pending, the frozen submission plot
+  carries the preserved historical score while retaining that run in the
+  internal post-submission queue.
 - A terminal failed job is a wrong answer and contributes zero.
 - Running, stale, and pending jobs are not assigned zero. They are excluded
   until resolved, and the affected arm is marked provisional with `*` and/or a
@@ -76,10 +79,10 @@ The gold RLM averages over terminal models currently show:
 
 | Tier | 100 reactions | Full corpus |
 | --- | ---: | ---: |
-| Tier 1 | 0.910 | 0.915 |
-| Tier 2 | 0.915 | 0.922 |
-| Tier 3 | 0.716 | 0.568 |
-| Tier 4 | 0.616 | 0.318 |
+| Tier 1 | 0.919 | 0.900 |
+| Tier 2 | 0.906 | 0.907 |
+| Tier 3 | 0.730 | 0.558 |
+| Tier 4 | 0.586 | 0.320 |
 
 This supports the claim that RLM performance is stable with corpus scale for
 lookup and aggregation, while reaction-level and relational reasoning degrade

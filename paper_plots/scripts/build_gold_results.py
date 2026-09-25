@@ -23,7 +23,11 @@ from rxnhaystack.control_room import (
     merge_snapshots,
     scientific_dashboard_view,
 )
-from rxnhaystack.score_recovery import apply_corrected_score_recoveries
+from rxnhaystack.score_recovery import (
+    SUBMISSION_SCORE_FREEZE_ID,
+    apply_corrected_score_recoveries,
+    carry_forward_pending_corrected_scores,
+)
 
 MODEL_ORDER = (
     "qwen3.5",
@@ -359,7 +363,7 @@ def arm_summaries(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
         ),
     ):
         counts = Counter(str(row["status"]) for row in group)
-        invalidated_successes = sum(
+        pending_corrected_rescores = sum(
             row["status"] == "succeeded"
             and row.get("score_correction_status") == "historical_score_invalidated"
             for row in group
@@ -380,11 +384,9 @@ def arm_summaries(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
                 "method": method,
                 "expected_jobs": len(group),
                 **{f"{status}_jobs": counts[status] for status in STATUS_ORDER},
-                "scored_success_jobs": (
-                    counts["succeeded"] - unscored_successes - invalidated_successes
-                ),
+                "scored_success_jobs": counts["succeeded"] - unscored_successes,
                 "unscored_success_jobs": unscored_successes,
-                "ground_truth_invalidated_jobs": invalidated_successes,
+                "ground_truth_invalidated_jobs": pending_corrected_rescores,
                 "is_final": is_final,
                 "legend_label": method.upper() if method == "llm" else method.capitalize(),
                 "note": "terminal and scored"
@@ -708,9 +710,10 @@ def write_readme(path: Path, arms: list[dict[str, Any]], *, as_of: str) -> None:
         "bulky raw trajectories remain in their original experiment artifact stores.",
         "All plotting aggregates score terminal failed jobs as zero. Running, stale, and "
         "pending jobs are excluded from the current score and keep their arm provisional. "
-        "Scores invalidated by a versioned ground-truth correction are also excluded, keep "
-        "their original value in `original_f1`, and reduce the reported score coverage; "
-        "resource measurements from those successful runs remain valid.",
+        "Exact corrected rescores are used wherever recoverable. For remaining rows in the "
+        "internal post-submission rescore queue, the last available historical score is "
+        "carried forward under an explicit status marker so terminal trajectory denominators "
+        "remain complete; resource measurements remain unchanged.",
         "",
         "## Main benchmark arms",
         "",
@@ -764,9 +767,8 @@ def write_readme(path: Path, arms: list[dict[str, Any]], *, as_of: str) -> None:
             "directory also stores a status-explicit provisional Qwen matched-cardinality "
             "snapshot, which is excluded from final inference until all 725 cells terminate.",
             "Exact corrected rescores are included and labeled `corrected_exact_rescore`. "
-            "Remaining ground-truth-invalidated control scores are excluded exactly as in "
-            "the main benchmark tables; the causal-control aggregates report their score "
-            "coverage while retaining all measured resource fields.",
+            "Pending corrected control scores follow the same submission-freeze carry-forward "
+            "policy as the main benchmark and remain listed in the internal queue.",
             "",
             "## Prospective-route control",
             "",
@@ -954,6 +956,7 @@ def main() -> None:
     corrected_recovery_manifest, corrected_recovery_count = apply_corrected_score_recoveries(
         all_rows, args.corrected_score_recoveries
     )
+    carried_score_count = carry_forward_pending_corrected_scores(all_rows)
     arms = arm_summaries(all_rows)
     add_arm_finality(all_rows, arms)
     scaling = scaling_summaries(all_rows)
@@ -1063,6 +1066,15 @@ def main() -> None:
             "recovery_id": corrected_recovery_manifest["recovery_id"],
             "available": len(corrected_recovery_manifest["recoveries"]),
             "applied": corrected_recovery_count,
+        },
+        "submission_score_freeze": {
+            "freeze_id": SUBMISSION_SCORE_FREEZE_ID,
+            "policy": (
+                "Use exact corrected rescores where available; otherwise carry forward the "
+                "preserved historical score while retaining historical_score_invalidated "
+                "status in the internal post-submission queue."
+            ),
+            "carried_historical_scores": carried_score_count,
         },
         "source_snapshots": [
             {

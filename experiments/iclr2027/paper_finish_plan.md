@@ -23,13 +23,15 @@ queue for finishing the submission.
   rescored or whether the model saw incorrect inputs and the run must be
   repeated. Re-run API inference only when rescoring cannot recover the valid
   result.
-  The classification and artifact recovery pass are complete: 1,311 unique affected
-  runs have exact corrected scores from preserved logs or deterministic reruns.
-  Sathvik's artifact tar resolved 380 of the 480 formerly access-blocked runs. The
-  remaining 432 logs (332 under `liac`, 100 under Sathvik's entity) lack sufficient
-  retained prediction detail and still require a corrected rerun.
-  Scores still marked `historical_score_invalidated` remain excluded; exclusion
-  is not a corrected score.
+  The classification, artifact, and Phoenix recovery passes produced exact corrected
+  scores for 1,542 of 1,743 affected runs. The remaining 201 runs are frozen one per
+  row, including experiment, arm, model, task, context, configured seed, repetition,
+  source and historical score, in
+  `paper_plots/gold/iclr2027/post_submission/pending_corrected_rescores.csv`.
+  For the submission freeze, those rows retain their last available historical score
+  so terminal trajectory denominators remain complete; their internal
+  `historical_score_invalidated` status is unchanged and is not an exact corrected
+  rescore.
 - [x] Apply the audit across LLM, CodeAct, and RLM for every model and control
   experiment that contains an affected task. Verify Task 15's
   `macro_reaction_f1`/`macro_f1` normalization explicitly.
@@ -149,6 +151,12 @@ queue for finishing the submission.
 
 #### Post-deadline completion queue
 
+- [ ] Recover or rerun the exact 201 rows in
+  `paper_plots/gold/iclr2027/post_submission/pending_corrected_rescores.csv`, replace
+  every carried historical value with an exact corrected rescore, regenerate all gold
+  tables and figures, and compare every locked manuscript claim against the submission
+  manifest. Do not broaden this into whole-arm reruns: the CSV is the authoritative
+  run-level queue.
 - [ ] Complete the GLM 5.2 CodeAct arm and regenerate its model profile. This
   is an artifact-completeness follow-up and is outside the frozen submission
   analysis.

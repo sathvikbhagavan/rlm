@@ -3,6 +3,7 @@ from __future__ import annotations
 import io
 import json
 import tarfile
+from pathlib import Path
 
 import pytest
 
@@ -21,6 +22,8 @@ from paper_plots.scripts.build_gold_results import (
     scaling_summaries,
     tier_efficiency_summaries,
 )
+from paper_plots.scripts.build_post_submission_queue import build_queue
+from rxnhaystack.score_recovery import carry_forward_pending_corrected_scores
 
 
 def test_task15_uses_reaction_f1() -> None:
@@ -344,9 +347,13 @@ def test_ground_truth_correction_invalidates_score_but_preserves_provenance(tmp_
     assert rows[0]["f1"] is None
     assert rows[0]["score_available"] is False
     assert rows[0]["score_correction_status"] == "historical_score_invalidated"
+    assert carry_forward_pending_corrected_scores(rows) == 1
+    assert rows[0]["f1"] == 0.75
+    assert rows[0]["score_available"] is True
+    assert rows[0]["score_correction_status"] == "historical_score_invalidated"
     summary = arm_summaries(rows)[0]
     assert summary["is_final"] is True
-    assert summary["scored_success_jobs"] == 0
+    assert summary["scored_success_jobs"] == 1
     assert summary["ground_truth_invalidated_jobs"] == 1
 
 
@@ -380,6 +387,56 @@ def test_control_ground_truth_correction_invalidates_only_affected_scores(tmp_pa
     assert rows[1]["f1"] == 0.75
     assert rows[1]["score_available"] is True
     assert rows[1]["score_correction_status"] == "not_affected"
+    assert carry_forward_pending_corrected_scores(rows) == 1
+    assert rows[0]["f1"] == 0.75
+    assert rows[0]["score_available"] is True
+
+
+def test_post_submission_queue_freezes_experiment_arm_model_seed_and_repetition(
+    tmp_path: Path,
+) -> None:
+    gold = tmp_path / "gold"
+    (gold / "causal_controls").mkdir(parents=True)
+    run_id = "full-gpt-5-mini-tier3-task18-rlm-xfull-r03"
+    main_header = (
+        "scope,run_id,model,model_label,method,tier,task,context,repetition,"
+        "question_count,score_name,original_f1,score_correction_status\n"
+    )
+    (gold / "full_benchmark_records.csv").write_text(
+        main_header + f"full_benchmark,{run_id},gpt-5-mini,GPT-5 mini,rlm,3,tier3/task18,"
+        "full,3,1,macro_f1,0.5,historical_score_invalidated\n"
+    )
+    for name in ("codeact_x1000_records.csv", "rlm_x1000_records.csv"):
+        (gold / name).write_text(main_header)
+    control_header = (
+        "study,arm,model,model_label,context,condition,tier,task,repetition,"
+        "question_count,original_f1,score_correction_status,run_id\n"
+    )
+    (gold / "causal_controls/records.csv").write_text(
+        control_header + "oracle_predicate,ordinary,openai/gpt-5-mini,GPT-5 mini,full,ordinary,3,"
+        f"tier3/task18,3,1,0.5,historical_score_invalidated,{run_id}\n"
+    )
+    (gold / "causal_controls/matched_qwen_provisional.csv").write_text(control_header)
+    recovery = {
+        "recovery_id": "recovery-v2",
+        "unresolved": [
+            {
+                "run_id": run_id,
+                "reason": "prediction-underdetermined-or-validation-failed",
+                "source_sha256": "abc",
+                "wandb_url": "https://wandb.ai/liac/project/runs/1",
+            }
+        ],
+    }
+
+    rows = build_queue(recovery=recovery, gold_dir=gold, configured_seed=42)
+
+    assert len(rows) == 1
+    assert rows[0]["model"] == "gpt-5-mini"
+    assert rows[0]["configured_seed"] == 42
+    assert rows[0]["repetition"] == 3
+    assert rows[0]["experiments"] == "causal_control;main_benchmark"
+    assert rows[0]["arms"] == ("full_benchmark/rlm/xfull;oracle_predicate/ordinary/ordinary/xfull")
 
 
 def test_external_x1000_result_pack_is_validated_and_flattened(tmp_path) -> None:

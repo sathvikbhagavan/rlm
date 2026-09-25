@@ -198,8 +198,7 @@ def summarize_model(
             or (row["status"] == "succeeded" and row_score_available(row))
         ]
         resolved_scores = [
-            float(row["f1"]) if row["status"] == "succeeded" else 0.0
-            for row in scoreable
+            float(row["f1"]) if row["status"] == "succeeded" else 0.0 for row in scoreable
         ]
         task_summaries.append(
             {
@@ -254,21 +253,17 @@ def main() -> None:
         "schema_version": 1,
         "generated_at": datetime.now(UTC).isoformat(),
         "model": args.model,
-        "sources": [
-            {"path": str(source), "sha256": sha256_file(source)} for source in sources
-        ],
+        "sources": [{"path": str(source), "sha256": sha256_file(source)} for source in sources],
         "outputs": [
             {"path": path.name, "sha256": sha256_file(path)} for path in (summary_path, task_path)
         ],
         "aggregation": {
             "f1": (
                 "question-weighted within each repetition; terminal failures score zero; "
-                "ground-truth-invalidated successes are excluded and reduce score coverage"
+                "pending corrected rescores use the submission-freeze historical value and "
+                "retain their internal queue status"
             ),
-            "additive_resources": (
-                "sum divided by all successful question trajectories, including runs whose "
-                "historical scores were invalidated"
-            ),
+            "additive_resources": ("sum divided by all successful question trajectories"),
             "peak_memory": "mean combined process-tree plus Docker peak per successful job",
             "variation": "population standard deviation across five repetitions",
         },

@@ -10,6 +10,8 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
+SUBMISSION_SCORE_FREEZE_ID = "rxnhaystack-iclr2027-submission-score-freeze-v1"
+
 TASK_QUESTION_IDS: dict[str, tuple[str, ...]] = {
     "tier3/task6": (
         "rxh-t3-task6-acyl-chloride-with-primary-amine",
@@ -142,6 +144,34 @@ def apply_corrected_score_recoveries(
         row["sources"] = f"{row['sources']};{marker}"
         applied += 1
     return payload, applied
+
+
+def carry_forward_pending_corrected_scores(rows: list[dict[str, Any]]) -> int:
+    """Use preserved historical scores while exact corrected rescoring is pending.
+
+    Exact recoveries must be applied first. Pending rows keep their explicit
+    ``historical_score_invalidated`` status for the post-submission queue, but
+    their last available score enters the frozen submission aggregates so
+    terminal trajectory denominators remain complete. A run that never had a
+    score is never assigned one here.
+    """
+
+    carried = 0
+    for row in rows:
+        if row.get("score_correction_status") != "historical_score_invalidated":
+            continue
+        historical = row.get("original_f1")
+        if historical in (None, ""):
+            raise ValueError(
+                f"Pending corrected score has no historical value: {row.get('run_id')}"
+            )
+        row["f1"] = float(historical)
+        row["score_available"] = True
+        marker = f"submission-score-freeze:{SUBMISSION_SCORE_FREEZE_ID}"
+        sources = str(row.get("sources", ""))
+        row["sources"] = f"{sources};{marker}" if sources else marker
+        carried += 1
+    return carried
 
 
 def parse_indices(value: str) -> tuple[int, ...]:
