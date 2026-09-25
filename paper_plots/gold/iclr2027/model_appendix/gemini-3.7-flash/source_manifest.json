@@ -1,35 +1,35 @@
 {
   "aggregation": {
-    "additive_resources": "sum divided by all successful question trajectories, including runs whose historical scores were invalidated",
-    "f1": "question-weighted within each repetition; terminal failures score zero; ground-truth-invalidated successes are excluded and reduce score coverage",
+    "additive_resources": "sum divided by all successful question trajectories",
+    "f1": "question-weighted within each repetition; terminal failures score zero; pending corrected rescores use the submission-freeze historical value and retain their internal queue status",
     "peak_memory": "mean combined process-tree plus Docker peak per successful job",
     "variation": "population standard deviation across five repetitions"
   },
-  "generated_at": "2026-09-25T14:44:55.576992+00:00",
+  "generated_at": "2026-09-25T20:39:32.791817+00:00",
   "model": "gemini-3.7-flash",
   "outputs": [
     {
       "path": "tier_metrics.csv",
-      "sha256": "f10cbb721cb81526795db3e287067bec3ef62529a6b75ea10f760cfe08ff5080"
+      "sha256": "84215937cd916af0e72627bec67779c87a3c6b0ec7e140c6f307bb054603d9a7"
     },
     {
       "path": "task_f1.csv",
-      "sha256": "aba0f606685e42d7c947794424471ab62b3d820f89b649f2fb0561c140270b9d"
+      "sha256": "9a4259ec55210dd80620c43604c2c600c008a0648422094ae7d224d6b6f5df1f"
     }
   ],
   "schema_version": 1,
   "sources": [
     {
       "path": "paper_plots/gold/iclr2027/full_benchmark_records.csv",
-      "sha256": "599dddce39dff4afe404e59e0204bb0ffd45aa8f98657a409d10d46144bfae15"
+      "sha256": "cffff19a9dad878cd3dd5e70f2c38a49dd64f63460cca0780ab65ac8d6dbd1a6"
     },
     {
       "path": "paper_plots/gold/iclr2027/codeact_x1000_records.csv",
-      "sha256": "d6d103366f78f6b7c997e503a940cffe5d6c116c897c5f4aa47a1d03fcee9654"
+      "sha256": "826904f1b843751e941317d83ec4528221bec42bea6c31dc6fc1555d49d5712c"
     },
     {
       "path": "paper_plots/gold/iclr2027/rlm_x1000_records.csv",
-      "sha256": "9ea9fa601f573078a125f91acbcfb95e355180c99fbb93e5f779a440126dbe13"
+      "sha256": "1306bf0cfd15e5f9cadd1e28f943c830a505458dd64de8fdd1908857b1c0851a"
     }
   ]
 }

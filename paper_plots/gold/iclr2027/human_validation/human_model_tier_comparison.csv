@@ -8,9 +8,9 @@ mean_f1,observations,population,score_coverage,tier,unit
 0.7985020617696919,200,model_codeact,1.0,2,successful task-context-repetition run
 0.9177241864721529,360,model_rlm,1.0,2,successful task-context-repetition run
 0.9250143054036402,16,human_assigned_items,1.0,3,first submitted non-abstained question answer
-0.37828731690452766,901,model_llm,0.9385416666666667,3,successful task-context-repetition run
+0.38011852178006034,960,model_llm,1.0,3,successful task-context-repetition run
 0.7874986864108705,790,model_codeact,1.0,3,successful task-context-repetition run
-0.7296056347234339,1331,model_rlm,0.9386459802538787,3,successful task-context-repetition run
+0.7237373104662534,1418,model_rlm,1.0,3,successful task-context-repetition run
 0.6799408549577999,16,human_assigned_items,1.0,4,first submitted non-abstained question answer
 0.22754154021193937,540,model_llm,1.0,4,successful task-context-repetition run
 0.6397560646363203,429,model_codeact,1.0,4,successful task-context-repetition run

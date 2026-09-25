@@ -80,15 +80,15 @@ gemini-3.7-flash,3,tier3/task17,T3.4 Fused heterocycle (1Q),rlm,100,5,5,0,5,1.0,
 gemini-3.7-flash,3,tier3/task17,T3.4 Fused heterocycle (1Q),rlm,500,5,5,0,5,1.0,0.5333333333333333,0.26666666666666666
 gemini-3.7-flash,3,tier3/task17,T3.4 Fused heterocycle (1Q),rlm,1000,5,5,0,5,1.0,0.6880000000000001,0.0
 gemini-3.7-flash,3,tier3/task17,T3.4 Fused heterocycle (1Q),rlm,full,5,5,0,5,1.0,0.6762802025251554,0.0
-gemini-3.7-flash,3,tier3/task18,T3.5 New ring system (1Q),llm,100,5,5,0,0,0.0,,
-gemini-3.7-flash,3,tier3/task18,T3.5 New ring system (1Q),llm,500,5,5,0,0,0.0,,
-gemini-3.7-flash,3,tier3/task18,T3.5 New ring system (1Q),codeact,100,5,5,0,0,0.0,,
-gemini-3.7-flash,3,tier3/task18,T3.5 New ring system (1Q),codeact,500,5,5,0,0,0.0,,
-gemini-3.7-flash,3,tier3/task18,T3.5 New ring system (1Q),codeact,1000,5,5,0,0,0.0,,
-gemini-3.7-flash,3,tier3/task18,T3.5 New ring system (1Q),rlm,100,5,5,0,0,0.0,,
-gemini-3.7-flash,3,tier3/task18,T3.5 New ring system (1Q),rlm,500,5,5,0,0,0.0,,
-gemini-3.7-flash,3,tier3/task18,T3.5 New ring system (1Q),rlm,1000,5,3,2,2,0.4,0.0,0.0
-gemini-3.7-flash,3,tier3/task18,T3.5 New ring system (1Q),rlm,full,5,5,0,0,0.0,,
+gemini-3.7-flash,3,tier3/task18,T3.5 New ring system (1Q),llm,100,5,5,0,5,1.0,0.8865413105413105,0.05075448032033307
+gemini-3.7-flash,3,tier3/task18,T3.5 New ring system (1Q),llm,500,5,5,0,5,1.0,0.6008540694566966,0.05562870916989948
+gemini-3.7-flash,3,tier3/task18,T3.5 New ring system (1Q),codeact,100,5,5,0,5,1.0,0.9606153846153846,0.05012268970903935
+gemini-3.7-flash,3,tier3/task18,T3.5 New ring system (1Q),codeact,500,5,5,0,5,1.0,0.7634450875758185,0.06480173755103828
+gemini-3.7-flash,3,tier3/task18,T3.5 New ring system (1Q),codeact,1000,5,5,0,5,1.0,0.5489877286355781,0.31092576152353707
+gemini-3.7-flash,3,tier3/task18,T3.5 New ring system (1Q),rlm,100,5,5,0,5,1.0,0.6389816404015187,0.06268628740456736
+gemini-3.7-flash,3,tier3/task18,T3.5 New ring system (1Q),rlm,500,5,5,0,5,1.0,0.6117287395151946,0.09071498513585713
+gemini-3.7-flash,3,tier3/task18,T3.5 New ring system (1Q),rlm,1000,5,3,2,5,1.0,0.3688083076043548,0.3034151896331144
+gemini-3.7-flash,3,tier3/task18,T3.5 New ring system (1Q),rlm,full,5,5,0,5,1.0,0.5926740800947726,0.08741348498828269
 gemini-3.7-flash,3,tier3/task20,T3.6 Fused-ring construction (1Q),llm,100,5,5,0,5,1.0,1.0,0.0
 gemini-3.7-flash,3,tier3/task20,T3.6 Fused-ring construction (1Q),llm,500,5,5,0,5,1.0,0.8192821067821068,0.049215274587987023
 gemini-3.7-flash,3,tier3/task20,T3.6 Fused-ring construction (1Q),codeact,100,5,5,0,5,1.0,0.8,0.4
@@ -116,15 +116,15 @@ gemini-3.7-flash,3,tier3/task22,T3.8 HATU / T3P reagent (1Q),rlm,100,5,5,0,5,1.0
 gemini-3.7-flash,3,tier3/task22,T3.8 HATU / T3P reagent (1Q),rlm,500,5,5,0,5,1.0,1.0,0.0
 gemini-3.7-flash,3,tier3/task22,T3.8 HATU / T3P reagent (1Q),rlm,1000,5,5,0,5,1.0,1.0,0.0
 gemini-3.7-flash,3,tier3/task22,T3.8 HATU / T3P reagent (1Q),rlm,full,5,5,0,5,1.0,0.9984820472900651,0.0018591047965076108
-gemini-3.7-flash,3,tier3/task23,T3.9 New stereocenter (1Q),llm,100,5,5,0,0,0.0,,
-gemini-3.7-flash,3,tier3/task23,T3.9 New stereocenter (1Q),llm,500,5,5,0,0,0.0,,
-gemini-3.7-flash,3,tier3/task23,T3.9 New stereocenter (1Q),codeact,100,5,5,0,0,0.0,,
-gemini-3.7-flash,3,tier3/task23,T3.9 New stereocenter (1Q),codeact,500,5,5,0,0,0.0,,
-gemini-3.7-flash,3,tier3/task23,T3.9 New stereocenter (1Q),codeact,1000,5,5,0,0,0.0,,
-gemini-3.7-flash,3,tier3/task23,T3.9 New stereocenter (1Q),rlm,100,5,5,0,0,0.0,,
-gemini-3.7-flash,3,tier3/task23,T3.9 New stereocenter (1Q),rlm,500,5,5,0,0,0.0,,
-gemini-3.7-flash,3,tier3/task23,T3.9 New stereocenter (1Q),rlm,1000,5,5,0,0,0.0,,
-gemini-3.7-flash,3,tier3/task23,T3.9 New stereocenter (1Q),rlm,full,5,5,0,0,0.0,,
+gemini-3.7-flash,3,tier3/task23,T3.9 New stereocenter (1Q),llm,100,5,5,0,5,1.0,0.75,0.0
+gemini-3.7-flash,3,tier3/task23,T3.9 New stereocenter (1Q),llm,500,5,5,0,5,1.0,0.8,0.1
+gemini-3.7-flash,3,tier3/task23,T3.9 New stereocenter (1Q),codeact,100,5,5,0,5,1.0,1.0,0.0
+gemini-3.7-flash,3,tier3/task23,T3.9 New stereocenter (1Q),codeact,500,5,5,0,5,1.0,0.55,0.458257569495584
+gemini-3.7-flash,3,tier3/task23,T3.9 New stereocenter (1Q),codeact,1000,5,5,0,5,1.0,1.0,0.0
+gemini-3.7-flash,3,tier3/task23,T3.9 New stereocenter (1Q),rlm,100,5,5,0,5,1.0,1.0,0.0
+gemini-3.7-flash,3,tier3/task23,T3.9 New stereocenter (1Q),rlm,500,5,5,0,5,1.0,1.0,0.0
+gemini-3.7-flash,3,tier3/task23,T3.9 New stereocenter (1Q),rlm,1000,5,5,0,5,1.0,1.0,0.0
+gemini-3.7-flash,3,tier3/task23,T3.9 New stereocenter (1Q),rlm,full,5,5,0,5,1.0,0.995956862136857,0.00739922660227359
 gemini-3.7-flash,3,tier3/task24,T3.10 E-alkene formation (1Q),llm,100,5,5,0,5,1.0,1.0,0.0
 gemini-3.7-flash,3,tier3/task24,T3.10 E-alkene formation (1Q),llm,500,5,5,0,5,1.0,0.9636363636363636,0.04453617714151235
 gemini-3.7-flash,3,tier3/task24,T3.10 E-alkene formation (1Q),codeact,100,5,5,0,5,1.0,0.8,0.4
@@ -134,24 +134,24 @@ gemini-3.7-flash,3,tier3/task24,T3.10 E-alkene formation (1Q),rlm,100,5,5,0,5,1.
 gemini-3.7-flash,3,tier3/task24,T3.10 E-alkene formation (1Q),rlm,500,5,5,0,5,1.0,1.0,0.0
 gemini-3.7-flash,3,tier3/task24,T3.10 E-alkene formation (1Q),rlm,1000,5,5,0,5,1.0,1.0,0.0
 gemini-3.7-flash,3,tier3/task24,T3.10 E-alkene formation (1Q),rlm,full,5,5,0,5,1.0,1.0,0.0
-gemini-3.7-flash,3,tier3/task6,T3.11-14 Amide couplings (4Q),llm,100,5,5,0,0,0.0,,
-gemini-3.7-flash,3,tier3/task6,T3.11-14 Amide couplings (4Q),llm,500,5,5,0,0,0.0,,
-gemini-3.7-flash,3,tier3/task6,T3.11-14 Amide couplings (4Q),codeact,100,5,5,0,0,0.0,,
-gemini-3.7-flash,3,tier3/task6,T3.11-14 Amide couplings (4Q),codeact,500,5,5,0,0,0.0,,
-gemini-3.7-flash,3,tier3/task6,T3.11-14 Amide couplings (4Q),codeact,1000,5,5,0,0,0.0,,
-gemini-3.7-flash,3,tier3/task6,T3.11-14 Amide couplings (4Q),rlm,100,5,5,0,0,0.0,,
-gemini-3.7-flash,3,tier3/task6,T3.11-14 Amide couplings (4Q),rlm,500,5,5,0,0,0.0,,
-gemini-3.7-flash,3,tier3/task6,T3.11-14 Amide couplings (4Q),rlm,1000,5,5,0,0,0.0,,
-gemini-3.7-flash,3,tier3/task6,T3.11-14 Amide couplings (4Q),rlm,full,5,5,0,0,0.0,,
-gemini-3.7-flash,3,tier3/task7,T3.15-19 Group transformations (5Q),llm,100,5,5,0,0,0.0,,
-gemini-3.7-flash,3,tier3/task7,T3.15-19 Group transformations (5Q),llm,500,5,5,0,0,0.0,,
-gemini-3.7-flash,3,tier3/task7,T3.15-19 Group transformations (5Q),codeact,100,5,5,0,0,0.0,,
-gemini-3.7-flash,3,tier3/task7,T3.15-19 Group transformations (5Q),codeact,500,5,5,0,0,0.0,,
-gemini-3.7-flash,3,tier3/task7,T3.15-19 Group transformations (5Q),codeact,1000,5,5,0,0,0.0,,
-gemini-3.7-flash,3,tier3/task7,T3.15-19 Group transformations (5Q),rlm,100,5,5,0,0,0.0,,
-gemini-3.7-flash,3,tier3/task7,T3.15-19 Group transformations (5Q),rlm,500,5,5,0,0,0.0,,
-gemini-3.7-flash,3,tier3/task7,T3.15-19 Group transformations (5Q),rlm,1000,5,4,1,1,0.2,0.0,0.0
-gemini-3.7-flash,3,tier3/task7,T3.15-19 Group transformations (5Q),rlm,full,5,5,0,0,0.0,,
+gemini-3.7-flash,3,tier3/task6,T3.11-14 Amide couplings (4Q),llm,100,5,5,0,5,1.0,0.714275,0.0
+gemini-3.7-flash,3,tier3/task6,T3.11-14 Amide couplings (4Q),llm,500,5,5,0,5,1.0,0.648245,0.002681436182347084
+gemini-3.7-flash,3,tier3/task6,T3.11-14 Amide couplings (4Q),codeact,100,5,5,0,5,1.0,0.8066378066378068,0.02916059217599022
+gemini-3.7-flash,3,tier3/task6,T3.11-14 Amide couplings (4Q),codeact,500,5,5,0,5,1.0,0.6927411477411478,0.10091477939150037
+gemini-3.7-flash,3,tier3/task6,T3.11-14 Amide couplings (4Q),codeact,1000,5,5,0,5,1.0,0.397595124532788,0.10023362049413906
+gemini-3.7-flash,3,tier3/task6,T3.11-14 Amide couplings (4Q),rlm,100,5,5,0,5,1.0,0.8111832611832612,0.03546350361750683
+gemini-3.7-flash,3,tier3/task6,T3.11-14 Amide couplings (4Q),rlm,500,5,5,0,5,1.0,0.7806055900621118,0.06754359242322909
+gemini-3.7-flash,3,tier3/task6,T3.11-14 Amide couplings (4Q),rlm,1000,5,5,0,5,1.0,0.677404970760234,0.013396899331536576
+gemini-3.7-flash,3,tier3/task6,T3.11-14 Amide couplings (4Q),rlm,full,5,5,0,5,1.0,0.8864320157034085,0.03504040947251413
+gemini-3.7-flash,3,tier3/task7,T3.15-19 Group transformations (5Q),llm,100,5,5,0,5,1.0,0.9318200000000001,0.0
+gemini-3.7-flash,3,tier3/task7,T3.15-19 Group transformations (5Q),llm,500,5,5,0,5,1.0,0.9333333333333332,0.0
+gemini-3.7-flash,3,tier3/task7,T3.15-19 Group transformations (5Q),codeact,100,5,5,0,5,1.0,0.9318181818181819,0.0
+gemini-3.7-flash,3,tier3/task7,T3.15-19 Group transformations (5Q),codeact,500,5,5,0,5,1.0,0.96,0.0
+gemini-3.7-flash,3,tier3/task7,T3.15-19 Group transformations (5Q),codeact,1000,5,5,0,5,1.0,0.8249643463497452,0.09455549370973242
+gemini-3.7-flash,3,tier3/task7,T3.15-19 Group transformations (5Q),rlm,100,5,5,0,5,1.0,0.9318181818181819,0.0
+gemini-3.7-flash,3,tier3/task7,T3.15-19 Group transformations (5Q),rlm,500,5,5,0,5,1.0,0.96,0.0
+gemini-3.7-flash,3,tier3/task7,T3.15-19 Group transformations (5Q),rlm,1000,5,4,1,5,1.0,0.7502402159244264,0.37512431726241474
+gemini-3.7-flash,3,tier3/task7,T3.15-19 Group transformations (5Q),rlm,full,5,5,0,5,1.0,0.8506823225024315,0.043745648082673415
 gemini-3.7-flash,3,tier3/task8,T3.20-21 Protecting groups (2Q),llm,100,5,5,0,5,1.0,0.990909090909091,0.018181818181818167
 gemini-3.7-flash,3,tier3/task8,T3.20-21 Protecting groups (2Q),llm,500,5,5,0,5,1.0,0.9253539253539254,0.007231870835050892
 gemini-3.7-flash,3,tier3/task8,T3.20-21 Protecting groups (2Q),codeact,100,5,5,0,5,1.0,0.9436363636363637,0.02181818181818178
@@ -170,15 +170,15 @@ gemini-3.7-flash,3,tier3/task9,T3.22-25 Named reactions (4Q),rlm,100,5,5,0,5,1.0
 gemini-3.7-flash,3,tier3/task9,T3.22-25 Named reactions (4Q),rlm,500,5,5,0,5,1.0,0.9577692307692308,0.025999999999999978
 gemini-3.7-flash,3,tier3/task9,T3.22-25 Named reactions (4Q),rlm,1000,5,5,0,5,1.0,0.9602630848979734,0.014912318015931715
 gemini-3.7-flash,3,tier3/task9,T3.22-25 Named reactions (4Q),rlm,full,5,5,0,5,1.0,0.9120023249687488,0.06253777304220769
-gemini-3.7-flash,3,tier3/task10,T3.26-30 Mechanisms I (5Q),llm,100,5,5,0,0,0.0,,
-gemini-3.7-flash,3,tier3/task10,T3.26-30 Mechanisms I (5Q),llm,500,5,5,0,0,0.0,,
-gemini-3.7-flash,3,tier3/task10,T3.26-30 Mechanisms I (5Q),codeact,100,5,5,0,0,0.0,,
-gemini-3.7-flash,3,tier3/task10,T3.26-30 Mechanisms I (5Q),codeact,500,5,5,0,0,0.0,,
-gemini-3.7-flash,3,tier3/task10,T3.26-30 Mechanisms I (5Q),codeact,1000,5,5,0,0,0.0,,
-gemini-3.7-flash,3,tier3/task10,T3.26-30 Mechanisms I (5Q),rlm,100,5,5,0,0,0.0,,
-gemini-3.7-flash,3,tier3/task10,T3.26-30 Mechanisms I (5Q),rlm,500,5,5,0,0,0.0,,
-gemini-3.7-flash,3,tier3/task10,T3.26-30 Mechanisms I (5Q),rlm,1000,5,5,0,0,0.0,,
-gemini-3.7-flash,3,tier3/task10,T3.26-30 Mechanisms I (5Q),rlm,full,5,5,0,0,0.0,,
+gemini-3.7-flash,3,tier3/task10,T3.26-30 Mechanisms I (5Q),llm,100,5,5,0,5,1.0,0.8298989898989898,0.007272727272727275
+gemini-3.7-flash,3,tier3/task10,T3.26-30 Mechanisms I (5Q),llm,500,5,5,0,5,1.0,0.9473079999999999,0.019477706641183416
+gemini-3.7-flash,3,tier3/task10,T3.26-30 Mechanisms I (5Q),codeact,100,5,5,0,5,1.0,0.9595959595959596,0.0
+gemini-3.7-flash,3,tier3/task10,T3.26-30 Mechanisms I (5Q),codeact,500,5,5,0,5,1.0,0.9159052287581699,0.06639122549331475
+gemini-3.7-flash,3,tier3/task10,T3.26-30 Mechanisms I (5Q),codeact,1000,5,5,0,5,1.0,0.8625663637927268,0.011079635619304539
+gemini-3.7-flash,3,tier3/task10,T3.26-30 Mechanisms I (5Q),rlm,100,5,5,0,5,1.0,0.9640404040404039,0.008888888888888901
+gemini-3.7-flash,3,tier3/task10,T3.26-30 Mechanisms I (5Q),rlm,500,5,5,0,5,1.0,0.9417399804496579,0.03146386492546672
+gemini-3.7-flash,3,tier3/task10,T3.26-30 Mechanisms I (5Q),rlm,1000,5,5,0,5,1.0,0.871110376307918,0.001088674275680468
+gemini-3.7-flash,3,tier3/task10,T3.26-30 Mechanisms I (5Q),rlm,full,5,5,0,5,1.0,0.7099857372232531,0.01774656404480195
 gemini-3.7-flash,3,tier3/task10b,T3.31-35 Mechanisms II (5Q),llm,100,5,5,0,5,1.0,0.7595959595959596,0.0
 gemini-3.7-flash,3,tier3/task10b,T3.31-35 Mechanisms II (5Q),llm,500,5,5,0,5,1.0,0.6518831168831168,0.039538150008851546
 gemini-3.7-flash,3,tier3/task10b,T3.31-35 Mechanisms II (5Q),codeact,100,5,5,0,5,1.0,0.7551515151515151,0.008888888888888901
@@ -233,15 +233,15 @@ gemini-3.7-flash,4,tier4/task14,T4.10-11 Protecting-group pairs (2Q),rlm,100,5,5
 gemini-3.7-flash,4,tier4/task14,T4.10-11 Protecting-group pairs (2Q),rlm,500,5,5,0,5,1.0,1.0,0.0
 gemini-3.7-flash,4,tier4/task14,T4.10-11 Protecting-group pairs (2Q),rlm,1000,5,4,1,5,1.0,0.8,0.4
 gemini-3.7-flash,4,tier4/task14,T4.10-11 Protecting-group pairs (2Q),rlm,full,5,5,0,5,1.0,0.9746666666666666,0.05066666666666668
-gemini-3.7-flash,4,tier4/task15,T4.12-15 Ring-construction chains (4Q),llm,100,5,5,0,0,0.0,,
-gemini-3.7-flash,4,tier4/task15,T4.12-15 Ring-construction chains (4Q),llm,500,5,5,0,0,0.0,,
-gemini-3.7-flash,4,tier4/task15,T4.12-15 Ring-construction chains (4Q),codeact,100,5,5,0,0,0.0,,
-gemini-3.7-flash,4,tier4/task15,T4.12-15 Ring-construction chains (4Q),codeact,500,5,5,0,0,0.0,,
-gemini-3.7-flash,4,tier4/task15,T4.12-15 Ring-construction chains (4Q),codeact,1000,5,5,0,0,0.0,,
-gemini-3.7-flash,4,tier4/task15,T4.12-15 Ring-construction chains (4Q),rlm,100,5,5,0,0,0.0,,
-gemini-3.7-flash,4,tier4/task15,T4.12-15 Ring-construction chains (4Q),rlm,500,5,5,0,0,0.0,,
-gemini-3.7-flash,4,tier4/task15,T4.12-15 Ring-construction chains (4Q),rlm,1000,5,5,0,0,0.0,,
-gemini-3.7-flash,4,tier4/task15,T4.12-15 Ring-construction chains (4Q),rlm,full,5,5,0,0,0.0,,
+gemini-3.7-flash,4,tier4/task15,T4.12-15 Ring-construction chains (4Q),llm,100,5,5,0,5,1.0,0.95,0.1
+gemini-3.7-flash,4,tier4/task15,T4.12-15 Ring-construction chains (4Q),llm,500,5,5,0,5,1.0,0.9,0.1224744871391589
+gemini-3.7-flash,4,tier4/task15,T4.12-15 Ring-construction chains (4Q),codeact,100,5,5,0,5,1.0,0.95,0.1
+gemini-3.7-flash,4,tier4/task15,T4.12-15 Ring-construction chains (4Q),codeact,500,5,5,0,5,1.0,0.892855,0.196914204921839
+gemini-3.7-flash,4,tier4/task15,T4.12-15 Ring-construction chains (4Q),codeact,1000,5,5,0,5,1.0,0.654765,0.15989881300372433
+gemini-3.7-flash,4,tier4/task15,T4.12-15 Ring-construction chains (4Q),rlm,100,5,5,0,5,1.0,1.0,0.0
+gemini-3.7-flash,4,tier4/task15,T4.12-15 Ring-construction chains (4Q),rlm,500,5,5,0,5,1.0,1.0,0.0
+gemini-3.7-flash,4,tier4/task15,T4.12-15 Ring-construction chains (4Q),rlm,1000,5,5,0,5,1.0,0.9,0.2
+gemini-3.7-flash,4,tier4/task15,T4.12-15 Ring-construction chains (4Q),rlm,full,5,5,0,5,1.0,0.95,0.1
 gemini-3.7-flash,4,tier4/task16,T4.16-25 Truncated routes (10Q),llm,100,5,5,0,5,1.0,0.5650000000000001,0.013333333333333286
 gemini-3.7-flash,4,tier4/task16,T4.16-25 Truncated routes (10Q),llm,500,5,5,0,5,1.0,0.5583333333333333,0.0
 gemini-3.7-flash,4,tier4/task16,T4.16-25 Truncated routes (10Q),codeact,100,5,5,0,5,1.0,0.4133333333333333,0.09273618495495704

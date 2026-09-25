@@ -1,0 +1,54 @@
+{
+  "configured_seed": 42,
+  "counts": {
+    "by_context": {
+      "100": 41,
+      "1000": 6,
+      "500": 54,
+      "5000": 15,
+      "50000": 14,
+      "full": 71
+    },
+    "by_experiment": {
+      "causal_control": 32,
+      "causal_control;main_benchmark": 10,
+      "main_benchmark": 136,
+      "provisional_control": 17,
+      "x1000_extension": 6
+    },
+    "by_method": {
+      "llm": 59,
+      "rlm": 142
+    },
+    "by_model": {
+      "claude-haiku-4.5": 30,
+      "deepseek-v4-flash": 15,
+      "gemini-3.7-flash": 32,
+      "glm-5.2": 31,
+      "gpt-5-mini": 61,
+      "qwen3.5": 32
+    },
+    "by_repetition": {
+      "1": 42,
+      "2": 39,
+      "3": 40,
+      "4": 41,
+      "5": 39
+    },
+    "by_task": {
+      "tier3/task10": 19,
+      "tier3/task18": 119,
+      "tier3/task23": 45,
+      "tier3/task7": 18
+    }
+  },
+  "files": {
+    "README.md": "93c46c2aabc23726511450f63d981456aee806d900d0e5d4078cc6daa40b2a88",
+    "pending_corrected_rescores.csv": "83c2547182044550fe774e1b9d32948486073e6792e2ee8c05f0d285ba2a9e54",
+    "pending_corrected_rescores.jsonl": "2612c241f8d0ab0dcec19c9d62bf0c05dc0460a26f778fe9c3bc2240852817f9"
+  },
+  "queued_run_count": 201,
+  "recovery_id": "rxnhaystack-corrected-score-recovery-2026-09-25-v2",
+  "schema_version": 1,
+  "submission_score_freeze_id": "rxnhaystack-iclr2027-submission-score-freeze-v1"
+}
