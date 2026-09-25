@@ -125,6 +125,25 @@ Keep raw model outputs and context artifacts fixed when applying these entries.
 Do not silently mix corrected scores with scores produced under an older oracle
 or prompt version.
 
+### Correction provenance and affected-run identity
+
+| Change | Correction commit | Historical-run selection |
+| --- | --- | --- |
+| T4 Task 12b exhaustive human answer | `793b08a` | Human submissions using bundles before 1.3.0; model scores are unaffected. |
+| T3 Tasks 18 and 23; T4 Task 15 one-chain human evaluator | `5eefa91` | Every archived run whose canonical task is `tier3/task18` or `tier3/task23`; the human evaluator change does not alter model outputs. |
+| T3 Task 7; T4 Task 13 prompt; T4 Task 15 exhaustive alternatives | `ffbbe41` | Every archived `tier3/task7` and `tier4/task15` run; Task 13 remains the original-prompt condition. |
+| T3 Tasks 6 and 10; final connectivity-only Task 7 correction | `bfb038a` | Every archived run whose canonical task is `tier3/task6`, `tier3/task7`, or `tier3/task10`. |
+| Task 15 score-field normalization | `778c3fe` | Every `tier4/task15` run selects `macro_reaction_f1`; all other tasks select `macro_f1`. |
+
+Exact affected run IDs and their old values are retained row by row in
+`paper_plots/gold/iclr2027/full_benchmark_records.csv`,
+`codeact_x1000_records.csv`, `rlm_x1000_records.csv`, and the causal-control
+records. Affected rows carry correction ID
+`rxnhaystack-ground-truth-2026-09-25-v2`, preserve the former score in
+`original_f1`, and use `score_correction_status` to distinguish invalidated
+historical scores from affected jobs without a historical score. The source
+manifest checksums these tables and the correction overlay.
+
 | Feedback source | Task | Required action for historical model results | Reason |
 | --- | --- | --- | --- |
 | Theo | T3 Task 18 | Rescore every LLM, RLM, and CodeAct output at every context size. | Ground-truth membership changed from 46,528 to 17,022. |

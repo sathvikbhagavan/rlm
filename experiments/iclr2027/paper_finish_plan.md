@@ -15,7 +15,7 @@ queue for finishing the submission.
 
 ### 1. Audit every evaluator and freeze the scientific results
 
-- [ ] Enumerate every ground-truth, evaluator, and metric implementation that
+- [x] Enumerate every ground-truth, evaluator, and metric implementation that
   changed after the benchmark runs were produced. Record the affected tasks,
   run identities, old and new behavior, and the commit that introduced each
   correction.
@@ -23,10 +23,13 @@ queue for finishing the submission.
   rescored or whether the model saw incorrect inputs and the run must be
   repeated. Re-run API inference only when rescoring cannot recover the valid
   result.
-- [ ] Apply the audit across LLM, CodeAct, and RLM for every model and control
+  The classification is complete, but corrected reruns or recovered raw
+  predictions are still needed for scores currently marked
+  `historical_score_invalidated`; exclusion is not a corrected score.
+- [x] Apply the audit across LLM, CodeAct, and RLM for every model and control
   experiment that contains an affected task. Verify Task 15's
   `macro_reaction_f1`/`macro_f1` normalization explicitly.
-- [ ] Freeze corrected per-run results, checksums, exclusions, and a concise
+- [x] Freeze corrected per-run results, checksums, exclusions, and a concise
   correction record before regenerating any final figure or table.
 
 ### 2. Consolidate the human annotations
