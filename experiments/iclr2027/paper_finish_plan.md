@@ -222,8 +222,12 @@ Completed on the corrected five-model freeze. The full 6,029-job valid
 population separates scientific outcomes from execution failures. Exact
 precision/recall reconstruction supports set-error signatures for 2,229
 question outputs from corrected Tier-3 Tasks 6, 7, 10, 18, and 23; outputs
-without sufficient retained detail remain unclassified. The data, source
-hashes, plot, and interpretation boundary are in
+without sufficient retained detail remain unclassified. A cross-model trace
+audit reconciles these frequencies with the earlier chemistry-specific
+analysis: it preserves the observed invalid RDKit operations, disconnected
+chemical tests, brittle SMARTS, missing graph links, and coarse route proxies,
+while removing superseded workshop-era scores. The data, reviewed trace
+inventory, source hashes, plot, and interpretation boundary are in
 `paper_plots/gold/iclr2027/failure_analysis/`.
 
 ### 6. Iterate and finalize Figure 1
