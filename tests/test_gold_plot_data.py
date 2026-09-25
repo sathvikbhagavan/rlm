@@ -511,10 +511,11 @@ def test_cross_model_summary_uses_model_mean_and_standard_error() -> None:
 
     summary = cross_model_scaling_summaries(rows)[0]
 
-    assert summary["mean_f1"] == pytest.approx(0.5)
+    assert summary["mean_f1"] == pytest.approx(0.6)
     assert summary["model_std"] == pytest.approx(0.5477225575)
-    assert summary["model_sem"] == pytest.approx(0.2236067977)
-    assert summary["n_models"] == 6
+    assert summary["model_sem"] == pytest.approx(0.2449489743)
+    assert summary["n_models"] == 5
+    assert "glm-5.2" not in summary["included_models"]
     assert summary["is_final"] is True
 
 

@@ -37,6 +37,7 @@ MODEL_ORDER = (
     "gpt-5-mini",
     "claude-haiku-4.5",
 )
+PAPER_MODEL_ORDER = tuple(model for model in MODEL_ORDER if model != "glm-5.2")
 PAID_MODELS = frozenset({"gemini-3.7-flash", "gpt-5-mini", "claude-haiku-4.5"})
 MODEL_LABELS = {
     "qwen3.5": "Qwen 3.5",
@@ -60,17 +61,17 @@ METHOD_ORDER = ("llm", "codeact", "rlm")
 STATUS_ORDER = ("succeeded", "running", "stale", "failed", "pending")
 CONTEXT_ORDER = {"100": 0, "500": 1, "1000": 2, "full": 3}
 EXPECTED_MODELS_BY_METHOD_CONTEXT = {
-    ("llm", "100"): frozenset(MODEL_ORDER),
-    ("llm", "500"): frozenset(MODEL_ORDER),
-    ("codeact", "100"): frozenset(MODEL_ORDER),
-    ("codeact", "500"): frozenset(MODEL_ORDER),
+    ("llm", "100"): frozenset(PAPER_MODEL_ORDER),
+    ("llm", "500"): frozenset(PAPER_MODEL_ORDER),
+    ("codeact", "100"): frozenset(PAPER_MODEL_ORDER),
+    ("codeact", "500"): frozenset(PAPER_MODEL_ORDER),
     ("codeact", "1000"): frozenset(
         {"qwen3.5", "deepseek-v4-flash", "gemini-3.7-flash", "gpt-5-mini"}
     ),
-    ("rlm", "100"): frozenset(MODEL_ORDER),
-    ("rlm", "500"): frozenset(MODEL_ORDER),
+    ("rlm", "100"): frozenset(PAPER_MODEL_ORDER),
+    ("rlm", "500"): frozenset(PAPER_MODEL_ORDER),
     ("rlm", "1000"): frozenset({"deepseek-v4-flash", "gemini-3.7-flash", "gpt-5-mini"}),
-    ("rlm", "full"): frozenset(MODEL_ORDER),
+    ("rlm", "full"): frozenset(PAPER_MODEL_ORDER),
 }
 QUESTION_COUNTS = {
     "tier1/task1": 10,
@@ -496,10 +497,16 @@ def cross_model_scaling_summaries(
             CONTEXT_ORDER[item[0][1]],
         ),
     ):
-        eligible = [row for row in group if row["f1"] is not None and bool(row["arm_final"])]
+        expected_models = EXPECTED_MODELS_BY_METHOD_CONTEXT[(method, context)]
+        eligible = [
+            row
+            for row in group
+            if row["f1"] is not None
+            and bool(row["arm_final"])
+            and str(row["model"]) in expected_models
+        ]
         if not eligible:
             continue
-        expected_models = EXPECTED_MODELS_BY_METHOD_CONTEXT[(method, context)]
         observed_models = {str(row["model"]) for row in eligible}
         values = [float(row["f1_zero_imputed"]) for row in eligible]
         model_std = statistics.stdev(values) if len(values) > 1 else None
@@ -604,14 +611,16 @@ def cross_model_efficiency_summaries(
             CONTEXT_ORDER[item[0][1]],
         ),
     ):
+        expected_models = EXPECTED_MODELS_BY_METHOD_CONTEXT[(method, context)]
         eligible = [
             row
             for row in group
-            if bool(row["arm_final"]) and all(row[metric] is not None for metric in metrics)
+            if bool(row["arm_final"])
+            and all(row[metric] is not None for metric in metrics)
+            and str(row["model"]) in expected_models
         ]
         if not eligible:
             continue
-        expected_models = EXPECTED_MODELS_BY_METHOD_CONTEXT[(method, context)]
         observed_models = {str(row["model"]) for row in eligible}
         row_out: dict[str, Any] = {
             "method": method,
@@ -969,9 +978,16 @@ def main() -> None:
     write_csv(output / "full_benchmark_records.csv", rows)
     write_csv(output / "codeact_x1000_records.csv", extension_rows)
     write_csv(output / "rlm_x1000_records.csv", rlm_x1000_rows)
-    write_csv(output / "final_arm_records.csv", [row for row in all_rows if row["arm_final"]])
+    paper_rows = [
+        row
+        for row in all_rows
+        if str(row["model"])
+        in EXPECTED_MODELS_BY_METHOD_CONTEXT[(str(row["method"]), str(row["context"]))]
+    ]
+    write_csv(output / "final_arm_records.csv", [row for row in paper_rows if row["arm_final"]])
     write_csv(
-        output / "provisional_arm_records.csv", [row for row in all_rows if not row["arm_final"]]
+        output / "provisional_arm_records.csv",
+        [row for row in all_rows if row not in paper_rows or not row["arm_final"]],
     )
     write_csv(output / "arm_status.csv", arms)
     write_csv(output / "tier_scaling.csv", scaling)

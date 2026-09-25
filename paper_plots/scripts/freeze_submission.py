@@ -80,6 +80,10 @@ def build_claims(gold_dir: Path) -> dict[str, Any]:
     prospective = read_csv(gold_dir / "prospective_decomposition/aggregates.csv")
     human = json.loads((gold_dir / "human_validation/summary.json").read_text())
     efficiency = read_csv(gold_dir / "efficiency_appendix/across_models.csv")
+    expected_trajectories = sum(int(row["question_count"]) for row in final_records)
+    successful_trajectories = sum(
+        int(row["question_count"]) for row in final_records if row["status"] == "succeeded"
+    )
     return {
         "freeze_id": FREEZE_ID,
         "benchmark": {
@@ -88,9 +92,9 @@ def build_claims(gold_dir: Path) -> dict[str, Any]:
             "interfaces": 3,
             "models": len({row["model"] for row in final_records}),
             "terminal_jobs": len(final_records),
-            "terminal_question_trajectories": sum(
-                int(row["question_count"]) for row in final_records
-            ),
+            "expected_question_trajectories": expected_trajectories,
+            "terminal_question_trajectories": expected_trajectories,
+            "successful_question_trajectories": successful_trajectories,
         },
         "core_scaling": keyed_rows(scaling, ("method", "context", "tier")),
         "capability_split_across_models": keyed_rows(capability, ("capability_group",)),
@@ -180,7 +184,7 @@ def main() -> None:
         encoding="utf-8",
     )
     print(
-        f"Frozen {claims['benchmark']['terminal_question_trajectories']:,} terminal "
+        f"Frozen {claims['benchmark']['expected_question_trajectories']:,} expected "
         f"question trajectories to {args.output_dir}"
     )
 
