@@ -154,6 +154,13 @@ queue for finishing the submission.
   colors, typography, metric units, and colorbar range. Regenerate any remaining
   legacy figure that still uses an older palette.
 
+#### Citation integrity audit
+
+- [ ] Manually verify every bibliography entry and every in-text citation
+  against the original publication or official record. Confirm the title,
+  authors, venue, year, identifier or URL, and that each cited source supports
+  the sentence in which it appears; remove or correct any unverifiable entry.
+
 #### Cost and resource disclosure
 
 - [x] Report recorded API cost in USD per successful trajectory alongside
