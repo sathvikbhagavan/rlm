@@ -70,6 +70,15 @@ class ExtractedPrediction:
     extraction_method: str
 
 
+@dataclass(frozen=True)
+class AggregateMetricRecovery:
+    historical_true_positives: tuple[int, ...]
+    corrected_true_positives: int
+    corrected_precision: float
+    corrected_recall: float
+    corrected_f1: float
+
+
 def sha256_bytes(value: bytes) -> str:
     return hashlib.sha256(value).hexdigest()
 
@@ -315,7 +324,9 @@ def extract_tier3_predictions(
             continue
         expected_count = int(count_match.group(2))
         candidates = (
-            _codeact_candidates(segment) if method == "codeact" else _rlm_candidates(segment)
+            _codeact_candidates(segment, task=task)
+            if method == "codeact"
+            else _rlm_candidates(segment)
         )
         selected: tuple[int, ...] | None = None
         selected_method = ""
@@ -334,7 +345,7 @@ def extract_tier3_predictions(
     return output
 
 
-def _codeact_candidates(segment: str) -> list[tuple[str, str]]:
+def _codeact_candidates(segment: str, *, task: str) -> list[tuple[str, str]]:
     output: list[tuple[str, str]] = []
     output.extend(
         ("codeact-answer-tag", match.group(1))
@@ -347,6 +358,24 @@ def _codeact_candidates(segment: str) -> list[tuple[str, str]]:
         for match in re.finditer(r"ANSWER:\s*([^\r\n]+)", segment, flags=re.IGNORECASE)
     )
     output.extend(_final_answer_box_candidates(segment))
+    iteration_start = segment.rfind("===== ITERATION 1 =====")
+    finish_start = segment.rfind("---- FINISH REASON:")
+    if 0 <= iteration_start < finish_start:
+        transcript = segment[iteration_start:finish_start]
+        historical_answer = re.search(
+            r"ANSWER:\s*(.*)", transcript, flags=re.IGNORECASE | re.DOTALL
+        )
+        if historical_answer:
+            output.append(("codeact-historical-transcript", historical_answer.group(1)))
+        elif task == "tier3/task18":
+            output.extend(
+                ("codeact-final-code-block", match.group(1))
+                for match in re.finditer(
+                    r"```(?:python)?\s*\n(.*?)```",
+                    transcript,
+                    flags=re.IGNORECASE | re.DOTALL,
+                )
+            )
     return sorted(output, key=lambda item: segment.rfind(item[1]))
 
 
@@ -371,7 +400,19 @@ def _final_answer_box_candidates(segment: str) -> list[tuple[str, str]]:
             stripped = line.strip().strip("│").strip()
             if stripped:
                 lines.append(stripped)
-        output.append(("rlm-final-answer-box", " ".join(lines)))
+        joined = " ".join(lines)
+        wrapped = "".join(lines)
+        output.append(("rlm-final-answer-box", joined))
+        output.append(("rlm-final-answer-box-wrapped", wrapped))
+        for method, candidate in (
+            ("rlm-final-answer-box-historical-answer", joined),
+            ("rlm-final-answer-box-wrapped-historical-answer", wrapped),
+        ):
+            historical_answer = re.search(
+                r"ANSWER:\s*(.*)", candidate, flags=re.IGNORECASE | re.DOTALL
+            )
+            if historical_answer:
+                output.append((method, historical_answer.group(1)))
     return output
 
 
@@ -390,6 +431,103 @@ def infer_prediction(
     if metric.exact_match:
         return historical_ground_truth_in_context, "prediction-equals-historical-ground-truth"
     return None, "prediction-underdetermined"
+
+
+def infer_metric_from_aggregate(
+    *,
+    metric: SampleMetric,
+    historical_ground_truth_in_context: frozenset[int],
+    corrected_ground_truth_in_context: frozenset[int],
+) -> AggregateMetricRecovery | None:
+    """Recover a corrected metric when aggregate evidence makes it unique.
+
+    The submitted indices need not be identifiable. We enumerate historical
+    true-positive counts compatible with the four-decimal console metrics,
+    then bound how many of those predictions can lie in the unchanged,
+    removed, and added ground-truth partitions. A result is returned only if
+    every compatible contingency table gives the same corrected TP count.
+
+    Predictions outside the sampled context are conservatively treated as an
+    unbounded pool of negatives because the historical evaluator did not
+    reject out-of-context or out-of-range integers.
+    """
+
+    predicted_count = metric.predicted_count
+    historical_count = len(historical_ground_truth_in_context)
+    corrected_count = len(corrected_ground_truth_in_context)
+
+    def matches_logged(value: float, logged: float) -> bool:
+        return f"{value:.4f}" == f"{logged:.4f}"
+
+    compatible_historical_tp: list[int] = []
+    corrected_tp_options: set[int] = set()
+    common_count = len(historical_ground_truth_in_context & corrected_ground_truth_in_context)
+    removed_count = len(historical_ground_truth_in_context - corrected_ground_truth_in_context)
+    added_count = len(corrected_ground_truth_in_context - historical_ground_truth_in_context)
+
+    for historical_tp in range(min(predicted_count, historical_count) + 1):
+        precision = historical_tp / predicted_count if predicted_count else 0.0
+        recall = historical_tp / historical_count if historical_count else 0.0
+        f1 = 2 * precision * recall / (precision + recall) if precision + recall else 0.0
+        if not (
+            matches_logged(precision, metric.precision)
+            and matches_logged(recall, metric.recall)
+            and matches_logged(f1, metric.f1)
+        ):
+            continue
+        compatible_historical_tp.append(historical_tp)
+
+        common_tp_min = max(0, historical_tp - removed_count)
+        common_tp_max = min(historical_tp, common_count)
+        added_tp_max = min(predicted_count - historical_tp, added_count)
+        for common_tp in range(common_tp_min, common_tp_max + 1):
+            corrected_tp_options.update(range(common_tp, common_tp + added_tp_max + 1))
+
+    if not compatible_historical_tp or len(corrected_tp_options) != 1:
+        return None
+
+    corrected_tp = next(iter(corrected_tp_options))
+    precision = corrected_tp / predicted_count if predicted_count else 0.0
+    recall = corrected_tp / corrected_count if corrected_count else 0.0
+    f1 = 2 * precision * recall / (precision + recall) if precision + recall else 0.0
+    return AggregateMetricRecovery(
+        historical_true_positives=tuple(compatible_historical_tp),
+        corrected_true_positives=corrected_tp,
+        corrected_precision=precision,
+        corrected_recall=recall,
+        corrected_f1=f1,
+    )
+
+
+def aggregate_question_score(
+    *,
+    question_id: str,
+    metric: SampleMetric,
+    historical_ground_truth_in_context: frozenset[int],
+    corrected_ground_truth_in_context: frozenset[int],
+) -> dict[str, Any] | None:
+    aggregate = infer_metric_from_aggregate(
+        metric=metric,
+        historical_ground_truth_in_context=historical_ground_truth_in_context,
+        corrected_ground_truth_in_context=corrected_ground_truth_in_context,
+    )
+    if aggregate is None:
+        return None
+    return {
+        "question_id": question_id,
+        "old_f1": metric.f1,
+        "corrected_f1": aggregate.corrected_f1,
+        "recovery": "aggregate-contingency-bounds",
+        "predicted_count": metric.predicted_count,
+        "historical_ground_truth_count": len(historical_ground_truth_in_context),
+        "corrected_ground_truth_count": len(corrected_ground_truth_in_context),
+        "historical_true_positive_options": list(aggregate.historical_true_positives),
+        "corrected_true_positives": aggregate.corrected_true_positives,
+        "corrected_precision": aggregate.corrected_precision,
+        "corrected_recall": aggregate.corrected_recall,
+        "validation_old_precision": metric.precision,
+        "validation_old_recall": metric.recall,
+    }
 
 
 def positive_cardinality_from_condition(condition: str) -> int | None:
@@ -419,6 +557,7 @@ def score_tier3_run(
         context = context_by_question[question_id]
         historical_in_context = frozenset(historical_ground_truth[question_id] & context)
         corrected_in_context = frozenset(corrected_ground_truth[question_id] & context)
+
         prediction = extracted.get(question_id)
         source = prediction.extraction_method if prediction is not None else ""
         if prediction is not None:
@@ -442,11 +581,42 @@ def score_tier3_run(
                 corrected_ground_truth_in_context=corrected_in_context,
             )
             if predicted is None:
+                aggregate_score = aggregate_question_score(
+                    question_id=question_id,
+                    metric=metric,
+                    historical_ground_truth_in_context=historical_in_context,
+                    corrected_ground_truth_in_context=corrected_in_context,
+                )
+                if aggregate_score is not None:
+                    question_scores.append(aggregate_score)
+                    continue
                 return None, question_scores
         old_precision, old_recall, old_f1 = precision_recall_f1(predicted, historical_in_context)
-        precision, recall, f1 = precision_recall_f1(predicted, corrected_in_context)
         if abs(old_f1 - metric.f1) > 5e-4:
-            return None, question_scores
+            inferred, inferred_source = infer_prediction(
+                metric=metric,
+                historical_ground_truth_in_context=historical_in_context,
+                corrected_ground_truth_in_context=corrected_in_context,
+            )
+            if inferred is None:
+                aggregate_score = aggregate_question_score(
+                    question_id=question_id,
+                    metric=metric,
+                    historical_ground_truth_in_context=historical_in_context,
+                    corrected_ground_truth_in_context=corrected_in_context,
+                )
+                if aggregate_score is not None:
+                    question_scores.append(aggregate_score)
+                    continue
+                return None, question_scores
+            predicted = inferred
+            source = inferred_source
+            old_precision, old_recall, old_f1 = precision_recall_f1(
+                predicted, historical_in_context
+            )
+            if abs(old_f1 - metric.f1) > 5e-4:
+                return None, question_scores
+        precision, recall, f1 = precision_recall_f1(predicted, corrected_in_context)
         question_scores.append(
             {
                 "question_id": question_id,

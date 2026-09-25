@@ -13,14 +13,17 @@ from paper_plots.scripts.recover_corrected_scores import (
 )
 from rlm.codeact_helpers import RandomContextPipeline
 from rxnhaystack.score_recovery import (
+    ExtractedPrediction,
     SampleMetric,
     apply_corrected_score_recoveries,
     context_indices,
     extract_tier3_predictions,
     historical_min_selected_ground_truth,
+    infer_metric_from_aggregate,
     infer_prediction,
     parse_sample_metrics,
     precision_recall_f1,
+    score_tier3_run,
 )
 
 
@@ -63,6 +66,65 @@ Metrics [new_ring_construction] -> precision=0.5000 recall=0.5000 f1=0.5000 exac
     assert metrics["new_ring_construction"].f1 == 0.5
 
 
+def test_extract_codeact_reproduces_historical_first_answer_substring() -> None:
+    log = """
+Question 1/1 task=new_ring_construction
+===== ITERATION 1 =====
+print(f"Final answer: {result_str}")
+for item in matches[:5]:
+    print(item[:60])
+    print(item[0])
+ANSWER: 6338,35263,50413
+---- FINISH REASON: stop ----
+Predicted [new_ring_construction] count: 6
+Metrics [new_ring_construction] -> precision=0.5000 recall=0.0811 f1=0.1395 exact_match=False count_error=31 count_exact=0
+"""
+
+    predictions = extract_tier3_predictions(log, task="tier3/task18", method="codeact")
+
+    prediction = predictions["rxh-t3-task18"]
+    assert prediction.extraction_method == "codeact-historical-transcript"
+    assert prediction.indices == (5, 60, 0, 6338, 35263, 50413)
+
+
+def test_extract_codeact_recovers_final_code_block_without_answer_marker() -> None:
+    log = """
+Question 1/1 task=new_ring_construction
+===== ITERATION 1 =====
+No usable answer yet.
+===== ITERATION 10 =====
+```python
+result = [0, 1, 2]
+```
+---- FINISH REASON: length ----
+Predicted [new_ring_construction] count: 3
+Metrics [new_ring_construction] -> precision=0.0000 recall=0.0000 f1=0.0000 exact_match=False count_error=34 count_exact=0
+"""
+
+    predictions = extract_tier3_predictions(log, task="tier3/task18", method="codeact")
+
+    prediction = predictions["rxh-t3-task18"]
+    assert prediction.extraction_method == "codeact-final-code-block"
+    assert prediction.indices == (0, 1, 2)
+
+
+def test_extract_rlm_rejoins_digits_split_by_rich_line_wrapping() -> None:
+    log = """
+╭─ ★ Final Answer ─────────╮
+│  11                     │
+│  6855,42                │
+╰──────────────────────────╯
+Predicted [new_ring_construction] count: 2
+Metrics [new_ring_construction] -> precision=1.0000 recall=0.5000 f1=0.6667 exact_match=False count_error=2 count_exact=0
+"""
+
+    predictions = extract_tier3_predictions(log, task="tier3/task18", method="rlm")
+
+    prediction = predictions["rxh-t3-task18"]
+    assert prediction.extraction_method == "rlm-final-answer-box-wrapped"
+    assert prediction.indices == (116855, 42)
+
+
 def test_extract_rlm_rich_final_answer() -> None:
     log = """
 ╭─ ★ Final Answer ─────────╮
@@ -75,6 +137,27 @@ Metrics [wittig_olefination] -> precision=1.0000 recall=0.6000 f1=0.7500 exact_m
 """
     predictions = extract_tier3_predictions(log, task="tier3/task10", method="rlm")
     assert predictions["rxh-t3-task10-wittig-olefination"].indices == (19, 7, 12)
+
+
+def test_extract_rlm_reproduces_historical_first_answer_substring() -> None:
+    log = """
+╭─ ★ Final Answer ─────────╮
+│ There should be 2334.   │
+│ The final answer: all   │
+│ results satisfy:        │
+│ 1. nitro removed       │
+│ 2. amine formed        │
+│ 3. product valid       │
+╰──────────────────────────╯
+Predicted [nitro_groups_to_amines] count: 3
+Metrics [nitro_groups_to_amines] -> precision=0.0000 recall=0.0000 f1=0.0000 exact_match=False count_error=2050 count_exact=0
+"""
+
+    predictions = extract_tier3_predictions(log, task="tier3/task7", method="rlm")
+
+    prediction = predictions["rxh-t3-task7-nitro-groups-to-amines"]
+    assert prediction.extraction_method == "rlm-final-answer-box-wrapped-historical-answer"
+    assert prediction.indices == (1, 2, 3)
 
 
 def test_inference_requires_mathematically_determined_prediction() -> None:
@@ -97,6 +180,59 @@ def test_inference_requires_mathematically_determined_prediction() -> None:
     )
     assert prediction is None
     assert reason == "prediction-underdetermined"
+
+
+def test_aggregate_recovery_handles_removed_ground_truth_when_old_tp_is_zero() -> None:
+    recovered = infer_metric_from_aggregate(
+        metric=SampleMetric("x", 3, 0.0, 0.0, 0.0, False),
+        historical_ground_truth_in_context=frozenset({1, 2}),
+        corrected_ground_truth_in_context=frozenset({1}),
+    )
+
+    assert recovered is not None
+    assert recovered.historical_true_positives == (0,)
+    assert recovered.corrected_true_positives == 0
+    assert recovered.corrected_f1 == 0.0
+
+
+def test_aggregate_recovery_handles_added_ground_truth_at_old_precision_one() -> None:
+    recovered = infer_metric_from_aggregate(
+        metric=SampleMetric("x", 1, 1.0, 0.5, 2 / 3, False),
+        historical_ground_truth_in_context=frozenset({1, 2}),
+        corrected_ground_truth_in_context=frozenset({1, 2, 3}),
+    )
+
+    assert recovered is not None
+    assert recovered.corrected_true_positives == 1
+    assert recovered.corrected_f1 == 0.5
+
+
+def test_aggregate_recovery_rejects_ambiguous_removed_positive_membership() -> None:
+    recovered = infer_metric_from_aggregate(
+        metric=SampleMetric("x", 1, 1.0, 0.5, 2 / 3, False),
+        historical_ground_truth_in_context=frozenset({1, 2}),
+        corrected_ground_truth_in_context=frozenset({1}),
+    )
+
+    assert recovered is None
+
+
+def test_invalid_extracted_candidate_falls_back_to_determined_prediction() -> None:
+    score, question_scores = score_tier3_run(
+        task="tier3/task18",
+        context_by_question={"rxh-t3-task18": frozenset({1, 2, 3})},
+        historical_ground_truth={"rxh-t3-task18": frozenset({1, 2})},
+        corrected_ground_truth={"rxh-t3-task18": frozenset({1})},
+        metrics={
+            "new_ring_construction": SampleMetric("new_ring_construction", 2, 1.0, 1.0, 1.0, True)
+        },
+        extracted={
+            "rxh-t3-task18": ExtractedPrediction("rxh-t3-task18", (8, 9), "spurious-code-block")
+        },
+    )
+
+    assert score == 2 / 3
+    assert question_scores[0]["recovery"] == "prediction-equals-historical-ground-truth"
 
 
 def test_precision_recall_f1_empty_is_zero() -> None:
