@@ -10,7 +10,7 @@ from pathlib import Path
 
 import matplotlib.pyplot as plt
 import numpy as np
-from plot_style import HEATMAP_CMAP, apply_paper_style
+from plot_style import HEATMAP_CMAP, add_upper_headroom, apply_paper_style
 
 CONDITIONS = (
     "scale-x100-k1",
@@ -137,14 +137,14 @@ def aggregate_condition_metric(
 def matched_resource_page(rows: list[dict[str, str]]) -> plt.Figure:
     rows = [row for row in rows if row["study"] == "matched_cardinality"]
     metrics = (
-        ("calls", "Model calls / trajectory", "log"),
-        ("input_tokens", "Input tokens / trajectory", "log"),
-        ("output_tokens", "Output tokens / trajectory", "log"),
-        ("cost_usd", "Recorded cost (USD) / trajectory", "symlog"),
-        ("latency_seconds", "Model latency (s) / trajectory", "log"),
-        ("tool_time_seconds", "Tool time (s) / trajectory", "symlog"),
-        ("process_wall_time_seconds", "Process wall time (s) / trajectory", "log"),
-        ("peak_combined_memory_mib", "Peak memory (MiB) / job", "log"),
+        ("calls", "Model calls / trajectory", "linear"),
+        ("input_tokens", "Input tokens / trajectory", "linear"),
+        ("output_tokens", "Output tokens / trajectory", "linear"),
+        ("cost_usd", "Recorded cost (USD) / trajectory", "linear"),
+        ("latency_seconds", "Model latency (s) / trajectory", "linear"),
+        ("tool_time_seconds", "Tool time (s) / trajectory", "log"),
+        ("process_wall_time_seconds", "Process wall time (s) / trajectory", "linear"),
+        ("peak_combined_memory_mib", "Peak memory (MiB) / job", "linear"),
     )
     figure, axes = plt.subplots(2, 4, figsize=(7.35, 4.35), sharex=True, squeeze=False)
     x = np.arange(len(CONDITIONS))
@@ -159,6 +159,8 @@ def matched_resource_page(rows: list[dict[str, str]]) -> plt.Figure:
                 values,
                 color=RESOURCE_TIER_COLORS[tier],
                 marker=("o", "s", "D")[tier - 1],
+                markersize=3.6,
+                markeredgewidth=0.6,
                 label=f"Tier {tier}",
             )
         axis.axvline(4.5, color="#BDBDBD", linewidth=0.8, linestyle="--")
@@ -170,9 +172,12 @@ def matched_resource_page(rows: list[dict[str, str]]) -> plt.Figure:
             axis.tick_params(axis="x", labelbottom=False)
         if scale == "log":
             axis.set_yscale("log")
-        else:
+        elif scale == "symlog":
             axis.set_yscale("symlog", linthresh=1e-4)
             axis.set_ylim(bottom=0)
+        else:
+            axis.set_ylim(bottom=0)
+        add_upper_headroom(axis, scale)
         axis.grid(axis="y", which="both", color="#D8DDE2", linewidth=0.45)
         axis.spines[["top", "right"]].set_visible(False)
     figure.legend(
@@ -297,14 +302,14 @@ def oracle_model_page(rows: list[dict[str, str]], model: str) -> plt.Figure:
         and row["arm"] in {"ordinary", "predicate"}
     ]
     metrics = (
-        ("calls", "Model calls / trajectory", "log", False),
-        ("input_tokens", "Input tokens / trajectory", "log", False),
-        ("output_tokens", "Output tokens / trajectory", "log", False),
-        ("cost_usd", "Recorded cost (USD) / trajectory", "symlog", False),
-        ("latency_seconds", "Model latency (s) / trajectory", "log", False),
+        ("calls", "Model calls / trajectory", "linear", False),
+        ("input_tokens", "Input tokens / trajectory", "linear", False),
+        ("output_tokens", "Output tokens / trajectory", "linear", False),
+        ("cost_usd", "Recorded cost (USD) / trajectory", "linear", False),
+        ("latency_seconds", "Model latency (s) / trajectory", "linear", False),
         ("tool_time_seconds", "Tool time (s) / trajectory", "symlog", False),
-        ("process_wall_time_seconds", "Process wall time (s) / trajectory", "log", False),
-        ("peak_combined_memory_mib", "Peak memory (MiB) / job", "log", False),
+        ("process_wall_time_seconds", "Process wall time (s) / trajectory", "linear", False),
+        ("peak_combined_memory_mib", "Peak memory (MiB) / job", "linear", False),
     )
     figure, axes = plt.subplots(2, 4, figsize=(7.35, 4.25), sharex=True, squeeze=False)
     x = np.arange(3)
@@ -334,6 +339,8 @@ def oracle_model_page(rows: list[dict[str, str]], model: str) -> plt.Figure:
                 values,
                 color=ARM_COLORS[arm],
                 marker=("o" if arm == "ordinary" else "D"),
+                markersize=3.6,
+                markeredgewidth=0.6,
                 label=("Ordinary RLM" if arm == "ordinary" else "Chemistry rule supplied"),
             )
         axis.set_title(label, loc="left", pad=4, fontsize=7.8)
@@ -348,7 +355,8 @@ def oracle_model_page(rows: list[dict[str, str]], model: str) -> plt.Figure:
             axis.set_yscale("symlog", linthresh=1e-4)
             axis.set_ylim(bottom=0)
         else:
-            axis.set_ylim(-0.03, 1.03)
+            axis.set_ylim(bottom=0)
+        add_upper_headroom(axis, scale)
         axis.grid(axis="y", which="both", color="#D8DDE2", linewidth=0.45)
         axis.spines[["top", "right"]].set_visible(False)
     figure.legend(

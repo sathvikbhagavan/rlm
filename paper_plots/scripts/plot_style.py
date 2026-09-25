@@ -3,6 +3,8 @@
 from __future__ import annotations
 
 import matplotlib as mpl
+import numpy as np
+from matplotlib.axes import Axes
 
 # Discrete samples from Matplotlib's perceptually uniform Plasma map.  Keep
 # method identity fixed across every benchmark figure.
@@ -14,6 +16,23 @@ METHOD_COLORS = {
 METHOD_LABELS = {"llm": "LLM", "codeact": "CodeAct", "rlm": "RLM"}
 METHOD_MARKERS = {"llm": "o", "codeact": "s", "rlm": "D"}
 HEATMAP_CMAP = "plasma"
+
+
+def add_upper_headroom(axis: Axes, scale: str, fraction: float = 0.12) -> None:
+    """Keep markers and error bars clear of the top frame.
+
+    Matplotlib's default margin is visually too tight in the paper's compact
+    multi-panel figures.  Expand in transformed space for logarithmic axes so
+    the padding remains proportional across orders of magnitude.
+    """
+    lower, upper = axis.get_ylim()
+    if not np.isfinite(lower) or not np.isfinite(upper) or upper <= lower:
+        return
+    if scale == "log" and lower > 0:
+        log_lower, log_upper = np.log(lower), np.log(upper)
+        axis.set_ylim(lower, np.exp(log_upper + fraction * (log_upper - log_lower)))
+    else:
+        axis.set_ylim(lower, upper + fraction * (upper - lower))
 
 
 def apply_paper_style() -> None:

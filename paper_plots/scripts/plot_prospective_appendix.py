@@ -10,7 +10,7 @@ from pathlib import Path
 
 import matplotlib.pyplot as plt
 import numpy as np
-from plot_style import HEATMAP_CMAP, apply_paper_style
+from plot_style import HEATMAP_CMAP, add_upper_headroom, apply_paper_style
 
 CONDITIONS = ("name_only", "structure_only", "structure_plus_class")
 CONDITION_LABELS = ("Target name", "Target structure", "Structure +\nfinal-step class")
@@ -136,14 +136,14 @@ def target_heatmaps(rows: list[dict[str, str]]) -> plt.Figure:
 
 def resource_page(rows: list[dict[str, str]]) -> plt.Figure:
     metrics = (
-        ("calls", "Model calls / trajectory", "log"),
-        ("input_tokens", "Input tokens / trajectory", "log"),
-        ("output_tokens", "Output tokens / trajectory", "log"),
-        ("cost_usd", "Recorded cost (USD) / trajectory", "symlog"),
-        ("latency_seconds", "Model latency (s) / trajectory", "log"),
+        ("calls", "Model calls / trajectory", "linear"),
+        ("input_tokens", "Input tokens / trajectory", "linear"),
+        ("output_tokens", "Output tokens / trajectory", "linear"),
+        ("cost_usd", "Recorded cost (USD) / trajectory", "linear"),
+        ("latency_seconds", "Model latency (s) / trajectory", "linear"),
         ("tool_time_seconds", "Tool time (s) / trajectory", "symlog"),
-        ("process_wall_time_seconds", "Process wall time (s) / trajectory", "log"),
-        ("peak_combined_memory_mib", "Peak memory (MiB) / job", "log"),
+        ("process_wall_time_seconds", "Process wall time (s) / trajectory", "linear"),
+        ("peak_combined_memory_mib", "Peak memory (MiB) / job", "linear"),
     )
     figure, axes = plt.subplots(2, 4, figsize=(7.35, 4.25), sharex=True, squeeze=False)
     x = np.arange(3)
@@ -173,7 +173,11 @@ def resource_page(rows: list[dict[str, str]]) -> plt.Figure:
                 yerr=errors,
                 color=MODEL_COLORS[model],
                 marker=MODEL_MARKERS[model],
-                capsize=2,
+                markersize=3.6,
+                markeredgewidth=0.6,
+                elinewidth=0.8,
+                capsize=1.8,
+                capthick=0.8,
                 label=model,
             )
         axis.set_title(label, loc="left", pad=4, fontsize=7.8)
@@ -184,9 +188,12 @@ def resource_page(rows: list[dict[str, str]]) -> plt.Figure:
             axis.tick_params(axis="x", labelbottom=False)
         if scale == "log":
             axis.set_yscale("log")
-        else:
+        elif scale == "symlog":
             axis.set_yscale("symlog", linthresh=1e-4)
             axis.set_ylim(bottom=0)
+        else:
+            axis.set_ylim(bottom=0)
+        add_upper_headroom(axis, scale)
         axis.grid(axis="y", which="both", color="#D8DDE2", linewidth=0.45)
         axis.spines[["top", "right"]].set_visible(False)
     figure.legend(
