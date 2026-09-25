@@ -211,20 +211,24 @@ queue for finishing the submission.
 
 ### 5. Complete the trace-based failure analysis
 
-- [x] Classify failures across models and interfaces from the recorded traces,
+- [ ] Classify failures across models and interfaces from the recorded traces,
   separating scientific errors from evaluator, provider, timeout, memory, and
   transport failures.
-- [x] Quantify the scientifically meaningful failure modes by task family and
+- [ ] Quantify the scientifically meaningful failure modes by task family and
   method, inspect representative traces, and add the resulting plot and prose
   to the main paper or appendix as appropriate.
 
-Completed on the corrected five-model freeze. The full 6,029-job valid
-population separates scientific outcomes from execution failures. Exact
-precision/recall reconstruction supports set-error signatures for 2,229
-question outputs from corrected Tier-3 Tasks 6, 7, 10, 18, and 23; outputs
-without sufficient retained detail remain unclassified. The data, source
-hashes, plot, and interpretation boundary are in
-`paper_plots/gold/iclr2027/failure_analysis/`.
+In progress on the corrected five-model freeze. The automation inventories all
+6,150 jobs, excludes the 1,179 final-arm runs whose historical scores await
+exact correction, and identifies 2,429 unaffected Tier-3/Tier-4 wrong-answer
+candidates. A deterministic 60-run review sample balances all five models and
+three interfaces; 43 traces are locally available and 17 collaborator-run
+Qwen/Gemini traces require export permission. Seventeen high-information traces
+have undergone manual root-cause review. The audit, current evidence table, and
+interpretation boundary are in
+`paper_plots/gold/iclr2027/failure_analysis/`. Complete the corrected rescoring,
+import missing collaborator traces, audit author agreement, then regenerate the
+aggregate failure figure and paper prose.
 
 ### 6. Iterate and finalize Figure 1
 
@@ -724,10 +728,10 @@ publication-quality plot/table, manuscript prose, and a compiled Overleaf push.
 6. **Consolidate human annotations.** Import all collaborator exports, verify
    expertise and assignments, run the existing analysis, and report the actual
    study design.
-7. **Completed: multi-model failure analysis.** The corrected five-model
-   population separates execution failures from scientific outcomes; the
-   reconstructable trace cohort quantifies observable set-error signatures,
-   and directly inspected traces provide chemistry-specific examples.
+7. **In progress: multi-model failure analysis.** The unaffected five-model
+   population separates execution failures from scientific outcomes, and a
+   manually reviewed trace cohort supplies chemistry-specific mechanisms. Exact
+   rescoring and collaborator-trace import remain before the final aggregate.
 8. **Completed: efficiency appendix.** Calls, tokens, latency, tool time, wall
    time, memory, cost, accounting coverage, and early-failure caveats are
    reported.

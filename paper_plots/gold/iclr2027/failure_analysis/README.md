@@ -9,18 +9,18 @@ python paper_plots/scripts/plot_failure_analysis.py
 
 The analysis starts from `../final_arm_records.csv`, covering the five paper
 models. Every run listed in `../post_submission/pending_corrected_rescores.csv`
-is excluded. This leaves 6,029 jobs and 20,271 expected question trajectories.
-Rows marked `corrected_exact_rescore` and `not_affected` are valid. The 51
-`affected_without_historical_score` rows are retained only as execution
-failures and never interpreted as chemical wrong answers.
+is excluded. The current corrected-score queue leaves 4,971 jobs and 16,601
+expected question trajectories. Rows marked `not_affected` are valid. Historical
+scores marked `historical_score_invalidated` do not enter failure statistics or
+trace-cause selection until exact rescoring completes.
 
 `job_outcomes.csv` covers the entire valid job population. It separates exact,
 partial, and zero scientific scores from execution failures.
 
-`trace_error_records.csv` is narrower. It contains the 2,229 question outputs
-from corrected Tier-3 Tasks 6, 7, 10, 18, and 23 for which retained predictions
-support exact reconstruction of corrected precision and recall. Its labels are
-observable set-error signatures:
+`trace_error_records.csv` is the reconstructable set-error cohort. At the
+current snapshot it is empty because all affected historical scores await exact
+rescoring. Once corrected rows are restored, its labels remain observable
+set-error signatures:
 
 - empty answer;
 - omissions only (precision 1, recall below 1);
@@ -28,7 +28,19 @@ observable set-error signatures:
 - mixed omissions and extras.
 
 These signatures do not assert a chemical cause. Chemistry-specific causes are
-supported separately by direct inspection of the representative traces quoted
-in the paper. Outputs lacking reconstructable precision and recall remain
-unclassified instead of being imputed. All corrected scores use
+supported separately by `reviewed_trace_causes.csv` and documented in
+`deep_dive_review.md`. Outputs lacking sufficient retained evidence remain
+unclassified instead of being imputed. Corrected scores use
 `rxnhaystack-human-1.6.0`; GLM is outside the paper population.
+
+The trace-review automation is run with:
+
+```bash
+uv run python paper_plots/scripts/build_failure_trace_review.py \
+  --wandb-records paper_plots/data/iclr2027/records.csv \
+  --output-dir /tmp/rxnhaystack-failure-review \
+  --per-model-method 4
+```
+
+Its regular-expression signals retrieve evidence for human inspection; they are
+never treated as scientific failure labels.
