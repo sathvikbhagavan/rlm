@@ -34,8 +34,11 @@ uv run python paper_plots/scripts/build_gold_results.py
 uv run python paper_plots/scripts/build_causal_controls.py
 ```
 
-The recovery command reconstructs the original sampled context, validates the
-historical score, then scores the same prediction against the corrected answer.
+The recovery command reconstructs the original sampled context and validates the
+historical score before accepting a corrected result. It recovers exact predictions
+using the historical parser semantics where possible. When indices are absent, it
+accepts an aggregate recovery only if every contingency table compatible with the
+logged count and four-decimal precision/recall/F1 has the same corrected score.
 Artifact tars are read in place without filesystem extraction; successful attempts
 are selected by the W&B URL recorded in metadata, and duplicate backup copies must
 be byte-identical.

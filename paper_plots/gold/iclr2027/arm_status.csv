@@ -1,25 +1,25 @@
 scope,model,model_label,method,expected_jobs,succeeded_jobs,running_jobs,stale_jobs,failed_jobs,pending_jobs,scored_success_jobs,unscored_success_jobs,ground_truth_invalidated_jobs,is_final,legend_label,note
 codeact_x1000,qwen3.5,Qwen 3.5,codeact,150,150,0,0,0,0,150,0,0,True,Codeact,terminal and scored
 codeact_x1000,deepseek-v4-flash,DeepSeek V4 Flash,codeact,150,85,0,0,65,0,85,0,0,True,Codeact,terminal and scored
-codeact_x1000,gemini-3.7-flash,Gemini 3.7 Flash,codeact,150,150,0,0,0,0,149,0,1,True,Codeact,terminal and scored
+codeact_x1000,gemini-3.7-flash,Gemini 3.7 Flash,codeact,150,150,0,0,0,0,150,0,0,True,Codeact,terminal and scored
 codeact_x1000,gpt-5-mini,GPT-5 mini,codeact,150,89,0,0,61,0,89,0,0,True,Codeact,terminal and scored
-full_benchmark,qwen3.5,Qwen 3.5,llm,300,300,0,0,0,0,287,0,13,True,LLM,terminal and scored
+full_benchmark,qwen3.5,Qwen 3.5,llm,300,300,0,0,0,0,292,0,8,True,LLM,terminal and scored
 full_benchmark,qwen3.5,Qwen 3.5,codeact,300,300,0,0,0,0,300,0,0,True,Codeact,terminal and scored
-full_benchmark,qwen3.5,Qwen 3.5,rlm,450,449,0,0,1,0,417,0,32,True,Rlm,terminal and scored
-full_benchmark,deepseek-v4-flash,DeepSeek V4 Flash,llm,300,300,0,0,0,0,287,0,13,True,LLM,terminal and scored
+full_benchmark,qwen3.5,Qwen 3.5,rlm,450,449,0,0,1,0,429,0,20,True,Rlm,terminal and scored
+full_benchmark,deepseek-v4-flash,DeepSeek V4 Flash,llm,300,300,0,0,0,0,297,0,3,True,LLM,terminal and scored
 full_benchmark,deepseek-v4-flash,DeepSeek V4 Flash,codeact,300,269,0,0,31,0,269,0,0,True,Codeact,terminal and scored
-full_benchmark,deepseek-v4-flash,DeepSeek V4 Flash,rlm,450,450,0,0,0,0,429,0,21,True,Rlm,terminal and scored
-full_benchmark,glm-5.2,GLM 5.2,llm,300,300,0,0,0,0,280,0,20,True,LLM,terminal and scored
+full_benchmark,deepseek-v4-flash,DeepSeek V4 Flash,rlm,450,450,0,0,0,0,441,0,9,True,Rlm,terminal and scored
+full_benchmark,glm-5.2,GLM 5.2,llm,300,300,0,0,0,0,285,0,15,True,LLM,terminal and scored
 full_benchmark,glm-5.2,GLM 5.2,codeact,300,0,0,0,1,299,0,0,0,False,Codeact,"299 running, stale, pending, or unscored"
-full_benchmark,glm-5.2,GLM 5.2,rlm,450,384,0,1,41,24,359,0,25,False,Rlm,"25 running, stale, pending, or unscored"
+full_benchmark,glm-5.2,GLM 5.2,rlm,450,384,0,1,41,24,368,0,16,False,Rlm,"25 running, stale, pending, or unscored"
 full_benchmark,gemini-3.7-flash,Gemini 3.7 Flash,llm,300,300,0,0,0,0,280,0,20,True,LLM,terminal and scored
 full_benchmark,gemini-3.7-flash,Gemini 3.7 Flash,codeact,300,300,0,0,0,0,300,0,0,True,Codeact,terminal and scored
-full_benchmark,gemini-3.7-flash,Gemini 3.7 Flash,rlm,450,447,0,0,3,0,413,0,34,True,Rlm,terminal and scored
+full_benchmark,gemini-3.7-flash,Gemini 3.7 Flash,rlm,450,447,0,0,3,0,428,0,19,True,Rlm,terminal and scored
 full_benchmark,gpt-5-mini,GPT-5 mini,llm,300,300,0,0,0,0,286,0,14,True,LLM,terminal and scored
 full_benchmark,gpt-5-mini,GPT-5 mini,codeact,300,300,0,0,0,0,300,0,0,True,Codeact,terminal and scored
-full_benchmark,gpt-5-mini,GPT-5 mini,rlm,450,450,0,0,0,0,418,0,32,True,Rlm,terminal and scored
-full_benchmark,claude-haiku-4.5,Claude Haiku 4.5,llm,300,300,0,0,0,0,280,0,20,True,LLM,terminal and scored
-full_benchmark,claude-haiku-4.5,Claude Haiku 4.5,codeact,300,300,0,0,0,0,298,0,2,True,Codeact,terminal and scored
-full_benchmark,claude-haiku-4.5,Claude Haiku 4.5,rlm,450,450,0,0,0,0,422,0,28,True,Rlm,terminal and scored
-rlm_x1000,deepseek-v4-flash,DeepSeek V4 Flash,rlm,150,150,0,0,0,0,143,0,7,True,Rlm,terminal and scored
-rlm_x1000,gemini-3.7-flash,Gemini 3.7 Flash,rlm,150,137,0,0,13,0,130,0,7,True,Rlm,terminal and scored
+full_benchmark,gpt-5-mini,GPT-5 mini,rlm,450,450,0,0,0,0,432,0,18,True,Rlm,terminal and scored
+full_benchmark,claude-haiku-4.5,Claude Haiku 4.5,llm,300,300,0,0,0,0,286,0,14,True,LLM,terminal and scored
+full_benchmark,claude-haiku-4.5,Claude Haiku 4.5,codeact,300,300,0,0,0,0,300,0,0,True,Codeact,terminal and scored
+full_benchmark,claude-haiku-4.5,Claude Haiku 4.5,rlm,450,450,0,0,0,0,436,0,14,True,Rlm,terminal and scored
+rlm_x1000,deepseek-v4-flash,DeepSeek V4 Flash,rlm,150,150,0,0,0,0,147,0,3,True,Rlm,terminal and scored
+rlm_x1000,gemini-3.7-flash,Gemini 3.7 Flash,rlm,150,137,0,0,13,0,134,0,3,True,Rlm,terminal and scored

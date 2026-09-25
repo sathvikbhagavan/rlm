@@ -173,21 +173,22 @@ per-question and macro scores. Tier-4 Task 15 is checked against the historical 
 sets before its expanded alternatives are scored. The nine affected deterministic
 executor cells are rerun against the corrected predicates rather than assumed correct.
 
-`paper_plots/gold/corrected_score_recoveries.json` now freezes 1,311 unique exact
-rescores. These restore 909 main-benchmark rows, 78 CodeAct-x1000 rows, 43 RLM-x1000
-rows, 249 completed causal-control rows, and 96 provisional Qwen control rows. Some
+`paper_plots/gold/corrected_score_recoveries.json` now freezes 1,518 unique exact
+rescores. These restore 1,013 main-benchmark rows, 79 CodeAct-x1000 rows, 51 RLM-x1000
+rows, 322 completed causal-control rows, and 133 provisional Qwen control rows. Some
 run IDs occur in both the main and control tables, so table applications intentionally
 outnumber unique recoveries. Restored rows are labeled `corrected_exact_rescore`, keep
 their historical value in `original_f1`, and carry the recovery ID in `sources`.
 
 Sathvik's checksummed campaign-artifact tar supplied all 480 formerly access-blocked
-stdout logs. It produced 380 additional exact rescores; the remaining 100 have the same
-retention limitation as the accessible logs. Of 1,743 unique affected runs, 432 remain
-unresolved: 332 under the `liac` W&B entity and 100 under
+stdout logs. It produced 413 additional exact rescores; the remaining 67 have the same
+retention limitation as the accessible logs. Of 1,743 unique affected runs, 225 remain
+unresolved: 158 under the `liac` W&B entity and 67 under
 `sathvikbhagavan-epfl`. These logs do not preserve enough prediction detail to
-determine the corrected overlap from aggregate precision/recall/counts alone. No
-corrected score is guessed or imputed. Consequently, 274 main-benchmark, 1
-CodeAct-x1000, 14 RLM-x1000, 115 completed control, and 54
+determine the corrected overlap. The recovery additionally uses historical parser
+semantics and exact contingency-table bounds when every compatible prediction has the
+same corrected score; no corrected score is guessed or imputed. Consequently, 170
+main-benchmark, 0 CodeAct-x1000, 6 RLM-x1000, 42 completed control, and 17
 provisional Qwen control rows remain `historical_score_invalidated`; the respective
 tables also contain 77, 41, 3, 0, and 25 affected jobs without a historical score.
 Status, cost, token, timing, and memory evidence remains valid. The cached source logs,
