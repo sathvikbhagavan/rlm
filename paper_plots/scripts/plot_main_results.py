@@ -379,8 +379,8 @@ def efficiency_legend(figure: plt.Figure, *, top: float = 1.01) -> None:
 def plot_efficiency_frontier(records: list[dict[str, str]]) -> plt.Figure:
     """Plot the paid-model mean accuracy--cost frontier by tier."""
     points = aggregate_efficiency_points(records)
-    figure, axes = plt.subplots(2, 2, figsize=(7.0, 4.55), sharey=True)
-    for tier, axis in enumerate(axes.ravel(), start=1):
+    figure, axes = plt.subplots(1, 4, figsize=(7.35, 2.55), sharey=True)
+    for tier, axis in enumerate(axes, start=1):
         for method in METHODS:
             contexts = [context for context in CONTEXTS if (tier, method, context) in points]
             contexts.sort(key=CONTEXTS.index)
@@ -412,19 +412,19 @@ def plot_efficiency_frontier(records: list[dict[str, str]]) -> plt.Figure:
         axis.set_ylim(-0.02, 1.06)
         axis.set_yticks(np.linspace(0, 1, 6))
         axis.set_title(
-            f"({chr(96 + tier)}) Tier {tier}: {TIER_NAMES[tier]} ($n={TIER_QUESTIONS[tier]}$)",
+            f"({chr(96 + tier)}) Tier {tier}\n{TIER_NAMES[tier]} ($n={TIER_QUESTIONS[tier]}$)",
             loc="left",
             pad=5,
+            fontsize=8.3,
         )
         axis.grid(color="#D8DDE2", linewidth=0.5, which="both")
         axis.spines[["top", "right"]].set_visible(False)
         axis.tick_params(length=2.5, width=0.6)
-    for axis in axes[1]:
-        axis.set_xlabel("Recorded cost (USD) / trajectory")
-    for axis in axes[:, 0]:
-        axis.set_ylabel("Macro F1")
-    efficiency_legend(figure, top=1.02)
-    figure.subplots_adjust(top=0.89, hspace=0.35, wspace=0.20)
+        axis.set_xlabel("USD / trajectory", fontsize=7.2)
+        axis.tick_params(axis="x", labelsize=6.5)
+    axes[0].set_ylabel("Macro F1")
+    efficiency_legend(figure, top=1.01)
+    figure.subplots_adjust(left=0.075, right=0.995, top=0.75, bottom=0.20, wspace=0.18)
     return figure
 
 

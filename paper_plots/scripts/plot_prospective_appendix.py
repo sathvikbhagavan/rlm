@@ -52,9 +52,9 @@ def aggregate_performance(rows: list[dict[str, str]]) -> plt.Figure:
         ("mean_exact_match_accuracy", "Exact-route accuracy"),
     )
     lookup = {(row["model_label"], row["condition"]): row for row in rows}
-    figure, axes = plt.subplots(2, 2, figsize=(7.25, 5.1), squeeze=False)
+    figure, axes = plt.subplots(1, 4, figsize=(7.35, 2.55), sharey=True)
     x = np.arange(3)
-    for axis, (metric, label) in zip(axes.ravel(), metrics, strict=True):
+    for axis, (metric, label) in zip(axes, metrics, strict=True):
         for model in MODELS:
             values = [float(lookup[(model, condition)][metric]) for condition in CONDITIONS]
             errors = (
@@ -72,13 +72,21 @@ def aggregate_performance(rows: list[dict[str, str]]) -> plt.Figure:
                 capsize=2.5,
                 label=model,
             )
-        axis.set_xticks(x, CONDITION_LABELS)
-        axis.set_ylabel(label)
-        axis.set_ylim(-0.025, 0.62 if metric != "mean_exact_match_accuracy" else 0.42)
+        axis.set_xticks(x, ("Name", "Structure", "+ step class"), rotation=22, ha="right")
+        axis.set_title(label, loc="left", pad=5, fontsize=8.4)
+        axis.set_ylim(-0.025, 1.03)
         axis.grid(axis="y", color="#D8DDE2", linewidth=0.5)
         axis.spines[["top", "right"]].set_visible(False)
-    axes[0, 0].legend(frameon=False)
-    figure.subplots_adjust(left=0.10, right=0.99, top=0.98, bottom=0.11, hspace=0.35, wspace=0.28)
+        axis.tick_params(axis="x", labelsize=6.8)
+    axes[0].set_ylabel("Score")
+    figure.legend(
+        *axes[0].get_legend_handles_labels(),
+        loc="upper center",
+        ncol=2,
+        frameon=False,
+        bbox_to_anchor=(0.5, 1.01),
+    )
+    figure.subplots_adjust(left=0.07, right=0.995, top=0.81, bottom=0.26, wspace=0.18)
     return figure
 
 

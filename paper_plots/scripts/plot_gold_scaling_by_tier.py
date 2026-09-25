@@ -8,11 +8,16 @@ import csv
 import json
 from pathlib import Path
 
-import matplotlib as mpl
 import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.backends.backend_pdf import PdfPages
 from matplotlib.lines import Line2D
+from plot_style import (
+    METHOD_COLORS,
+    METHOD_LABELS,
+    METHOD_MARKERS,
+    apply_paper_style,
+)
 
 MODEL_ORDER = (
     "qwen3.5",
@@ -23,9 +28,8 @@ MODEL_ORDER = (
     "claude-haiku-4.5",
 )
 METHODS = ("llm", "codeact", "rlm")
-METHOD_LABELS = {"llm": "LLM", "codeact": "CodeAct", "rlm": "RLM"}
-COLORS = {"llm": "#0072B2", "codeact": "#D55E00", "rlm": "#009E73"}
-MARKERS = {"llm": "o", "codeact": "s", "rlm": "D"}
+COLORS = METHOD_COLORS
+MARKERS = METHOD_MARKERS
 MODEL_MARKERS = {
     "qwen3.5": "o",
     "deepseek-v4-flash": "s",
@@ -50,24 +54,7 @@ TIER_NAMES = {
 }
 TIER_QUESTIONS = {1: 10, 2: 20, 3: 35, 4: 35}
 
-mpl.rcParams.update(
-    {
-        "font.family": "serif",
-        "font.serif": ["Times New Roman", "Times", "DejaVu Serif"],
-        "mathtext.fontset": "stix",
-        "font.size": 8,
-        "axes.titlesize": 9,
-        "axes.labelsize": 8,
-        "xtick.labelsize": 7.5,
-        "ytick.labelsize": 7.5,
-        "legend.fontsize": 7.5,
-        "axes.linewidth": 0.7,
-        "lines.linewidth": 1.5,
-        "pdf.fonttype": 42,
-        "ps.fonttype": 42,
-        "savefig.facecolor": "white",
-    }
-)
+apply_paper_style()
 
 
 def read_csv(path: Path) -> list[dict[str, str]]:
@@ -85,13 +72,11 @@ def model_figure(
     arms: dict[tuple[str, str], dict[str, str]],
 ) -> plt.Figure:
     model_rows = [row for row in rows if row["model"] == model]
-    model_label = model_rows[0]["model_label"]
     has_x1000 = any(row["context"] == "1000" and row["f1"] for row in model_rows)
     contexts = ("100", "500", "1000", "full") if has_x1000 else ("100", "500", "full")
     positions = {context: index for index, context in enumerate(contexts)}
     full_position = positions["full"]
-    fig, axes = plt.subplots(2, 2, figsize=(7.0, 4.85), sharex=True, sharey=True)
-    axes = axes.ravel()
+    fig, axes = plt.subplots(1, 4, figsize=(7.45, 2.45), sharex=True, sharey=True)
 
     for tier, axis in enumerate(axes, start=1):
         axis.axvspan(full_position - 0.28, full_position + 0.28, color="#F1F3F5", zorder=0)
@@ -118,9 +103,11 @@ def model_figure(
                 zorder=3,
             )
         axis.set_title(
-            f"({chr(96 + tier)}) Tier {tier}: {TIER_NAMES[tier]} ($n={TIER_QUESTIONS[tier]}$)",
+            f"({chr(96 + tier)}) Tier {tier} ($n={TIER_QUESTIONS[tier]}$)",
             loc="left",
-            pad=5,
+            pad=6,
+            fontsize=9,
+            fontweight="normal",
         )
         axis.set_xlim(-0.18, full_position + 0.2)
         axis.set_ylim(-0.02, 1.06)
@@ -130,11 +117,10 @@ def model_figure(
         axis.tick_params(length=2.5, width=0.6)
 
     tick_labels = ["Full" if context == "full" else context for context in contexts]
-    for axis in axes[2:]:
+    for axis in axes:
         axis.set_xticks(range(len(contexts)), tick_labels)
         axis.set_xlabel("Context size (reactions)")
-    for axis in axes[::2]:
-        axis.set_ylabel("Macro F1")
+    axes[0].set_ylabel("Macro F1")
 
     incomplete = {method: not as_bool(arms[(model, method)]["is_final"]) for method in METHODS}
     handles = [
@@ -150,20 +136,19 @@ def model_figure(
         )
         for method in METHODS
     ]
-    fig.suptitle(model_label, y=0.995, fontsize=10, fontweight="bold")
     fig.legend(
         handles=handles,
         loc="upper center",
         ncol=3,
         frameon=False,
-        bbox_to_anchor=(0.5, 0.955),
+        bbox_to_anchor=(0.5, 0.995),
         handlelength=2.2,
     )
     note = "Terminal failed jobs score zero; unresolved jobs are excluded from the current curve."
     if any(incomplete.values()):
         note += "  * Arm has running, stale, pending, or unrun jobs in the gold snapshot."
     fig.text(0.5, 0.008, note, ha="center", va="bottom", fontsize=7, color="#555555")
-    fig.subplots_adjust(top=0.82, bottom=0.12, hspace=0.35, wspace=0.20)
+    fig.subplots_adjust(top=0.82, bottom=0.25, wspace=0.18)
     return fig
 
 
@@ -180,8 +165,7 @@ def combined_figure(
             MODEL_ORDER, np.linspace(-0.075, 0.075, len(MODEL_ORDER)), strict=True
         )
     }
-    fig, axes = plt.subplots(2, 2, figsize=(7.45, 5.35), sharex=True, sharey=True)
-    axes = axes.ravel()
+    fig, axes = plt.subplots(1, 4, figsize=(7.45, 3.0), sharex=True, sharey=True)
 
     for tier, axis in enumerate(axes, start=1):
         axis.axvspan(2.72, 3.28, color="#F1F3F5", zorder=0)
@@ -217,9 +201,10 @@ def combined_figure(
                     zorder=3,
                 )
         axis.set_title(
-            f"({chr(96 + tier)}) Tier {tier}: {TIER_NAMES[tier]} ($n={TIER_QUESTIONS[tier]}$)",
+            f"({chr(96 + tier)}) Tier {tier}\n{TIER_NAMES[tier]} ($n={TIER_QUESTIONS[tier]}$)",
             loc="left",
             pad=5,
+            fontsize=8.2,
         )
         axis.set_xlim(-0.2, 3.2)
         axis.set_ylim(-0.02, 1.06)
@@ -228,11 +213,11 @@ def combined_figure(
         axis.spines[["top", "right"]].set_visible(False)
         axis.tick_params(length=2.5, width=0.6)
 
-    for axis in axes[2:]:
+    for axis in axes:
         axis.set_xticks(range(len(contexts)), ("100", "500", "1000", "Full"))
         axis.set_xlabel("Context size (reactions)")
-    for axis in axes[::2]:
-        axis.set_ylabel("Macro F1")
+        axis.tick_params(axis="x", labelsize=6.8)
+    axes[0].set_ylabel("Macro F1")
 
     method_handles = [
         Line2D([0], [0], color=COLORS[method], linewidth=1.8, label=METHOD_LABELS[method])
@@ -253,13 +238,13 @@ def combined_figure(
                 + next(row["model_label"] for row in rows if row["model"] == model),
             )
         )
-    fig.suptitle("Scaling by tier across six models", y=0.995, fontsize=10, fontweight="bold")
+    fig.suptitle("Scaling by tier across six models", y=0.995, fontsize=9.5, fontweight="bold")
     method_legend = fig.legend(
         handles=method_handles,
         loc="upper center",
         ncol=3,
         frameon=False,
-        bbox_to_anchor=(0.5, 0.962),
+        bbox_to_anchor=(0.5, 0.94),
         handlelength=2.4,
     )
     fig.add_artist(method_legend)
@@ -268,7 +253,7 @@ def combined_figure(
         loc="upper center",
         ncol=6,
         frameon=False,
-        bbox_to_anchor=(0.5, 0.918),
+        bbox_to_anchor=(0.5, 0.875),
         columnspacing=1.05,
         handletextpad=0.35,
     )
@@ -282,7 +267,7 @@ def combined_figure(
         fontsize=6.8,
         color="#555555",
     )
-    fig.subplots_adjust(top=0.79, bottom=0.11, hspace=0.34, wspace=0.20)
+    fig.subplots_adjust(top=0.70, bottom=0.22, wspace=0.18)
     return fig
 
 
@@ -290,8 +275,7 @@ def model_average_figure(rows: list[dict[str, str]]) -> plt.Figure:
     """Plot mean tier performance with standard errors across model-level means."""
     contexts = ("100", "500", "1000", "full")
     positions = {context: index for index, context in enumerate(contexts)}
-    fig, axes = plt.subplots(2, 2, figsize=(7.0, 4.9), sharex=True, sharey=True)
-    axes = axes.ravel()
+    fig, axes = plt.subplots(1, 4, figsize=(7.45, 2.65), sharex=True, sharey=True)
 
     for tier, axis in enumerate(axes, start=1):
         axis.axvspan(2.72, 3.28, color="#F1F3F5", zorder=0)
@@ -334,9 +318,10 @@ def model_average_figure(rows: list[dict[str, str]]) -> plt.Figure:
                         color=COLORS[method],
                     )
         axis.set_title(
-            f"({chr(96 + tier)}) Tier {tier}: {TIER_NAMES[tier]} ($n={TIER_QUESTIONS[tier]}$)",
+            f"({chr(96 + tier)}) Tier {tier}\n{TIER_NAMES[tier]} ($n={TIER_QUESTIONS[tier]}$)",
             loc="left",
             pad=5,
+            fontsize=8.2,
         )
         axis.set_xlim(-0.18, 3.2)
         axis.set_ylim(-0.02, 1.08)
@@ -345,11 +330,11 @@ def model_average_figure(rows: list[dict[str, str]]) -> plt.Figure:
         axis.spines[["top", "right"]].set_visible(False)
         axis.tick_params(length=2.5, width=0.6)
 
-    for axis in axes[2:]:
+    for axis in axes:
         axis.set_xticks(range(len(contexts)), ("100", "500", "1000", "Full"))
         axis.set_xlabel("Context size (reactions)")
-    for axis in axes[::2]:
-        axis.set_ylabel("Macro F1")
+        axis.tick_params(axis="x", labelsize=6.8)
+    axes[0].set_ylabel("Macro F1")
 
     provisional_methods = {
         method: any(row["method"] == method and not as_bool(row["is_final"]) for row in rows)
@@ -366,13 +351,13 @@ def model_average_figure(rows: list[dict[str, str]]) -> plt.Figure:
         )
         for method in METHODS
     ]
-    fig.suptitle("Mean scaling across models", y=0.99, fontsize=10, fontweight="bold")
+    fig.suptitle("Mean scaling across models", y=0.99, fontsize=9.5, fontweight="bold")
     fig.legend(
         handles=handles,
         loc="upper center",
         ncol=3,
         frameon=False,
-        bbox_to_anchor=(0.5, 0.947),
+        bbox_to_anchor=(0.5, 0.925),
         handlelength=2.2,
     )
     fig.text(
@@ -385,7 +370,7 @@ def model_average_figure(rows: list[dict[str, str]]) -> plt.Figure:
         fontsize=6.7,
         color="#555555",
     )
-    fig.subplots_adjust(top=0.82, bottom=0.12, hspace=0.35, wspace=0.20)
+    fig.subplots_adjust(top=0.72, bottom=0.23, wspace=0.18)
     return fig
 
 
@@ -396,8 +381,7 @@ def rlm_tier_scaling_figure(
     """Rebuild the original RLM-by-tier scaling view from gold results."""
     contexts = ("100", "500", "full")
     positions = {context: index for index, context in enumerate(contexts)}
-    fig, axes = plt.subplots(2, 2, figsize=(7.2, 5.4), sharex=True, sharey=True)
-    axes = axes.ravel()
+    fig, axes = plt.subplots(1, 4, figsize=(7.45, 2.75), sharex=True, sharey=True)
 
     for tier, axis in enumerate(axes, start=1):
         axis.axvspan(1.72, 2.28, color="#F1F3F5", zorder=0)
@@ -431,9 +415,10 @@ def rlm_tier_scaling_figure(
                 zorder=3,
             )
         axis.set_title(
-            f"({chr(96 + tier)}) Tier {tier}: {TIER_NAMES[tier]} ($n={TIER_QUESTIONS[tier]}$)",
+            f"({chr(96 + tier)}) Tier {tier}\n{TIER_NAMES[tier]} ($n={TIER_QUESTIONS[tier]}$)",
             loc="left",
             pad=5,
+            fontsize=8.2,
         )
         axis.set_xlim(-0.18, 2.2)
         axis.set_ylim(-0.02, 1.06)
@@ -442,11 +427,11 @@ def rlm_tier_scaling_figure(
         axis.spines[["top", "right"]].set_visible(False)
         axis.tick_params(length=2.5, width=0.6)
 
-    for axis in axes[2:]:
+    for axis in axes:
         axis.set_xticks(range(len(contexts)), ("100", "500", "Full"))
         axis.set_xlabel("Accessible corpus size (reactions)")
-    for axis in axes[::2]:
-        axis.set_ylabel("Question-weighted macro F1")
+        axis.tick_params(axis="x", labelsize=6.8)
+    axes[0].set_ylabel("Question-weighted macro F1")
 
     handles = []
     for model in MODEL_ORDER:
@@ -487,7 +472,7 @@ def rlm_tier_scaling_figure(
         fontsize=6.8,
         color="#555555",
     )
-    fig.subplots_adjust(top=0.82, bottom=0.12, hspace=0.35, wspace=0.20)
+    fig.subplots_adjust(top=0.70, bottom=0.23, wspace=0.18)
     return fig
 
 

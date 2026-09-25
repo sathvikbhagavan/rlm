@@ -52,14 +52,6 @@ TASK_LABELS = {
 ORACLE_TASKS = ("tier3/task6", "tier3/task10", "tier3/task23", "tier4/task13", "tier4/task14")
 ARM_COLORS = {"ordinary": "#5302A3", "predicate": "#CB4679"}
 TIER_COLORS = {1: "#7E03A8", 2: "#5302A3", 3: "#CB4679"}
-STATUS_COLORS = {
-    "succeeded": "#2CA25F",
-    "failed": "#DE2D26",
-    "running": "#3182BD",
-    "pending": "#9E9E9E",
-    "stale": "#756BB1",
-}
-
 apply_paper_style()
 
 
@@ -184,25 +176,15 @@ def matched_resource_page(rows: list[dict[str, str]]) -> plt.Figure:
     return figure
 
 
-def qwen_provisional(rows: list[dict[str, str]]) -> plt.Figure:
-    figure, axes = plt.subplots(1, 2, figsize=(7.25, 2.8))
-    x = np.arange(len(CONDITIONS))
-    bottoms = np.zeros(len(CONDITIONS))
-    for status in ("succeeded", "failed", "running", "pending", "stale"):
-        values = [
-            sum(row["condition"] == condition and row["status"] == status for row in rows)
-            for condition in CONDITIONS
-        ]
-        if not any(values):
-            continue
-        axes[0].bar(
-            x, values, bottom=bottoms, color=STATUS_COLORS[status], label=status.capitalize()
-        )
-        bottoms += np.asarray(values)
-    axes[0].set_ylabel("Jobs")
-    axes[0].set_title("(a) Snapshot coverage", loc="left")
-    axes[0].legend(frameon=False, fontsize=6.5, ncol=2)
+def qwen_snapshot(rows: list[dict[str, str]]) -> plt.Figure:
+    """Plot the scientific result from the available Qwen matched runs.
 
+    Execution coverage belongs in the experiment ledger and dashboard, not in
+    the scientific figure.  Keeping it out also prevents transient job state
+    from competing visually with the measured score.
+    """
+    figure, axis = plt.subplots(figsize=(7.25, 2.45))
+    x = np.arange(len(CONDITIONS))
     for tier in (2, 3):
         values = []
         for condition in CONDITIONS:
@@ -216,23 +198,28 @@ def qwen_provisional(rows: list[dict[str, str]]) -> plt.Figure:
             numerator = sum(float(row["f1"]) * int(row["question_count"]) for row in group)
             denominator = sum(int(row["question_count"]) for row in group)
             values.append(numerator / denominator if denominator else np.nan)
-        axes[1].plot(
+        axis.plot(
             x,
             values,
             color=TIER_COLORS[tier],
             marker=("s" if tier == 2 else "D"),
             label=f"Tier {tier}",
         )
-    axes[1].set_ylim(-0.03, 1.03)
-    axes[1].set_ylabel("Macro F1 among completed successes")
-    axes[1].set_title("(b) Performance among completed runs", loc="left")
-    axes[1].legend(frameon=False)
-    for axis in axes:
-        axis.set_xticks(x, CONDITION_LABELS, rotation=30, ha="right")
-        axis.axvline(4.5, color="#BDBDBD", linewidth=0.8, linestyle="--")
-        axis.grid(axis="y", color="#D8DDE2", linewidth=0.45)
-        axis.spines[["top", "right"]].set_visible(False)
-    figure.subplots_adjust(left=0.09, right=0.99, top=0.92, bottom=0.25, wspace=0.32)
+    axis.set_ylim(-0.03, 1.03)
+    axis.set_ylabel("Macro F1")
+    axis.set_xticks(x, CONDITION_LABELS)
+    axis.set_xlabel("Corpus size $N$ / positive reactions $K$")
+    axis.axvline(4.5, color="#BDBDBD", linewidth=0.8, linestyle="--")
+    axis.grid(axis="y", color="#D8DDE2", linewidth=0.45)
+    axis.spines[["top", "right"]].set_visible(False)
+    figure.legend(
+        *axis.get_legend_handles_labels(),
+        loc="upper center",
+        ncol=2,
+        frameon=False,
+        bbox_to_anchor=(0.5, 1.01),
+    )
+    figure.subplots_adjust(left=0.08, right=0.995, top=0.83, bottom=0.23)
     return figure
 
 
@@ -407,7 +394,7 @@ def main() -> int:
     qwen = read_csv(args.data_root / "matched_qwen_provisional.csv")
     save(matched_task_heatmap(records), args.output, "matched_gpt_task_heatmap")
     save(matched_resource_page(records), args.output, "matched_gpt_resources")
-    save(qwen_provisional(qwen), args.output, "matched_qwen_provisional")
+    save(qwen_snapshot(qwen), args.output, "matched_qwen_snapshot")
     save(oracle_heatmaps(records), args.output, "oracle_task_context_heatmaps")
     save(oracle_model_page(records, "Qwen 3.5"), args.output, "oracle_qwen_profile")
     save(oracle_model_page(records, "Claude Haiku 4.5"), args.output, "oracle_claude_profile")
