@@ -34,6 +34,7 @@ MODEL = "gpt-5-mini"
 METHODS = ("llm", "codeact", "rlm")
 CONTEXTS = ("100", "500", "full")
 CONTEXT_LABELS = ("100", "500", "Full")
+CONTEXT_MARKERS = {"100": "o", "500": "s", "full": "D"}
 TIER_NAMES = {
     1: "Structural lookup",
     2: "Property aggregation",
@@ -172,6 +173,123 @@ def plot_performance(rows: list[dict[str, str]]) -> plt.Figure:
     return figure
 
 
+def efficiency_points(
+    records: list[dict[str, str]],
+) -> dict[tuple[int, str, str], tuple[float, float, float]]:
+    """Aggregate GPT-5-mini F1 and USD cost per question trajectory.
+
+    Each repetition receives equal weight. Within a repetition, task scores are
+    weighted by their question counts and terminal failures contribute zero.
+    Recorded API cost is divided by the same number of question trajectories.
+    """
+    by_repetition: dict[tuple[int, str, str, int], list[dict[str, str]]] = defaultdict(list)
+    for row in records:
+        if row["model"] == MODEL and row["method"] in METHODS and row["context"] in CONTEXTS:
+            key = (
+                int(row["tier"]),
+                row["method"],
+                row["context"],
+                int(row["repetition"]),
+            )
+            by_repetition[key].append(row)
+
+    repetition_values: dict[tuple[int, str, str], list[tuple[float, float]]] = defaultdict(list)
+    for (tier, method, context, _), members in by_repetition.items():
+        trajectories = sum(int(row["question_count"]) for row in members)
+        if trajectories == 0:
+            continue
+        f1 = (
+            sum(
+                int(row["question_count"])
+                * (float(row["f1"]) if row["status"] == "succeeded" and row["f1"] else 0.0)
+                for row in members
+            )
+            / trajectories
+        )
+        cost = sum(float(row["cost_usd"] or 0.0) for row in members) / trajectories
+        repetition_values[(tier, method, context)].append((f1, cost))
+
+    points: dict[tuple[int, str, str], tuple[float, float, float]] = {}
+    for key, values in repetition_values.items():
+        f1_values = [value[0] for value in values]
+        cost_values = [value[1] for value in values]
+        points[key] = (
+            statistics.fmean(cost_values),
+            statistics.fmean(f1_values),
+            statistics.pstdev(f1_values),
+        )
+    return points
+
+
+def plot_efficiency_frontier(records: list[dict[str, str]]) -> plt.Figure:
+    """Plot the current GPT-5-mini accuracy--cost frontier by tier."""
+    points = efficiency_points(records)
+    figure, axes = plt.subplots(2, 2, figsize=(7.0, 4.55), sharey=True)
+    for tier, axis in enumerate(axes.ravel(), start=1):
+        for method in METHODS:
+            contexts = [context for context in CONTEXTS if (tier, method, context) in points]
+            contexts.sort(key=CONTEXTS.index)
+            costs = [points[(tier, method, context)][0] for context in contexts]
+            scores = [points[(tier, method, context)][1] for context in contexts]
+            errors = [points[(tier, method, context)][2] for context in contexts]
+            axis.plot(costs, scores, color=METHOD_COLORS[method], linewidth=1.25, zorder=2)
+            for context, cost, score, error in zip(contexts, costs, scores, errors, strict=True):
+                axis.errorbar(
+                    cost,
+                    score,
+                    yerr=error,
+                    color=METHOD_COLORS[method],
+                    marker=CONTEXT_MARKERS[context],
+                    markersize=4.8,
+                    markeredgecolor="white",
+                    markeredgewidth=0.45,
+                    capsize=2.8,
+                    elinewidth=0.9,
+                    zorder=3,
+                )
+        axis.set_xscale("log")
+        axis.set_ylim(-0.02, 1.06)
+        axis.set_yticks(np.linspace(0, 1, 6))
+        axis.set_title(
+            f"({chr(96 + tier)}) Tier {tier}: {TIER_NAMES[tier]} ($n={TIER_QUESTIONS[tier]}$)",
+            loc="left",
+            pad=5,
+        )
+        axis.grid(color="#D8DDE2", linewidth=0.5, which="both")
+        axis.spines[["top", "right"]].set_visible(False)
+        axis.tick_params(length=2.5, width=0.6)
+        axis.set_xlabel("Recorded cost (USD) / trajectory")
+    for axis in axes[:, 0]:
+        axis.set_ylabel("Macro F1")
+
+    method_handles = [
+        Line2D([0], [0], color=METHOD_COLORS[method], label=METHOD_LABELS[method])
+        for method in METHODS
+    ]
+    context_handles = [
+        Line2D(
+            [0],
+            [0],
+            color="#555555",
+            marker=CONTEXT_MARKERS[context],
+            linestyle="none",
+            markerfacecolor="#555555",
+            markeredgecolor="white",
+            label=label,
+        )
+        for context, label in zip(CONTEXTS, CONTEXT_LABELS, strict=True)
+    ]
+    figure.legend(
+        handles=method_handles + context_handles,
+        loc="upper center",
+        ncol=6,
+        frameon=False,
+        bbox_to_anchor=(0.5, 1.01),
+    )
+    figure.subplots_adjust(top=0.89, hspace=0.35, wspace=0.20)
+    return figure
+
+
 def capability_matrix(records: list[dict[str, str]], tier: int) -> tuple[np.ndarray, list[str]]:
     selected = [
         row
@@ -262,6 +380,7 @@ def main() -> None:
     records = read_csv(args.gold / "full_benchmark_records.csv")
     save(plot_performance(scaling), args.output, "performance_overview")
     save(plot_capabilities(records), args.output, "capability_map")
+    save(plot_efficiency_frontier(records), args.output, "efficiency_frontier")
     print(f"Wrote main-text figures to {args.output}")
 
 

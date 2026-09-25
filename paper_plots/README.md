@@ -1,22 +1,21 @@
 # Paper plots
 
 This directory contains the plotting pipeline and exported aggregates used for
-the RxnHaystack paper figures. The checked-in PDFs are the vector files used in
-the manuscript; PNGs are included for convenient previewing.
+the RxnHaystack paper figures. Final paper candidates live under
+`paper_plots/figures/gold/` and are generated from the auditable tables in
+`paper_plots/gold/iclr2027/`. The checked-in PDFs are vector exports; PNGs are
+included for convenient previewing.
 
-From the repository root, regenerate every figure with:
+From the repository root, regenerate the gold tables and figures with the
+commands in `paper_plots/gold/iclr2027/README.md`. For example:
 
 ```sh
-python -m venv .venv
-source .venv/bin/activate
-pip install -r paper_plots/requirements.txt
-python paper_plots/scripts/plot_results.py
+uv run --frozen python paper_plots/scripts/build_gold_results.py
+uv run --with-requirements paper_plots/requirements.txt \
+  python paper_plots/scripts/plot_main_results.py
 ```
 
-The pinned plotting environment requires Python 3.11 or newer, consistent with
-the repository's Python requirement.
-
-The script reads `paper_plots/data/plot_data/` and writes ten figures to
-`paper_plots/figures/`. The exports cover all 100 benchmark questions. Most
-configurations contain five runs; full-corpus RLM on truncated synthesis routes
-contains three.
+`paper_plots/data/plot_data/` and `paper_plots/scripts/plot_results.py` preserve
+the workshop-era input and plotting implementation for historical
+reproducibility. Their superseded figure exports are intentionally not kept in
+the active figure directory.

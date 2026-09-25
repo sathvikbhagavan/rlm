@@ -169,6 +169,13 @@ queue for finishing the submission.
   model and interface. Distinguish paid API use from institutional inference
   access, and exclude development/debugging spend from the benchmark total.
 
+#### Final title selection
+
+- [ ] Select the paper title after the scientific results and framing are
+  frozen. Compare concise candidates for specificity, memorability, and
+  consistency with the paper's diagnostic-benchmark contribution, then use the
+  selected title consistently in the manuscript and release materials.
+
 ### 5. Complete the trace-based failure analysis
 
 - [ ] Classify failures across models and interfaces from the recorded traces,

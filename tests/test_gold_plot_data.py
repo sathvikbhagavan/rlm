@@ -55,6 +55,42 @@ def test_main_capability_matrix_weights_questions_and_scores_failures_zero() -> 
     assert matrix[0, 6] == pytest.approx(0.25)
 
 
+def test_efficiency_frontier_uses_usd_per_trajectory_and_scores_failures_zero() -> None:
+    pytest.importorskip("matplotlib")
+    from paper_plots.scripts.plot_main_results import efficiency_points
+
+    rows = [
+        {
+            "model": "gpt-5-mini",
+            "tier": "4",
+            "method": "rlm",
+            "context": "full",
+            "repetition": "1",
+            "question_count": "3",
+            "status": "succeeded",
+            "f1": "0.75",
+            "cost_usd": "0.30",
+        },
+        {
+            "model": "gpt-5-mini",
+            "tier": "4",
+            "method": "rlm",
+            "context": "full",
+            "repetition": "1",
+            "question_count": "1",
+            "status": "failed",
+            "f1": "",
+            "cost_usd": "0.10",
+        },
+    ]
+
+    cost, f1, f1_std = efficiency_points(rows)[(4, "rlm", "full")]
+
+    assert cost == pytest.approx(0.10)
+    assert f1 == pytest.approx(0.5625)
+    assert f1_std == 0.0
+
+
 def test_terminal_failures_do_not_make_an_arm_provisional() -> None:
     rows = [
         {
