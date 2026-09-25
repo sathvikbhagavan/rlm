@@ -15,7 +15,7 @@ from plot_style import HEATMAP_CMAP, apply_paper_style
 CONDITIONS = ("name_only", "structure_only", "structure_plus_class")
 CONDITION_LABELS = ("Target name", "Target structure", "Structure +\nfinal-step class")
 MODELS = ("Qwen", "Claude")
-MODEL_COLORS = {"Qwen": "#5302A3", "Claude": "#FCA636"}
+MODEL_COLORS = {"Qwen": "#5302A3", "Claude": "#CB4679"}
 MODEL_MARKERS = {"Qwen": "o", "Claude": "D"}
 TARGETS = ("pyrimidine_piperazine", "lactam_dipeptide", "benzamide_pyrazole")
 TARGET_LABELS = {

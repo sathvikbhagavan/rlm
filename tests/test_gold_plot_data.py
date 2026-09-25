@@ -91,6 +91,38 @@ def test_efficiency_frontier_uses_usd_per_trajectory_and_scores_failures_zero() 
     assert f1_std == 0.0
 
 
+def test_aggregate_efficiency_frontier_uses_only_paid_models() -> None:
+    pytest.importorskip("matplotlib")
+    from paper_plots.scripts.plot_main_results import aggregate_efficiency_points
+
+    rows = []
+    for model, score, cost in (
+        ("gemini-3.7-flash", 0.3, 0.03),
+        ("gpt-5-mini", 0.6, 0.06),
+        ("claude-haiku-4.5", 0.9, 0.09),
+        ("qwen3.5", 1.0, 0.0),
+    ):
+        rows.append(
+            {
+                "model": model,
+                "tier": "3",
+                "method": "rlm",
+                "context": "full",
+                "repetition": "1",
+                "question_count": "1",
+                "status": "succeeded",
+                "f1": str(score),
+                "cost_usd": str(cost),
+            }
+        )
+
+    cost, _, f1, _, model_count = aggregate_efficiency_points(rows)[(3, "rlm", "full")]
+
+    assert cost == pytest.approx(0.06)
+    assert f1 == pytest.approx(0.6)
+    assert model_count == 3
+
+
 def test_terminal_failures_do_not_make_an_arm_provisional() -> None:
     rows = [
         {

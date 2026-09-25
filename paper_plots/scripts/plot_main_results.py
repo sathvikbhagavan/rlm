@@ -12,6 +12,7 @@ from pathlib import Path
 import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.lines import Line2D
+from matplotlib.ticker import LogLocator, NullFormatter
 
 try:
     from plot_style import (
@@ -31,6 +32,12 @@ except ModuleNotFoundError:  # Imported as a package by tests.
     )
 
 MODEL = "gpt-5-mini"
+PAID_MODELS = ("gemini-3.7-flash", "gpt-5-mini", "claude-haiku-4.5")
+PAID_MODEL_LABELS = {
+    "gemini-3.7-flash": "Gemini 3.7 Flash",
+    "gpt-5-mini": "GPT-5 mini",
+    "claude-haiku-4.5": "Claude Haiku 4.5",
+}
 METHODS = ("llm", "codeact", "rlm")
 CONTEXTS = ("100", "500", "full")
 CONTEXT_LABELS = ("100", "500", "Full")
@@ -272,8 +279,10 @@ def plot_aggregate_performance(rows: list[dict[str, str]], *, kind: str = "line"
 
 def efficiency_points(
     records: list[dict[str, str]],
+    *,
+    model: str = MODEL,
 ) -> dict[tuple[int, str, str], tuple[float, float, float]]:
-    """Aggregate GPT-5-mini F1 and USD cost per question trajectory.
+    """Aggregate one model's F1 and USD cost per question trajectory.
 
     Each repetition receives equal weight. Within a repetition, task scores are
     weighted by their question counts and terminal failures contribute zero.
@@ -281,7 +290,7 @@ def efficiency_points(
     """
     by_repetition: dict[tuple[int, str, str, int], list[dict[str, str]]] = defaultdict(list)
     for row in records:
-        if row["model"] == MODEL and row["method"] in METHODS and row["context"] in CONTEXTS:
+        if row["model"] == model and row["method"] in METHODS and row["context"] in CONTEXTS:
             key = (
                 int(row["tier"]),
                 row["method"],
@@ -318,47 +327,29 @@ def efficiency_points(
     return points
 
 
-def plot_efficiency_frontier(records: list[dict[str, str]]) -> plt.Figure:
-    """Plot the current GPT-5-mini accuracy--cost frontier by tier."""
-    points = efficiency_points(records)
-    figure, axes = plt.subplots(2, 2, figsize=(7.0, 4.55), sharey=True)
-    for tier, axis in enumerate(axes.ravel(), start=1):
-        for method in METHODS:
-            contexts = [context for context in CONTEXTS if (tier, method, context) in points]
-            contexts.sort(key=CONTEXTS.index)
-            costs = [points[(tier, method, context)][0] for context in contexts]
-            scores = [points[(tier, method, context)][1] for context in contexts]
-            errors = [points[(tier, method, context)][2] for context in contexts]
-            axis.plot(costs, scores, color=METHOD_COLORS[method], linewidth=1.25, zorder=2)
-            for context, cost, score, error in zip(contexts, costs, scores, errors, strict=True):
-                axis.errorbar(
-                    cost,
-                    score,
-                    yerr=error,
-                    color=METHOD_COLORS[method],
-                    marker=CONTEXT_MARKERS[context],
-                    markersize=4.8,
-                    markeredgecolor="white",
-                    markeredgewidth=0.45,
-                    capsize=2.8,
-                    elinewidth=0.9,
-                    zorder=3,
-                )
-        axis.set_xscale("log")
-        axis.set_ylim(-0.02, 1.06)
-        axis.set_yticks(np.linspace(0, 1, 6))
-        axis.set_title(
-            f"({chr(96 + tier)}) Tier {tier}: {TIER_NAMES[tier]} ($n={TIER_QUESTIONS[tier]}$)",
-            loc="left",
-            pad=5,
+def aggregate_efficiency_points(
+    records: list[dict[str, str]],
+) -> dict[tuple[int, str, str], tuple[float, float, float, float, int]]:
+    """Aggregate accuracy and recorded API cost over the paid model arms."""
+    by_model = {model: efficiency_points(records, model=model) for model in PAID_MODELS}
+    keys = set.intersection(*(set(points) for points in by_model.values()))
+    aggregates: dict[tuple[int, str, str], tuple[float, float, float, float, int]] = {}
+    for key in keys:
+        costs = [by_model[model][key][0] for model in PAID_MODELS]
+        scores = [by_model[model][key][1] for model in PAID_MODELS]
+        count = len(scores)
+        aggregates[key] = (
+            statistics.fmean(costs),
+            statistics.pstdev(costs) / np.sqrt(count),
+            statistics.fmean(scores),
+            statistics.pstdev(scores) / np.sqrt(count),
+            count,
         )
-        axis.grid(color="#D8DDE2", linewidth=0.5, which="both")
-        axis.spines[["top", "right"]].set_visible(False)
-        axis.tick_params(length=2.5, width=0.6)
-        axis.set_xlabel("Recorded cost (USD) / trajectory")
-    for axis in axes[:, 0]:
-        axis.set_ylabel("Macro F1")
+    return aggregates
 
+
+def efficiency_legend(figure: plt.Figure, *, top: float = 1.01) -> None:
+    """Add the shared method and context legend to an efficiency figure."""
     method_handles = [
         Line2D([0], [0], color=METHOD_COLORS[method], label=METHOD_LABELS[method])
         for method in METHODS
@@ -381,9 +372,116 @@ def plot_efficiency_frontier(records: list[dict[str, str]]) -> plt.Figure:
         loc="upper center",
         ncol=6,
         frameon=False,
-        bbox_to_anchor=(0.5, 1.01),
+        bbox_to_anchor=(0.5, top),
     )
+
+
+def plot_efficiency_frontier(records: list[dict[str, str]]) -> plt.Figure:
+    """Plot the paid-model mean accuracy--cost frontier by tier."""
+    points = aggregate_efficiency_points(records)
+    figure, axes = plt.subplots(2, 2, figsize=(7.0, 4.55), sharey=True)
+    for tier, axis in enumerate(axes.ravel(), start=1):
+        for method in METHODS:
+            contexts = [context for context in CONTEXTS if (tier, method, context) in points]
+            contexts.sort(key=CONTEXTS.index)
+            costs = [points[(tier, method, context)][0] for context in contexts]
+            cost_errors = [points[(tier, method, context)][1] for context in contexts]
+            scores = [points[(tier, method, context)][2] for context in contexts]
+            score_errors = [points[(tier, method, context)][3] for context in contexts]
+            axis.plot(costs, scores, color=METHOD_COLORS[method], linewidth=1.25, zorder=2)
+            for context, cost, cost_error, score, score_error in zip(
+                contexts, costs, cost_errors, scores, score_errors, strict=True
+            ):
+                axis.errorbar(
+                    cost,
+                    score,
+                    xerr=cost_error,
+                    yerr=score_error,
+                    color=METHOD_COLORS[method],
+                    marker=CONTEXT_MARKERS[context],
+                    markersize=4.8,
+                    markeredgecolor="white",
+                    markeredgewidth=0.45,
+                    capsize=2.0,
+                    elinewidth=0.75,
+                    zorder=3,
+                )
+        axis.set_xscale("log")
+        axis.xaxis.set_major_locator(LogLocator(base=10, subs=(1.0, 2.0, 5.0)))
+        axis.xaxis.set_minor_formatter(NullFormatter())
+        axis.set_ylim(-0.02, 1.06)
+        axis.set_yticks(np.linspace(0, 1, 6))
+        axis.set_title(
+            f"({chr(96 + tier)}) Tier {tier}: {TIER_NAMES[tier]} ($n={TIER_QUESTIONS[tier]}$)",
+            loc="left",
+            pad=5,
+        )
+        axis.grid(color="#D8DDE2", linewidth=0.5, which="both")
+        axis.spines[["top", "right"]].set_visible(False)
+        axis.tick_params(length=2.5, width=0.6)
+    for axis in axes[1]:
+        axis.set_xlabel("Recorded cost (USD) / trajectory")
+    for axis in axes[:, 0]:
+        axis.set_ylabel("Macro F1")
+    efficiency_legend(figure, top=1.02)
     figure.subplots_adjust(top=0.89, hspace=0.35, wspace=0.20)
+    return figure
+
+
+def plot_efficiency_frontier_by_model(records: list[dict[str, str]]) -> plt.Figure:
+    """Plot the same frontier separately for every paid model and tier."""
+    figure, axes = plt.subplots(3, 4, figsize=(7.35, 6.35), sharey=True)
+    for row_index, model in enumerate(PAID_MODELS):
+        points = efficiency_points(records, model=model)
+        for column, tier in enumerate(range(1, 5)):
+            axis = axes[row_index, column]
+            for method in METHODS:
+                contexts = [context for context in CONTEXTS if (tier, method, context) in points]
+                contexts.sort(key=CONTEXTS.index)
+                costs = [points[(tier, method, context)][0] for context in contexts]
+                scores = [points[(tier, method, context)][1] for context in contexts]
+                errors = [points[(tier, method, context)][2] for context in contexts]
+                axis.plot(
+                    costs,
+                    scores,
+                    color=METHOD_COLORS[method],
+                    linewidth=1.1,
+                    zorder=2,
+                )
+                for context, cost, score, error in zip(
+                    contexts, costs, scores, errors, strict=True
+                ):
+                    axis.errorbar(
+                        cost,
+                        score,
+                        yerr=error,
+                        color=METHOD_COLORS[method],
+                        marker=CONTEXT_MARKERS[context],
+                        markersize=3.8,
+                        markeredgecolor="white",
+                        markeredgewidth=0.4,
+                        capsize=1.8,
+                        elinewidth=0.65,
+                        zorder=3,
+                    )
+            axis.set_xscale("log")
+            axis.xaxis.set_major_locator(LogLocator(base=10, subs=(1.0,)))
+            axis.xaxis.set_minor_formatter(NullFormatter())
+            axis.set_ylim(-0.02, 1.06)
+            axis.set_yticks(np.linspace(0, 1, 6))
+            axis.grid(color="#D8DDE2", linewidth=0.45, which="both")
+            axis.spines[["top", "right"]].set_visible(False)
+            axis.tick_params(length=2.2, width=0.55, labelsize=6.5)
+            if row_index == 0:
+                axis.set_title(f"Tier {tier}\n{TIER_NAMES[tier]}", fontsize=8.3, pad=5)
+            if column == 0:
+                axis.set_ylabel(f"{PAID_MODEL_LABELS[model]}\nMacro F1", fontsize=7.2)
+            if row_index == len(PAID_MODELS) - 1:
+                axis.set_xlabel("USD / trajectory", fontsize=7.0)
+            else:
+                axis.tick_params(axis="x", labelbottom=False)
+    efficiency_legend(figure, top=0.995)
+    figure.subplots_adjust(left=0.105, right=0.995, top=0.90, bottom=0.07, hspace=0.35, wspace=0.26)
     return figure
 
 
@@ -478,6 +576,11 @@ def main() -> None:
     save(plot_aggregate_performance(aggregate_scaling), args.output, "performance_overview")
     save(plot_capabilities(records), args.output, "capability_map")
     save(plot_efficiency_frontier(records), args.output, "efficiency_frontier")
+    save(
+        plot_efficiency_frontier_by_model(records),
+        args.output,
+        "efficiency_frontier_by_model",
+    )
     print(f"Wrote main-text figures to {args.output}")
 
 

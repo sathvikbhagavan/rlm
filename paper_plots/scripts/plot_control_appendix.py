@@ -50,8 +50,8 @@ TASK_LABELS = {
     "tier4/task14": "T4 Protecting-group paths",
 }
 ORACLE_TASKS = ("tier3/task6", "tier3/task10", "tier3/task23", "tier4/task13", "tier4/task14")
-ARM_COLORS = {"ordinary": "#5302A3", "predicate": "#FCA636"}
-TIER_COLORS = {1: "#7E03A8", 2: "#CC4778", 3: "#F89540"}
+ARM_COLORS = {"ordinary": "#5302A3", "predicate": "#CB4679"}
+TIER_COLORS = {1: "#7E03A8", 2: "#5302A3", 3: "#CB4679"}
 STATUS_COLORS = {
     "succeeded": "#2CA25F",
     "failed": "#DE2D26",
