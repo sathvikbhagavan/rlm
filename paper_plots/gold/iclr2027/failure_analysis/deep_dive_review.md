@@ -28,6 +28,42 @@ emphasizes low-scoring, task-diverse examples. Its cause counts are therefore
 not prevalence estimates for the benchmark. Population-level claims continue
 to use all valid scores; the review explains mechanisms.
 
+## Mapping failures to the benchmark's diagnostic objective
+
+RxnHaystack is designed to locate the first broken link in a capability chain:
+
+1. **Dataset access:** can the system reach the relevant records?
+2. **Faithful structured execution:** can it parse the records and execute the
+   required scan, join, or transformation without losing observations?
+3. **Chemical abstraction:** can it formulate the structural or mechanistic
+   rule that defines a valid answer?
+4. **Relational orchestration:** can it preserve that rule while enumerating
+   and combining paths or recursive subproblems?
+5. **Target and route reasoning:** can it connect a target description to a
+   compatible multi-step synthesis path?
+
+The traces become informative only when read against the benchmark controls.
+In the sampled contexts, every scored positive is already present, so literal
+reagent searches and brittle SMARTS are post-access failures of chemical
+abstraction. Full-corpus RLM traces control access more strongly: family-level
+under- and over-enumeration after all 122,456 reactions are exposed implicates
+rule induction and orchestration. The chemistry-rule-supplied control removes
+rule induction, while the deterministic executor removes model orchestration;
+the remaining gaps separate those two capabilities. Mechanical graph tasks
+provide an internal comparison for chemically constrained graph tasks, and the
+Task-16 decomposition isolates target representation and final-step knowledge
+within route construction.
+
+This mapping changes the paper's interpretation of the examples. A failed
+CodeAct run is not evidence that tools are unhelpful: unsupported action syntax
+or a zero-record parse shows that executable *access* was available but
+structured execution failed. A full-corpus RLM run that exactly solves two
+chain families yet overgenerates another does not exhibit a generic context
+failure; it shows transformation-dependent abstraction and enumeration. A
+connection refusal supports neither conclusion and remains an infrastructure
+failure. The complete mechanism-to-objective mapping is recorded in
+`diagnostic_objective_map.csv`.
+
 ## Recurrent mechanisms
 
 1. **The intended computation sometimes never ran.** Claude Haiku 4.5 emitted

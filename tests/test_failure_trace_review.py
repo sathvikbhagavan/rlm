@@ -71,3 +71,25 @@ def test_reviewed_causes_reference_valid_unaffected_runs() -> None:
         assert row["confidence"] in {"high", "medium", "low"}
         assert row["review_status"] == "reviewed"
         assert row["direct_evidence"]
+
+
+def test_diagnostic_map_uses_reviewed_examples_and_explicit_controls() -> None:
+    root = Path(__file__).resolve().parents[1] / "paper_plots/gold/iclr2027/failure_analysis"
+    with (root / "reviewed_trace_causes.csv").open(newline="") as stream:
+        reviewed = {row["run_id"] for row in csv.DictReader(stream)}
+    with (root / "diagnostic_objective_map.csv").open(newline="") as stream:
+        mappings = list(csv.DictReader(stream))
+
+    capabilities = {row["benchmark_capability"] for row in mappings}
+    assert {
+        "faithful structured execution",
+        "chemical abstraction",
+        "orchestration and state preservation",
+        "relational semantics and graph construction",
+        "prospective target interpretation and route construction",
+    }.issubset(capabilities)
+    for row in mappings:
+        examples = row["representative_runs"].split(";")
+        assert all(run_id in reviewed for run_id in examples)
+        assert row["design_contrast"]
+        assert row["supported_interpretation"]

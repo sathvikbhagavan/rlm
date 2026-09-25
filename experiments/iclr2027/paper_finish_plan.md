@@ -224,7 +224,10 @@ exact correction, and identifies 2,429 unaffected Tier-3/Tier-4 wrong-answer
 candidates. A deterministic 60-run review sample balances all five models and
 three interfaces; 43 traces are locally available and 17 collaborator-run
 Qwen/Gemini traces require export permission. Seventeen high-information traces
-have undergone manual root-cause review. The audit, current evidence table, and
+have undergone manual root-cause review. The observed mechanisms are explicitly
+mapped to dataset access, structured execution, chemical abstraction,
+relational orchestration, and route reasoning, together with the benchmark
+contrast that supports each inference. The audit, current evidence table, and
 interpretation boundary are in
 `paper_plots/gold/iclr2027/failure_analysis/`. Complete the corrected rescoring,
 import missing collaborator traces, audit author agreement, then regenerate the

@@ -29,8 +29,11 @@ set-error signatures:
 
 These signatures do not assert a chemical cause. Chemistry-specific causes are
 supported separately by `reviewed_trace_causes.csv` and documented in
-`deep_dive_review.md`. Outputs lacking sufficient retained evidence remain
-unclassified instead of being imputed. Corrected scores use
+`deep_dive_review.md`. `diagnostic_objective_map.csv` connects those causes to
+the access, execution, chemical-abstraction, relational-orchestration, and
+route-reasoning capabilities isolated by the benchmark controls. Outputs
+lacking sufficient retained evidence remain unclassified instead of being
+imputed. Corrected scores use
 `rxnhaystack-human-1.6.0`; GLM is outside the paper population.
 
 The trace-review automation is run with:
