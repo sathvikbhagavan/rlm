@@ -145,7 +145,7 @@ def resource_page(rows: list[dict[str, str]]) -> plt.Figure:
         ("process_wall_time_seconds", "Process wall time (s) / trajectory", "log"),
         ("peak_combined_memory_mib", "Peak memory (MiB) / job", "log"),
     )
-    figure, axes = plt.subplots(4, 2, figsize=(7.25, 8.7), squeeze=False)
+    figure, axes = plt.subplots(2, 4, figsize=(7.35, 4.25), sharex=True, squeeze=False)
     x = np.arange(3)
     for index, (metric, label, scale) in enumerate(metrics):
         axis = axes.ravel()[index]
@@ -176,8 +176,12 @@ def resource_page(rows: list[dict[str, str]]) -> plt.Figure:
                 capsize=2,
                 label=model,
             )
-        axis.set_xticks(x, CONDITION_LABELS)
-        axis.set_ylabel(label)
+        axis.set_title(label, loc="left", pad=4, fontsize=7.8)
+        axis.set_xticks(x)
+        if index >= 4:
+            axis.set_xticklabels(("Name", "Structure", "+ step class"), rotation=22, ha="right")
+        else:
+            axis.tick_params(axis="x", labelbottom=False)
         if scale == "log":
             axis.set_yscale("log")
         else:
@@ -185,8 +189,14 @@ def resource_page(rows: list[dict[str, str]]) -> plt.Figure:
             axis.set_ylim(bottom=0)
         axis.grid(axis="y", which="both", color="#D8DDE2", linewidth=0.45)
         axis.spines[["top", "right"]].set_visible(False)
-    axes.ravel()[0].legend(frameon=False)
-    figure.subplots_adjust(left=0.11, right=0.99, top=0.99, bottom=0.055, hspace=0.48, wspace=0.35)
+    figure.legend(
+        *axes.ravel()[0].get_legend_handles_labels(),
+        loc="upper center",
+        ncol=2,
+        frameon=False,
+        bbox_to_anchor=(0.5, 0.995),
+    )
+    figure.subplots_adjust(left=0.065, right=0.995, top=0.87, bottom=0.18, hspace=0.30, wspace=0.30)
     return figure
 
 

@@ -52,6 +52,7 @@ TASK_LABELS = {
 ORACLE_TASKS = ("tier3/task6", "tier3/task10", "tier3/task23", "tier4/task13", "tier4/task14")
 ARM_COLORS = {"ordinary": "#5302A3", "predicate": "#CB4679"}
 TIER_COLORS = {1: "#7E03A8", 2: "#5302A3", 3: "#CB4679"}
+RESOURCE_TIER_COLORS = {1: "#5302A3", 2: "#CB4679", 3: "#FCA636"}
 apply_paper_style()
 
 
@@ -145,9 +146,9 @@ def matched_resource_page(rows: list[dict[str, str]]) -> plt.Figure:
         ("process_wall_time_seconds", "Process wall time (s) / trajectory", "log"),
         ("peak_combined_memory_mib", "Peak memory (MiB) / job", "log"),
     )
-    figure, axes = plt.subplots(4, 2, figsize=(7.25, 9.0), squeeze=False)
+    figure, axes = plt.subplots(2, 4, figsize=(7.35, 4.35), sharex=True, squeeze=False)
     x = np.arange(len(CONDITIONS))
-    for axis, (metric, label, scale) in zip(axes.ravel(), metrics, strict=True):
+    for index, (axis, (metric, label, scale)) in enumerate(zip(axes.ravel(), metrics, strict=True)):
         for tier in (1, 2, 3):
             values = [
                 aggregate_condition_metric(rows, condition, tier, metric)
@@ -156,13 +157,17 @@ def matched_resource_page(rows: list[dict[str, str]]) -> plt.Figure:
             axis.plot(
                 x,
                 values,
-                color=TIER_COLORS[tier],
+                color=RESOURCE_TIER_COLORS[tier],
                 marker=("o", "s", "D")[tier - 1],
                 label=f"Tier {tier}",
             )
         axis.axvline(4.5, color="#BDBDBD", linewidth=0.8, linestyle="--")
-        axis.set_xticks(x, CONDITION_LABELS, rotation=25, ha="right")
-        axis.set_ylabel(label)
+        axis.set_title(label, loc="left", pad=4, fontsize=7.8)
+        axis.set_xticks(x)
+        if index >= 4:
+            axis.set_xticklabels(CONDITION_LABELS, rotation=42, ha="right", fontsize=6.2)
+        else:
+            axis.tick_params(axis="x", labelbottom=False)
         if scale == "log":
             axis.set_yscale("log")
         else:
@@ -170,9 +175,15 @@ def matched_resource_page(rows: list[dict[str, str]]) -> plt.Figure:
             axis.set_ylim(bottom=0)
         axis.grid(axis="y", which="both", color="#D8DDE2", linewidth=0.45)
         axis.spines[["top", "right"]].set_visible(False)
-    axes[0, 0].legend(frameon=False, ncol=3)
+    figure.legend(
+        *axes[0, 0].get_legend_handles_labels(),
+        loc="upper center",
+        ncol=3,
+        frameon=False,
+        bbox_to_anchor=(0.5, 0.995),
+    )
     figure.supxlabel("Corpus size $N$ / positive reactions $K$", y=0.01)
-    figure.subplots_adjust(left=0.11, right=0.99, top=0.98, bottom=0.09, hspace=0.43, wspace=0.32)
+    figure.subplots_adjust(left=0.065, right=0.995, top=0.87, bottom=0.20, hspace=0.30, wspace=0.30)
     return figure
 
 
@@ -286,7 +297,6 @@ def oracle_model_page(rows: list[dict[str, str]], model: str) -> plt.Figure:
         and row["arm"] in {"ordinary", "predicate"}
     ]
     metrics = (
-        ("f1", "Macro F1", "linear", True),
         ("calls", "Model calls / trajectory", "log", False),
         ("input_tokens", "Input tokens / trajectory", "log", False),
         ("output_tokens", "Output tokens / trajectory", "log", False),
@@ -296,10 +306,10 @@ def oracle_model_page(rows: list[dict[str, str]], model: str) -> plt.Figure:
         ("process_wall_time_seconds", "Process wall time (s) / trajectory", "log", False),
         ("peak_combined_memory_mib", "Peak memory (MiB) / job", "log", False),
     )
-    figure, axes = plt.subplots(5, 2, figsize=(7.25, 9.8), squeeze=False)
+    figure, axes = plt.subplots(2, 4, figsize=(7.35, 4.25), sharex=True, squeeze=False)
     x = np.arange(3)
-    for axis, (metric, label, scale, is_score) in zip(
-        axes.ravel()[: len(metrics)], metrics, strict=True
+    for index, (axis, (metric, label, scale, is_score)) in enumerate(
+        zip(axes.ravel(), metrics, strict=True)
     ):
         for arm in ("ordinary", "predicate"):
             values = []
@@ -326,8 +336,12 @@ def oracle_model_page(rows: list[dict[str, str]], model: str) -> plt.Figure:
                 marker=("o" if arm == "ordinary" else "D"),
                 label=("Ordinary RLM" if arm == "ordinary" else "Chemistry rule supplied"),
             )
-        axis.set_xticks(x, CONTEXT_LABELS)
-        axis.set_ylabel(label)
+        axis.set_title(label, loc="left", pad=4, fontsize=7.8)
+        axis.set_xticks(x)
+        if index >= 4:
+            axis.set_xticklabels(CONTEXT_LABELS)
+        else:
+            axis.tick_params(axis="x", labelbottom=False)
         if scale == "log":
             axis.set_yscale("log")
         elif scale == "symlog":
@@ -337,10 +351,15 @@ def oracle_model_page(rows: list[dict[str, str]], model: str) -> plt.Figure:
             axis.set_ylim(-0.03, 1.03)
         axis.grid(axis="y", which="both", color="#D8DDE2", linewidth=0.45)
         axis.spines[["top", "right"]].set_visible(False)
-    axes[-1, -1].axis("off")
-    axes[0, 0].legend(frameon=False)
+    figure.legend(
+        *axes[0, 0].get_legend_handles_labels(),
+        loc="upper center",
+        ncol=2,
+        frameon=False,
+        bbox_to_anchor=(0.5, 0.995),
+    )
     figure.supxlabel("Context size (reactions)", y=0.01)
-    figure.subplots_adjust(left=0.105, right=0.995, top=0.99, bottom=0.06, hspace=0.43, wspace=0.34)
+    figure.subplots_adjust(left=0.065, right=0.995, top=0.87, bottom=0.13, hspace=0.30, wspace=0.30)
     return figure
 
 
