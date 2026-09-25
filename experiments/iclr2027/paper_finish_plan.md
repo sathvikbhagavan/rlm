@@ -224,6 +224,11 @@ queue for finishing the submission.
 
 - [ ] Revisit the title after the results are frozen and choose wording whose
   scope matches the controlled evidence.
+- [ ] Perform a cross-output consistency audit against the frozen per-run
+  records. For every reported result, verify that the prose, tables, main
+  figures, appendix figures, captions, denominators, aggregation units,
+  failure handling, and uncertainty summaries agree. Resolve every apparent
+  contradiction before making any claim of consistency or robustness.
 - [ ] Perform a claim-by-claim, citation, terminology, and model-naming audit.
   Verify especially that the paper does not imply laboratory validation,
   unsupported human-level performance, cross-domain empirical generalization,
