@@ -23,7 +23,11 @@ from rxnhaystack.control_room import (
     merge_snapshots,
     scientific_dashboard_view,
 )
-from rxnhaystack.score_recovery import SUBMISSION_SCORE_FREEZE_ID
+from rxnhaystack.score_recovery import (
+    SUBMISSION_SCORE_FREEZE_ID,
+    apply_corrected_score_recoveries,
+    carry_forward_pending_corrected_scores,
+)
 
 MODEL_ORDER = (
     "qwen3.5",
@@ -715,10 +719,10 @@ def write_readme(path: Path, arms: list[dict[str, Any]], *, as_of: str) -> None:
         "bulky raw trajectories remain in their original experiment artifact stores.",
         "All plotting aggregates score terminal failed jobs as zero. Running, stale, and "
         "pending jobs are excluded from the current score and keep their arm provisional. "
-        "Scores belonging to a corrected task are excluded from submission aggregates until "
-        "the complete arm is audited against `rxnhaystack-human-1.6.0`. Historical values are "
-        "retained only in the internal post-submission audit queue; resource measurements "
-        "remain unchanged.",
+        "Exact corrected rescores are used wherever recoverable. For remaining rows in the "
+        "internal post-submission rescore queue, the last available historical score is "
+        "carried forward under an explicit status marker so terminal trajectory denominators "
+        "remain complete; resource measurements remain unchanged.",
         "",
         "## Main benchmark arms",
         "",
@@ -772,7 +776,9 @@ def write_readme(path: Path, arms: list[dict[str, Any]], *, as_of: str) -> None:
             "RLM counterparts, and the deterministic executor ceiling. Its record tables and "
             "source manifest preserve the aggregation rules and contributing snapshots. Qwen "
             "has 673 successful and 52 terminal failed cells; failures contribute zero.",
-            "Affected-task scores remain excluded and are listed in the internal audit queue.",
+            "Exact corrected rescores are included and labeled `corrected_exact_rescore`. "
+            "Pending corrected control scores follow the same submission-freeze carry-forward "
+            "policy as the main benchmark and remain listed in the internal queue.",
             "",
             "## Prospective-route control",
             "",
@@ -854,8 +860,10 @@ def parse_args() -> argparse.Namespace:
 def main() -> None:
     args = parse_args()
     snapshots = load_snapshot_directory(args.snapshot_dir)
-    merged = scientific_dashboard_view(merge_snapshots(snapshots))
+    raw_merged = merge_snapshots(snapshots)
+    merged = scientific_dashboard_view(raw_merged)
     campaigns = {str(campaign["name"]): campaign for campaign in merged["campaigns"]}
+    raw_campaigns = {str(campaign["name"]): campaign for campaign in raw_merged["campaigns"]}
     full = campaigns[FULL_CAMPAIGN]
     x1000 = campaigns[DEEPSEEK_CODEACT_X1000_CAMPAIGN]
     rows = [flatten_run(run, scope="full_benchmark") for run in full["runs"]]
@@ -929,37 +937,43 @@ def main() -> None:
         row["status"] not in {"succeeded", "failed"} for row in gemini_rlm_rows
     ):
         raise ValueError("Gemini RLM x1000 arm must contain 150 terminal records")
-    gpt_rlm_rows: list[dict[str, Any]] = []
-    gpt_docker_campaign = campaigns.get(GPT_RLM_X1000_DOCKER_CAMPAIGN)
-    if gpt_docker_campaign is not None:
-        gpt_non_docker_rows = [
-            flattened
-            for run in x1000["runs"]
-            if (flattened := flatten_run(run, scope="rlm_x1000"))["model"] == "gpt-5-mini"
-            and flattened["method"] == "rlm"
-        ]
-        gpt_docker_rows = [
-            flatten_run(run, scope="rlm_x1000") for run in gpt_docker_campaign["runs"]
-        ]
-        gpt_rlm_rows = gpt_non_docker_rows + gpt_docker_rows
-        if len(gpt_non_docker_rows) != 135 or len(gpt_docker_rows) != 15:
-            raise ValueError(
-                "GPT-5-mini RLM x1000 cardinality mismatch: "
-                f"{len(gpt_non_docker_rows)} non-Docker and {len(gpt_docker_rows)} Docker"
-            )
-        unresolved_gpt = [
-            row["run_id"] for row in gpt_rlm_rows if row["status"] not in {"succeeded", "failed"}
-        ]
-        if unresolved_gpt:
-            raise ValueError(f"GPT-5-mini RLM x1000 arm is not terminal: {unresolved_gpt[:3]!r}")
+    gpt_non_docker_rows = [
+        flattened
+        for run in x1000["runs"]
+        if (flattened := flatten_run(run, scope="rlm_x1000"))["model"] == "gpt-5-mini"
+        and flattened["method"] == "rlm"
+    ]
+    # The scientific dashboard view deliberately folds shard campaigns into the generic
+    # x=1000 study and omits the held Docker campaign. Keep the raw merged campaign only long
+    # enough to complete the canonical 135 non-Docker + 15 Docker arm.
+    gpt_docker_campaign = raw_campaigns.get(GPT_RLM_X1000_DOCKER_CAMPAIGN)
+    if gpt_docker_campaign is None:
+        raise ValueError("Missing GPT-5-mini RLM x1000 Docker campaign")
+    gpt_docker_rows = [
+        flatten_run(run, scope="rlm_x1000") for run in gpt_docker_campaign["runs"]
+    ]
+    gpt_rlm_rows = gpt_non_docker_rows + gpt_docker_rows
+    if len(gpt_non_docker_rows) != 135 or len(gpt_docker_rows) != 15:
+        raise ValueError(
+            "GPT-5-mini RLM x1000 cardinality mismatch: "
+            f"{len(gpt_non_docker_rows)} non-Docker and {len(gpt_docker_rows)} Docker"
+        )
+    if len({str(row["run_id"]) for row in gpt_rlm_rows}) != 150:
+        raise ValueError("GPT-5-mini RLM x1000 contains duplicate run IDs")
+    unresolved_gpt = [
+        row["run_id"] for row in gpt_rlm_rows if row["status"] not in {"succeeded", "failed"}
+    ]
+    if unresolved_gpt:
+        raise ValueError(f"GPT-5-mini RLM x1000 arm is not terminal: {unresolved_gpt[:3]!r}")
     rlm_x1000_rows = deepseek_rlm_rows + gemini_rlm_rows + gpt_rlm_rows
     all_rows = rows + extension_rows + rlm_x1000_rows
     ground_truth_correction_manifest = apply_ground_truth_corrections(
         all_rows, args.ground_truth_corrections
     )
-    corrected_recovery_manifest = json.loads(
-        args.corrected_score_recoveries.read_text(encoding="utf-8")
+    corrected_recovery_manifest, corrected_recovery_count = apply_corrected_score_recoveries(
+        all_rows, args.corrected_score_recoveries
     )
+    carried_score_count = carry_forward_pending_corrected_scores(all_rows)
     arms = arm_summaries(all_rows)
     add_arm_finality(all_rows, arms)
     scaling = scaling_summaries(all_rows)
@@ -1080,16 +1094,16 @@ def main() -> None:
             "sha256": sha256_file(args.corrected_score_recoveries),
             "recovery_id": corrected_recovery_manifest["recovery_id"],
             "available": len(corrected_recovery_manifest["recoveries"]),
-            "applied": 0,
+            "applied": corrected_recovery_count,
         },
         "submission_score_freeze": {
             "freeze_id": SUBMISSION_SCORE_FREEZE_ID,
             "policy": (
-                "Exclude every score from a corrected task until the complete frozen arm is "
-                "rescored against rxnhaystack-human-1.6.0; preserve the historical value only "
-                "as internal audit evidence."
+                "Use exact corrected rescores where available; otherwise carry forward the "
+                "preserved historical score while retaining historical_score_invalidated "
+                "status in the internal post-submission queue."
             ),
-            "carried_historical_scores": 0,
+            "carried_historical_scores": carried_score_count,
         },
         "source_snapshots": [
             {

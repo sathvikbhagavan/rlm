@@ -52,7 +52,7 @@ FIELDNAMES = (
     "configured_seed",
     "repetition",
     "question_count",
-    "historical_score_excluded_from_submission",
+    "historical_score_carried_in_submission",
     "score_name",
     "source_entity",
     "wandb_url",
@@ -102,10 +102,9 @@ def source_entity(url: str) -> str:
 def build_queue(
     *, recovery: dict[str, Any], gold_dir: Path, configured_seed: int
 ) -> list[dict[str, Any]]:
-    audit_rows = [*recovery["recoveries"], *recovery["unresolved"]]
-    unresolved = {str(row["run_id"]): row for row in audit_rows}
-    if len(unresolved) != len(audit_rows):
-        raise ValueError("Recovery manifest contains duplicate affected run IDs")
+    unresolved = {str(row["run_id"]): row for row in recovery["unresolved"]}
+    if len(unresolved) != len(recovery["unresolved"]):
+        raise ValueError("Recovery manifest contains duplicate unresolved run IDs")
 
     occurrences: dict[str, list[tuple[str, dict[str, str]]]] = defaultdict(list)
     for relative_path, experiment in TABLES:
@@ -179,11 +178,11 @@ def build_queue(
                 "configured_seed": configured_seed,
                 "repetition": next(iter(repetitions)),
                 "question_count": next(iter(question_counts)),
-                "historical_score_excluded_from_submission": next(iter(scores)),
+                "historical_score_carried_in_submission": next(iter(scores)),
                 "score_name": next(iter(score_names)),
                 "source_entity": source_entity(str(pending.get("wandb_url", ""))),
                 "wandb_url": pending.get("wandb_url", ""),
-                "reason": pending.get("reason", "complete-post-submission-corrected-score-audit"),
+                "reason": pending["reason"],
                 "source_sha256": pending["source_sha256"],
             }
         )
@@ -220,9 +219,8 @@ def write_outputs(
         "# Post-submission corrected-rescore queue",
         "",
         "This is internal audit material, not manuscript prose. It freezes every run whose "
-        "score is excluded from submission-time aggregates. Historical values are retained "
-        "only for reproducibility; every listed run requires a post-submission audit against "
-        "the corrected human bundle.",
+        "exact corrected score is still pending. The submission tables carry the preserved "
+        "historical score for these rows so terminal trajectory denominators remain complete.",
         "",
         f"- Unique queued runs: **{len(rows)}**",
         f"- Recovery ledger: `{recovery['recovery_id']}`",
@@ -288,10 +286,9 @@ def main() -> None:
         gold_dir=args.gold_dir,
         configured_seed=args.configured_seed,
     )
-    if len(rows) != int(recovery["counts"]["unique_affected_runs"]):
+    if len(rows) != int(recovery["counts"]["unresolved"]):
         raise ValueError(
-            "Queue cardinality mismatch: "
-            f"{len(rows)} != {recovery['counts']['unique_affected_runs']}"
+            f"Queue cardinality mismatch: {len(rows)} != {recovery['counts']['unresolved']}"
         )
     write_outputs(rows=rows, recovery=recovery, output_dir=args.output_dir)
     print(f"Wrote {len(rows)} post-submission corrected-rescore rows")
