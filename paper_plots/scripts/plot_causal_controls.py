@@ -77,9 +77,9 @@ def mean_sd(values: list[float]) -> tuple[float, float]:
 
 def aggregate_rows(records: list[dict[str, Any]]) -> list[dict[str, Any]]:
     matched = [row for row in records if row["study"] == "matched_cardinality"]
-    if {row["model_label"] for row in matched} != {"GPT-5 mini"}:
-        raise ValueError("Matched-cardinality figure must contain only completed GPT-5-mini data")
-    matched_reps = weighted_replication_means(matched, ("condition", "context", "tier"))
+    matched_reps = weighted_replication_means(
+        matched, ("model_label", "condition", "context", "tier")
+    )
 
     oracle = [
         row
@@ -98,12 +98,13 @@ def aggregate_rows(records: list[dict[str, Any]]) -> list[dict[str, Any]]:
         return scored, total, scored / total if total else 0.0
 
     aggregates: list[dict[str, Any]] = []
-    for (condition, context, tier), values in sorted(matched_reps.items()):
+    for (model_label, condition, context, tier), values in sorted(matched_reps.items()):
         mean, sd = mean_sd(values)
         group = [
             row
             for row in matched
-            if row["condition"] == condition
+            if row["model_label"] == model_label
+            and row["condition"] == condition
             and row["context"] == context
             and row["tier"] == tier
         ]
@@ -111,7 +112,7 @@ def aggregate_rows(records: list[dict[str, Any]]) -> list[dict[str, Any]]:
         aggregates.append(
             {
                 "study": "matched_cardinality",
-                "model_label": "GPT-5 mini",
+                "model_label": model_label,
                 "arm": "matched",
                 "condition": condition,
                 "context": context,
@@ -129,9 +130,7 @@ def aggregate_rows(records: list[dict[str, Any]]) -> list[dict[str, Any]]:
         group = [
             row
             for row in oracle
-            if row["model_label"] == model_label
-            and row["context"] == context
-            and row["arm"] == arm
+            if row["model_label"] == model_label and row["context"] == context and row["arm"] == arm
         ]
         scored, total, fraction = coverage(group)
         aggregates.append(
@@ -173,13 +172,16 @@ def matched_lookup(
     }
 
 
-def plot_matched_scale(axis: plt.Axes, aggregates: list[dict[str, Any]]) -> None:
+def plot_matched_scale(
+    axis: plt.Axes, aggregates: list[dict[str, Any]], *, model_label: str, panel: str
+) -> None:
     positions = np.arange(len(CONTEXTS))
     for tier in (2, 3):
         values = {
             row["context"]: row
             for row in aggregates
             if row["study"] == "matched_cardinality"
+            and row["model_label"] == model_label
             and str(row["condition"]).startswith("scale-")
             and row["tier"] == tier
         }
@@ -200,11 +202,13 @@ def plot_matched_scale(axis: plt.Axes, aggregates: list[dict[str, Any]]) -> None
     axis.set_xticks(positions, CONTEXT_LABELS)
     axis.set_xlabel("Corpus size $N$")
     axis.set_ylabel("Macro F1")
-    axis.set_title("(a) Scale ($K=1$)", loc="left", pad=5)
+    axis.set_title(f"({panel}) Scale ($K=1$)\n{model_label}", loc="left", pad=5, fontsize=8.0)
     style_axis(axis)
 
 
-def plot_matched_cardinality(axis: plt.Axes, aggregates: list[dict[str, Any]]) -> None:
+def plot_matched_cardinality(
+    axis: plt.Axes, aggregates: list[dict[str, Any]], *, model_label: str, panel: str
+) -> None:
     conditions = (
         ("scale-x5000-k1", "1"),
         ("cardinality-x5000-k5", "5"),
@@ -219,6 +223,7 @@ def plot_matched_cardinality(axis: plt.Axes, aggregates: list[dict[str, Any]]) -
                 row
                 for row in aggregates
                 if row["study"] == "matched_cardinality"
+                and row["model_label"] == model_label
                 and row["condition"] == condition
                 and row["tier"] == tier
             ]
@@ -241,7 +246,12 @@ def plot_matched_cardinality(axis: plt.Axes, aggregates: list[dict[str, Any]]) -
         )
     axis.set_xticks(positions, [label for _, label in conditions])
     axis.set_xlabel("Positive reactions $K$")
-    axis.set_title("(b) Cardinality ($N=5{,}000$)", loc="left", pad=5)
+    axis.set_title(
+        f"({panel}) Cardinality ($N=5{{,}}000$)\n{model_label}",
+        loc="left",
+        pad=5,
+        fontsize=8.0,
+    )
     style_axis(axis)
 
 
@@ -345,20 +355,19 @@ def main() -> int:
     write_aggregates(args.records.with_name("aggregates.csv"), aggregates)
 
     figure, axes = plt.subplots(1, 4, figsize=(7.1, 2.45), sharey=True)
-    plot_matched_scale(axes[0], aggregates)
-    plot_matched_cardinality(axes[1], aggregates)
-    plot_oracle(axes[2], aggregates, model_label="Qwen 3.5", panel="c")
-    plot_oracle(axes[3], aggregates, model_label="Claude Haiku 4.5", panel="d")
+    plot_matched_scale(axes[0], aggregates, model_label="GPT-5 mini", panel="a")
+    plot_matched_cardinality(axes[1], aggregates, model_label="GPT-5 mini", panel="b")
+    plot_matched_scale(axes[2], aggregates, model_label="Qwen 3.5", panel="c")
+    plot_matched_cardinality(axes[3], aggregates, model_label="Qwen 3.5", panel="d")
     axes[1].set_ylabel("")
 
     tier_handles, tier_labels = axes[0].get_legend_handles_labels()
-    rule_handles, rule_labels = axes[2].get_legend_handles_labels()
     figure.legend(
-        tier_handles + rule_handles,
-        tier_labels + rule_labels,
+        tier_handles,
+        tier_labels,
         loc="lower center",
         bbox_to_anchor=(0.5, 0.01),
-        ncol=5,
+        ncol=2,
         frameon=False,
         handlelength=1.8,
         columnspacing=1.3,

@@ -416,9 +416,10 @@ def test_post_submission_queue_freezes_experiment_arm_model_seed_and_repetition(
         control_header + "oracle_predicate,ordinary,openai/gpt-5-mini,GPT-5 mini,full,ordinary,3,"
         f"tier3/task18,3,1,0.5,historical_score_invalidated,{run_id}\n"
     )
-    (gold / "causal_controls/matched_qwen_provisional.csv").write_text(control_header)
+    (gold / "causal_controls/matched_qwen_terminal.csv").write_text(control_header)
     recovery = {
         "recovery_id": "recovery-v2",
+        "recoveries": [],
         "unresolved": [
             {
                 "run_id": run_id,

@@ -1,11 +1,11 @@
 # Gold ICLR 2027 plotting results
 
-Frozen from the shared experiment dashboard at `2026-09-25T20:44:08.863360+00:00`.
+Frozen from the shared experiment dashboard at `2026-09-25T21:08:00.402095+00:00`.
 
 Gold means that the plotting input is frozen, auditable, and provenance-recorded. It does not mean every experiment arm is finished. `arm_status.csv` and the `arm_final` columns distinguish terminal arms from provisional ones.
 
 The CSV files contain sanitized metrics sufficient to regenerate paper plots; bulky raw trajectories remain in their original experiment artifact stores.
-All plotting aggregates score terminal failed jobs as zero. Running, stale, and pending jobs are excluded from the current score and keep their arm provisional. Exact corrected rescores are used wherever recoverable. For remaining rows in the internal post-submission rescore queue, the last available historical score is carried forward under an explicit status marker so terminal trajectory denominators remain complete; resource measurements remain unchanged.
+All plotting aggregates score terminal failed jobs as zero. Running, stale, and pending jobs are excluded from the current score and keep their arm provisional. Scores belonging to a corrected task are excluded from submission aggregates until the complete arm is audited against `rxnhaystack-human-1.6.0`. Historical values are retained only in the internal post-submission audit queue; resource measurements remain unchanged.
 
 ## Main benchmark arms
 
@@ -36,8 +36,8 @@ All plotting aggregates score terminal failed jobs as zero. Running, stale, and 
 
 ## Causal controls
 
-The `causal_controls/` directory freezes the completed GPT-5-mini matched-cardinality arm, Qwen/Claude chemistry-rule controls and their ordinary RLM counterparts, and the deterministic executor ceiling. Its record tables and source manifest preserve the aggregation rules and contributing snapshots. The directory also stores a status-explicit provisional Qwen matched-cardinality snapshot, which is excluded from final inference until all 725 cells terminate.
-Exact corrected rescores are included and labeled `corrected_exact_rescore`. Pending corrected control scores follow the same submission-freeze carry-forward policy as the main benchmark and remain listed in the internal queue.
+The `causal_controls/` directory freezes the terminal GPT-5-mini and Qwen matched-cardinality arms, Qwen/Claude chemistry-rule controls and their ordinary RLM counterparts, and the deterministic executor ceiling. Its record tables and source manifest preserve the aggregation rules and contributing snapshots. Qwen has 673 successful and 52 terminal failed cells; failures contribute zero.
+Affected-task scores remain excluded and are listed in the internal audit queue.
 
 ## Prospective-route control
 

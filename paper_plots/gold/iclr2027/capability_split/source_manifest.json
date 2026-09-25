@@ -1,26 +1,27 @@
 {
   "aggregation": {
     "across_models": "unweighted mean and observed model range",
+    "corrected_tasks": "excluded pending post-submission audit",
     "scope": "terminal full-corpus RLM arms",
-    "terminal_failures": "score zero",
+    "terminal_failures": "score zero when the task score is available",
     "within_model": "question-weighted mean across task scripts and repetitions"
   },
-  "generated_at": "2026-09-25T20:53:16.907626+00:00",
+  "generated_at": "2026-09-25T21:23:10.037281+00:00",
   "outputs": [
     {
       "path": "per_model.csv",
-      "sha256": "76687bd328919ec8c94d342dbd27927e05d6102ad49f7c841ff68ff9107e4c57"
+      "sha256": "fea8a9e6f82ca01bf04360f1e1080a1de004a84212414dab97880fb19e9cb7f4"
     },
     {
       "path": "across_models.csv",
-      "sha256": "6607f657bb4ed72221b13e673fa885bd4fdf5a285ff0e2af19f77a75ab5622b3"
+      "sha256": "187764517f280f3c915911dd79e50c11fa5573ca8394980c454adea0250ca47c"
     }
   ],
   "schema_version": 1,
   "source": {
     "path": "paper_plots/gold/iclr2027/full_benchmark_records.csv",
-    "sha256": "cffff19a9dad878cd3dd5e70f2c38a49dd64f63460cca0780ab65ac8d6dbd1a6"
+    "sha256": "599dddce39dff4afe404e59e0204bb0ffd45aa8f98657a409d10d46144bfae15"
   },
-  "source_repository_commit": "4d84d3235418ed1f7e139377bd11e13970467826",
-  "source_snapshot_as_of": "2026-09-25T20:44:08.863360+00:00"
+  "source_repository_commit": "37fde6de381bc0ddc0a0226ea0b156d7bcfafed5",
+  "source_snapshot_as_of": "2026-09-25T21:08:00.402095+00:00"
 }

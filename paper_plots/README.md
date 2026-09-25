@@ -20,10 +20,11 @@ the workshop-era input and plotting implementation for historical
 reproducibility. Their superseded figure exports are intentionally not kept in
 the active figure directory.
 
-## Corrected-score recovery
+## Post-submission corrected-score audit
 
-After a versioned ground-truth change, recover exact scores from preserved run
-logs before rebuilding the tables:
+After a versioned ground-truth change, preserved logs can reconstruct exact
+scores for audit. Submission-time builders nevertheless exclude every affected
+task score until the complete frozen arm has been checked under one policy:
 
 ```sh
 WANDB_API_KEY=... uv run python \
@@ -55,7 +56,8 @@ It writes an exact-rescore manifest and a separate prediction ledger under
 in the ignored local cache `artifacts/score-recovery/`. The recovery ledger is
 replaced atomically and, by default, cannot be replaced by one with fewer
 recovered runs. It can then be joined to the frozen experiment tables by
-`build_post_submission_queue.py`, which records every still-pending run with
+`build_post_submission_queue.py`, which records every affected run with
 its experiment, arm, model, task, context, configured seed, and repetition.
-Runs without sufficient retained prediction evidence remain explicitly queued
-rather than being classified as exact corrected rescores.
+The current submission freeze does not restore either recovered or historical
+scores to paper aggregates. All affected identities remain explicitly queued
+for the complete post-submission audit.

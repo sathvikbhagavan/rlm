@@ -19,12 +19,15 @@ def read_csv(path: Path) -> list[dict[str, str]]:
         return list(csv.DictReader(stream))
 
 
-def write_csv(path: Path, rows: list[dict[str, Any]]) -> None:
+def write_csv(
+    path: Path, rows: list[dict[str, Any]], *, fieldnames: tuple[str, ...] | None = None
+) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    if not rows:
-        raise ValueError(f"Refusing to write empty table: {path}")
+    columns = list(rows[0]) if rows else list(fieldnames or ())
+    if not columns:
+        raise ValueError(f"Empty table requires explicit columns: {path}")
     with path.open("w", newline="") as stream:
-        writer = csv.DictWriter(stream, fieldnames=list(rows[0]), lineterminator="\n")
+        writer = csv.DictWriter(stream, fieldnames=columns, lineterminator="\n")
         writer.writeheader()
         writer.writerows(rows)
 
@@ -169,9 +172,50 @@ def build(root: Path) -> dict[str, Any]:
         "task_signatures": output / "task_error_signatures.csv",
     }
     write_csv(paths["job_outcomes"], outcome_rows)
-    write_csv(paths["trace_records"], signatures)
-    write_csv(paths["trace_signatures"], signature_rows)
-    write_csv(paths["task_signatures"], task_rows)
+    write_csv(
+        paths["trace_records"],
+        signatures,
+        fieldnames=(
+            "run_id",
+            "model",
+            "method",
+            "task",
+            "question_id",
+            "signature",
+            "corrected_f1",
+            "corrected_precision",
+            "corrected_recall",
+            "predicted_count",
+            "ground_truth_count",
+            "recovery",
+        ),
+    )
+    write_csv(
+        paths["trace_signatures"],
+        signature_rows,
+        fieldnames=(
+            "method",
+            "signature",
+            "question_outputs",
+            "erroneous_question_outputs",
+            "all_classifiable_question_outputs",
+            "fraction_of_errors",
+        ),
+    )
+    write_csv(
+        paths["task_signatures"],
+        task_rows,
+        fieldnames=(
+            "method",
+            "task",
+            "question_outputs",
+            "exact",
+            "empty_answer",
+            "omissions_only",
+            "extra_selections_only",
+            "mixed_omissions_and_extras",
+        ),
+    )
 
     summary = {
         "schema_version": 1,

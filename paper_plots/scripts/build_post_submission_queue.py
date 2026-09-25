@@ -24,6 +24,7 @@ MODEL_ALIASES = {
     "openai/gpt-5-mini": ("gpt-5-mini", "GPT-5 mini"),
     "claude-haiku-4.5": ("claude-haiku-4.5", "Claude Haiku 4.5"),
     "anthropic/claude-haiku-4.5": ("claude-haiku-4.5", "Claude Haiku 4.5"),
+    "none": ("deterministic-executor", "Deterministic executor"),
 }
 
 TABLES = (
@@ -31,7 +32,7 @@ TABLES = (
     ("codeact_x1000_records.csv", "x1000_extension"),
     ("rlm_x1000_records.csv", "x1000_extension"),
     ("causal_controls/records.csv", "causal_control"),
-    ("causal_controls/matched_qwen_provisional.csv", "provisional_control"),
+    ("causal_controls/matched_qwen_terminal.csv", "matched_control"),
 )
 
 FIELDNAMES = (
@@ -51,7 +52,7 @@ FIELDNAMES = (
     "configured_seed",
     "repetition",
     "question_count",
-    "historical_score_carried_in_submission",
+    "historical_score_excluded_from_submission",
     "score_name",
     "source_entity",
     "wandb_url",
@@ -101,9 +102,10 @@ def source_entity(url: str) -> str:
 def build_queue(
     *, recovery: dict[str, Any], gold_dir: Path, configured_seed: int
 ) -> list[dict[str, Any]]:
-    unresolved = {str(row["run_id"]): row for row in recovery["unresolved"]}
-    if len(unresolved) != len(recovery["unresolved"]):
-        raise ValueError("Recovery manifest contains duplicate unresolved run IDs")
+    audit_rows = [*recovery["recoveries"], *recovery["unresolved"]]
+    unresolved = {str(row["run_id"]): row for row in audit_rows}
+    if len(unresolved) != len(audit_rows):
+        raise ValueError("Recovery manifest contains duplicate affected run IDs")
 
     occurrences: dict[str, list[tuple[str, dict[str, str]]]] = defaultdict(list)
     for relative_path, experiment in TABLES:
@@ -177,11 +179,11 @@ def build_queue(
                 "configured_seed": configured_seed,
                 "repetition": next(iter(repetitions)),
                 "question_count": next(iter(question_counts)),
-                "historical_score_carried_in_submission": next(iter(scores)),
+                "historical_score_excluded_from_submission": next(iter(scores)),
                 "score_name": next(iter(score_names)),
                 "source_entity": source_entity(str(pending.get("wandb_url", ""))),
                 "wandb_url": pending.get("wandb_url", ""),
-                "reason": pending["reason"],
+                "reason": pending.get("reason", "complete-post-submission-corrected-score-audit"),
                 "source_sha256": pending["source_sha256"],
             }
         )
@@ -218,8 +220,9 @@ def write_outputs(
         "# Post-submission corrected-rescore queue",
         "",
         "This is internal audit material, not manuscript prose. It freezes every run whose "
-        "exact corrected score is still pending. The submission tables carry the preserved "
-        "historical score for these rows so terminal trajectory denominators remain complete.",
+        "score is excluded from submission-time aggregates. Historical values are retained "
+        "only for reproducibility; every listed run requires a post-submission audit against "
+        "the corrected human bundle.",
         "",
         f"- Unique queued runs: **{len(rows)}**",
         f"- Recovery ledger: `{recovery['recovery_id']}`",
@@ -285,9 +288,10 @@ def main() -> None:
         gold_dir=args.gold_dir,
         configured_seed=args.configured_seed,
     )
-    if len(rows) != int(recovery["counts"]["unresolved"]):
+    if len(rows) != int(recovery["counts"]["unique_affected_runs"]):
         raise ValueError(
-            f"Queue cardinality mismatch: {len(rows)} != {recovery['counts']['unresolved']}"
+            "Queue cardinality mismatch: "
+            f"{len(rows)} != {recovery['counts']['unique_affected_runs']}"
         )
     write_outputs(rows=rows, recovery=recovery, output_dir=args.output_dir)
     print(f"Wrote {len(rows)} post-submission corrected-rescore rows")

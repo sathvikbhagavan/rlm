@@ -43,9 +43,18 @@ def paid_efficiency_claims(records: list[dict[str, str]]) -> dict[str, dict[str,
 
     by_cell: dict[tuple[int, str, str], list[tuple[float, float]]] = defaultdict(list)
     for (tier, method, context, _model), rows in groups.items():
-        terminal = [row for row in rows if row["status"] in {"succeeded", "failed"}]
+        terminal = [
+            row
+            for row in rows
+            if row["status"] in {"succeeded", "failed"}
+            and row.get("score_correction_status") == "not_affected"
+        ]
         expected_trajectories = sum(int(row["question_count"]) for row in terminal)
-        successful = [row for row in terminal if row["status"] == "succeeded"]
+        successful = [
+            row
+            for row in terminal
+            if row["status"] == "succeeded" and row.get("score_available", "").lower() == "true"
+        ]
         successful_trajectories = sum(int(row["question_count"]) for row in successful)
         if not expected_trajectories or not successful_trajectories:
             continue

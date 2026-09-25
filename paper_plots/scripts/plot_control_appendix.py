@@ -199,12 +199,7 @@ def matched_resource_page(rows: list[dict[str, str]]) -> plt.Figure:
 
 
 def qwen_snapshot(rows: list[dict[str, str]]) -> plt.Figure:
-    """Plot the scientific result from the available Qwen matched runs.
-
-    Execution coverage belongs in the experiment ledger and dashboard, not in
-    the scientific figure.  Keeping it out also prevents transient job state
-    from competing visually with the measured score.
-    """
+    """Plot the terminal Qwen matched result, counting failed cells as zero."""
     figure, axis = plt.subplots(figsize=(7.25, 2.45))
     x = np.arange(len(CONDITIONS))
     for tier in (2, 3):
@@ -215,7 +210,6 @@ def qwen_snapshot(rows: list[dict[str, str]]) -> plt.Figure:
                 for row in rows
                 if row["condition"] == condition
                 and int(row["tier"]) == tier
-                and row["status"] == "succeeded"
                 and score_available(row)
             ]
             numerator = sum(float(row["f1"]) * int(row["question_count"]) for row in group)
@@ -435,7 +429,7 @@ def main() -> int:
     )
     args = parser.parse_args()
     records = read_csv(args.data_root / "records.csv")
-    qwen = read_csv(args.data_root / "matched_qwen_provisional.csv")
+    qwen = read_csv(args.data_root / "matched_qwen_terminal.csv")
     save(matched_task_heatmap(records), args.output, "matched_gpt_task_heatmap")
     save(matched_resource_page(records), args.output, "matched_gpt_resources")
     save(qwen_snapshot(qwen), args.output, "matched_qwen_snapshot")

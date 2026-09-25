@@ -5,27 +5,31 @@
     "peak_memory": "mean combined process-tree plus Docker peak per successful job",
     "variation": "population standard deviation across five repetitions"
   },
-  "generated_at": "2026-09-25T20:39:32.633581+00:00",
+  "generated_at": "2026-09-25T21:12:01.992549+00:00",
   "model": "qwen3.5",
   "outputs": [
     {
       "path": "tier_metrics.csv",
-      "sha256": "a8e49c214a69a9375a184713886d50fa05d259cf548094a542a9f243dd28770f"
+      "sha256": "7ed4944c4fd134bfbdef10500b4e0a62cf6e9523ef293bcada048cbade351a5c"
     },
     {
       "path": "task_f1.csv",
-      "sha256": "c93471bd04bdae09e039a52a986e67f089d3e5524a698b2d2c7788e911813efb"
+      "sha256": "d0e40d0900c40ea2cd6800d5c265206654aa6db6f3e48ad5b543ddf71702435e"
     }
   ],
   "schema_version": 1,
   "sources": [
     {
       "path": "paper_plots/gold/iclr2027/full_benchmark_records.csv",
-      "sha256": "cffff19a9dad878cd3dd5e70f2c38a49dd64f63460cca0780ab65ac8d6dbd1a6"
+      "sha256": "599dddce39dff4afe404e59e0204bb0ffd45aa8f98657a409d10d46144bfae15"
     },
     {
       "path": "paper_plots/gold/iclr2027/codeact_x1000_records.csv",
-      "sha256": "826904f1b843751e941317d83ec4528221bec42bea6c31dc6fc1555d49d5712c"
+      "sha256": "d6d103366f78f6b7c997e503a940cffe5d6c116c897c5f4aa47a1d03fcee9654"
+    },
+    {
+      "path": "paper_plots/gold/iclr2027/rlm_x1000_records.csv",
+      "sha256": "9ea9fa601f573078a125f91acbcfb95e355180c99fbb93e5f779a440126dbe13"
     }
   ]
 }

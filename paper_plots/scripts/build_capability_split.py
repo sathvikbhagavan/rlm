@@ -87,12 +87,16 @@ def capability_summaries(
         denominator = 0
         failures = 0
         for row in members:
+            if "score_available" in row and not as_bool(row.get("score_available")):
+                continue
             weight = int(row["question_count"])
             denominator += weight
             if row["status"] == "succeeded" and row.get("f1") not in {None, ""}:
                 numerator += float(row["f1"]) * weight
             else:
                 failures += 1
+        if denominator == 0:
+            continue
         per_model.append(
             {
                 "model": model,
@@ -162,7 +166,8 @@ def main() -> None:
         "aggregation": {
             "scope": "terminal full-corpus RLM arms",
             "within_model": "question-weighted mean across task scripts and repetitions",
-            "terminal_failures": "score zero",
+            "terminal_failures": "score zero when the task score is available",
+            "corrected_tasks": "excluded pending post-submission audit",
             "across_models": "unweighted mean and observed model range",
         },
     }

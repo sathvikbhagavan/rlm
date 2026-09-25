@@ -2,52 +2,56 @@
   "configured_seed": 42,
   "counts": {
     "by_context": {
-      "100": 41,
-      "1000": 6,
-      "500": 54,
-      "5000": 15,
-      "50000": 14,
-      "full": 71
+      "100": 586,
+      "1000": 136,
+      "500": 580,
+      "5000": 139,
+      "50000": 47,
+      "full": 255
     },
     "by_experiment": {
-      "causal_control": 32,
-      "causal_control;main_benchmark": 10,
-      "main_benchmark": 136,
-      "provisional_control": 17,
-      "x1000_extension": 6
+      "causal_control": 274,
+      "causal_control;main_benchmark": 90,
+      "causal_control;matched_control": 150,
+      "main_benchmark": 1093,
+      "x1000_extension": 136
     },
     "by_method": {
-      "llm": 59,
-      "rlm": 142
+      "codeact": 372,
+      "llm": 360,
+      "rlm": 1011
     },
     "by_model": {
-      "claude-haiku-4.5": 30,
-      "deepseek-v4-flash": 15,
-      "gemini-3.7-flash": 32,
-      "glm-5.2": 31,
-      "gpt-5-mini": 61,
-      "qwen3.5": 32
+      "claude-haiku-4.5": 255,
+      "deepseek-v4-flash": 243,
+      "deterministic-executor": 9,
+      "gemini-3.7-flash": 267,
+      "glm-5.2": 140,
+      "gpt-5-mini": 394,
+      "qwen3.5": 435
     },
     "by_repetition": {
-      "1": 42,
-      "2": 39,
-      "3": 40,
-      "4": 41,
-      "5": 39
+      "1": 394,
+      "2": 340,
+      "3": 339,
+      "4": 338,
+      "5": 332
     },
     "by_task": {
-      "tier3/task10": 19,
-      "tier3/task18": 119,
-      "tier3/task23": 45,
-      "tier3/task7": 18
+      "tier3/task10": 315,
+      "tier3/task18": 292,
+      "tier3/task23": 330,
+      "tier3/task6": 309,
+      "tier3/task7": 276,
+      "tier4/task15": 221
     }
   },
   "files": {
-    "README.md": "93c46c2aabc23726511450f63d981456aee806d900d0e5d4078cc6daa40b2a88",
-    "pending_corrected_rescores.csv": "83c2547182044550fe774e1b9d32948486073e6792e2ee8c05f0d285ba2a9e54",
-    "pending_corrected_rescores.jsonl": "2612c241f8d0ab0dcec19c9d62bf0c05dc0460a26f778fe9c3bc2240852817f9"
+    "README.md": "82a691248a60aafcabac21efaaafe5a64e8f0e86cd41ad53c77057341fe5b771",
+    "pending_corrected_rescores.csv": "3002fc7cc96aa0adb4370284d227c697578dc0853d68d40503b648545a2f27c7",
+    "pending_corrected_rescores.jsonl": "b52ea8b6db92a3e033f878c339bd738138b43cdbc93a745c03295a1b0359ef03"
   },
-  "queued_run_count": 201,
+  "queued_run_count": 1743,
   "recovery_id": "rxnhaystack-corrected-score-recovery-2026-09-25-v2",
   "schema_version": 1,
   "submission_score_freeze_id": "rxnhaystack-iclr2027-submission-score-freeze-v1"

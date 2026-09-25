@@ -10,6 +10,7 @@ from pathlib import Path, PurePosixPath
 from typing import Any
 
 from rxnhaystack.control_room import (
+    load_snapshot,
     publish_snapshot,
     safe_metrics,
     snapshot_digest,
@@ -19,8 +20,10 @@ from rxnhaystack.control_room import (
 
 CAMPAIGN = "iclr2027-sathvik-x1000-succeeded-pack-v1"
 SOURCE_ID = "sathvik-x1000-succeeded-packs-v1"
+DEEPSEEK_SOURCE_ID = "sathvik-deepseek-x1000-docker-pack-v1"
 QWEN_MODEL = "qwen3.5-397b"
 GEMINI_MODEL = "gemini-3.7-flash"
+DEEPSEEK_MODEL = "deepseek-v4-flash"
 
 
 def nested_metrics(row: dict[str, Any]) -> dict[str, Any]:
@@ -112,7 +115,7 @@ def validate_rows(
             ("4", task, repetition) for task in ("16", "17", "17b") for repetition in range(1, 6)
         }
         if identities != expected:
-            raise ValueError("Gemini pack must contain five repetitions of Docker Tasks 16/17/17b")
+            raise ValueError("Docker pack must contain five repetitions of Tasks 16/17/17b")
 
 
 def stable_hash(value: Any) -> str:
@@ -126,15 +129,15 @@ def build_pack_snapshot(
     gemini_rlm_docker_path: Path,
 ) -> dict[str, Any]:
     inputs = (
-        (qwen_codeact_path, QWEN_MODEL, "codeact", False),
-        (gemini_codeact_path, GEMINI_MODEL, "codeact", False),
-        (gemini_rlm_docker_path, GEMINI_MODEL, "rlm", True),
+        (qwen_codeact_path, QWEN_MODEL, "codeact", False, ""),
+        (gemini_codeact_path, GEMINI_MODEL, "codeact", False, ""),
+        (gemini_rlm_docker_path, GEMINI_MODEL, "rlm", True, ""),
     )
     expected_runs: list[dict[str, Any]] = []
     observations: list[dict[str, Any]] = []
     packed_times: list[datetime] = []
     archive_hashes: list[str] = []
-    for path, model, method, docker_only in inputs:
+    for path, model, method, docker_only, canonical_prefix in inputs:
         manifest, rows = load_pack(path)
         validate_rows(rows, model=model, method=method, docker_only=docker_only)
         packed_at = datetime.fromisoformat(str(manifest["packed_at"]))
@@ -145,7 +148,7 @@ def build_pack_snapshot(
         for row in rows:
             metrics = safe_metrics(nested_metrics(row))
             resources = metrics.get("resources", {})
-            run_id = str(row["run_id"])
+            run_id = canonical_prefix + str(row["run_id"])
             repetition = int(row["repetition"])
             spec_material = {
                 "run_id": run_id,
@@ -229,6 +232,77 @@ def build_pack_snapshot(
     return payload
 
 
+def build_deepseek_repair_snapshot(pack_path: Path, reference_path: Path) -> dict[str, Any]:
+    """Attach the successful Docker pack to the existing 150-cell campaign identity."""
+    reference = load_snapshot(reference_path)
+    manifest, rows = load_pack(pack_path)
+    validate_rows(rows, model=DEEPSEEK_MODEL, method="rlm", docker_only=True)
+    expected = {item["run_id"]: item for item in reference["experiment"]["expected_runs"]}
+    observations: list[dict[str, Any]] = []
+    packed_at = datetime.fromisoformat(str(manifest["packed_at"]))
+    if packed_at.tzinfo is None:
+        packed_at = packed_at.replace(tzinfo=UTC)
+    archive_hash = sha256_file(pack_path)
+    for row in rows:
+        run_id = "x1000-openrouter-" + str(row["run_id"])
+        if run_id not in expected:
+            raise ValueError(f"Packed run is absent from the reference campaign: {run_id}")
+        metrics = safe_metrics(nested_metrics(row))
+        resources = metrics.get("resources", {})
+        wall_seconds = float(resources.get("process_wall_time_seconds", 0.0))
+        started_at = packed_at - timedelta(seconds=wall_seconds)
+        attempt = int(row.get("attempt", 1))
+        attempt_key = stable_hash(
+            {
+                "run_id": run_id,
+                "spec_hash": expected[run_id]["spec_hash"],
+                "attempt": attempt,
+                "started_at": started_at.isoformat(),
+                "archive_sha256": archive_hash,
+            }
+        )
+        observations.append(
+            {
+                "run_id": run_id,
+                "spec_hash": expected[run_id]["spec_hash"],
+                "status": "succeeded",
+                "attempt_count": 1,
+                "started_at": started_at.isoformat(),
+                "finished_at": packed_at.isoformat(),
+                "attempts": [
+                    {
+                        "attempt_key": attempt_key,
+                        "attempt": attempt,
+                        "status": "succeeded",
+                        "started_at": started_at.isoformat(),
+                        "finished_at": packed_at.isoformat(),
+                        "return_code": 0,
+                        "failure_category": None,
+                        "metrics": metrics,
+                    }
+                ],
+            }
+        )
+    payload: dict[str, Any] = {
+        "schema_version": 1,
+        "generated_at": packed_at.astimezone(UTC).isoformat(),
+        "source": {
+            "id": DEEPSEEK_SOURCE_ID,
+            "machine": "liacpc15",
+            "owner": "Sathvik",
+            "scheduler_job_id": None,
+            "session_name": "provided-deepseek-x1000-docker-pack",
+            "git_commit": "external-result-pack",
+            "tracked_dirty": False,
+        },
+        "experiment": reference["experiment"],
+        "observations": sorted(observations, key=lambda item: item["run_id"]),
+    }
+    payload["snapshot_id"] = snapshot_digest(payload)
+    validate_snapshot(payload)
+    return payload
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(
         description="Validate and publish Sathvik's successful x1000 result packs."
@@ -236,6 +310,9 @@ def main() -> int:
     parser.add_argument("--qwen-codeact-pack", type=Path, required=True)
     parser.add_argument("--gemini-codeact-pack", type=Path, required=True)
     parser.add_argument("--gemini-rlm-docker-pack", type=Path, required=True)
+    parser.add_argument("--deepseek-rlm-docker-pack", type=Path, required=True)
+    parser.add_argument("--deepseek-reference-snapshot", type=Path, required=True)
+    parser.add_argument("--deepseek-output", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--wandb-key-file", type=Path)
     parser.add_argument("--entity", default="liac")
@@ -251,6 +328,14 @@ def main() -> int:
         f"Validated {len(snapshot['observations'])} successful x1000 records; "
         f"snapshot {snapshot['snapshot_id'][:12]}"
     )
+    deepseek_snapshot = build_deepseek_repair_snapshot(
+        args.deepseek_rlm_docker_pack.resolve(), args.deepseek_reference_snapshot.resolve()
+    )
+    write_snapshot(args.deepseek_output.resolve(), deepseek_snapshot)
+    print(
+        f"Validated {len(deepseek_snapshot['observations'])} DeepSeek Docker records; "
+        f"snapshot {deepseek_snapshot['snapshot_id'][:12]}"
+    )
     if args.wandb_key_file is not None:
         key = args.wandb_key_file.expanduser().read_text(encoding="utf-8").strip()
         if not key:
@@ -259,6 +344,10 @@ def main() -> int:
             args.output.resolve(), api_key=key, entity=args.entity, project=args.project
         )
         print(f"Published {SOURCE_ID}: {url}")
+        deepseek_url = publish_snapshot(
+            args.deepseek_output.resolve(), api_key=key, entity=args.entity, project=args.project
+        )
+        print(f"Published {DEEPSEEK_SOURCE_ID}: {deepseek_url}")
     return 0
 
 

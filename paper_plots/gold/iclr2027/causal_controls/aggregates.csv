@@ -1,32 +1,51 @@
 study,model_label,arm,condition,context,tier,mean_f1,sd_f1,replications,scored_question_trajectories,total_question_trajectories,score_coverage
 matched_cardinality,GPT-5 mini,matched,cardinality-x5000-k20,5000,2,0.981090909090909,0.025964056528303883,5,100,100,1.0
-matched_cardinality,GPT-5 mini,matched,cardinality-x5000-k20,5000,3,0.5254477960052882,0.02945242194260019,5,175,175,1.0
+matched_cardinality,GPT-5 mini,matched,cardinality-x5000-k20,5000,3,0.5376434533524602,0.04340766540152485,5,95,175,0.5428571428571428
 matched_cardinality,GPT-5 mini,matched,cardinality-x5000-k5,5000,2,0.99,0.022360679774997918,5,100,100,1.0
-matched_cardinality,GPT-5 mini,matched,cardinality-x5000-k5,5000,3,0.41808097323751775,0.022853202132832037,5,175,175,1.0
+matched_cardinality,GPT-5 mini,matched,cardinality-x5000-k5,5000,3,0.5050176704672025,0.07631932708480145,5,95,175,0.5428571428571428
 matched_cardinality,GPT-5 mini,matched,scale-x100-k1,100,1,1.0,0.0,5,50,50,1.0
 matched_cardinality,GPT-5 mini,matched,scale-x100-k1,100,2,0.97,0.02738612787525833,5,100,100,1.0
-matched_cardinality,GPT-5 mini,matched,scale-x100-k1,100,3,0.6713260390403246,0.027938469392134336,5,175,175,1.0
+matched_cardinality,GPT-5 mini,matched,scale-x100-k1,100,3,0.6784828037459617,0.034425317609907,5,95,175,0.5428571428571428
 matched_cardinality,GPT-5 mini,matched,scale-x500-k1,500,1,1.0,0.0,5,50,50,1.0
 matched_cardinality,GPT-5 mini,matched,scale-x500-k1,500,2,1.0,0.0,5,100,100,1.0
-matched_cardinality,GPT-5 mini,matched,scale-x500-k1,500,3,0.5649617055111316,0.025387380519775436,5,175,175,1.0
+matched_cardinality,GPT-5 mini,matched,scale-x500-k1,500,3,0.574074746301458,0.04553614173134241,5,95,175,0.5428571428571428
 matched_cardinality,GPT-5 mini,matched,scale-x5000-k1,5000,1,1.0,0.0,5,50,50,1.0
 matched_cardinality,GPT-5 mini,matched,scale-x5000-k1,5000,2,0.99,0.022360679774997918,5,100,100,1.0
-matched_cardinality,GPT-5 mini,matched,scale-x5000-k1,5000,3,0.34368028645981646,0.060254949675918726,5,175,175,1.0
+matched_cardinality,GPT-5 mini,matched,scale-x5000-k1,5000,3,0.44297616165745557,0.0733002052281603,5,95,175,0.5428571428571428
 matched_cardinality,GPT-5 mini,matched,scale-x50000-k1,50000,1,1.0,0.0,5,50,50,1.0
 matched_cardinality,GPT-5 mini,matched,scale-x50000-k1,50000,2,0.961111111111111,0.03986861137335368,5,100,100,1.0
-matched_cardinality,GPT-5 mini,matched,scale-x50000-k1,50000,3,0.21677681780579888,0.03224758180224225,5,175,175,1.0
+matched_cardinality,GPT-5 mini,matched,scale-x50000-k1,50000,3,0.3227334177997717,0.035598237555874,5,95,175,0.5428571428571428
 matched_cardinality,GPT-5 mini,matched,scale-xfull-k1,full,1,1.0,0.0,5,50,50,1.0
 matched_cardinality,GPT-5 mini,matched,scale-xfull-k1,full,2,0.980042735042735,0.027327714928516423,5,100,100,1.0
-matched_cardinality,GPT-5 mini,matched,scale-xfull-k1,full,3,0.22153138611553871,0.0257355414906568,5,175,175,1.0
-oracle_predicate,Claude Haiku 4.5,ordinary,ordinary,100,,0.376841869323487,0.04122668831231042,5,80,80,1.0
-oracle_predicate,Claude Haiku 4.5,predicate,predicate,100,,0.39583333333333337,0.08068715304598785,5,80,80,1.0
-oracle_predicate,Claude Haiku 4.5,ordinary,ordinary,500,,0.3996453082348891,0.04085299739105896,5,80,80,1.0
-oracle_predicate,Claude Haiku 4.5,predicate,predicate,500,,0.425,0.12022115038544591,5,80,80,1.0
-oracle_predicate,Claude Haiku 4.5,ordinary,ordinary,full,,0.29827255339807124,0.05035603677070802,5,80,80,1.0
-oracle_predicate,Claude Haiku 4.5,predicate,predicate,full,,0.5506964318810371,0.0844978059706601,5,80,80,1.0
-oracle_predicate,Qwen 3.5,ordinary,ordinary,100,,0.8022930541680541,0.06828638505612472,5,80,80,1.0
-oracle_predicate,Qwen 3.5,predicate,predicate,100,,0.6791666666666667,0.12893123705638168,5,80,80,1.0
-oracle_predicate,Qwen 3.5,ordinary,ordinary,500,,0.7708796305340626,0.053441131759595806,5,80,80,1.0
-oracle_predicate,Qwen 3.5,predicate,predicate,500,,0.73,0.13422229695546117,5,80,80,1.0
-oracle_predicate,Qwen 3.5,ordinary,ordinary,full,,0.5480838108068187,0.0796496394610496,5,80,80,1.0
-oracle_predicate,Qwen 3.5,predicate,predicate,full,,0.7212841363346386,0.08263807147566118,5,80,80,1.0
+matched_cardinality,GPT-5 mini,matched,scale-xfull-k1,full,3,0.35018009243828563,0.029662017859511863,5,95,175,0.5428571428571428
+matched_cardinality,Qwen 3.5,matched,cardinality-x5000-k20,5000,2,0.9763046175841813,0.023857402198555734,5,100,100,1.0
+matched_cardinality,Qwen 3.5,matched,cardinality-x5000-k20,5000,3,0.6073674135786276,0.02408119344582748,5,95,175,0.5428571428571428
+matched_cardinality,Qwen 3.5,matched,cardinality-x5000-k5,5000,2,0.9657295173961842,0.025896906935428635,5,100,100,1.0
+matched_cardinality,Qwen 3.5,matched,cardinality-x5000-k5,5000,3,0.5581866944552589,0.06896756290945731,5,95,175,0.5428571428571428
+matched_cardinality,Qwen 3.5,matched,scale-x100-k1,100,1,0.96,0.0547722557505166,5,50,50,1.0
+matched_cardinality,Qwen 3.5,matched,scale-x100-k1,100,2,0.9650000000000001,0.033166247903553936,5,100,100,1.0
+matched_cardinality,Qwen 3.5,matched,scale-x100-k1,100,3,0.6526315789473685,0.16759837658542937,5,95,175,0.5428571428571428
+matched_cardinality,Qwen 3.5,matched,scale-x500-k1,500,1,1.0,0.0,5,50,50,1.0
+matched_cardinality,Qwen 3.5,matched,scale-x500-k1,500,2,0.9835238095238095,0.02289084816482814,5,100,100,1.0
+matched_cardinality,Qwen 3.5,matched,scale-x500-k1,500,3,0.6438734343345717,0.08906883442800001,5,95,175,0.5428571428571428
+matched_cardinality,Qwen 3.5,matched,scale-x5000-k1,5000,1,1.0,0.0,5,50,50,1.0
+matched_cardinality,Qwen 3.5,matched,scale-x5000-k1,5000,2,0.9815238095238096,0.0190160452598395,5,100,100,1.0
+matched_cardinality,Qwen 3.5,matched,scale-x5000-k1,5000,3,0.4534858430315648,0.10589441139848735,5,95,175,0.5428571428571428
+matched_cardinality,Qwen 3.5,matched,scale-x50000-k1,50000,1,0.9800000000000001,0.04472135954999579,5,50,50,1.0
+matched_cardinality,Qwen 3.5,matched,scale-x50000-k1,50000,2,0.9672852147852147,0.03364621191946229,5,100,100,1.0
+matched_cardinality,Qwen 3.5,matched,scale-x50000-k1,50000,3,0.3575337214635351,0.0485586567234614,5,95,175,0.5428571428571428
+matched_cardinality,Qwen 3.5,matched,scale-xfull-k1,full,1,1.0,0.0,5,50,50,1.0
+matched_cardinality,Qwen 3.5,matched,scale-xfull-k1,full,2,0.9019791522291521,0.05584526462379468,5,100,100,1.0
+matched_cardinality,Qwen 3.5,matched,scale-xfull-k1,full,3,0.28295475317459023,0.031037560418829522,5,95,175,0.5428571428571428
+oracle_predicate,Claude Haiku 4.5,ordinary,ordinary,100,,0.3,0.13944333775567927,5,30,80,0.375
+oracle_predicate,Claude Haiku 4.5,predicate,predicate,100,,0.2333333333333333,0.14907119849998599,5,30,80,0.375
+oracle_predicate,Claude Haiku 4.5,ordinary,ordinary,500,,0.4,0.14907119849998599,5,30,80,0.375
+oracle_predicate,Claude Haiku 4.5,predicate,predicate,500,,0.3333333333333333,0.2041241452319315,5,30,80,0.375
+oracle_predicate,Claude Haiku 4.5,ordinary,ordinary,full,,0.2441049169605018,0.09779214142648965,5,30,80,0.375
+oracle_predicate,Claude Haiku 4.5,predicate,predicate,full,,0.2916083197303657,0.15864722054507863,5,30,80,0.375
+oracle_predicate,Qwen 3.5,ordinary,ordinary,100,,0.8333333333333334,0.11785113019775793,5,30,80,0.375
+oracle_predicate,Qwen 3.5,predicate,predicate,100,,0.6666666666666667,0.16666666666666669,5,30,80,0.375
+oracle_predicate,Qwen 3.5,ordinary,ordinary,500,,0.8355555555555556,0.1428112801160856,5,30,80,0.375
+oracle_predicate,Qwen 3.5,predicate,predicate,500,,0.8800000000000001,0.216794833886788,5,30,80,0.375
+oracle_predicate,Qwen 3.5,ordinary,ordinary,full,,0.6464511966876189,0.1746193312526203,5,30,80,0.375
+oracle_predicate,Qwen 3.5,predicate,predicate,full,,0.5487465566564588,0.21405717373682165,5,30,80,0.375

@@ -23,11 +23,7 @@ from rxnhaystack.control_room import (
     merge_snapshots,
     scientific_dashboard_view,
 )
-from rxnhaystack.score_recovery import (
-    SUBMISSION_SCORE_FREEZE_ID,
-    apply_corrected_score_recoveries,
-    carry_forward_pending_corrected_scores,
-)
+from rxnhaystack.score_recovery import SUBMISSION_SCORE_FREEZE_ID
 
 MODEL_ORDER = (
     "qwen3.5",
@@ -719,10 +715,10 @@ def write_readme(path: Path, arms: list[dict[str, Any]], *, as_of: str) -> None:
         "bulky raw trajectories remain in their original experiment artifact stores.",
         "All plotting aggregates score terminal failed jobs as zero. Running, stale, and "
         "pending jobs are excluded from the current score and keep their arm provisional. "
-        "Exact corrected rescores are used wherever recoverable. For remaining rows in the "
-        "internal post-submission rescore queue, the last available historical score is "
-        "carried forward under an explicit status marker so terminal trajectory denominators "
-        "remain complete; resource measurements remain unchanged.",
+        "Scores belonging to a corrected task are excluded from submission aggregates until "
+        "the complete arm is audited against `rxnhaystack-human-1.6.0`. Historical values are "
+        "retained only in the internal post-submission audit queue; resource measurements "
+        "remain unchanged.",
         "",
         "## Main benchmark arms",
         "",
@@ -771,15 +767,12 @@ def write_readme(path: Path, arms: list[dict[str, Any]], *, as_of: str) -> None:
             "",
             "## Causal controls",
             "",
-            "The `causal_controls/` directory freezes the completed GPT-5-mini "
-            "matched-cardinality arm, Qwen/Claude chemistry-rule controls and their ordinary "
+            "The `causal_controls/` directory freezes the terminal GPT-5-mini and Qwen "
+            "matched-cardinality arms, Qwen/Claude chemistry-rule controls and their ordinary "
             "RLM counterparts, and the deterministic executor ceiling. Its record tables and "
-            "source manifest preserve the aggregation rules and contributing snapshots. The "
-            "directory also stores a status-explicit provisional Qwen matched-cardinality "
-            "snapshot, which is excluded from final inference until all 725 cells terminate.",
-            "Exact corrected rescores are included and labeled `corrected_exact_rescore`. "
-            "Pending corrected control scores follow the same submission-freeze carry-forward "
-            "policy as the main benchmark and remain listed in the internal queue.",
+            "source manifest preserve the aggregation rules and contributing snapshots. Qwen "
+            "has 673 successful and 52 terminal failed cells; failures contribute zero.",
+            "Affected-task scores remain excluded and are listed in the internal audit queue.",
             "",
             "## Prospective-route control",
             "",
@@ -964,10 +957,9 @@ def main() -> None:
     ground_truth_correction_manifest = apply_ground_truth_corrections(
         all_rows, args.ground_truth_corrections
     )
-    corrected_recovery_manifest, corrected_recovery_count = apply_corrected_score_recoveries(
-        all_rows, args.corrected_score_recoveries
+    corrected_recovery_manifest = json.loads(
+        args.corrected_score_recoveries.read_text(encoding="utf-8")
     )
-    carried_score_count = carry_forward_pending_corrected_scores(all_rows)
     arms = arm_summaries(all_rows)
     add_arm_finality(all_rows, arms)
     scaling = scaling_summaries(all_rows)
@@ -1088,16 +1080,16 @@ def main() -> None:
             "sha256": sha256_file(args.corrected_score_recoveries),
             "recovery_id": corrected_recovery_manifest["recovery_id"],
             "available": len(corrected_recovery_manifest["recoveries"]),
-            "applied": corrected_recovery_count,
+            "applied": 0,
         },
         "submission_score_freeze": {
             "freeze_id": SUBMISSION_SCORE_FREEZE_ID,
             "policy": (
-                "Use exact corrected rescores where available; otherwise carry forward the "
-                "preserved historical score while retaining historical_score_invalidated "
-                "status in the internal post-submission queue."
+                "Exclude every score from a corrected task until the complete frozen arm is "
+                "rescored against rxnhaystack-human-1.6.0; preserve the historical value only "
+                "as internal audit evidence."
             ),
-            "carried_historical_scores": carried_score_count,
+            "carried_historical_scores": 0,
         },
         "source_snapshots": [
             {

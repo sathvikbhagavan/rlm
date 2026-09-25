@@ -1,13 +1,13 @@
 method,signature,question_outputs,erroneous_question_outputs,all_classifiable_question_outputs,fraction_of_errors
-llm,empty answer,20,56,56,0.35714285714285715
-llm,omissions only,13,56,56,0.23214285714285715
-llm,extra selections only,16,56,56,0.2857142857142857
-llm,mixed omissions and extras,7,56,56,0.125
-codeact,empty answer,32,566,947,0.05653710247349823
-codeact,omissions only,156,566,947,0.2756183745583039
-codeact,extra selections only,207,566,947,0.3657243816254417
-codeact,mixed omissions and extras,171,566,947,0.30212014134275617
-rlm,empty answer,109,876,1226,0.12442922374429223
-rlm,omissions only,129,876,1226,0.14726027397260275
-rlm,extra selections only,280,876,1226,0.319634703196347
-rlm,mixed omissions and extras,358,876,1226,0.408675799086758
+llm,empty answer,0,0,0,0.0
+llm,omissions only,0,0,0,0.0
+llm,extra selections only,0,0,0,0.0
+llm,mixed omissions and extras,0,0,0,0.0
+codeact,empty answer,0,0,0,0.0
+codeact,omissions only,0,0,0,0.0
+codeact,extra selections only,0,0,0,0.0
+codeact,mixed omissions and extras,0,0,0,0.0
+rlm,empty answer,0,0,0,0.0
+rlm,omissions only,0,0,0,0.0
+rlm,extra selections only,0,0,0,0.0
+rlm,mixed omissions and extras,0,0,0,0.0
