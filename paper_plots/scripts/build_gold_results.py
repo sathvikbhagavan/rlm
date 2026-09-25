@@ -749,12 +749,14 @@ def write_readme(path: Path, arms: list[dict[str, Any]], *, as_of: str) -> None:
             "- `full_benchmark_records.csv`: every one of the 6,300 expected main-benchmark jobs.",
             "- `codeact_x1000_records.csv`: the final Qwen, DeepSeek, Gemini, and GPT-5-mini CodeAct x1000 extensions.",
             "- `rlm_x1000_records.csv`: terminal RLM x1000 extensions available at the freeze time.",
-            "- `final_arm_records.csv`: records belonging to terminal arms.",
-            "- `provisional_arm_records.csv`: records belonging to unfinished arms.",
+            "- `final_arm_records.csv`: records in the five-model paper scope belonging to "
+            "terminal arms.",
+            "- `provisional_arm_records.csv`: unfinished arms and completed campaign records "
+            "outside the five-model paper scope (currently GLM LLM).",
             "- `arm_status.csv`: the finality decision used for legend asterisks.",
             "- `tier_scaling.csv`: the faithful four-tier plotting aggregate.",
             "- `tier_scaling_across_models.csv`: unweighted means and standard errors across "
-            "terminal model arms; terminal failed trajectories contribute zero.",
+            "the five paper models; terminal failed trajectories contribute zero.",
             "- `tier_efficiency_by_model.csv`: recorded cost, tokens, and wall time per "
             "successfully answered trajectory for each model. Failed jobs do not enter resource "
             "averages.",
@@ -984,10 +986,15 @@ def main() -> None:
         if str(row["model"])
         in EXPECTED_MODELS_BY_METHOD_CONTEXT[(str(row["method"]), str(row["context"]))]
     ]
+    paper_run_ids = {str(row["run_id"]) for row in paper_rows}
     write_csv(output / "final_arm_records.csv", [row for row in paper_rows if row["arm_final"]])
     write_csv(
         output / "provisional_arm_records.csv",
-        [row for row in all_rows if row not in paper_rows or not row["arm_final"]],
+        [
+            row
+            for row in all_rows
+            if str(row["run_id"]) not in paper_run_ids or not row["arm_final"]
+        ],
     )
     write_csv(output / "arm_status.csv", arms)
     write_csv(output / "tier_scaling.csv", scaling)
