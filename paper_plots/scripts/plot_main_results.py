@@ -173,6 +173,103 @@ def plot_performance(rows: list[dict[str, str]]) -> plt.Figure:
     return figure
 
 
+def plot_aggregate_performance(rows: list[dict[str, str]], *, kind: str = "line") -> plt.Figure:
+    """Plot the core benchmark mean across terminal model arms in four panels."""
+    if kind not in {"line", "bar"}:
+        raise ValueError(f"Unsupported aggregate plot kind: {kind}")
+    selected = [row for row in rows if row["context"] in CONTEXTS and row["method"] in METHODS]
+    lookup = {(int(row["tier"]), row["method"], row["context"]): row for row in selected}
+    positions = np.arange(len(CONTEXTS), dtype=float)
+    offsets = {"llm": -0.23, "codeact": 0.0, "rlm": 0.23}
+    figure, axes = plt.subplots(1, 4, figsize=(7.35, 2.55), sharex=True, sharey=True)
+
+    for tier, axis in enumerate(axes, start=1):
+        axis.axvspan(1.72, 2.28, color="#F1F3F5", zorder=0)
+        for method in METHODS:
+            contexts = [context for context in CONTEXTS if (tier, method, context) in lookup]
+            points = [lookup[(tier, method, context)] for context in contexts]
+            x_values = np.asarray([CONTEXTS.index(context) for context in contexts], dtype=float)
+            means = np.asarray([float(row["mean_f1"]) for row in points])
+            errors = np.asarray(
+                [float(row["model_sem"]) if row["model_sem"] else 0.0 for row in points]
+            )
+            if kind == "bar":
+                bar_x = x_values + offsets[method]
+                if contexts == ["full"]:
+                    bar_x = x_values
+                axis.bar(
+                    bar_x,
+                    means,
+                    width=0.21,
+                    yerr=errors,
+                    color=METHOD_COLORS[method],
+                    edgecolor="white",
+                    linewidth=0.45,
+                    capsize=2.0,
+                    error_kw={"elinewidth": 0.8, "capthick": 0.8},
+                    zorder=3,
+                )
+            else:
+                axis.errorbar(
+                    x_values,
+                    means,
+                    yerr=errors,
+                    color=METHOD_COLORS[method],
+                    marker=METHOD_MARKERS[method],
+                    markersize=4.7,
+                    markeredgecolor="white",
+                    markeredgewidth=0.45,
+                    capsize=2.5,
+                    elinewidth=0.9,
+                    zorder=3,
+                )
+        axis.set_title(
+            f"({chr(96 + tier)}) Tier {tier}\n{TIER_NAMES[tier]} ($n={TIER_QUESTIONS[tier]}$)",
+            loc="left",
+            pad=5,
+            fontsize=8.5,
+        )
+        axis.set_xlim(-0.38, 2.38)
+        axis.set_ylim(-0.02, 1.06)
+        axis.set_yticks(np.linspace(0, 1, 6))
+        axis.set_xticks(positions, CONTEXT_LABELS)
+        axis.set_xlabel("Context size")
+        axis.grid(axis="y", color="#D8DDE2", linewidth=0.5, zorder=0)
+        axis.spines[["top", "right"]].set_visible(False)
+        axis.tick_params(length=2.3, width=0.55)
+    axes[0].set_ylabel("Macro F1")
+
+    model_counts = {
+        method: sorted({int(row["n_models"]) for row in selected if row["method"] == method})
+        for method in METHODS
+    }
+    if any(len(counts) != 1 for counts in model_counts.values()):
+        raise ValueError("Core aggregate figure expects one model count per interface")
+    handles = [
+        Line2D(
+            [0],
+            [0],
+            color=METHOD_COLORS[method],
+            marker=METHOD_MARKERS[method] if kind == "line" else "s",
+            linewidth=1.5 if kind == "line" else 0,
+            markersize=5.0,
+            markeredgecolor="white",
+            label=f"{METHOD_LABELS[method]} ($n={model_counts[method][0]}$ models)",
+        )
+        for method in METHODS
+    ]
+    figure.legend(
+        handles=handles,
+        loc="upper center",
+        ncol=3,
+        frameon=False,
+        bbox_to_anchor=(0.5, 1.02),
+        handlelength=2.0,
+    )
+    figure.subplots_adjust(left=0.07, right=0.995, top=0.76, bottom=0.19, wspace=0.17)
+    return figure
+
+
 def efficiency_points(
     records: list[dict[str, str]],
 ) -> dict[tuple[int, str, str], tuple[float, float, float]]:
@@ -376,9 +473,9 @@ def parse_args() -> argparse.Namespace:
 
 def main() -> None:
     args = parse_args()
-    scaling = read_csv(args.gold / "tier_scaling.csv")
+    aggregate_scaling = read_csv(args.gold / "tier_scaling_across_models.csv")
     records = read_csv(args.gold / "full_benchmark_records.csv")
-    save(plot_performance(scaling), args.output, "performance_overview")
+    save(plot_aggregate_performance(aggregate_scaling), args.output, "performance_overview")
     save(plot_capabilities(records), args.output, "capability_map")
     save(plot_efficiency_frontier(records), args.output, "efficiency_frontier")
     print(f"Wrote main-text figures to {args.output}")

@@ -15,9 +15,9 @@ import matplotlib.pyplot as plt
 import numpy as np
 from plot_style import apply_paper_style
 
-TIER_COLORS = {2: "#5302A3", 3: "#FCA636"}
+TIER_COLORS = {2: "#5302A3", 3: "#CB4679"}
 TIER_MARKERS = {2: "o", 3: "s"}
-ARM_COLORS = {"ordinary": "#5302A3", "predicate": "#FCA636", "executor": "#8A8F98"}
+ARM_COLORS = {"ordinary": "#5302A3", "predicate": "#CB4679", "executor": "#8A8F98"}
 ARM_MARKERS = {"ordinary": "o", "predicate": "D"}
 MODEL_SHORT_NAMES = {"Qwen 3.5": "Qwen", "Claude Haiku 4.5": "Claude"}
 CONTEXTS = ("100", "500", "5000", "50000", "full")

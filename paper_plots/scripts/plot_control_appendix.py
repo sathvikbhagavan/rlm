@@ -225,7 +225,7 @@ def qwen_provisional(rows: list[dict[str, str]]) -> plt.Figure:
         )
     axes[1].set_ylim(-0.03, 1.03)
     axes[1].set_ylabel("Macro F1 among completed successes")
-    axes[1].set_title("(b) Provisional diagnostic", loc="left")
+    axes[1].set_title("(b) Performance among completed runs", loc="left")
     axes[1].legend(frameon=False)
     for axis in axes:
         axis.set_xticks(x, CONDITION_LABELS, rotation=30, ha="right")
