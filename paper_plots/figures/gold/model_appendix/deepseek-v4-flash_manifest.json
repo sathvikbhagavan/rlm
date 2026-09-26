@@ -2,19 +2,19 @@
   "figures": [
     {
       "path": "deepseek-v4-flash_core_metrics.pdf",
-      "sha256": "faa22465dfd8e3a2cec458e23956a92118c0c5b920302a7c47d411c9160c65b3"
+      "sha256": "2fef353a3718b4c2e7077cb969e365784fdf0021cac0d86c50578ad1eb576490"
     },
     {
       "path": "deepseek-v4-flash_core_metrics.png",
-      "sha256": "9adbc8aaf36dae9426d75c6eb61ab8122edcfc55d0a1dc6aba573c70091d8b56"
+      "sha256": "e8a73b3d3a6e2b7893809a8435da2bec2cf3aaf29c9a9afe706343224cffd213"
     },
     {
       "path": "deepseek-v4-flash_resource_diagnostics.pdf",
-      "sha256": "e53b59d662a5331026f49cecc697ce23f31e9b01955d8119219764c2c0dd22e2"
+      "sha256": "63b2f37c9db39fd551e3dc25275dce6c6b6b1d8f07538c96294a2214f5d4cc0f"
     },
     {
       "path": "deepseek-v4-flash_resource_diagnostics.png",
-      "sha256": "ffcae2d2e2090d6c4c8723d518729eaae182bcae1a50584eb69c7af121a0d35e"
+      "sha256": "9a956a762fe7f5ca54877b0ae8365cf7e21bb6027c4612c0783d2cc627a3f65d"
     },
     {
       "path": "deepseek-v4-flash_task_heatmap.pdf",

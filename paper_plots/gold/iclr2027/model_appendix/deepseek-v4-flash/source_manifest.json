@@ -5,7 +5,7 @@
     "peak_memory": "mean combined process-tree plus Docker peak per successful job",
     "variation": "population standard deviation across five repetitions"
   },
-  "generated_at": "2026-09-25T09:23:18.803726+00:00",
+  "generated_at": "2026-09-26T10:39:12.458902+00:00",
   "model": "deepseek-v4-flash",
   "outputs": [
     {
@@ -21,7 +21,7 @@
   "sources": [
     {
       "path": "paper_plots/gold/iclr2027/full_benchmark_records.csv",
-      "sha256": "11ad780d29f0b214bc8f4836e0f720cd13370e9921fbee40bd4a7958797783b1"
+      "sha256": "43bbc0542c9ca2164fc71ea245cff0dadc5bc2edf41297aa0fceded25b74f9f0"
     },
     {
       "path": "paper_plots/gold/iclr2027/codeact_x1000_records.csv",
@@ -29,7 +29,7 @@
     },
     {
       "path": "paper_plots/gold/iclr2027/rlm_x1000_records.csv",
-      "sha256": "f09cafc112e5f062e357868ca52baafd4b6ac5af50f2585f336d815d8e361db0"
+      "sha256": "9a60eb374d4e70ae8ef76f12762bef74a283ffe8e761e744275080ae8d43325d"
     }
   ]
 }

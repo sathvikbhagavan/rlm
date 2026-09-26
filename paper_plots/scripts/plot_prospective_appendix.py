@@ -154,7 +154,7 @@ def resource_page(rows: list[dict[str, str]]) -> plt.Figure:
     for index, (metric, label, scale) in enumerate(metrics):
         axis = axes.ravel()[index]
         for model in MODELS:
-            if metric == "cost_usd" and model == "Qwen 3.5":
+            if metric == "cost_usd" and model == "Qwen":
                 continue
             values = []
             errors = []

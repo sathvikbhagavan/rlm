@@ -2,41 +2,41 @@
   "figures": [
     {
       "path": "qwen3_5_core_metrics.pdf",
-      "sha256": "14c4a842cb2c2779bb852aa4036c87b78547044d79e87663b4479e1a4e7155d6"
+      "sha256": "617ff89356e3fcab1d3dd6d5342374318152edc9d00a5a514ab3331094f96a4e"
     },
     {
       "path": "qwen3_5_core_metrics.png",
-      "sha256": "ec68566388d8669d9951a373fb9e1803c9cf4b18b73634fc1d17a4cdd202a10c"
+      "sha256": "79c516c686021576c150e06db55143ee59e0bfd3e267bf79288a6c93eea4c299"
     },
     {
       "path": "qwen3_5_resource_diagnostics.pdf",
-      "sha256": "48213985a118e0d1ba7a3babf49d54b53dc61605ad91046ca72b814f5819310e"
+      "sha256": "88a7d0225bf859b0626bb338a19f0941f997bedebdec5d74de0bdbe06826d802"
     },
     {
       "path": "qwen3_5_resource_diagnostics.png",
-      "sha256": "bef73ab9900aaa99acd0d85b9ce90fea450849dd45e7731bdcb33d18031d3b33"
+      "sha256": "412dbe2be344f7679e7464677be72a188f46a7257da3768691aee3722c4a2066"
     },
     {
       "path": "qwen3_5_task_heatmap.pdf",
-      "sha256": "95a3c38e7f66591c38498ea7933dd7c97b90f7abd21782e7f6ef979854432ebc"
+      "sha256": "c396f7b595dd077c4b7fe1b7722f5b748c7127f54d5a6074872d93ecef03753f"
     },
     {
       "path": "qwen3_5_task_heatmap.png",
-      "sha256": "a8cf20742b70fb85ba76fe427ceb260903692fcc1ed3114c4aca8f19eb17df74"
+      "sha256": "3ccbb943984a0884e5e826afe8c0abf51518c81fbf496b7fadfe46de2446ea38"
     }
   ],
   "model": "qwen3.5",
-  "model_label": "Qwen 3.5",
+  "model_label": "Qwen3.5-397B-A17B",
   "palette": "Plasma",
   "schema_version": 1,
   "sources": [
     {
       "path": "paper_plots/gold/iclr2027/model_appendix/qwen3.5/tier_metrics.csv",
-      "sha256": "ed71538d6640589a4746928b96c45de362469f7ae930bcc3db12656673058fcf"
+      "sha256": "d2b5ee0ec1dca721b574a508f074e206feec9e650f4f720a31d22f82db4e8eb3"
     },
     {
       "path": "paper_plots/gold/iclr2027/model_appendix/qwen3.5/task_f1.csv",
-      "sha256": "ceb375ca1e19a5073982f044f04cd751937f2eb2207d5905435752c0891c4167"
+      "sha256": "8a3829369024f7751c20f7c357cba6b605b258daedf62f9f543f559fb3f6b758"
     }
   ]
 }

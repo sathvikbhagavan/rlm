@@ -5,7 +5,7 @@
     "peak_memory": "mean combined process-tree plus Docker peak per successful job",
     "variation": "population standard deviation across five repetitions"
   },
-  "generated_at": "2026-09-24T22:50:59.877965+00:00",
+  "generated_at": "2026-09-26T10:39:15.378035+00:00",
   "model": "claude-haiku-4.5",
   "outputs": [
     {
@@ -21,7 +21,15 @@
   "sources": [
     {
       "path": "paper_plots/gold/iclr2027/full_benchmark_records.csv",
-      "sha256": "67eca1cd678f70c8daaebe0441d8a35f6e153720833df52add929f32c42b77d6"
+      "sha256": "43bbc0542c9ca2164fc71ea245cff0dadc5bc2edf41297aa0fceded25b74f9f0"
+    },
+    {
+      "path": "paper_plots/gold/iclr2027/codeact_x1000_records.csv",
+      "sha256": "52b76824c624aeaa913833ba742089da2806672bb9d9d16de345713752bf702d"
+    },
+    {
+      "path": "paper_plots/gold/iclr2027/rlm_x1000_records.csv",
+      "sha256": "9a60eb374d4e70ae8ef76f12762bef74a283ffe8e761e744275080ae8d43325d"
     }
   ]
 }
