@@ -71,7 +71,9 @@ EXPECTED_MODELS_BY_METHOD_CONTEXT = {
     ),
     ("rlm", "100"): frozenset(PAPER_MODEL_ORDER),
     ("rlm", "500"): frozenset(PAPER_MODEL_ORDER),
-    ("rlm", "1000"): frozenset({"deepseek-v4-flash", "gemini-3.7-flash", "gpt-5-mini"}),
+    ("rlm", "1000"): frozenset(
+        {"qwen3.5", "deepseek-v4-flash", "gemini-3.7-flash", "gpt-5-mini"}
+    ),
     ("rlm", "full"): frozenset(PAPER_MODEL_ORDER),
 }
 QUESTION_COUNTS = {
@@ -132,6 +134,9 @@ DEFAULT_QWEN_X1000_PACK = Path(
 )
 DEFAULT_DEEPSEEK_RLM_X1000_PACK = Path(
     "paper_plots/gold/source_packs/deepseek-rlm-x1000-docker-succeeded-pack.tgz"
+)
+DEFAULT_QWEN_RLM_X1000_PACK = Path(
+    "paper_plots/gold/source_packs/qwen-rlm-x1000-succeeded-pack.tgz"
 )
 DEFAULT_SCORE_RECOVERIES = Path("paper_plots/gold/source_packs/deepseek-score-recoveries.json")
 DEFAULT_GPT_RLM_X1000_SCORE_RECOVERIES = Path(
@@ -848,6 +853,12 @@ def parse_args() -> argparse.Namespace:
         help="Sanitized DeepSeek RLM x1000 Docker-result pack.",
     )
     parser.add_argument(
+        "--qwen-rlm-x1000-pack",
+        type=Path,
+        default=DEFAULT_QWEN_RLM_X1000_PACK,
+        help="Sanitized Qwen RLM x1000 result pack.",
+    )
+    parser.add_argument(
         "--score-recoveries",
         type=Path,
         default=DEFAULT_SCORE_RECOVERIES,
@@ -954,6 +965,18 @@ def main() -> None:
         row["status"] not in {"succeeded", "failed"} for row in gemini_rlm_rows
     ):
         raise ValueError("Gemini RLM x1000 arm must contain 150 terminal records")
+    expected_qwen_rlm_ids = {
+        str(row["run_id"]).replace("-x500-", "-x1000-")
+        for row in rows
+        if row["model"] == "qwen3.5" and row["method"] == "rlm" and row["context"] == "500"
+    }
+    qwen_rlm_rows, qwen_rlm_pack_manifest = load_result_pack(
+        args.qwen_rlm_x1000_pack,
+        expected_model="qwen3.5-397b",
+        expected_run_ids=expected_qwen_rlm_ids,
+        expected_method="rlm",
+        scope="rlm_x1000",
+    )
     gpt_non_docker_rows = [
         flattened
         for run in x1000["runs"]
@@ -985,7 +1008,7 @@ def main() -> None:
     gpt_rlm_recovery_manifest = apply_score_recoveries(
         gpt_rlm_rows, args.gpt_rlm_x1000_score_recoveries
     )
-    rlm_x1000_rows = deepseek_rlm_rows + gemini_rlm_rows + gpt_rlm_rows
+    rlm_x1000_rows = qwen_rlm_rows + deepseek_rlm_rows + gemini_rlm_rows + gpt_rlm_rows
     all_rows = rows + extension_rows + rlm_x1000_rows
     ground_truth_correction_manifest = apply_ground_truth_corrections(
         all_rows, args.ground_truth_corrections
@@ -1096,6 +1119,15 @@ def main() -> None:
                 "n_runs": deepseek_rlm_pack_manifest["n_runs"],
                 "rule": deepseek_rlm_pack_manifest["rule"],
             },
+            {
+                "path": str(args.qwen_rlm_x1000_pack),
+                "sha256": sha256_file(args.qwen_rlm_x1000_pack),
+                "bytes": args.qwen_rlm_x1000_pack.stat().st_size,
+                "packed_at": qwen_rlm_pack_manifest["packed_at"],
+                "models": qwen_rlm_pack_manifest["models"],
+                "n_runs": qwen_rlm_pack_manifest["n_runs"],
+                "rule": qwen_rlm_pack_manifest["rule"],
+            },
         ],
         "score_recoveries": {
             "path": str(args.score_recoveries),
@@ -1157,6 +1189,7 @@ def main() -> None:
         or len(extension_rows) != 600
         or len(deepseek_rlm_rows) != 150
         or len(gemini_rlm_rows) != 150
+        or len(qwen_rlm_rows) != 150
         or len(gpt_rlm_rows) not in {0, 150}
     ):
         raise ValueError(
@@ -1167,6 +1200,7 @@ def main() -> None:
             f"{len(gpt_extension_rows)} GPT-5-mini x1000, and "
             f"{len(deepseek_rlm_rows)} DeepSeek RLM x1000, "
             f"{len(gemini_rlm_rows)} Gemini RLM x1000, plus "
+            f"{len(qwen_rlm_rows)} Qwen RLM x1000, plus "
             f"{len(gpt_rlm_rows)} GPT-5-mini RLM x1000"
         )
     print(

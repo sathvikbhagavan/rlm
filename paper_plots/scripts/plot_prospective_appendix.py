@@ -154,6 +154,8 @@ def resource_page(rows: list[dict[str, str]]) -> plt.Figure:
     for index, (metric, label, scale) in enumerate(metrics):
         axis = axes.ravel()[index]
         for model in MODELS:
+            if metric == "cost_usd" and model == "Qwen":
+                continue
             values = []
             errors = []
             for condition in CONDITIONS:
@@ -183,6 +185,15 @@ def resource_page(rows: list[dict[str, str]]) -> plt.Figure:
                 capsize=1.8,
                 capthick=0.8,
                 label=MODEL_DISPLAY_NAMES[model],
+            )
+        if metric == "cost_usd":
+            axis.text(
+                0.03,
+                0.05,
+                "Qwen3.5-397B-A17B: unavailable",
+                transform=axis.transAxes,
+                fontsize=6.2,
+                color="#555555",
             )
         axis.set_title(label, loc="left", pad=4, fontsize=7.8)
         axis.set_xticks(x)
