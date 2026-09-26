@@ -390,14 +390,16 @@ def executor_heatmaps(rows: list[dict[str, str]]) -> plt.Figure:
         image = axis.imshow(array, cmap=HEATMAP_CMAP, aspect="auto")
         for i in range(array.shape[0]):
             for j in range(array.shape[1]):
+                red, green, blue, _ = image.cmap(image.norm(array[i, j]))
+                luminance = 0.2126 * red + 0.7152 * green + 0.0722 * blue
                 axis.text(
                     j,
                     i,
                     f"{array[i, j]:.1f}",
                     ha="center",
                     va="center",
-                    fontsize=6.5,
-                    color="white" if array[i, j] < np.nanmedian(array) else "#111111",
+                    fontsize=7.0,
+                    color="white" if luminance < 0.48 else "#111111",
                 )
         axis.set_xticks(range(3), CONTEXT_LABELS)
         axis.set_yticks(
