@@ -6,7 +6,7 @@
     "terminal_failures": "score zero",
     "within_model": "question-weighted mean across task scripts and repetitions"
   },
-  "generated_at": "2026-09-26T00:59:35.423125+00:00",
+  "generated_at": "2026-09-26T10:45:56.051584+00:00",
   "outputs": [
     {
       "path": "per_model.csv",
@@ -22,6 +22,6 @@
     "path": "paper_plots/gold/iclr2027/full_benchmark_records.csv",
     "sha256": "cffff19a9dad878cd3dd5e70f2c38a49dd64f63460cca0780ab65ac8d6dbd1a6"
   },
-  "source_repository_commit": "a74cae3a776406b053792ea47b488180ce812b65",
-  "source_snapshot_as_of": "2026-09-26T00:47:16.402100+00:00"
+  "source_repository_commit": "169a6e2b30b611681a666894437154a3af110db0",
+  "source_snapshot_as_of": "2026-09-26T10:35:17.623383+00:00"
 }

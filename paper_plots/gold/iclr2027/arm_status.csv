@@ -21,6 +21,7 @@ full_benchmark,gpt-5-mini,GPT-5 mini,rlm,450,450,0,0,0,0,450,0,18,True,Rlm,termi
 full_benchmark,claude-haiku-4.5,Claude Haiku 4.5,llm,300,300,0,0,0,0,300,0,14,True,LLM,terminal and scored
 full_benchmark,claude-haiku-4.5,Claude Haiku 4.5,codeact,300,300,0,0,0,0,300,0,0,True,Codeact,terminal and scored
 full_benchmark,claude-haiku-4.5,Claude Haiku 4.5,rlm,450,450,0,0,0,0,450,0,14,True,Rlm,terminal and scored
+rlm_x1000,qwen3.5,Qwen 3.5,rlm,150,150,0,0,0,0,150,0,30,True,Rlm,terminal and scored
 rlm_x1000,deepseek-v4-flash,DeepSeek V4 Flash,rlm,150,150,0,0,0,0,150,0,3,True,Rlm,terminal and scored
 rlm_x1000,gemini-3.7-flash,Gemini 3.7 Flash,rlm,150,137,0,0,13,0,137,0,3,True,Rlm,terminal and scored
 rlm_x1000,gpt-5-mini,GPT-5 mini,rlm,150,150,0,0,0,0,150,0,30,True,Rlm,terminal and scored

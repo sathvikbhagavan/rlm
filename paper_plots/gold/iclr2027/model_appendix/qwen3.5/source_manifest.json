@@ -5,16 +5,16 @@
     "peak_memory": "mean combined process-tree plus Docker peak per successful job",
     "variation": "population standard deviation across five repetitions"
   },
-  "generated_at": "2026-09-26T00:59:48.172734+00:00",
+  "generated_at": "2026-09-26T10:45:56.127064+00:00",
   "model": "qwen3.5",
   "outputs": [
     {
       "path": "tier_metrics.csv",
-      "sha256": "a8e49c214a69a9375a184713886d50fa05d259cf548094a542a9f243dd28770f"
+      "sha256": "0d927f8311fdfa5ea84f5996905fe7a8b632494cb4d7d08b3a873afa5e820ee8"
     },
     {
       "path": "task_f1.csv",
-      "sha256": "4c976d0879c417e3b33e9471d73722c55d92606da7cb062113cdc14042d4ceb4"
+      "sha256": "283e15e704a530717386c65f06efe0ffba0f71d17fb92c448fa2d13566cd5d0c"
     }
   ],
   "schema_version": 1,
@@ -29,7 +29,7 @@
     },
     {
       "path": "paper_plots/gold/iclr2027/rlm_x1000_records.csv",
-      "sha256": "222c7d96db857c81627ce4dda7808d266d352f549519f76fbb76dec858de996a"
+      "sha256": "f03aeb76280c1007c85bb162324e3d400fa6a52ede3f97311a45fcb6ff972c64"
     }
   ]
 }

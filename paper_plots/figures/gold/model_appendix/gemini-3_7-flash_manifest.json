@@ -2,19 +2,19 @@
   "figures": [
     {
       "path": "gemini-3_7-flash_core_metrics.pdf",
-      "sha256": "cc9b76a79e1b598115e257eccbe85bcd80535fe35dcd59fbc47fe174491da92b"
+      "sha256": "30db82464dee34b28d34c98aa9f6ea2df49b48d9de0ce81b44221216012297c7"
     },
     {
       "path": "gemini-3_7-flash_core_metrics.png",
-      "sha256": "e752887dc4ab5093a8fe5a12d3b92972db6b0998c7bdd87c2fec8519ca3296af"
+      "sha256": "5a396888b7438c3969feb918c30247f094480c5a3f2cda270b7bef807a8f0c01"
     },
     {
       "path": "gemini-3_7-flash_resource_diagnostics.pdf",
-      "sha256": "5f6d09ae5fffa577aea3f15e88b8321a7626bbc0c0c729f99f3db701f42854bb"
+      "sha256": "e4c2e47d6d62f8d58743ad700ea0b36f4b15d258061f7e3a7eb760e60aa6c880"
     },
     {
       "path": "gemini-3_7-flash_resource_diagnostics.png",
-      "sha256": "05b1b0a612c587baab485832025fdf42712a578d0b692ceb2f28ea57c2c35540"
+      "sha256": "f5d549f86735813105dd0726edeb3090a447672e0af4dcba4ebae52fec3912b7"
     },
     {
       "path": "gemini-3_7-flash_task_heatmap.pdf",
@@ -26,7 +26,7 @@
     }
   ],
   "model": "gemini-3.7-flash",
-  "model_label": "Gemini-3.7-Flash",
+  "model_label": "Gemini 3.7 Flash",
   "palette": "Plasma",
   "schema_version": 1,
   "sources": [

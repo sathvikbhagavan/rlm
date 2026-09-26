@@ -2,19 +2,19 @@
   "figures": [
     {
       "path": "claude-haiku-4_5_core_metrics.pdf",
-      "sha256": "99312109896357292f937f74bc86c31fafa61791f793be4081a28ee20279ddc2"
+      "sha256": "b73be8fa4980be8380ea078e857732369801ba6652004b7ca8b401505a802d41"
     },
     {
       "path": "claude-haiku-4_5_core_metrics.png",
-      "sha256": "a378e5bf76c5264a13320dbe2e25494c0902b96294056f6a652ca88d539dad74"
+      "sha256": "eac9891897091189420b3fe81c217cb56bf9e2a823dc7b9d1340b55a4212ea9d"
     },
     {
       "path": "claude-haiku-4_5_resource_diagnostics.pdf",
-      "sha256": "b694846e7bdae061c1a7683fc12775bf3cf01ebf4d44134a44f1f6add98b037c"
+      "sha256": "1c81d581797f53de484d020ba1328d1adc87eeba5cb5ec31de8d9cfda805d5d2"
     },
     {
       "path": "claude-haiku-4_5_resource_diagnostics.png",
-      "sha256": "a1804695be679d9c3397e21ecd11badd33f89ee1943cffc29402a256b7d2984d"
+      "sha256": "643457585a480934e62ca24384b09c5ebf962db7b1d62723bf17ac41d27a8190"
     },
     {
       "path": "claude-haiku-4_5_task_heatmap.pdf",

@@ -2,19 +2,19 @@
   "figures": [
     {
       "path": "gpt-5-mini_core_metrics.pdf",
-      "sha256": "0d5711a96535976f0c0f8be52e54b1f06d86c45fb8a528c5f8759443d8d35e10"
+      "sha256": "a00189218d4ee1155c015531b8234ab47dcd30897fa2ace2f7d33a1db702401f"
     },
     {
       "path": "gpt-5-mini_core_metrics.png",
-      "sha256": "ecd87241b46affd4b53c998c9fa2ce27f3c1ce68f7fe84574af9dd7f4324fbae"
+      "sha256": "31059a7cec4705f2802c72d05d3e2526fdcbae7b16ce92eb15224afac32ad308"
     },
     {
       "path": "gpt-5-mini_resource_diagnostics.pdf",
-      "sha256": "caadafc2ea2738679513057969c3f3e6b48fcf387577d66694c2ed822096ec3c"
+      "sha256": "15e18f120a076d73bd06e2234a779da4a22f190fb041fd86d40d21e81b5610a7"
     },
     {
       "path": "gpt-5-mini_resource_diagnostics.png",
-      "sha256": "c4180a4d1df1d0a7ba674460d5b9c7145c488662ce447982f9ae61187c2a3394"
+      "sha256": "75e4eeec0ffe29e4fa9b96d29db57433a39a3d38df728c4eda397116754b864d"
     },
     {
       "path": "gpt-5-mini_task_heatmap.pdf",
