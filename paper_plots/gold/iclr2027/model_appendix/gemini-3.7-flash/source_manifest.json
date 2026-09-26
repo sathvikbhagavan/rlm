@@ -5,16 +5,16 @@
     "peak_memory": "mean combined process-tree plus Docker peak per successful job",
     "variation": "population standard deviation across five repetitions"
   },
-  "generated_at": "2026-09-25T23:49:35.786159+00:00",
+  "generated_at": "2026-09-26T00:59:53.954858+00:00",
   "model": "gemini-3.7-flash",
   "outputs": [
     {
       "path": "tier_metrics.csv",
-      "sha256": "84215937cd916af0e72627bec67779c87a3c6b0ec7e140c6f307bb054603d9a7"
+      "sha256": "b9a86def41dd8a554d764d5cea0e23e1d32e29169f6dcaed2945c39f3c9aa862"
     },
     {
       "path": "task_f1.csv",
-      "sha256": "9a4259ec55210dd80620c43604c2c600c008a0648422094ae7d224d6b6f5df1f"
+      "sha256": "a2a731d28eb66f49f85869e7db4edc1592767059f9377b422d412ebcd6f41280"
     }
   ],
   "schema_version": 1,
@@ -25,11 +25,11 @@
     },
     {
       "path": "paper_plots/gold/iclr2027/codeact_x1000_records.csv",
-      "sha256": "826904f1b843751e941317d83ec4528221bec42bea6c31dc6fc1555d49d5712c"
+      "sha256": "58a64baa74843ec12ec17687cd8c1d9250945e2881b74c59cb22903f9c6f94e5"
     },
     {
       "path": "paper_plots/gold/iclr2027/rlm_x1000_records.csv",
-      "sha256": "602b9acee1ed0826a8409e9e69c92ebbafbdcd673c4e6234410ed528c0cc7c8e"
+      "sha256": "222c7d96db857c81627ce4dda7808d266d352f549519f76fbb76dec858de996a"
     }
   ]
 }

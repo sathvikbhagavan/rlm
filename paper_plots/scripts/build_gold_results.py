@@ -8,6 +8,7 @@ import csv
 import hashlib
 import json
 import math
+import re
 import statistics
 import subprocess
 import tarfile
@@ -105,6 +106,7 @@ QUESTION_COUNTS = {
     "tier4/task17": 5,
     "tier4/task17b": 5,
 }
+RUN_REPETITION_RE = re.compile(r"-r(?P<repetition>\d+)$")
 RESOURCE_FIELDS = (
     "peak_combined_memory_mib",
     "peak_docker_memory_mib",
@@ -185,6 +187,12 @@ def flatten_run(run: dict[str, Any], *, scope: str) -> dict[str, Any]:
     score_name, f1 = result_score(task, metrics)
     resources = metrics.get("resources") or {}
     slug = model_slug(str(run["model"]))
+    repetition_match = RUN_REPETITION_RE.search(str(run["run_id"]))
+    repetition = (
+        int(repetition_match.group("repetition"))
+        if repetition_match is not None
+        else int(run["repetition"])
+    )
     row: dict[str, Any] = {
         "scope": scope,
         "run_id": run["run_id"],
@@ -194,7 +202,7 @@ def flatten_run(run: dict[str, Any], *, scope: str) -> dict[str, Any]:
         "tier": tier_for_task(task),
         "task": task,
         "context": normalize_context(run["corpus_size"]),
-        "repetition": int(run["repetition"]),
+        "repetition": repetition,
         "question_count": QUESTION_COUNTS[task],
         "status": run["status"],
         "report_state": run.get("report_state", ""),

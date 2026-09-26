@@ -111,14 +111,14 @@ qwen3.5,3,tier3/task23,T3.9 New stereocenter (1Q),codeact,1000,5,5,0,5,1.0,1.0,0
 qwen3.5,3,tier3/task23,T3.9 New stereocenter (1Q),rlm,100,5,5,0,5,1.0,1.0,0.0
 qwen3.5,3,tier3/task23,T3.9 New stereocenter (1Q),rlm,500,5,5,0,5,1.0,1.0,0.0
 qwen3.5,3,tier3/task23,T3.9 New stereocenter (1Q),rlm,full,5,5,0,5,1.0,0.999656475437994,0.0
-qwen3.5,3,tier3/task24,T3.10 E-alkene formation (1Q),llm,100,5,5,0,5,1.0,0.3047619047619048,0.02332847374079217
-qwen3.5,3,tier3/task24,T3.10 E-alkene formation (1Q),llm,500,5,5,0,5,1.0,0.0,0.0
-qwen3.5,3,tier3/task24,T3.10 E-alkene formation (1Q),codeact,100,5,5,0,5,1.0,1.0,0.0
-qwen3.5,3,tier3/task24,T3.10 E-alkene formation (1Q),codeact,500,5,5,0,5,1.0,1.0,0.0
-qwen3.5,3,tier3/task24,T3.10 E-alkene formation (1Q),codeact,1000,5,5,0,5,1.0,1.0,0.0
-qwen3.5,3,tier3/task24,T3.10 E-alkene formation (1Q),rlm,100,5,5,0,5,1.0,1.0,0.0
-qwen3.5,3,tier3/task24,T3.10 E-alkene formation (1Q),rlm,500,5,5,0,5,1.0,1.0,0.0
-qwen3.5,3,tier3/task24,T3.10 E-alkene formation (1Q),rlm,full,5,5,0,5,1.0,0.8,0.4
+qwen3.5,3,tier3/task24,T3.10 E-alkene in product (1Q),llm,100,5,5,0,5,1.0,0.3047619047619048,0.02332847374079217
+qwen3.5,3,tier3/task24,T3.10 E-alkene in product (1Q),llm,500,5,5,0,5,1.0,0.0,0.0
+qwen3.5,3,tier3/task24,T3.10 E-alkene in product (1Q),codeact,100,5,5,0,5,1.0,1.0,0.0
+qwen3.5,3,tier3/task24,T3.10 E-alkene in product (1Q),codeact,500,5,5,0,5,1.0,1.0,0.0
+qwen3.5,3,tier3/task24,T3.10 E-alkene in product (1Q),codeact,1000,5,5,0,5,1.0,1.0,0.0
+qwen3.5,3,tier3/task24,T3.10 E-alkene in product (1Q),rlm,100,5,5,0,5,1.0,1.0,0.0
+qwen3.5,3,tier3/task24,T3.10 E-alkene in product (1Q),rlm,500,5,5,0,5,1.0,1.0,0.0
+qwen3.5,3,tier3/task24,T3.10 E-alkene in product (1Q),rlm,full,5,5,0,5,1.0,0.8,0.4
 qwen3.5,3,tier3/task6,T3.11-14 Amide couplings (4Q),llm,100,5,5,0,5,1.0,0.41071,0.021873943403053764
 qwen3.5,3,tier3/task6,T3.11-14 Amide couplings (4Q),llm,500,5,5,0,5,1.0,0.046485,0.0022359897137509376
 qwen3.5,3,tier3/task6,T3.11-14 Amide couplings (4Q),codeact,100,5,5,0,5,1.0,0.798874458874459,0.08228800467447883

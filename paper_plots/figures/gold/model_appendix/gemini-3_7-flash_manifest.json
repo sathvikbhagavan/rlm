@@ -2,41 +2,41 @@
   "figures": [
     {
       "path": "gemini-3_7-flash_core_metrics.pdf",
-      "sha256": "fd71a1173c9988dadf475fbd59533ee65a688edcae6c75f1b63e53299c0a6cea"
+      "sha256": "cc9b76a79e1b598115e257eccbe85bcd80535fe35dcd59fbc47fe174491da92b"
     },
     {
       "path": "gemini-3_7-flash_core_metrics.png",
-      "sha256": "e07e287472bc32e6689588a63f5801b8ed34339621a878f93b654da3beb887a4"
+      "sha256": "e752887dc4ab5093a8fe5a12d3b92972db6b0998c7bdd87c2fec8519ca3296af"
     },
     {
       "path": "gemini-3_7-flash_resource_diagnostics.pdf",
-      "sha256": "16f3bb91c81c1051daa9a86dd3e7351952397e8684483ce376fdc3414bcf5a7c"
+      "sha256": "5f6d09ae5fffa577aea3f15e88b8321a7626bbc0c0c729f99f3db701f42854bb"
     },
     {
       "path": "gemini-3_7-flash_resource_diagnostics.png",
-      "sha256": "3dfe05e856c1d9dd8bba1f7fd407f1d9d01c6c7b76cfa6c564cb0aa28f41dd81"
+      "sha256": "05b1b0a612c587baab485832025fdf42712a578d0b692ceb2f28ea57c2c35540"
     },
     {
       "path": "gemini-3_7-flash_task_heatmap.pdf",
-      "sha256": "9f1a0a91e9c74166ebb5114ed64e8a4afea055680cb43220b5b2123a36b27d93"
+      "sha256": "7dcb7262c28e93210757413a4bce2948d3d72eddc43e3e78e5af8d2ff3754908"
     },
     {
       "path": "gemini-3_7-flash_task_heatmap.png",
-      "sha256": "8eb3de135f47852fbfe380ddd5d8d1a92388d10eb67e426297c35cb5bd64d0e5"
+      "sha256": "cfbb09fe08d4780307e515aab3f3a110bcc5a19d832a132ee0a586e19913fa90"
     }
   ],
   "model": "gemini-3.7-flash",
-  "model_label": "Gemini 3.7 Flash",
+  "model_label": "Gemini-3.7-Flash",
   "palette": "Plasma",
   "schema_version": 1,
   "sources": [
     {
       "path": "paper_plots/gold/iclr2027/model_appendix/gemini-3.7-flash/tier_metrics.csv",
-      "sha256": "84215937cd916af0e72627bec67779c87a3c6b0ec7e140c6f307bb054603d9a7"
+      "sha256": "b9a86def41dd8a554d764d5cea0e23e1d32e29169f6dcaed2945c39f3c9aa862"
     },
     {
       "path": "paper_plots/gold/iclr2027/model_appendix/gemini-3.7-flash/task_f1.csv",
-      "sha256": "9a4259ec55210dd80620c43604c2c600c008a0648422094ae7d224d6b6f5df1f"
+      "sha256": "a2a731d28eb66f49f85869e7db4edc1592767059f9377b422d412ebcd6f41280"
     }
   ]
 }

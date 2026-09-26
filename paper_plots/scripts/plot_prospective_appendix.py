@@ -23,9 +23,9 @@ MODEL_DISPLAY_NAMES = {
 }
 TARGETS = ("pyrimidine_piperazine", "lactam_dipeptide", "benzamide_pyrazole")
 TARGET_LABELS = {
-    "pyrimidine_piperazine": "Pyrimidine--piperazine",
+    "pyrimidine_piperazine": "Pyrimidine–piperazine",
     "lactam_dipeptide": "Lactam dipeptide",
-    "benzamide_pyrazole": "Benzamide--pyrazole",
+    "benzamide_pyrazole": "Benzamide–pyrazole",
 }
 
 apply_paper_style()

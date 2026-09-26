@@ -7,6 +7,7 @@ import argparse
 import csv
 import hashlib
 import json
+import statistics
 import subprocess
 from collections import Counter
 from datetime import UTC, datetime
@@ -74,6 +75,8 @@ FIELDNAMES = (
     "question_count",
     "status",
     "f1",
+    "precision",
+    "recall",
     "score_available",
     "original_f1",
     "score_correction_status",
@@ -118,6 +121,15 @@ def successful_score(run: dict[str, Any]) -> float:
     return float(value)
 
 
+def successful_set_metrics(run: dict[str, Any]) -> tuple[float | str, float | str]:
+    """Return recorded macro precision and recall when the campaign stores them."""
+    attempt = successful_attempt(run)
+    results = (attempt.get("metrics") or {}).get("results") or {}
+    if results.get("macro_precision") is None or results.get("macro_recall") is None:
+        return "", ""
+    return float(results["macro_precision"]), float(results["macro_recall"])
+
+
 def context_label(value: Any) -> str:
     return "full" if str(value) == "full" else str(int(value))
 
@@ -129,6 +141,7 @@ def row(
     attempt = successful_attempt(run)
     metrics = attempt.get("metrics") or {}
     resources = metrics.get("resources") or {}
+    precision, recall = successful_set_metrics(run)
     return {
         "study": study,
         "arm": arm,
@@ -142,6 +155,8 @@ def row(
         "question_count": QUESTION_COUNTS[task],
         "status": "succeeded",
         "f1": successful_score(run),
+        "precision": precision,
+        "recall": recall,
         "score_available": True,
         "original_f1": "",
         "score_correction_status": "",
@@ -183,6 +198,8 @@ def terminal_matched_row(run: dict[str, Any]) -> dict[str, Any]:
         "question_count": QUESTION_COUNTS[task],
         "status": status,
         "f1": "",
+        "precision": "",
+        "recall": "",
         "score_available": False,
         "original_f1": "",
         "score_correction_status": "",
@@ -212,6 +229,8 @@ def terminal_matched_row(run: dict[str, Any]) -> dict[str, Any]:
         output.update(
             {
                 "f1": 0.0,
+                "precision": 0.0,
+                "recall": 0.0,
                 "score_available": True,
                 "calls": metrics.get("calls", ""),
                 "cost_usd": metrics.get("cost_usd", ""),
@@ -286,6 +305,37 @@ def apply_ground_truth_corrections(rows: list[dict[str, Any]], path: Path) -> di
     return payload
 
 
+def apply_corrected_set_metrics(rows: list[dict[str, Any]], path: Path) -> int:
+    """Apply corrected precision/recall where retained predictions permit it.
+
+    Unresolved corrected runs retain their recorded historical set metrics under
+    the same explicitly labelled submission-freeze policy used for F1.
+    """
+    payload = json.loads(path.read_text(encoding="utf-8"))
+    recoveries = {str(item["run_id"]): item for item in payload["recoveries"]}
+    applied = 0
+    for record in rows:
+        if record.get("score_correction_status") != "corrected_exact_rescore":
+            continue
+        recovery = recoveries[str(record["run_id"])]
+        question_scores = recovery.get("question_scores") or []
+        if not question_scores or not all(
+            "corrected_precision" in item and "corrected_recall" in item
+            for item in question_scores
+        ):
+            # Some Task-23 recoveries certify that the in-context ground truth is
+            # unchanged without retaining a second copy of precision/recall.
+            continue
+        record["precision"] = statistics.fmean(
+            float(item["corrected_precision"]) for item in question_scores
+        )
+        record["recall"] = statistics.fmean(
+            float(item["corrected_recall"]) for item in question_scores
+        )
+        applied += 1
+    return applied
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--cache-dir", type=Path, default=Path("artifacts/control-room/shared"))
@@ -317,6 +367,9 @@ def main() -> int:
     rows = build_rows(campaigns)
     correction_manifest = apply_ground_truth_corrections(rows, args.ground_truth_corrections)
     recovery_manifest, recovered_final = apply_corrected_score_recoveries(
+        rows, args.corrected_score_recoveries
+    )
+    corrected_set_metrics = apply_corrected_set_metrics(
         rows, args.corrected_score_recoveries
     )
     carried_final = carry_forward_pending_corrected_scores(rows)
@@ -362,6 +415,7 @@ def main() -> int:
             "recovery_id": recovery_manifest["recovery_id"],
             "available": len(recovery_manifest["recoveries"]),
             "applied_final": recovered_final,
+            "precision_recall_applied": corrected_set_metrics,
         },
         "submission_score_freeze": {
             "freeze_id": SUBMISSION_SCORE_FREEZE_ID,

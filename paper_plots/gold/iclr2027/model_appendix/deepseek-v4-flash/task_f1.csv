@@ -125,15 +125,15 @@ deepseek-v4-flash,3,tier3/task23,T3.9 New stereocenter (1Q),rlm,100,5,5,0,5,1.0,
 deepseek-v4-flash,3,tier3/task23,T3.9 New stereocenter (1Q),rlm,500,5,5,0,5,1.0,1.0,0.0
 deepseek-v4-flash,3,tier3/task23,T3.9 New stereocenter (1Q),rlm,1000,5,5,0,5,1.0,1.0,0.0
 deepseek-v4-flash,3,tier3/task23,T3.9 New stereocenter (1Q),rlm,full,5,5,0,5,1.0,0.7991420982145699,0.3918452203466571
-deepseek-v4-flash,3,tier3/task24,T3.10 E-alkene formation (1Q),llm,100,5,5,0,5,1.0,0.05714285714285715,0.1142857142857143
-deepseek-v4-flash,3,tier3/task24,T3.10 E-alkene formation (1Q),llm,500,5,5,0,5,1.0,0.05850585058505851,0.10738492533462321
-deepseek-v4-flash,3,tier3/task24,T3.10 E-alkene formation (1Q),codeact,100,5,5,0,5,1.0,1.0,0.0
-deepseek-v4-flash,3,tier3/task24,T3.10 E-alkene formation (1Q),codeact,500,5,5,0,5,1.0,0.9818181818181818,0.036363636363636376
-deepseek-v4-flash,3,tier3/task24,T3.10 E-alkene formation (1Q),codeact,1000,5,5,0,5,1.0,0.8,0.4
-deepseek-v4-flash,3,tier3/task24,T3.10 E-alkene formation (1Q),rlm,100,5,5,0,5,1.0,0.6,0.4898979485566356
-deepseek-v4-flash,3,tier3/task24,T3.10 E-alkene formation (1Q),rlm,500,5,5,0,5,1.0,0.4,0.4898979485566356
-deepseek-v4-flash,3,tier3/task24,T3.10 E-alkene formation (1Q),rlm,1000,5,5,0,5,1.0,0.8,0.4
-deepseek-v4-flash,3,tier3/task24,T3.10 E-alkene formation (1Q),rlm,full,5,5,0,5,1.0,0.37333333333333335,0.45917800953926835
+deepseek-v4-flash,3,tier3/task24,T3.10 E-alkene in product (1Q),llm,100,5,5,0,5,1.0,0.05714285714285715,0.1142857142857143
+deepseek-v4-flash,3,tier3/task24,T3.10 E-alkene in product (1Q),llm,500,5,5,0,5,1.0,0.05850585058505851,0.10738492533462321
+deepseek-v4-flash,3,tier3/task24,T3.10 E-alkene in product (1Q),codeact,100,5,5,0,5,1.0,1.0,0.0
+deepseek-v4-flash,3,tier3/task24,T3.10 E-alkene in product (1Q),codeact,500,5,5,0,5,1.0,0.9818181818181818,0.036363636363636376
+deepseek-v4-flash,3,tier3/task24,T3.10 E-alkene in product (1Q),codeact,1000,5,5,0,5,1.0,0.8,0.4
+deepseek-v4-flash,3,tier3/task24,T3.10 E-alkene in product (1Q),rlm,100,5,5,0,5,1.0,0.6,0.4898979485566356
+deepseek-v4-flash,3,tier3/task24,T3.10 E-alkene in product (1Q),rlm,500,5,5,0,5,1.0,0.4,0.4898979485566356
+deepseek-v4-flash,3,tier3/task24,T3.10 E-alkene in product (1Q),rlm,1000,5,5,0,5,1.0,0.8,0.4
+deepseek-v4-flash,3,tier3/task24,T3.10 E-alkene in product (1Q),rlm,full,5,5,0,5,1.0,0.37333333333333335,0.45917800953926835
 deepseek-v4-flash,3,tier3/task6,T3.11-14 Amide couplings (4Q),llm,100,5,5,0,5,1.0,0.01476,0.00011999999999999996
 deepseek-v4-flash,3,tier3/task6,T3.11-14 Amide couplings (4Q),llm,500,5,5,0,5,1.0,0.039490000000000004,0.0533897616589548
 deepseek-v4-flash,3,tier3/task6,T3.11-14 Amide couplings (4Q),codeact,100,5,5,0,5,1.0,0.8215584415584416,0.0217662980525993

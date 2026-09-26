@@ -18,15 +18,15 @@
     },
     {
       "path": "qwen3_5_task_heatmap.pdf",
-      "sha256": "27d73f39680ee8a19376ac0d7087dd83cea41eac56d23f79cfaf9abc1f60811b"
+      "sha256": "acd7b215e8bb33017691071ae09b68735816eb8503d69a2f82ad3f5e98213ba6"
     },
     {
       "path": "qwen3_5_task_heatmap.png",
-      "sha256": "21ffb86aa2c01d110fda9b4b5099cea56efce33348283d6bef94672d49a450e2"
+      "sha256": "2d9dd85313bc0e48f9a351873bdff0a7f323da542366d8b3dde4a94b9e76d103"
     }
   ],
   "model": "qwen3.5",
-  "model_label": "Qwen 3.5",
+  "model_label": "Qwen3.5-397B-A17B",
   "palette": "Plasma",
   "schema_version": 1,
   "sources": [
@@ -36,7 +36,7 @@
     },
     {
       "path": "paper_plots/gold/iclr2027/model_appendix/qwen3.5/task_f1.csv",
-      "sha256": "c93471bd04bdae09e039a52a986e67f089d3e5524a698b2d2c7788e911813efb"
+      "sha256": "4c976d0879c417e3b33e9471d73722c55d92606da7cb062113cdc14042d4ceb4"
     }
   ]
 }

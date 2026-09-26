@@ -45,6 +45,8 @@ def read_records(path: Path) -> list[dict[str, Any]]:
                     "question_count": int(row["question_count"]),
                     "score_available": as_bool(row["score_available"]),
                     "f1": float(row["f1"]) if row["f1"] else None,
+                    "precision": float(row["precision"]) if row.get("precision") else None,
+                    "recall": float(row["recall"]) if row.get("recall") else None,
                 }
             )
     return rows
@@ -53,14 +55,15 @@ def read_records(path: Path) -> list[dict[str, Any]]:
 def weighted_replication_means(
     rows: Iterable[dict[str, Any]],
     key_fields: tuple[str, ...],
+    metric: str = "f1",
 ) -> dict[tuple[Any, ...], list[float]]:
     accum: dict[tuple[Any, ...], list[float]] = defaultdict(lambda: [0.0, 0.0])
     for row in rows:
-        if not row["score_available"] or row["f1"] is None:
+        if not row["score_available"] or row[metric] is None:
             continue
         key = tuple(row[field] for field in key_fields) + (row["repetition"],)
         weight = row["question_count"]
-        accum[key][0] += row["f1"] * weight
+        accum[key][0] += row[metric] * weight
         accum[key][1] += weight
     replications: dict[tuple[Any, ...], list[tuple[int, float]]] = defaultdict(list)
     for key, (weighted_sum, total_weight) in accum.items():
@@ -79,6 +82,12 @@ def aggregate_rows(records: list[dict[str, Any]]) -> list[dict[str, Any]]:
     matched = [row for row in records if row["study"] == "matched_cardinality"]
     matched_reps = weighted_replication_means(
         matched, ("model_label", "condition", "context", "tier")
+    )
+    matched_precision_reps = weighted_replication_means(
+        matched, ("model_label", "condition", "context", "tier"), "precision"
+    )
+    matched_recall_reps = weighted_replication_means(
+        matched, ("model_label", "condition", "context", "tier"), "recall"
     )
 
     oracle = [
@@ -100,6 +109,12 @@ def aggregate_rows(records: list[dict[str, Any]]) -> list[dict[str, Any]]:
     aggregates: list[dict[str, Any]] = []
     for (model_label, condition, context, tier), values in sorted(matched_reps.items()):
         mean, sd = mean_sd(values)
+        precision_mean, precision_sd = mean_sd(
+            matched_precision_reps[(model_label, condition, context, tier)]
+        )
+        recall_mean, recall_sd = mean_sd(
+            matched_recall_reps[(model_label, condition, context, tier)]
+        )
         group = [
             row
             for row in matched
@@ -119,6 +134,10 @@ def aggregate_rows(records: list[dict[str, Any]]) -> list[dict[str, Any]]:
                 "tier": tier,
                 "mean_f1": mean,
                 "sd_f1": sd,
+                "mean_precision": precision_mean,
+                "sd_precision": precision_sd,
+                "mean_recall": recall_mean,
+                "sd_recall": recall_sd,
                 "replications": len(values),
                 "scored_question_trajectories": scored,
                 "total_question_trajectories": total,
@@ -143,6 +162,10 @@ def aggregate_rows(records: list[dict[str, Any]]) -> list[dict[str, Any]]:
                 "tier": "",
                 "mean_f1": mean,
                 "sd_f1": sd,
+                "mean_precision": "",
+                "sd_precision": "",
+                "mean_recall": "",
+                "sd_recall": "",
                 "replications": len(values),
                 "scored_question_trajectories": scored,
                 "total_question_trajectories": total,
@@ -202,7 +225,8 @@ def plot_matched_scale(
     axis.set_xticks(positions, CONTEXT_LABELS)
     axis.set_xlabel("Corpus size $N$")
     axis.set_ylabel("Macro F1")
-    axis.set_title(f"({panel}) Scale ($K=1$)\n{model_label}", loc="left", pad=5, fontsize=8.0)
+    display_name = MODEL_DISPLAY_NAMES.get(model_label, model_label)
+    axis.set_title(f"({panel}) Scale ($K=1$)\n{display_name}", loc="left", pad=5, fontsize=8.0)
     style_axis(axis)
 
 
@@ -246,8 +270,9 @@ def plot_matched_cardinality(
         )
     axis.set_xticks(positions, [label for _, label in conditions])
     axis.set_xlabel("Positive reactions $K$")
+    display_name = MODEL_DISPLAY_NAMES.get(model_label, model_label)
     axis.set_title(
-        f"({panel}) Cardinality ($N=5{{,}}000$)\n{model_label}",
+        f"({panel}) Cardinality ($N=5{{,}}000$)\n{display_name}",
         loc="left",
         pad=5,
         fontsize=8.0,
@@ -328,6 +353,10 @@ def write_aggregates(path: Path, rows: list[dict[str, Any]]) -> None:
         "tier",
         "mean_f1",
         "sd_f1",
+        "mean_precision",
+        "sd_precision",
+        "mean_recall",
+        "sd_recall",
         "replications",
         "scored_question_trajectories",
         "total_question_trajectories",

@@ -18,11 +18,11 @@
     },
     {
       "path": "claude-haiku-4_5_task_heatmap.pdf",
-      "sha256": "d8ecfd1b654bcac539f5d21075d0e732e54824f4046778530dd075cfaaba56a8"
+      "sha256": "31da30767cb01b0064966a349982b525b079eb4f1f1a070a603dba99295fa663"
     },
     {
       "path": "claude-haiku-4_5_task_heatmap.png",
-      "sha256": "e03d2ca7c0dc38e44eef32ba6b623102f1894ccfd7ad27db3c720ef016ad9b88"
+      "sha256": "1d912bfd2dc38ce5760d94bdfbaa8fbad81ee25cfc9c0fe1e4e000631f8533a3"
     }
   ],
   "model": "claude-haiku-4.5",
@@ -36,7 +36,7 @@
     },
     {
       "path": "paper_plots/gold/iclr2027/model_appendix/claude-haiku-4.5/task_f1.csv",
-      "sha256": "a4116a6caba5cb45b6b403c36a416517821ff10905cd4e3956f02c0784f111e0"
+      "sha256": "be3e37361329176f4d3eba4056456b88be9c3aaa4230c63bfe2682866a9d1263"
     }
   ]
 }

@@ -5,10 +5,9 @@ from pathlib import Path
 
 import matplotlib as mpl
 import matplotlib.pyplot as plt
-from matplotlib.lines import Line2D
 import numpy as np
 import pandas as pd
-
+from matplotlib.lines import Line2D
 
 ROOT = Path(__file__).resolve().parents[1]
 DATA = ROOT / "data" / "plot_data"
@@ -176,7 +175,7 @@ TASK_ROWS = {
         ("21", "T3.7 Transition-metal reagent (1Q)"),
         ("22", "T3.8 HATU / T3P reagent (1Q)"),
         ("23", "T3.9 New stereocenter (1Q)"),
-        ("24", "T3.10 E-alkene formation (1Q)"),
+        ("24", "T3.10 E-alkene in product (1Q)"),
         ("6", "T3.11-14 Amide couplings (4Q)"),
         ("7", "T3.15-19 Group transformations (5Q)"),
         ("8", "T3.20-21 Protecting groups (2Q)"),
@@ -225,7 +224,7 @@ def plot_capability_map() -> None:
         gridspec_kw={"height_ratios": [2.0, 1.0]},
     )
     image = None
-    for ax, tier in zip(axes, (3, 4)):
+    for ax, tier in zip(axes, (3, 4), strict=True):
         values, row_labels = subgroup_matrix(tier)
         image = ax.imshow(values, cmap="cividis", vmin=0, vmax=1, aspect="auto")
         for row in range(values.shape[0]):
@@ -439,7 +438,7 @@ def plot_tier_detail(tier: int, overall: pd.DataFrame) -> None:
     fig, axes = plt.subplots(rows, cols, figsize=size)
     flat_axes = np.atleast_1d(axes).ravel()
     panels = detail_frames(tier, overall)
-    for ax, (title, frame) in zip(flat_axes, panels):
+    for ax, (title, frame) in zip(flat_axes, panels, strict=False):
         plot_metric_curve(ax, frame, title)
     cost_ax = flat_axes[len(panels)]
     plot_cost_curve(cost_ax, overall[overall["tier"] == tier])

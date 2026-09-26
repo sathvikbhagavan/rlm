@@ -2,41 +2,41 @@
   "figures": [
     {
       "path": "deepseek-v4-flash_core_metrics.pdf",
-      "sha256": "4fa20b101dd98f1608d9852390c1d23b3f8ff8cae0891dfc82e0025d3fb6d45f"
+      "sha256": "bf9b5d631c85e45407941c7699dcaea6fa8f9c83648abba6bf57dc6d5188ea59"
     },
     {
       "path": "deepseek-v4-flash_core_metrics.png",
-      "sha256": "b34d65b83e9355158f04a4ce85fbf0d0ebe548b5ab6326fb8d2b4e28714d5dcd"
+      "sha256": "88e2479eef1b4df00027a474714d9b9340937c117d17d30d0ccde4569596dbf6"
     },
     {
       "path": "deepseek-v4-flash_resource_diagnostics.pdf",
-      "sha256": "e53b59d662a5331026f49cecc697ce23f31e9b01955d8119219764c2c0dd22e2"
+      "sha256": "4ab0a8b4799092d36f164a7907a01a2b446606fafe6b3369a7365362e5993f1c"
     },
     {
       "path": "deepseek-v4-flash_resource_diagnostics.png",
-      "sha256": "ffcae2d2e2090d6c4c8723d518729eaae182bcae1a50584eb69c7af121a0d35e"
+      "sha256": "24e5d1453761a98b2aa60057ab2f7a5e94d777d601a5b007087920ff6266689d"
     },
     {
       "path": "deepseek-v4-flash_task_heatmap.pdf",
-      "sha256": "82f6cc04609ead4dd574bf5babff0595bc94f06762456618e12de07e57ad2ea3"
+      "sha256": "123ed644ce8a394ba57aef34c43b7c806d3659979c8aa5d96bfe394b2208d225"
     },
     {
       "path": "deepseek-v4-flash_task_heatmap.png",
-      "sha256": "5f069577fede325f210751c5ecbed50b2ca2457c8cf19ab3f456e53ebaf5b80b"
+      "sha256": "46a58db1a9970088731a3a722ea12aaf5d136893544e314a814e1773b20a78e7"
     }
   ],
   "model": "deepseek-v4-flash",
-  "model_label": "DeepSeek V4 Flash",
+  "model_label": "DeepSeek-V4-Flash",
   "palette": "Plasma",
   "schema_version": 1,
   "sources": [
     {
       "path": "paper_plots/gold/iclr2027/model_appendix/deepseek-v4-flash/tier_metrics.csv",
-      "sha256": "ed63d6d0c95ebef79c4119463421de0573ac0cab7c8e41695e521357f9e1b522"
+      "sha256": "d0540fe819a774ac7e58689ccee97d74fdc13b24fc6db61b3241f8dbdae39587"
     },
     {
       "path": "paper_plots/gold/iclr2027/model_appendix/deepseek-v4-flash/task_f1.csv",
-      "sha256": "3f07c7f8b6b0674f4ba12a886052c8b6db3af955a36faa6046c33c600fdf8e05"
+      "sha256": "c03284873c689429a058a6228a424ce42cedb0f20ed86cac14a2c793f5032f6e"
     }
   ]
 }

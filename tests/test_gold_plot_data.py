@@ -8,6 +8,9 @@ from pathlib import Path
 import pytest
 
 from paper_plots.scripts.build_causal_controls import (
+    apply_corrected_set_metrics,
+)
+from paper_plots.scripts.build_causal_controls import (
     apply_ground_truth_corrections as apply_control_ground_truth_corrections,
 )
 from paper_plots.scripts.build_gold_results import (
@@ -17,6 +20,7 @@ from paper_plots.scripts.build_gold_results import (
     arm_summaries,
     cross_model_efficiency_summaries,
     cross_model_scaling_summaries,
+    flatten_run,
     load_result_pack,
     result_score,
     scaling_summaries,
@@ -31,6 +35,62 @@ def test_task15_uses_reaction_f1() -> None:
 
     assert result_score("tier4/task15", metrics) == ("macro_reaction_f1", 0.8)
     assert result_score("tier4/task14", metrics) == ("macro_f1", 0.1)
+
+
+def test_flatten_run_recovers_repetition_from_run_id() -> None:
+    run = {
+        "run_id": "full-deepseek-v4-flash-tier1-task1-codeact-x1000-r05",
+        "model": "deepseek-v4-flash",
+        "method": "codeact",
+        "task": "tier1/task1",
+        "corpus_size": 1000,
+        "repetition": 1,
+        "status": "failed",
+        "attempt_count": 1,
+    }
+
+    assert flatten_run(run, scope="codeact_x1000")["repetition"] == 5
+
+
+def test_control_recovery_updates_precision_and_recall(tmp_path: Path) -> None:
+    rows = [
+        {
+            "run_id": "exact",
+            "score_correction_status": "corrected_exact_rescore",
+            "precision": 0.1,
+            "recall": 0.2,
+        },
+        {
+            "run_id": "unchanged",
+            "score_correction_status": "corrected_exact_rescore",
+            "precision": 0.3,
+            "recall": 0.4,
+        },
+    ]
+    path = tmp_path / "recoveries.json"
+    path.write_text(
+        json.dumps(
+            {
+                "recoveries": [
+                    {
+                        "run_id": "exact",
+                        "question_scores": [
+                            {"corrected_precision": 0.8, "corrected_recall": 0.6},
+                            {"corrected_precision": 0.4, "corrected_recall": 1.0},
+                        ],
+                    },
+                    {"run_id": "unchanged", "question_scores": [{}]},
+                ]
+            }
+        ),
+        encoding="utf-8",
+    )
+
+    assert apply_corrected_set_metrics(rows, path) == 1
+    assert rows[0]["precision"] == pytest.approx(0.6)
+    assert rows[0]["recall"] == pytest.approx(0.8)
+    assert rows[1]["precision"] == 0.3
+    assert rows[1]["recall"] == 0.4
 
 
 def test_main_capability_matrix_weights_questions_and_scores_failures_zero() -> None:

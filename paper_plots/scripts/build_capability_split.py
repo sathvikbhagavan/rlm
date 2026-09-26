@@ -87,7 +87,15 @@ def capability_summaries(
         denominator = 0
         failures = 0
         for row in members:
-            if "score_available" in row and not as_bool(row.get("score_available")):
+            # A terminal failure has no model answer to rescore, but it remains a
+            # resolved benchmark trajectory and therefore contributes zero.  The
+            # score-availability gate applies only to successful runs whose
+            # historical prediction could not be scored under the frozen evaluator.
+            if (
+                row["status"] == "succeeded"
+                and "score_available" in row
+                and not as_bool(row.get("score_available"))
+            ):
                 continue
             weight = int(row["question_count"])
             denominator += weight

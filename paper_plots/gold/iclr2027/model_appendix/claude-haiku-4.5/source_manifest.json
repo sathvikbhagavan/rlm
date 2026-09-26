@@ -5,7 +5,7 @@
     "peak_memory": "mean combined process-tree plus Docker peak per successful job",
     "variation": "population standard deviation across five repetitions"
   },
-  "generated_at": "2026-09-25T23:49:35.937201+00:00",
+  "generated_at": "2026-09-26T00:59:59.621381+00:00",
   "model": "claude-haiku-4.5",
   "outputs": [
     {
@@ -14,7 +14,7 @@
     },
     {
       "path": "task_f1.csv",
-      "sha256": "a4116a6caba5cb45b6b403c36a416517821ff10905cd4e3956f02c0784f111e0"
+      "sha256": "be3e37361329176f4d3eba4056456b88be9c3aaa4230c63bfe2682866a9d1263"
     }
   ],
   "schema_version": 1,

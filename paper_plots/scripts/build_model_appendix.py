@@ -38,7 +38,7 @@ TASK_LABELS = {
     "tier3/task21": "T3.7 Transition-metal reagent (1Q)",
     "tier3/task22": "T3.8 HATU / T3P reagent (1Q)",
     "tier3/task23": "T3.9 New stereocenter (1Q)",
-    "tier3/task24": "T3.10 E-alkene formation (1Q)",
+    "tier3/task24": "T3.10 E-alkene in product (1Q)",
     "tier3/task6": "T3.11-14 Amide couplings (4Q)",
     "tier3/task7": "T3.15-19 Group transformations (5Q)",
     "tier3/task8": "T3.20-21 Protecting groups (2Q)",
@@ -56,6 +56,11 @@ TASK_LABELS = {
     "tier4/task17b": "T4.31-35 SMIRKS chains II (5Q)",
 }
 TASK_ORDER = {task: index for index, task in enumerate(TASK_LABELS)}
+TIER_QUESTION_COUNTS = {1: 10, 2: 20, 3: 35, 4: 35}
+TIER_TASKS = {
+    tier: {task for task in TASK_LABELS if task.startswith(f"tier{tier}/")}
+    for tier in TIER_QUESTION_COUNTS
+}
 
 
 def read_csv(path: Path) -> list[dict[str, str]]:
@@ -106,6 +111,24 @@ def summarize_model(
     grouped: dict[tuple[str, str, int], list[dict[str, str]]] = defaultdict(list)
     for row in model_rows:
         grouped[(row["method"], row["context"], int(row["tier"]))].append(row)
+
+    for (method, context, tier), group in grouped.items():
+        by_repetition: dict[int, list[dict[str, str]]] = defaultdict(list)
+        for row in group:
+            by_repetition[int(row["repetition"])].append(row)
+        for repetition, repetition_group in by_repetition.items():
+            tasks = [row["task"] for row in repetition_group]
+            question_count = sum(int(row["question_count"]) for row in repetition_group)
+            if set(tasks) != TIER_TASKS[tier] or len(tasks) != len(TIER_TASKS[tier]):
+                raise ValueError(
+                    f"Incomplete task coverage for {model}/{method}/{context}/tier{tier}/"
+                    f"r{repetition}: observed {sorted(tasks)!r}"
+                )
+            if question_count != TIER_QUESTION_COUNTS[tier]:
+                raise ValueError(
+                    f"Incomplete question coverage for {model}/{method}/{context}/tier{tier}/"
+                    f"r{repetition}: {question_count}/{TIER_QUESTION_COUNTS[tier]}"
+                )
 
     summaries: list[dict[str, Any]] = []
     for (method, context, tier), group in sorted(

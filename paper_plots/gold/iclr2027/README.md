@@ -1,6 +1,6 @@
 # Gold ICLR 2027 plotting results
 
-Frozen from the shared experiment dashboard at `2026-09-25T23:35:48.482158+00:00`.
+Frozen from the shared experiment dashboard at `2026-09-26T00:47:16.402100+00:00`.
 
 Gold means that the plotting input is frozen, auditable, and provenance-recorded. It does not mean every experiment arm is finished. `arm_status.csv` and the `arm_final` columns distinguish terminal arms from provisional ones.
 

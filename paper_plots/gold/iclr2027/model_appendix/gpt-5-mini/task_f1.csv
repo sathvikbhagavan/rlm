@@ -125,15 +125,15 @@ gpt-5-mini,3,tier3/task23,T3.9 New stereocenter (1Q),rlm,100,5,5,0,5,1.0,1.0,0.0
 gpt-5-mini,3,tier3/task23,T3.9 New stereocenter (1Q),rlm,500,5,5,0,5,1.0,0.8,0.4
 gpt-5-mini,3,tier3/task23,T3.9 New stereocenter (1Q),rlm,1000,5,5,0,5,1.0,1.0,0.0
 gpt-5-mini,3,tier3/task23,T3.9 New stereocenter (1Q),rlm,full,5,5,0,5,1.0,0.9811584089323098,0.0
-gpt-5-mini,3,tier3/task24,T3.10 E-alkene formation (1Q),llm,100,5,5,0,5,1.0,0.9111111111111111,0.04444444444444442
-gpt-5-mini,3,tier3/task24,T3.10 E-alkene formation (1Q),llm,500,5,5,0,5,1.0,0.31428571428571433,0.18220120447341898
-gpt-5-mini,3,tier3/task24,T3.10 E-alkene formation (1Q),codeact,100,5,5,0,5,1.0,1.0,0.0
-gpt-5-mini,3,tier3/task24,T3.10 E-alkene formation (1Q),codeact,500,5,5,0,5,1.0,0.9636363636363636,0.04453617714151235
-gpt-5-mini,3,tier3/task24,T3.10 E-alkene formation (1Q),codeact,1000,5,5,0,5,1.0,1.0,0.0
-gpt-5-mini,3,tier3/task24,T3.10 E-alkene formation (1Q),rlm,100,5,5,0,5,1.0,0.8,0.4
-gpt-5-mini,3,tier3/task24,T3.10 E-alkene formation (1Q),rlm,500,5,5,0,5,1.0,0.9484848484848485,0.06748805288278817
-gpt-5-mini,3,tier3/task24,T3.10 E-alkene formation (1Q),rlm,1000,5,5,0,5,1.0,0.962962962962963,0.0740740740740741
-gpt-5-mini,3,tier3/task24,T3.10 E-alkene formation (1Q),rlm,full,5,5,0,5,1.0,1.0,0.0
+gpt-5-mini,3,tier3/task24,T3.10 E-alkene in product (1Q),llm,100,5,5,0,5,1.0,0.9111111111111111,0.04444444444444442
+gpt-5-mini,3,tier3/task24,T3.10 E-alkene in product (1Q),llm,500,5,5,0,5,1.0,0.31428571428571433,0.18220120447341898
+gpt-5-mini,3,tier3/task24,T3.10 E-alkene in product (1Q),codeact,100,5,5,0,5,1.0,1.0,0.0
+gpt-5-mini,3,tier3/task24,T3.10 E-alkene in product (1Q),codeact,500,5,5,0,5,1.0,0.9636363636363636,0.04453617714151235
+gpt-5-mini,3,tier3/task24,T3.10 E-alkene in product (1Q),codeact,1000,5,5,0,5,1.0,1.0,0.0
+gpt-5-mini,3,tier3/task24,T3.10 E-alkene in product (1Q),rlm,100,5,5,0,5,1.0,0.8,0.4
+gpt-5-mini,3,tier3/task24,T3.10 E-alkene in product (1Q),rlm,500,5,5,0,5,1.0,0.9484848484848485,0.06748805288278817
+gpt-5-mini,3,tier3/task24,T3.10 E-alkene in product (1Q),rlm,1000,5,5,0,5,1.0,0.962962962962963,0.0740740740740741
+gpt-5-mini,3,tier3/task24,T3.10 E-alkene in product (1Q),rlm,full,5,5,0,5,1.0,1.0,0.0
 gpt-5-mini,3,tier3/task6,T3.11-14 Amide couplings (4Q),llm,100,5,5,0,5,1.0,0.6350049999999999,0.02708289774008684
 gpt-5-mini,3,tier3/task6,T3.11-14 Amide couplings (4Q),llm,500,5,5,0,5,1.0,0.201285,0.09270963892713636
 gpt-5-mini,3,tier3/task6,T3.11-14 Amide couplings (4Q),codeact,100,5,5,0,5,1.0,0.7026029526029526,0.14288482336159805
