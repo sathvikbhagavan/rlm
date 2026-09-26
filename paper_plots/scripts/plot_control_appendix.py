@@ -327,6 +327,19 @@ def oracle_model_page(rows: list[dict[str, str]], model: str) -> plt.Figure:
     for index, (axis, (metric, label, scale, is_score)) in enumerate(
         zip(axes.ravel(), metrics, strict=True)
     ):
+        if metric == "cost_usd" and model == "Qwen 3.5":
+            axis.text(
+                0.5,
+                0.5,
+                "Cost accounting\nunavailable",
+                ha="center",
+                va="center",
+                transform=axis.transAxes,
+                color="#555555",
+            )
+            axis.set_title(label, loc="left", pad=4, fontsize=7.8)
+            axis.set_axis_off()
+            continue
         for arm in ("ordinary", "predicate"):
             values = []
             for context in CONTEXTS:
