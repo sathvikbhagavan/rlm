@@ -8,6 +8,14 @@
       "wandb_run_id": "qhq7uce8",
       "wandb_summary_sha256": "330575e0e3aa22d99dfab9030f827d0dce46d66fe217ed6a6063701b76a6e844",
       "stdout_sha256": "58b0dbee651b019c4e22f30e69a786ed936e94d335a9996744d60fccf3961c6a"
+    },
+    {
+      "run_id": "x1000-direct-openai-full-gpt-5-mini-tier4-task17b-rlm-x1000-r03",
+      "score_name": "macro_f1",
+      "score_value": 0.3333333333333333,
+      "wandb_run_id": "hqwpwv2t",
+      "wandb_summary_sha256": "ae55a0ff51db3f5816b45830f074d9bc6c805ac1b0420ca5d030d0ececf6cd6e",
+      "stdout_sha256": "2e3daaf6a9b0f23884754ea4f2679470a1c45ee7046811f208bcc6bbca239ad8"
     }
   ]
 }

@@ -815,7 +815,6 @@ def main() -> None:
     full = campaigns[FULL_CAMPAIGN]
     x1000 = campaigns[DEEPSEEK_CODEACT_X1000_CAMPAIGN]
     rows = [flatten_run(run, scope="full_benchmark") for run in full["runs"]]
-    score_recovery_manifest = apply_score_recoveries(rows, args.score_recoveries)
     deepseek_extension_rows = [
         flattened
         for run in x1000["runs"]
@@ -924,6 +923,7 @@ def main() -> None:
             raise ValueError(f"GPT-5-mini RLM x1000 arm is not terminal: {unresolved_gpt[:3]!r}")
     rlm_x1000_rows = qwen_rlm_rows + deepseek_rlm_rows + gemini_rlm_rows + gpt_rlm_rows
     all_rows = rows + extension_rows + rlm_x1000_rows
+    score_recovery_manifest = apply_score_recoveries(all_rows, args.score_recoveries)
     arms = arm_summaries(all_rows)
     add_arm_finality(all_rows, arms)
     scaling = scaling_summaries(all_rows)
