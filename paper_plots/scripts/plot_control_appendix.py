@@ -37,8 +37,8 @@ TASK_LABELS = {
     "tier3/task10": "T3 Mechanisms I",
     "tier3/task10b": "T3 Mechanisms II",
     "tier3/task13": "T3 New nitrogen",
-    "tier3/task14": "T3 C--N / C--O",
-    "tier3/task15": "T3 C--C formation",
+    "tier3/task14": "T3 C–N / C–O",
+    "tier3/task15": "T3 C–C formation",
     "tier3/task17": "T3 Fused heterocycle",
     "tier3/task18": "T3 New ring system",
     "tier3/task20": "T3 Fused-ring construction",
@@ -320,6 +320,19 @@ def oracle_model_page(rows: list[dict[str, str]], model: str) -> plt.Figure:
     for index, (axis, (metric, label, scale, is_score)) in enumerate(
         zip(axes.ravel(), metrics, strict=True)
     ):
+        if metric == "cost_usd" and model == "Qwen 3.5":
+            axis.text(
+                0.5,
+                0.5,
+                "Cost accounting\nunavailable",
+                ha="center",
+                va="center",
+                transform=axis.transAxes,
+                color="#555555",
+            )
+            axis.set_title(label, loc="left", pad=4, fontsize=7.8)
+            axis.set_axis_off()
+            continue
         for arm in ("ordinary", "predicate"):
             values = []
             for context in CONTEXTS:

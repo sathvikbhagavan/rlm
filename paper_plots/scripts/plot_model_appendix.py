@@ -88,7 +88,9 @@ def metric_page(
         metric: any(float(row[f"{metric}_mean"] or 0.0) > 0 for row in rows)
         for metric, _, _ in metrics
     }
-    figure, axes = plt.subplots(4, 4, figsize=(7.25, 9.0), squeeze=False)
+    figure, axes = plt.subplots(
+        len(metrics), 4, figsize=(7.25, 2.15 * len(metrics) + 0.4), squeeze=False
+    )
     for column, tier in enumerate(range(1, 5)):
         axes[0, column].set_title(
             f"Tier {tier}\n{TIER_NAMES[tier]}", fontsize=9, fontweight="normal", pad=6
@@ -170,7 +172,7 @@ def metric_page(
         bbox_to_anchor=(0.5, 0.995),
     )
     figure.subplots_adjust(
-        left=0.105, right=0.995, top=0.925, bottom=0.055, hspace=0.42, wspace=0.36
+        left=0.105, right=0.995, top=0.91, bottom=0.07, hspace=0.42, wspace=0.36
     )
     return figure
 
@@ -255,9 +257,14 @@ def main() -> None:
     args.output.mkdir(parents=True, exist_ok=True)
     prefix = args.model.replace(".", "_")
     figure_files: list[str] = []
+    core_metrics = (
+        tuple(metric for metric in CORE_METRICS if metric[0] != "cost_usd")
+        if args.model in {"qwen3.5", "deepseek-v4-flash"}
+        else CORE_METRICS
+    )
     figure_files.extend(
         save_figure(
-            metric_page(tier_rows, CORE_METRICS),
+            metric_page(tier_rows, core_metrics),
             args.output,
             f"{prefix}_core_metrics",
         )
