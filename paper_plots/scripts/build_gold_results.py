@@ -32,6 +32,7 @@ MODEL_ORDER = (
     "gpt-5-mini",
     "claude-haiku-4.5",
 )
+PAPER_MODELS = frozenset(model for model in MODEL_ORDER if model != "glm-5.2")
 PAID_MODELS = frozenset({"gemini-3.7-flash", "gpt-5-mini", "claude-haiku-4.5"})
 MODEL_LABELS = {
     "qwen3.5": "Qwen 3.5",
@@ -55,19 +56,19 @@ METHOD_ORDER = ("llm", "codeact", "rlm")
 STATUS_ORDER = ("succeeded", "running", "stale", "failed", "pending")
 CONTEXT_ORDER = {"100": 0, "500": 1, "1000": 2, "full": 3}
 EXPECTED_MODELS_BY_METHOD_CONTEXT = {
-    ("llm", "100"): frozenset(MODEL_ORDER),
-    ("llm", "500"): frozenset(MODEL_ORDER),
-    ("codeact", "100"): frozenset(MODEL_ORDER),
-    ("codeact", "500"): frozenset(MODEL_ORDER),
+    ("llm", "100"): PAPER_MODELS,
+    ("llm", "500"): PAPER_MODELS,
+    ("codeact", "100"): PAPER_MODELS,
+    ("codeact", "500"): PAPER_MODELS,
     ("codeact", "1000"): frozenset(
         {"qwen3.5", "deepseek-v4-flash", "gemini-3.7-flash", "gpt-5-mini"}
     ),
-    ("rlm", "100"): frozenset(MODEL_ORDER),
-    ("rlm", "500"): frozenset(MODEL_ORDER),
+    ("rlm", "100"): PAPER_MODELS,
+    ("rlm", "500"): PAPER_MODELS,
     ("rlm", "1000"): frozenset(
         {"qwen3.5", "deepseek-v4-flash", "gemini-3.7-flash", "gpt-5-mini"}
     ),
-    ("rlm", "full"): frozenset(MODEL_ORDER),
+    ("rlm", "full"): PAPER_MODELS,
 }
 QUESTION_COUNTS = {
     "tier1/task1": 10,
@@ -465,10 +466,16 @@ def cross_model_scaling_summaries(
             CONTEXT_ORDER[item[0][1]],
         ),
     ):
-        eligible = [row for row in group if row["f1"] is not None and bool(row["arm_final"])]
+        expected_models = EXPECTED_MODELS_BY_METHOD_CONTEXT[(method, context)]
+        eligible = [
+            row
+            for row in group
+            if str(row["model"]) in expected_models
+            and row["f1"] is not None
+            and bool(row["arm_final"])
+        ]
         if not eligible:
             continue
-        expected_models = EXPECTED_MODELS_BY_METHOD_CONTEXT[(method, context)]
         observed_models = {str(row["model"]) for row in eligible}
         values = [float(row["f1_zero_imputed"]) for row in eligible]
         model_std = statistics.stdev(values) if len(values) > 1 else None
@@ -576,7 +583,10 @@ def cross_model_efficiency_summaries(
         eligible = [
             row
             for row in group
-            if bool(row["arm_final"]) and all(row[metric] is not None for metric in metrics)
+            if str(row["model"])
+            in EXPECTED_MODELS_BY_METHOD_CONTEXT[(method, context)]
+            and bool(row["arm_final"])
+            and all(row[metric] is not None for metric in metrics)
         ]
         if not eligible:
             continue

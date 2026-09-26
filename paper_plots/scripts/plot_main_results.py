@@ -39,9 +39,11 @@ PAID_MODEL_LABELS = {
     "claude-haiku-4.5": "Claude Haiku 4.5",
 }
 METHODS = ("llm", "codeact", "rlm")
-CONTEXTS = ("100", "500", "full")
-CONTEXT_LABELS = ("100", "500", "Full")
-CONTEXT_MARKERS = {"100": "o", "500": "s", "full": "D"}
+CONTEXTS = ("100", "500", "1000", "full")
+CONTEXT_LABELS = ("100", "500", "1000", "Full")
+CONTEXT_MARKERS = {"100": "o", "500": "s", "1000": "^", "full": "D"}
+EFFICIENCY_CONTEXTS = ("100", "500", "full")
+EFFICIENCY_CONTEXT_LABELS = ("100", "500", "Full")
 TIER_NAMES = {
     1: "Structural lookup",
     2: "Property aggregation",
@@ -121,7 +123,7 @@ def plot_performance(rows: list[dict[str, str]]) -> plt.Figure:
     figure, axes = plt.subplots(2, 2, figsize=(7.0, 4.55), sharex=True, sharey=True)
     positions = np.arange(len(CONTEXTS))
     for tier, axis in enumerate(axes.ravel(), start=1):
-        axis.axvspan(1.72, 2.28, color="#F1F3F5", zorder=0)
+        axis.axvspan(2.72, 3.28, color="#F1F3F5", zorder=0)
         for method in METHODS:
             contexts = [context for context in CONTEXTS if (tier, method, context) in lookup]
             points = [lookup[(tier, method, context)] for context in contexts]
@@ -144,7 +146,7 @@ def plot_performance(rows: list[dict[str, str]]) -> plt.Figure:
             loc="left",
             pad=5,
         )
-        axis.set_xlim(-0.18, 2.2)
+        axis.set_xlim(-0.18, 3.2)
         axis.set_ylim(-0.02, 1.06)
         axis.set_yticks(np.linspace(0, 1, 6))
         axis.grid(axis="y", color="#D8DDE2", linewidth=0.55)
@@ -191,7 +193,7 @@ def plot_aggregate_performance(rows: list[dict[str, str]], *, kind: str = "line"
     figure, axes = plt.subplots(1, 4, figsize=(7.35, 2.55), sharex=True, sharey=True)
 
     for tier, axis in enumerate(axes, start=1):
-        axis.axvspan(1.72, 2.28, color="#F1F3F5", zorder=0)
+        axis.axvspan(2.72, 3.28, color="#F1F3F5", zorder=0)
         for method in METHODS:
             contexts = [context for context in CONTEXTS if (tier, method, context) in lookup]
             points = [lookup[(tier, method, context)] for context in contexts]
@@ -236,7 +238,7 @@ def plot_aggregate_performance(rows: list[dict[str, str]], *, kind: str = "line"
             pad=5,
             fontsize=8.5,
         )
-        axis.set_xlim(-0.38, 2.38)
+        axis.set_xlim(-0.38, 3.38)
         axis.set_ylim(-0.02, 1.06)
         axis.set_yticks(np.linspace(0, 1, 6))
         axis.set_xticks(positions, CONTEXT_LABELS)
@@ -246,12 +248,6 @@ def plot_aggregate_performance(rows: list[dict[str, str]], *, kind: str = "line"
         axis.tick_params(length=2.3, width=0.55)
     axes[0].set_ylabel("Macro F1")
 
-    model_counts = {
-        method: sorted({int(row["n_models"]) for row in selected if row["method"] == method})
-        for method in METHODS
-    }
-    if any(len(counts) != 1 for counts in model_counts.values()):
-        raise ValueError("Core aggregate figure expects one model count per interface")
     handles = [
         Line2D(
             [0],
@@ -261,7 +257,7 @@ def plot_aggregate_performance(rows: list[dict[str, str]], *, kind: str = "line"
             linewidth=1.5 if kind == "line" else 0,
             markersize=5.0,
             markeredgecolor="white",
-            label=f"{METHOD_LABELS[method]} ($n={model_counts[method][0]}$ models)",
+            label=METHOD_LABELS[method],
         )
         for method in METHODS
     ]
@@ -290,7 +286,11 @@ def efficiency_points(
     """
     by_repetition: dict[tuple[int, str, str, int], list[dict[str, str]]] = defaultdict(list)
     for row in records:
-        if row["model"] == model and row["method"] in METHODS and row["context"] in CONTEXTS:
+        if (
+            row["model"] == model
+            and row["method"] in METHODS
+            and row["context"] in EFFICIENCY_CONTEXTS
+        ):
             key = (
                 int(row["tier"]),
                 row["method"],
@@ -365,7 +365,9 @@ def efficiency_legend(figure: plt.Figure, *, top: float = 1.01) -> None:
             markeredgecolor="white",
             label=label,
         )
-        for context, label in zip(CONTEXTS, CONTEXT_LABELS, strict=True)
+        for context, label in zip(
+            EFFICIENCY_CONTEXTS, EFFICIENCY_CONTEXT_LABELS, strict=True
+        )
     ]
     figure.legend(
         handles=method_handles + context_handles,
@@ -382,8 +384,12 @@ def plot_efficiency_frontier(records: list[dict[str, str]]) -> plt.Figure:
     figure, axes = plt.subplots(1, 4, figsize=(7.35, 2.55), sharey=True)
     for tier, axis in enumerate(axes, start=1):
         for method in METHODS:
-            contexts = [context for context in CONTEXTS if (tier, method, context) in points]
-            contexts.sort(key=CONTEXTS.index)
+            contexts = [
+                context
+                for context in EFFICIENCY_CONTEXTS
+                if (tier, method, context) in points
+            ]
+            contexts.sort(key=EFFICIENCY_CONTEXTS.index)
             costs = [points[(tier, method, context)][0] for context in contexts]
             cost_errors = [points[(tier, method, context)][1] for context in contexts]
             scores = [points[(tier, method, context)][2] for context in contexts]
@@ -436,8 +442,12 @@ def plot_efficiency_frontier_by_model(records: list[dict[str, str]]) -> plt.Figu
         for column, tier in enumerate(range(1, 5)):
             axis = axes[row_index, column]
             for method in METHODS:
-                contexts = [context for context in CONTEXTS if (tier, method, context) in points]
-                contexts.sort(key=CONTEXTS.index)
+                contexts = [
+                    context
+                    for context in EFFICIENCY_CONTEXTS
+                    if (tier, method, context) in points
+                ]
+                contexts.sort(key=EFFICIENCY_CONTEXTS.index)
                 costs = [points[(tier, method, context)][0] for context in contexts]
                 scores = [points[(tier, method, context)][1] for context in contexts]
                 errors = [points[(tier, method, context)][2] for context in contexts]
