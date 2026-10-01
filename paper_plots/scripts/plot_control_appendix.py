@@ -30,7 +30,7 @@ TASK_LABELS = {
     "tier2/task3": "T2 Ring-count change",
     "tier2/task4": "T2 Aromatic rings",
     "tier2/task5": "T2 Weight + rings",
-    "tier3/task6": "T3 Amide classes",
+    "tier3/task6": "T3 Amide couplings",
     "tier3/task7": "T3 Group transformations",
     "tier3/task8": "T3 Protecting groups",
     "tier3/task9": "T3 Named reactions",
@@ -77,6 +77,10 @@ def mean(values: list[float]) -> float:
     return statistics.fmean(values) if values else float("nan")
 
 
+def score_available(row: dict[str, str]) -> bool:
+    return row.get("score_available", "").strip().lower() in {"1", "true", "yes"}
+
+
 def matched_task_heatmap(rows: list[dict[str, str]]) -> plt.Figure:
     rows = [row for row in rows if row["study"] == "matched_cardinality"]
     tasks = sorted({row["task"] for row in rows}, key=lambda task: list(TASK_LABELS).index(task))
@@ -86,7 +90,9 @@ def matched_task_heatmap(rows: list[dict[str, str]]) -> plt.Figure:
             values = [
                 float(row["f1"])
                 for row in rows
-                if row["task"] == task and row["condition"] == condition
+                if row["task"] == task
+                and row["condition"] == condition
+                and score_available(row)
             ]
             lookup[(task, condition)] = mean(values)
     data = np.asarray([[lookup[(task, condition)] for condition in CONDITIONS] for task in tasks])
@@ -193,12 +199,7 @@ def matched_resource_page(rows: list[dict[str, str]]) -> plt.Figure:
 
 
 def qwen_snapshot(rows: list[dict[str, str]]) -> plt.Figure:
-    """Plot the scientific result from the available Qwen matched runs.
-
-    Execution coverage belongs in the experiment ledger and dashboard, not in
-    the scientific figure.  Keeping it out also prevents transient job state
-    from competing visually with the measured score.
-    """
+    """Plot the terminal Qwen matched result, counting failed cells as zero."""
     figure, axis = plt.subplots(figsize=(7.25, 2.45))
     x = np.arange(len(CONDITIONS))
     for tier in (2, 3):
@@ -209,7 +210,7 @@ def qwen_snapshot(rows: list[dict[str, str]]) -> plt.Figure:
                 for row in rows
                 if row["condition"] == condition
                 and int(row["tier"]) == tier
-                and row["status"] == "succeeded"
+                and score_available(row)
             ]
             numerator = sum(float(row["f1"]) * int(row["question_count"]) for row in group)
             denominator = sum(int(row["question_count"]) for row in group)
@@ -266,6 +267,7 @@ def oracle_heatmaps(rows: list[dict[str, str]]) -> plt.Figure:
                     and row["context"] == context
                     and row["arm"] == arm
                     and row["model_label"] == model_label
+                    and score_available(row)
                 ]
                 values.append(mean([float(row["f1"]) for row in group]))
             data.append(values)
@@ -273,14 +275,19 @@ def oracle_heatmaps(rows: list[dict[str, str]]) -> plt.Figure:
         image = axis.imshow(array, cmap=HEATMAP_CMAP, vmin=0, vmax=1, aspect="auto")
         for i in range(array.shape[0]):
             for j in range(array.shape[1]):
+                value = array[i, j]
                 axis.text(
                     j,
                     i,
-                    f"{array[i, j]:.2f}",
+                    "---" if np.isnan(value) else f"{value:.2f}",
                     ha="center",
                     va="center",
                     fontsize=6.4,
-                    color="white" if array[i, j] < 0.58 else "#111111",
+                    color=(
+                        "#666666"
+                        if np.isnan(value)
+                        else ("white" if value < 0.58 else "#111111")
+                    ),
                 )
         axis.set_yticks(range(len(ORACLE_TASKS)), [TASK_LABELS[task] for task in ORACLE_TASKS])
         axis.set_xticks(range(len(columns)), labels)
@@ -403,16 +410,14 @@ def executor_heatmaps(rows: list[dict[str, str]]) -> plt.Figure:
         image = axis.imshow(array, cmap=HEATMAP_CMAP, aspect="auto")
         for i in range(array.shape[0]):
             for j in range(array.shape[1]):
-                red, green, blue, _ = image.cmap(image.norm(array[i, j]))
-                luminance = 0.2126 * red + 0.7152 * green + 0.0722 * blue
                 axis.text(
                     j,
                     i,
                     f"{array[i, j]:.1f}",
                     ha="center",
                     va="center",
-                    fontsize=7.0,
-                    color="white" if luminance < 0.48 else "#111111",
+                    fontsize=6.5,
+                    color="white" if array[i, j] < np.nanmedian(array) else "#111111",
                 )
         axis.set_xticks(range(3), CONTEXT_LABELS)
         axis.set_yticks(
@@ -437,7 +442,7 @@ def main() -> int:
     )
     args = parser.parse_args()
     records = read_csv(args.data_root / "records.csv")
-    qwen = read_csv(args.data_root / "matched_qwen_provisional.csv")
+    qwen = read_csv(args.data_root / "matched_qwen_terminal.csv")
     save(matched_task_heatmap(records), args.output, "matched_gpt_task_heatmap")
     save(matched_resource_page(records), args.output, "matched_gpt_resources")
     save(qwen_snapshot(qwen), args.output, "matched_qwen_snapshot")

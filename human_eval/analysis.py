@@ -1,10 +1,11 @@
 from __future__ import annotations
 
 import csv
+import hashlib
 import json
 import zipfile
 from collections import Counter, defaultdict
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 from typing import Any
 
 from .schema import ground_truth_answer_set, normalize_structured_answer, submitted_answer_set
@@ -78,17 +79,45 @@ def krippendorff_alpha_nominal(ratings: dict[str, list[str]]) -> float | None:
 
 def load_export(path: Path) -> tuple[dict[str, Any], list[dict[str, Any]], list[dict[str, Any]]]:
     with zipfile.ZipFile(path) as archive:
-        names = set(archive.namelist())
-        if not {"manifest.json", "annotations.jsonl", "timing.jsonl"} <= names:
+        names = {
+            name
+            for name in archive.namelist()
+            if not name.startswith("__MACOSX/") and not name.endswith("/")
+        }
+        manifest_names = sorted(name for name in names if name.endswith("manifest.json"))
+        candidates: list[tuple[str, str]] = []
+        for manifest_name in manifest_names:
+            member = PurePosixPath(manifest_name)
+            if member.is_absolute() or ".." in member.parts:
+                continue
+            prefix = manifest_name[: -len("manifest.json")]
+            if {f"{prefix}annotations.jsonl", f"{prefix}timing.jsonl"} <= names:
+                candidates.append((prefix, manifest_name))
+        if len(candidates) != 1:
             raise ValueError(f"Not a RxnHaystack export: {path}")
-        manifest = json.loads(archive.read("manifest.json"))
+        prefix, manifest_name = candidates[0]
+        manifest = json.loads(archive.read(manifest_name))
+        for relative_name, expected in manifest.get("contents", {}).items():
+            relative = PurePosixPath(relative_name)
+            if relative.is_absolute() or ".." in relative.parts:
+                raise ValueError(f"Unsafe export member in {path}: {relative_name}")
+            member_name = f"{prefix}{relative_name}"
+            if member_name not in names:
+                raise ValueError(f"Missing export member in {path}: {relative_name}")
+            data = archive.read(member_name)
+            if len(data) != int(expected["bytes"]):
+                raise ValueError(f"Size mismatch in {path}: {relative_name}")
+            if hashlib.sha256(data).hexdigest() != expected["sha256"]:
+                raise ValueError(f"Checksum mismatch in {path}: {relative_name}")
         annotations = [
             json.loads(line)
-            for line in archive.read("annotations.jsonl").decode().splitlines()
+            for line in archive.read(f"{prefix}annotations.jsonl").decode().splitlines()
             if line
         ]
         timing = [
-            json.loads(line) for line in archive.read("timing.jsonl").decode().splitlines() if line
+            json.loads(line)
+            for line in archive.read(f"{prefix}timing.jsonl").decode().splitlines()
+            if line
         ]
     return manifest, annotations, timing
 
@@ -105,6 +134,8 @@ def analyze(
     rows: list[dict[str, Any]] = []
     prospective_ratings: dict[str, list[str]] = defaultdict(list)
     agreement_ratings: dict[str, list[str]] = defaultdict(list)
+    baseline_answers: dict[str, dict[str, str]] = defaultdict(dict)
+    baseline_correctness: dict[str, dict[str, str]] = defaultdict(dict)
     issue_counts: Counter[str] = Counter()
     tool_counts: Counter[str] = Counter()
     time_by_user_item: dict[tuple[str, str, str], dict[str, float]] = defaultdict(
@@ -135,6 +166,13 @@ def analyze(
                 "offline_minutes": payload.get("offline_minutes"),
                 **time_by_user_item[(user, mode, item_id)],
             }
+            if item_id in questions:
+                base.update(
+                    {
+                        "tier": questions[item_id]["tier"],
+                        "category": questions[item_id]["category"],
+                    }
+                )
             for tool in payload.get("tools", []):
                 tool_counts[str(tool)] += 1
             for issue in payload.get("issue_tags", []):
@@ -149,8 +187,11 @@ def analyze(
                     _, entries = normalize_structured_answer(payload.get("answer_exact", ""))
                 predicted = submitted_answer_set(entries, answer_type)
                 base.update(answer_scores(predicted, expected_set, answer_type))
-                base.update(
-                    {"tier": questions[item_id]["tier"], "category": questions[item_id]["category"]}
+                baseline_answers[item_id][user] = json.dumps(
+                    sorted([list(value) for value in predicted]), separators=(",", ":")
+                )
+                baseline_correctness[item_id][user] = (
+                    "correct" if base["exact_match"] == 1.0 else "incorrect"
                 )
             if mode == "prospective":
                 base["overall_label"] = payload.get("overall_label", "")
@@ -161,24 +202,7 @@ def analyze(
             rows.append(base)
     submitted = [x for x in rows if x["submitted"]]
     baseline = [x for x in submitted if x["mode"] == "baseline"]
-    pairwise = None
-    if len(export_paths) == 2:
-        mappings = []
-        for path in export_paths:
-            _, anns, _ = load_export(path)
-            mappings.append(
-                {
-                    f"{x['mode']}:{x['item_id']}": (
-                        x["payload"].get("overall_label", "")
-                        if x["mode"] == "prospective"
-                        else x["payload"].get("severity", "")
-                    )
-                    for x in anns
-                    if x["mode"] in {"prospective", "audit"}
-                }
-            )
-        common = sorted(set(mappings[0]) & set(mappings[1]))
-        pairwise = cohen_kappa([mappings[0][x] for x in common], [mappings[1][x] for x in common])
+    baseline_pairwise = pairwise_baseline_agreement(baseline_answers, baseline_correctness)
     raw_agreement = None
     if agreement_ratings:
         comparable = [values for values in agreement_ratings.values() if len(values) >= 2]
@@ -212,8 +236,19 @@ def analyze(
         "prospective_fractions": fractions(prospective_ratings),
         "agreement": {
             "raw_proportion": raw_agreement,
-            "cohen_kappa_two_annotators": pairwise,
+            "cohen_kappa_two_annotators": prospective_audit_pairwise_kappa(
+                export_paths
+            ),
             "krippendorff_alpha_nominal": krippendorff_alpha_nominal(agreement_ratings),
+            "baseline": {
+                "pairwise": baseline_pairwise,
+                "krippendorff_alpha_answer_nominal": krippendorff_alpha_nominal(
+                    {item: list(values.values()) for item, values in baseline_answers.items()}
+                ),
+                "krippendorff_alpha_correctness_nominal": krippendorff_alpha_nominal(
+                    {item: list(values.values()) for item, values in baseline_correctness.items()}
+                ),
+            },
         },
         "missing_data_rule": "Only first submitted, non-abstained baseline answers enter accuracy; post-reveal revisions do not replace them, and uncertain prospective labels remain a separate category.",
         "disagreements": {
@@ -233,7 +268,74 @@ def analyze(
             for key, values in summary["disagreements"].items()
         ],
     )
+    write_csv(output / "baseline_pairwise_agreement.csv", baseline_pairwise)
     return summary
+
+
+def pairwise_baseline_agreement(
+    answers: dict[str, dict[str, str]], correctness: dict[str, dict[str, str]]
+) -> list[dict[str, Any]]:
+    annotators = sorted({user for ratings in answers.values() for user in ratings})
+    rows: list[dict[str, Any]] = []
+    for index, left in enumerate(annotators):
+        for right in annotators[index + 1 :]:
+            common = sorted(
+                item for item, values in answers.items() if left in values and right in values
+            )
+            left_answers = [answers[item][left] for item in common]
+            right_answers = [answers[item][right] for item in common]
+            left_correctness = [correctness[item][left] for item in common]
+            right_correctness = [correctness[item][right] for item in common]
+            rows.append(
+                {
+                    "annotator_a": left,
+                    "annotator_b": right,
+                    "overlap_items": len(common),
+                    "raw_answer_agreement": (
+                        sum(a == b for a, b in zip(left_answers, right_answers, strict=True))
+                        / len(common)
+                        if common
+                        else None
+                    ),
+                    "answer_cohen_kappa": cohen_kappa(left_answers, right_answers),
+                    "raw_correctness_agreement": (
+                        sum(a == b for a, b in zip(left_correctness, right_correctness, strict=True))
+                        / len(common)
+                        if common
+                        else None
+                    ),
+                    "correctness_cohen_kappa": cohen_kappa(
+                        left_correctness, right_correctness
+                    ),
+                    "answer_disagreement_items": "|".join(
+                        item
+                        for item in common
+                        if answers[item][left] != answers[item][right]
+                    ),
+                }
+            )
+    return rows
+
+
+def prospective_audit_pairwise_kappa(export_paths: list[Path]) -> float | None:
+    if len(export_paths) != 2:
+        return None
+    mappings = []
+    for path in export_paths:
+        _, annotations, _ = load_export(path)
+        mappings.append(
+            {
+                f"{annotation['mode']}:{annotation['item_id']}": (
+                    annotation["payload"].get("overall_label", "")
+                    if annotation["mode"] == "prospective"
+                    else annotation["payload"].get("severity", "")
+                )
+                for annotation in annotations
+                if annotation["mode"] in {"prospective", "audit"}
+            }
+        )
+    common = sorted(set(mappings[0]) & set(mappings[1]))
+    return cohen_kappa([mappings[0][item] for item in common], [mappings[1][item] for item in common])
 
 
 def administrator_reliability(
@@ -289,6 +391,6 @@ def read_jsonl(path: Path) -> list[dict[str, Any]]:
 def write_csv(path: Path, rows: list[dict[str, Any]]) -> None:
     fields = sorted({key for row in rows for key in row})
     with path.open("w", newline="", encoding="utf-8") as handle:
-        writer = csv.DictWriter(handle, fieldnames=fields)
+        writer = csv.DictWriter(handle, fieldnames=fields, lineterminator="\n")
         writer.writeheader()
         writer.writerows(rows)

@@ -2,27 +2,27 @@
   "figures": [
     {
       "path": "gemini-3_7-flash_core_metrics.pdf",
-      "sha256": "7ce7cae14c0290afa42fadd73271beac09fee61b63497e643edbe5de1a9acc3f"
+      "sha256": "30db82464dee34b28d34c98aa9f6ea2df49b48d9de0ce81b44221216012297c7"
     },
     {
       "path": "gemini-3_7-flash_core_metrics.png",
-      "sha256": "d3b24339bb25ecf6dffbba5c7270a20f86e73583d0e14738645a1f2bcbe86e09"
+      "sha256": "5a396888b7438c3969feb918c30247f094480c5a3f2cda270b7bef807a8f0c01"
     },
     {
       "path": "gemini-3_7-flash_resource_diagnostics.pdf",
-      "sha256": "e7ae42cc8637b06e4767f704848261fc35ddc4f2f3ec678428a03a213bbfde7f"
+      "sha256": "e4c2e47d6d62f8d58743ad700ea0b36f4b15d258061f7e3a7eb760e60aa6c880"
     },
     {
       "path": "gemini-3_7-flash_resource_diagnostics.png",
-      "sha256": "53d7b4a744fb849310c54c8cfa607fafda3bd325bf43d8e54cb4840c21351e97"
+      "sha256": "f5d549f86735813105dd0726edeb3090a447672e0af4dcba4ebae52fec3912b7"
     },
     {
       "path": "gemini-3_7-flash_task_heatmap.pdf",
-      "sha256": "fe4444e438f4f1d290db3ceba2d06aa5710c72ad2b845d5f16613ef390dbd59d"
+      "sha256": "7dcb7262c28e93210757413a4bce2948d3d72eddc43e3e78e5af8d2ff3754908"
     },
     {
       "path": "gemini-3_7-flash_task_heatmap.png",
-      "sha256": "3db40a251a8fcce806a4d4bbdfc083f94870d1551d7f6e4f50f2b6f016f897ee"
+      "sha256": "cfbb09fe08d4780307e515aab3f3a110bcc5a19d832a132ee0a586e19913fa90"
     }
   ],
   "model": "gemini-3.7-flash",
@@ -32,11 +32,11 @@
   "sources": [
     {
       "path": "paper_plots/gold/iclr2027/model_appendix/gemini-3.7-flash/tier_metrics.csv",
-      "sha256": "f359c8485e6e33ad1943530bbd6869a2486b74383b1ee15120005b0f468b1057"
+      "sha256": "b9a86def41dd8a554d764d5cea0e23e1d32e29169f6dcaed2945c39f3c9aa862"
     },
     {
       "path": "paper_plots/gold/iclr2027/model_appendix/gemini-3.7-flash/task_f1.csv",
-      "sha256": "902af7fcd69c4dcd84fdc747997d12ccd1d05883a715ab965a2c79c6f8ca255d"
+      "sha256": "a2a731d28eb66f49f85869e7db4edc1592767059f9377b422d412ebcd6f41280"
     }
   ]
 }

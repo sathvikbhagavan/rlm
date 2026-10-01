@@ -7,6 +7,7 @@ import argparse
 import csv
 import hashlib
 import json
+import statistics
 import subprocess
 from collections import Counter
 from datetime import UTC, datetime
@@ -20,6 +21,11 @@ from rxnhaystack.control_room import (
     load_snapshot_directory,
     merge_snapshots,
     scientific_dashboard_view,
+)
+from rxnhaystack.score_recovery import (
+    SUBMISSION_SCORE_FREEZE_ID,
+    apply_corrected_score_recoveries,
+    carry_forward_pending_corrected_scores,
 )
 
 EXECUTOR_CAMPAIGN = "iclr2027-oracle-executor-v1"
@@ -67,7 +73,14 @@ FIELDNAMES = (
     "task",
     "repetition",
     "question_count",
+    "status",
     "f1",
+    "precision",
+    "recall",
+    "score_available",
+    "original_f1",
+    "score_correction_status",
+    "ground_truth_version",
     "calls",
     "cost_usd",
     "input_tokens",
@@ -81,7 +94,7 @@ FIELDNAMES = (
     "result_updated_at",
     "sources",
 )
-PROVISIONAL_FIELDNAMES = (*FIELDNAMES[:10], "status", *FIELDNAMES[10:])
+PROVISIONAL_FIELDNAMES = FIELDNAMES
 
 
 def sha256_file(path: Path) -> str:
@@ -108,6 +121,15 @@ def successful_score(run: dict[str, Any]) -> float:
     return float(value)
 
 
+def successful_set_metrics(run: dict[str, Any]) -> tuple[float | str, float | str]:
+    """Return recorded macro precision and recall when the campaign stores them."""
+    attempt = successful_attempt(run)
+    results = (attempt.get("metrics") or {}).get("results") or {}
+    if results.get("macro_precision") is None or results.get("macro_recall") is None:
+        return "", ""
+    return float(results["macro_precision"]), float(results["macro_recall"])
+
+
 def context_label(value: Any) -> str:
     return "full" if str(value) == "full" else str(int(value))
 
@@ -119,6 +141,7 @@ def row(
     attempt = successful_attempt(run)
     metrics = attempt.get("metrics") or {}
     resources = metrics.get("resources") or {}
+    precision, recall = successful_set_metrics(run)
     return {
         "study": study,
         "arm": arm,
@@ -130,7 +153,14 @@ def row(
         "task": task,
         "repetition": int(run["repetition"]),
         "question_count": QUESTION_COUNTS[task],
+        "status": "succeeded",
         "f1": successful_score(run),
+        "precision": precision,
+        "recall": recall,
+        "score_available": True,
+        "original_f1": "",
+        "score_correction_status": "",
+        "ground_truth_version": "",
         **{
             field: metrics.get(field)
             for field in (
@@ -151,13 +181,13 @@ def row(
     }
 
 
-def provisional_matched_row(run: dict[str, Any]) -> dict[str, Any]:
-    """Preserve an unfinished Qwen cell without treating it as final evidence."""
+def terminal_matched_row(run: dict[str, Any]) -> dict[str, Any]:
+    """Freeze a terminal Qwen cell; unsuccessful trajectories score zero."""
     task = str(run["task"])
     status = str(run["status"])
     output: dict[str, Any] = {
         "study": "matched_cardinality",
-        "arm": "matched-provisional",
+        "arm": "matched",
         "model": run["model"],
         "model_label": MODEL_LABELS[str(run["model"])],
         "context": context_label(run["corpus_size"]),
@@ -168,6 +198,12 @@ def provisional_matched_row(run: dict[str, Any]) -> dict[str, Any]:
         "question_count": QUESTION_COUNTS[task],
         "status": status,
         "f1": "",
+        "precision": "",
+        "recall": "",
+        "score_available": False,
+        "original_f1": "",
+        "score_correction_status": "",
+        "ground_truth_version": "",
         "calls": "",
         "cost_usd": "",
         "input_tokens": "",
@@ -182,9 +218,33 @@ def provisional_matched_row(run: dict[str, Any]) -> dict[str, Any]:
         "sources": ";".join(run.get("sources", ())),
     }
     if status == "succeeded":
-        completed = row(run, study="matched_cardinality", arm="matched-provisional")
+        completed = row(run, study="matched_cardinality", arm="matched")
         output.update(completed)
         output["status"] = status
+    elif status == "failed":
+        attempts = run.get("attempts") or []
+        attempt = max(attempts, key=lambda item: item.get("started_at", "")) if attempts else {}
+        metrics = attempt.get("metrics") or {}
+        resources = metrics.get("resources") or {}
+        output.update(
+            {
+                "f1": 0.0,
+                "precision": 0.0,
+                "recall": 0.0,
+                "score_available": True,
+                "calls": metrics.get("calls", ""),
+                "cost_usd": metrics.get("cost_usd", ""),
+                "input_tokens": metrics.get("input_tokens", ""),
+                "output_tokens": metrics.get("output_tokens", ""),
+                "total_tokens": metrics.get("total_tokens", ""),
+                "latency_seconds": metrics.get("latency_seconds", ""),
+                "tool_time_seconds": metrics.get("tool_time_seconds", ""),
+                "process_wall_time_seconds": resources.get("process_wall_time_seconds", ""),
+                "peak_combined_memory_mib": resources.get("peak_combined_memory_mib", ""),
+            }
+        )
+    else:
+        raise ValueError(f"Qwen matched-cardinality cell is not terminal: {run['run_id']}")
     return output
 
 
@@ -192,6 +252,9 @@ def build_rows(campaigns: dict[str, dict[str, Any]]) -> list[dict[str, Any]]:
     matched = [run for run in campaigns[MATCHED_CAMPAIGN]["runs"] if run["model"] == GPT]
     if len(matched) != 725 or any(run["status"] != "succeeded" for run in matched):
         raise ValueError("GPT-5-mini matched-cardinality arm must be exactly 725/725 succeeded")
+    qwen = [run for run in campaigns[MATCHED_CAMPAIGN]["runs"] if run["model"] == QWEN]
+    if len(qwen) != 725 or any(run["status"] not in {"succeeded", "failed"} for run in qwen):
+        raise ValueError("Qwen matched-cardinality arm must contain 725 terminal cells")
 
     predicate = campaigns[ORACLE_CAMPAIGN]["runs"]
     if len(predicate) != 150 or any(run["status"] != "succeeded" for run in predicate):
@@ -210,17 +273,67 @@ def build_rows(campaigns: dict[str, dict[str, Any]]) -> list[dict[str, Any]]:
         raise ValueError("Ordinary oracle-comparison cells must be exactly 150/150 succeeded")
 
     rows = [row(run, study="matched_cardinality", arm="matched") for run in matched]
+    rows.extend(terminal_matched_row(run) for run in qwen)
     rows.extend(row(run, study="oracle_predicate", arm="ordinary") for run in ordinary)
     rows.extend(row(run, study="oracle_predicate", arm="predicate") for run in predicate)
     rows.extend(
         row(run, study="oracle_predicate", arm="executor", model_label="Deterministic executor")
         for run in executor
     )
-    if len(rows) != 1040:
-        raise AssertionError(f"Expected 1,040 frozen records, got {len(rows)}")
-    if any(record["study"] == "matched_cardinality" and record["model"] != GPT for record in rows):
-        raise AssertionError("Unfinished Qwen matched-cardinality records entered the freeze")
+    if len(rows) != 1765:
+        raise AssertionError(f"Expected 1,765 frozen records, got {len(rows)}")
     return sorted(rows, key=lambda item: (item["study"], item["arm"], item["run_id"]))
+
+
+def apply_ground_truth_corrections(rows: list[dict[str, Any]], path: Path) -> dict[str, Any]:
+    """Invalidate stale scores while preserving immutable control-run evidence."""
+    payload = json.loads(path.read_text(encoding="utf-8"))
+    affected = {str(task) for task in payload["affected_tasks"]}
+    for record in rows:
+        record["ground_truth_version"] = str(payload["corrected_bundle"])
+        record["original_f1"] = record.get("f1", "")
+        if str(record["task"]) not in affected:
+            record["score_correction_status"] = "not_affected"
+            continue
+        if bool(record.get("score_available")):
+            record["score_available"] = False
+            record["f1"] = ""
+            record["score_correction_status"] = "historical_score_invalidated"
+            record["sources"] = f"{record['sources']};ground-truth:{payload['correction_id']}"
+        else:
+            record["score_correction_status"] = "affected_without_historical_score"
+    return payload
+
+
+def apply_corrected_set_metrics(rows: list[dict[str, Any]], path: Path) -> int:
+    """Apply corrected precision/recall where retained predictions permit it.
+
+    Unresolved corrected runs retain their recorded historical set metrics under
+    the same explicitly labelled submission-freeze policy used for F1.
+    """
+    payload = json.loads(path.read_text(encoding="utf-8"))
+    recoveries = {str(item["run_id"]): item for item in payload["recoveries"]}
+    applied = 0
+    for record in rows:
+        if record.get("score_correction_status") != "corrected_exact_rescore":
+            continue
+        recovery = recoveries[str(record["run_id"])]
+        question_scores = recovery.get("question_scores") or []
+        if not question_scores or not all(
+            "corrected_precision" in item and "corrected_recall" in item
+            for item in question_scores
+        ):
+            # Some Task-23 recoveries certify that the in-context ground truth is
+            # unchanged without retaining a second copy of precision/recall.
+            continue
+        record["precision"] = statistics.fmean(
+            float(item["corrected_precision"]) for item in question_scores
+        )
+        record["recall"] = statistics.fmean(
+            float(item["corrected_recall"]) for item in question_scores
+        )
+        applied += 1
+    return applied
 
 
 def main() -> int:
@@ -228,6 +341,16 @@ def main() -> int:
     parser.add_argument("--cache-dir", type=Path, default=Path("artifacts/control-room/shared"))
     parser.add_argument(
         "--output-dir", type=Path, default=Path("paper_plots/gold/iclr2027/causal_controls")
+    )
+    parser.add_argument(
+        "--ground-truth-corrections",
+        type=Path,
+        default=Path("paper_plots/gold/ground_truth_corrections.json"),
+    )
+    parser.add_argument(
+        "--corrected-score-recoveries",
+        type=Path,
+        default=Path("paper_plots/gold/corrected_score_recoveries.json"),
     )
     args = parser.parse_args()
 
@@ -242,22 +365,23 @@ def main() -> int:
         raise ValueError(f"Missing dashboard studies: {sorted(missing)}")
 
     rows = build_rows(campaigns)
-    qwen_matched = [run for run in campaigns[MATCHED_CAMPAIGN]["runs"] if run["model"] == QWEN]
-    if len(qwen_matched) != 725:
-        raise ValueError(
-            f"Qwen matched-cardinality grid must contain 725 jobs, got {len(qwen_matched)}"
-        )
-    qwen_rows = sorted(
-        (provisional_matched_row(run) for run in qwen_matched), key=lambda item: item["run_id"]
+    correction_manifest = apply_ground_truth_corrections(rows, args.ground_truth_corrections)
+    recovery_manifest, recovered_final = apply_corrected_score_recoveries(
+        rows, args.corrected_score_recoveries
     )
+    corrected_set_metrics = apply_corrected_set_metrics(
+        rows, args.corrected_score_recoveries
+    )
+    carried_final = carry_forward_pending_corrected_scores(rows)
     args.output_dir.mkdir(parents=True, exist_ok=True)
     records_path = args.output_dir / "records.csv"
     with records_path.open("w", newline="", encoding="utf-8") as stream:
         writer = csv.DictWriter(stream, fieldnames=FIELDNAMES, lineterminator="\n")
         writer.writeheader()
         writer.writerows(rows)
-    provisional_path = args.output_dir / "matched_qwen_provisional.csv"
-    with provisional_path.open("w", newline="", encoding="utf-8") as stream:
+    qwen_path = args.output_dir / "matched_qwen_terminal.csv"
+    qwen_rows = [row for row in rows if row["study"] == "matched_cardinality" and row["model"] == QWEN]
+    with qwen_path.open("w", newline="", encoding="utf-8") as stream:
         writer = csv.DictWriter(stream, fieldnames=PROVISIONAL_FIELDNAMES, lineterminator="\n")
         writer.writeheader()
         writer.writerows(qwen_rows)
@@ -275,14 +399,39 @@ def main() -> int:
         "git_commit": subprocess.check_output(["git", "rev-parse", "HEAD"], text=True).strip(),
         "record_count": len(rows),
         "records_sha256": sha256_file(records_path),
-        "matched_qwen_provisional_sha256": sha256_file(provisional_path),
+        "matched_qwen_terminal_sha256": sha256_file(qwen_path),
+        "ground_truth_corrections": {
+            "path": str(args.ground_truth_corrections),
+            "sha256": sha256_file(args.ground_truth_corrections),
+            "correction_id": correction_manifest["correction_id"],
+            "corrected_bundle": correction_manifest["corrected_bundle"],
+            "policy": correction_manifest["policy"],
+            "final_records": dict(Counter(row["score_correction_status"] for row in rows)),
+            "qwen_records": dict(Counter(row["score_correction_status"] for row in qwen_rows)),
+        },
+        "corrected_score_recoveries": {
+            "path": str(args.corrected_score_recoveries),
+            "sha256": sha256_file(args.corrected_score_recoveries),
+            "recovery_id": recovery_manifest["recovery_id"],
+            "available": len(recovery_manifest["recoveries"]),
+            "applied_final": recovered_final,
+            "precision_recall_applied": corrected_set_metrics,
+        },
+        "submission_score_freeze": {
+            "freeze_id": SUBMISSION_SCORE_FREEZE_ID,
+            "policy": (
+                "Use exact corrected rescores where available; otherwise carry forward the "
+                "preserved historical score while retaining historical_score_invalidated "
+                "status in the internal post-submission queue."
+            ),
+            "carried_final": carried_final,
+        },
         "selection": {
-            "matched_cardinality": "GPT-5 mini only; 725/725 succeeded",
+            "matched_cardinality": "GPT-5 mini 725/725 succeeded; Qwen 673 succeeded and 52 terminal failures",
             "oracle_predicate": "Qwen 3.5 and Claude Haiku 4.5; 150/150 succeeded",
             "ordinary_comparison": "same models, tasks, contexts, and repetitions; 150/150 succeeded",
             "deterministic_executor": "15/15 succeeded",
-            "matched_qwen_provisional": dict(Counter(row["status"] for row in qwen_rows)),
-            "excluded_from_final_inference": "unfinished Qwen matched-cardinality arm",
+            "matched_qwen_terminal": dict(Counter(row["status"] for row in qwen_rows)),
         },
         "snapshot_files": snapshot_files,
     }

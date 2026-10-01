@@ -1,0 +1,17 @@
+mean_f1,observations,population,score_coverage,tier,unit
+1.0,7,human_assigned_items,1.0,1,first submitted non-abstained question answer
+0.8528097218261892,60,model_llm,1.0,1,successful task-context-repetition run
+0.9889999999999999,50,model_codeact,1.0,1,successful task-context-repetition run
+0.8996296296296293,90,model_rlm,1.0,1,successful task-context-repetition run
+0.8542154055027589,12,human_assigned_items,1.0,2,first submitted non-abstained question answer
+0.16792442892191645,240,model_llm,1.0,2,successful task-context-repetition run
+0.7985020617696919,200,model_codeact,1.0,2,successful task-context-repetition run
+0.9177241864721529,360,model_rlm,1.0,2,successful task-context-repetition run
+0.9250143054036402,16,human_assigned_items,1.0,3,first submitted non-abstained question answer
+0.38011852178006034,960,model_llm,1.0,3,successful task-context-repetition run
+0.7874986864108705,790,model_codeact,1.0,3,successful task-context-repetition run
+0.7237373104662534,1418,model_rlm,1.0,3,successful task-context-repetition run
+0.6799408549577999,16,human_assigned_items,1.0,4,first submitted non-abstained question answer
+0.22754154021193937,540,model_llm,1.0,4,successful task-context-repetition run
+0.6397560646363203,429,model_codeact,1.0,4,successful task-context-repetition run
+0.6346278433025067,762,model_rlm,1.0,4,successful task-context-repetition run

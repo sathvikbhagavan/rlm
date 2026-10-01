@@ -39,17 +39,17 @@ DEFAULT_RING_QUERIES: tuple[str, ...] = (
 HARDCODED_CHAINS_JSON = Path(__file__).with_name("task15_ring_hardcoded_chains.json")
 
 HARDCODED_GT_CHAIN_COUNTS: dict[str, int] = {
-    'quinoline': 199,
-    'indole': 184,
-    'benzothiazole': 44,
-    'benzimidazole': 142,
+    "quinoline": 299,
+    "indole": 241,
+    "benzothiazole": 44,
+    "benzimidazole": 142,
 }
 
 HARDCODED_GT_EXAMPLE: dict[str, tuple[int, ...]] = {
-    'quinoline': (1015, 1016, 1017),
-    'indole': (2583, 2584, 2585),
-    'benzothiazole': (16766, 16711, 111531),
-    'benzimidazole': (7688, 7689, 7690),
+    "quinoline": (1015, 1016, 1017),
+    "indole": (114, 115, 117),
+    "benzothiazole": (16766, 16711, 111531),
+    "benzimidazole": (7688, 7689, 7690),
 }
 
 
@@ -121,11 +121,7 @@ def ring_spec_for_question(question: RingQuestion) -> RingSystemSpec:
 
 
 def full_support_indices_for_question(question: RingQuestion) -> set[int]:
-    return {
-        idx
-        for chain in hardcoded_chains_for_question(question.ring_system)
-        for idx in chain
-    }
+    return {idx for chain in hardcoded_chains_for_question(question.ring_system) for idx in chain}
 
 
 def chains_for_context_sampling(
@@ -185,8 +181,7 @@ def print_task15_startup_banner() -> None:
         count = full_dataset_chain_count(question)
         if example is None:
             print(
-                f"Ground truth [3-reaction {question.ring_system}] "
-                f"chains={count} (not yet mined)"
+                f"Ground truth [3-reaction {question.ring_system}] chains={count} (not yet mined)"
             )
             continue
         print(
@@ -347,9 +342,7 @@ def update_task15_run_summary(
     run.summary["macro_valid_path"] = macro_valid_path
     run.summary["macro_objective_length_match"] = macro_objective_length
     run.summary["macro_reaction_f1"] = macro_reaction_f1
-    run.summary["avg_total_input_tokens_per_sample"] = (
-        total_input_tokens / total if total else 0.0
-    )
+    run.summary["avg_total_input_tokens_per_sample"] = total_input_tokens / total if total else 0.0
     run.summary["avg_total_output_tokens_per_sample"] = (
         total_output_tokens / total if total else 0.0
     )

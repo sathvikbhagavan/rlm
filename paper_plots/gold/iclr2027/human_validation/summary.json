@@ -1,0 +1,90 @@
+{
+  "abstentions": 1,
+  "administrator_control_and_duplicate_checks": null,
+  "agreement": {
+    "baseline": {
+      "krippendorff_alpha_answer_nominal": 0.7773386034255599,
+      "krippendorff_alpha_correctness_nominal": 0.7439393939393939,
+      "pairwise": [
+        {
+          "annotator_a": "reviewer-3",
+          "annotator_b": "reviewer-2",
+          "answer_cohen_kappa": 1.0,
+          "answer_disagreement_items": "",
+          "correctness_cohen_kappa": 1.0,
+          "overlap_items": 3,
+          "raw_answer_agreement": 1.0,
+          "raw_correctness_agreement": 1.0
+        },
+        {
+          "annotator_a": "reviewer-3",
+          "annotator_b": "reviewer-1",
+          "answer_cohen_kappa": 0.5454545454545454,
+          "answer_disagreement_items": "rxh-t3-task10-wittig-olefination|rxh-t4-task17-boc-buchwald",
+          "correctness_cohen_kappa": 0.5454545454545455,
+          "overlap_items": 5,
+          "raw_answer_agreement": 0.6,
+          "raw_correctness_agreement": 0.8
+        },
+        {
+          "annotator_a": "reviewer-2",
+          "annotator_b": "reviewer-1",
+          "answer_cohen_kappa": 1.0,
+          "answer_disagreement_items": "",
+          "correctness_cohen_kappa": 1.0,
+          "overlap_items": 3,
+          "raw_answer_agreement": 1.0,
+          "raw_correctness_agreement": 1.0
+        }
+      ]
+    },
+    "cohen_kappa_two_annotators": null,
+    "krippendorff_alpha_nominal": null,
+    "raw_proportion": null
+  },
+  "audit_issues": {},
+  "baseline_macro": {
+    "exact_match": 0.6862745098039216,
+    "f1": 0.8417621065061989,
+    "precision": 0.8476380692412183,
+    "recall": 0.869156116336448
+  },
+  "completion_by_mode": {
+    "baseline": 52
+  },
+  "completion_by_tier_category": {
+    "T1:structural-lookup": 7,
+    "T2:aromatic-ring-formation": 3,
+    "T2:combined-mw-ring": 3,
+    "T2:molecular-weight-change": 3,
+    "T2:ring-count-change": 3,
+    "T3:bond-level": 2,
+    "T3:functional-groups": 5,
+    "T3:mechanism-templates": 3,
+    "T3:reagent": 2,
+    "T3:scaffold": 2,
+    "T3:stereochemistry": 2,
+    "T4:chemically-constrained-graph": 6,
+    "T4:mechanical-graph": 3,
+    "T4:prospective-multiconstraint": 8
+  },
+  "disagreements": {},
+  "exports": 3,
+  "mean_confidence": 4.068181818181818,
+  "missing_data_rule": "Only first submitted, non-abstained baseline answers enter accuracy; post-reveal revisions do not replace them, and uncertain prospective labels remain a separate category.",
+  "prospective_fractions": {},
+  "time_limit_outcomes": 0,
+  "timing_totals": {
+    "active_seconds": 30440.589983,
+    "self_reported_offline_minutes": 345.5,
+    "wall_seconds": 38558.811685
+  },
+  "tool_use": {
+    "consulted_person": 2,
+    "literature_web": 2,
+    "llm_or_agent": 45,
+    "local_script": 48,
+    "offline_processing": 13,
+    "rdkit": 51
+  }
+}

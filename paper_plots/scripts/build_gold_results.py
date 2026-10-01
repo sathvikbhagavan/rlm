@@ -8,6 +8,7 @@ import csv
 import hashlib
 import json
 import math
+import re
 import statistics
 import subprocess
 import tarfile
@@ -23,6 +24,11 @@ from rxnhaystack.control_room import (
     merge_snapshots,
     scientific_dashboard_view,
 )
+from rxnhaystack.score_recovery import (
+    SUBMISSION_SCORE_FREEZE_ID,
+    apply_corrected_score_recoveries,
+    carry_forward_pending_corrected_scores,
+)
 
 MODEL_ORDER = (
     "qwen3.5",
@@ -32,7 +38,7 @@ MODEL_ORDER = (
     "gpt-5-mini",
     "claude-haiku-4.5",
 )
-PAPER_MODELS = frozenset(model for model in MODEL_ORDER if model != "glm-5.2")
+PAPER_MODEL_ORDER = tuple(model for model in MODEL_ORDER if model != "glm-5.2")
 PAID_MODELS = frozenset({"gemini-3.7-flash", "gpt-5-mini", "claude-haiku-4.5"})
 MODEL_LABELS = {
     "qwen3.5": "Qwen 3.5",
@@ -56,19 +62,19 @@ METHOD_ORDER = ("llm", "codeact", "rlm")
 STATUS_ORDER = ("succeeded", "running", "stale", "failed", "pending")
 CONTEXT_ORDER = {"100": 0, "500": 1, "1000": 2, "full": 3}
 EXPECTED_MODELS_BY_METHOD_CONTEXT = {
-    ("llm", "100"): PAPER_MODELS,
-    ("llm", "500"): PAPER_MODELS,
-    ("codeact", "100"): PAPER_MODELS,
-    ("codeact", "500"): PAPER_MODELS,
+    ("llm", "100"): frozenset(PAPER_MODEL_ORDER),
+    ("llm", "500"): frozenset(PAPER_MODEL_ORDER),
+    ("codeact", "100"): frozenset(PAPER_MODEL_ORDER),
+    ("codeact", "500"): frozenset(PAPER_MODEL_ORDER),
     ("codeact", "1000"): frozenset(
         {"qwen3.5", "deepseek-v4-flash", "gemini-3.7-flash", "gpt-5-mini"}
     ),
-    ("rlm", "100"): PAPER_MODELS,
-    ("rlm", "500"): PAPER_MODELS,
+    ("rlm", "100"): frozenset(PAPER_MODEL_ORDER),
+    ("rlm", "500"): frozenset(PAPER_MODEL_ORDER),
     ("rlm", "1000"): frozenset(
         {"qwen3.5", "deepseek-v4-flash", "gemini-3.7-flash", "gpt-5-mini"}
     ),
-    ("rlm", "full"): PAPER_MODELS,
+    ("rlm", "full"): frozenset(PAPER_MODEL_ORDER),
 }
 QUESTION_COUNTS = {
     "tier1/task1": 10,
@@ -102,6 +108,7 @@ QUESTION_COUNTS = {
     "tier4/task17": 5,
     "tier4/task17b": 5,
 }
+RUN_REPETITION_RE = re.compile(r"-r(?P<repetition>\d+)$")
 RESOURCE_FIELDS = (
     "peak_combined_memory_mib",
     "peak_docker_memory_mib",
@@ -132,6 +139,11 @@ DEFAULT_QWEN_RLM_X1000_PACK = Path(
     "paper_plots/gold/source_packs/qwen-rlm-x1000-succeeded-pack.tgz"
 )
 DEFAULT_SCORE_RECOVERIES = Path("paper_plots/gold/source_packs/deepseek-score-recoveries.json")
+DEFAULT_GPT_RLM_X1000_SCORE_RECOVERIES = Path(
+    "paper_plots/gold/source_packs/gpt-rlm-x1000-score-recoveries.json"
+)
+DEFAULT_GROUND_TRUTH_CORRECTIONS = Path("paper_plots/gold/ground_truth_corrections.json")
+DEFAULT_CORRECTED_SCORE_RECOVERIES = Path("paper_plots/gold/corrected_score_recoveries.json")
 GPT_RLM_X1000_DOCKER_CAMPAIGN = "iclr2027-gpt5mini-rlm-x1000-docker-v1"
 
 
@@ -180,6 +192,12 @@ def flatten_run(run: dict[str, Any], *, scope: str) -> dict[str, Any]:
     score_name, f1 = result_score(task, metrics)
     resources = metrics.get("resources") or {}
     slug = model_slug(str(run["model"]))
+    repetition_match = RUN_REPETITION_RE.search(str(run["run_id"]))
+    repetition = (
+        int(repetition_match.group("repetition"))
+        if repetition_match is not None
+        else int(run["repetition"])
+    )
     row: dict[str, Any] = {
         "scope": scope,
         "run_id": run["run_id"],
@@ -189,7 +207,7 @@ def flatten_run(run: dict[str, Any], *, scope: str) -> dict[str, Any]:
         "tier": tier_for_task(task),
         "task": task,
         "context": normalize_context(run["corpus_size"]),
-        "repetition": int(run["repetition"]),
+        "repetition": repetition,
         "question_count": QUESTION_COUNTS[task],
         "status": run["status"],
         "report_state": run.get("report_state", ""),
@@ -328,6 +346,26 @@ def apply_score_recoveries(rows: list[dict[str, Any]], path: Path) -> dict[str, 
     return payload
 
 
+def apply_ground_truth_corrections(rows: list[dict[str, Any]], path: Path) -> dict[str, Any]:
+    """Invalidate stale scores without altering immutable model-run evidence."""
+    payload = json.loads(path.read_text())
+    affected = {str(task) for task in payload["affected_tasks"]}
+    for row in rows:
+        row["ground_truth_version"] = str(payload["corrected_bundle"])
+        row["original_f1"] = row.get("f1")
+        if str(row["task"]) not in affected:
+            row["score_correction_status"] = "not_affected"
+            continue
+        if row["status"] == "succeeded" and bool(row["score_available"]):
+            row["score_available"] = False
+            row["f1"] = None
+            row["score_correction_status"] = "historical_score_invalidated"
+            row["sources"] = f"{row['sources']};ground-truth:{payload['correction_id']}"
+        else:
+            row["score_correction_status"] = "affected_without_historical_score"
+    return payload
+
+
 def arm_summaries(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
     grouped: dict[tuple[str, str, str], list[dict[str, Any]]] = defaultdict(list)
     for row in rows:
@@ -342,8 +380,16 @@ def arm_summaries(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
         ),
     ):
         counts = Counter(str(row["status"]) for row in group)
+        pending_corrected_rescores = sum(
+            row["status"] == "succeeded"
+            and row.get("score_correction_status") == "historical_score_invalidated"
+            for row in group
+        )
         unscored_successes = sum(
-            row["status"] == "succeeded" and not bool(row["score_available"]) for row in group
+            row["status"] == "succeeded"
+            and not bool(row["score_available"])
+            and row.get("score_correction_status") != "historical_score_invalidated"
+            for row in group
         )
         unfinished = counts["running"] + counts["stale"] + counts["pending"] + unscored_successes
         is_final = unfinished == 0
@@ -357,6 +403,7 @@ def arm_summaries(rows: list[dict[str, Any]]) -> list[dict[str, Any]]:
                 **{f"{status}_jobs": counts[status] for status in STATUS_ORDER},
                 "scored_success_jobs": counts["succeeded"] - unscored_successes,
                 "unscored_success_jobs": unscored_successes,
+                "ground_truth_invalidated_jobs": pending_corrected_rescores,
                 "is_final": is_final,
                 "legend_label": method.upper() if method == "llm" else method.capitalize(),
                 "note": "terminal and scored"
@@ -470,9 +517,9 @@ def cross_model_scaling_summaries(
         eligible = [
             row
             for row in group
-            if str(row["model"]) in expected_models
-            and row["f1"] is not None
+            if row["f1"] is not None
             and bool(row["arm_final"])
+            and str(row["model"]) in expected_models
         ]
         if not eligible:
             continue
@@ -531,9 +578,9 @@ def tier_efficiency_summaries(rows: list[dict[str, Any]]) -> list[dict[str, Any]
             CONTEXT_ORDER[item[0][2]],
         ),
     ):
-        successful = [
-            row for row in group if row["status"] == "succeeded" and bool(row["score_available"])
-        ]
+        # Ground-truth corrections can invalidate scientific scores without
+        # invalidating observed cost, token, timing, or memory measurements.
+        successful = [row for row in group if row["status"] == "succeeded"]
         row_out: dict[str, Any] = {
             "model": model,
             "model_label": MODEL_LABELS[model],
@@ -580,17 +627,16 @@ def cross_model_efficiency_summaries(
             CONTEXT_ORDER[item[0][1]],
         ),
     ):
+        expected_models = EXPECTED_MODELS_BY_METHOD_CONTEXT[(method, context)]
         eligible = [
             row
             for row in group
-            if str(row["model"])
-            in EXPECTED_MODELS_BY_METHOD_CONTEXT[(method, context)]
-            and bool(row["arm_final"])
+            if bool(row["arm_final"])
             and all(row[metric] is not None for metric in metrics)
+            and str(row["model"]) in expected_models
         ]
         if not eligible:
             continue
-        expected_models = EXPECTED_MODELS_BY_METHOD_CONTEXT[(method, context)]
         observed_models = {str(row["model"]) for row in eligible}
         row_out: dict[str, Any] = {
             "method": method,
@@ -688,7 +734,11 @@ def write_readme(path: Path, arms: list[dict[str, Any]], *, as_of: str) -> None:
         "The CSV files contain sanitized metrics sufficient to regenerate paper plots; "
         "bulky raw trajectories remain in their original experiment artifact stores.",
         "All plotting aggregates score terminal failed jobs as zero. Running, stale, and "
-        "pending jobs are excluded from the current score and keep their arm provisional.",
+        "pending jobs are excluded from the current score and keep their arm provisional. "
+        "Exact corrected rescores are used wherever recoverable. For remaining rows in the "
+        "internal post-submission rescore queue, the last available historical score is "
+        "carried forward under an explicit status marker so terminal trajectory denominators "
+        "remain complete; resource measurements remain unchanged.",
         "",
         "## Main benchmark arms",
         "",
@@ -715,12 +765,14 @@ def write_readme(path: Path, arms: list[dict[str, Any]], *, as_of: str) -> None:
             "- `full_benchmark_records.csv`: every one of the 6,300 expected main-benchmark jobs.",
             "- `codeact_x1000_records.csv`: the final Qwen, DeepSeek, Gemini, and GPT-5-mini CodeAct x1000 extensions.",
             "- `rlm_x1000_records.csv`: terminal RLM x1000 extensions available at the freeze time.",
-            "- `final_arm_records.csv`: records belonging to terminal arms.",
-            "- `provisional_arm_records.csv`: records belonging to unfinished arms.",
+            "- `final_arm_records.csv`: records in the five-model paper scope belonging to "
+            "terminal arms.",
+            "- `provisional_arm_records.csv`: unfinished arms and completed campaign records "
+            "outside the five-model paper scope (currently GLM LLM).",
             "- `arm_status.csv`: the finality decision used for legend asterisks.",
             "- `tier_scaling.csv`: the faithful four-tier plotting aggregate.",
             "- `tier_scaling_across_models.csv`: unweighted means and standard errors across "
-            "terminal model arms; terminal failed trajectories contribute zero.",
+            "the five paper models; terminal failed trajectories contribute zero.",
             "- `tier_efficiency_by_model.csv`: recorded cost, tokens, and wall time per "
             "successfully answered trajectory for each model. Failed jobs do not enter resource "
             "averages.",
@@ -735,12 +787,14 @@ def write_readme(path: Path, arms: list[dict[str, Any]], *, as_of: str) -> None:
             "",
             "## Causal controls",
             "",
-            "The `causal_controls/` directory freezes the completed GPT-5-mini "
-            "matched-cardinality arm, Qwen/Claude chemistry-rule controls and their ordinary "
+            "The `causal_controls/` directory freezes the terminal GPT-5-mini and Qwen "
+            "matched-cardinality arms, Qwen/Claude chemistry-rule controls and their ordinary "
             "RLM counterparts, and the deterministic executor ceiling. Its record tables and "
-            "source manifest preserve the aggregation rules and contributing snapshots. The "
-            "directory also stores a status-explicit provisional Qwen matched-cardinality "
-            "snapshot, which is excluded from final inference until all 725 cells terminate.",
+            "source manifest preserve the aggregation rules and contributing snapshots. Qwen "
+            "has 673 successful and 52 terminal failed cells; failures contribute zero.",
+            "Exact corrected rescores are included and labeled `corrected_exact_rescore`. "
+            "Pending corrected control scores follow the same submission-freeze carry-forward "
+            "policy as the main benchmark and remain listed in the internal queue.",
             "",
             "## Prospective-route control",
             "",
@@ -810,6 +864,24 @@ def parse_args() -> argparse.Namespace:
         default=DEFAULT_SCORE_RECOVERIES,
         help="Provenance-recorded score recoveries for legacy successful runs.",
     )
+    parser.add_argument(
+        "--gpt-rlm-x1000-score-recoveries",
+        type=Path,
+        default=DEFAULT_GPT_RLM_X1000_SCORE_RECOVERIES,
+        help="Provenance-recorded recovery for unscored GPT RLM x1000 successes.",
+    )
+    parser.add_argument(
+        "--ground-truth-corrections",
+        type=Path,
+        default=DEFAULT_GROUND_TRUTH_CORRECTIONS,
+        help="Versioned corrections applied after legacy score recoveries.",
+    )
+    parser.add_argument(
+        "--corrected-score-recoveries",
+        type=Path,
+        default=DEFAULT_CORRECTED_SCORE_RECOVERIES,
+        help="Exact rescores recovered after ground-truth correction.",
+    )
     return parser.parse_args()
 
 
@@ -819,12 +891,11 @@ def main() -> None:
     raw_merged = merge_snapshots(snapshots)
     merged = scientific_dashboard_view(raw_merged)
     campaigns = {str(campaign["name"]): campaign for campaign in merged["campaigns"]}
-    raw_campaigns = {
-        str(campaign["name"]): campaign for campaign in raw_merged["campaigns"]
-    }
+    raw_campaigns = {str(campaign["name"]): campaign for campaign in raw_merged["campaigns"]}
     full = campaigns[FULL_CAMPAIGN]
     x1000 = campaigns[DEEPSEEK_CODEACT_X1000_CAMPAIGN]
     rows = [flatten_run(run, scope="full_benchmark") for run in full["runs"]]
+    score_recovery_manifest = apply_score_recoveries(rows, args.score_recoveries)
     deepseek_extension_rows = [
         flattened
         for run in x1000["runs"]
@@ -906,34 +977,46 @@ def main() -> None:
         expected_method="rlm",
         scope="rlm_x1000",
     )
-    gpt_rlm_rows: list[dict[str, Any]] = []
-    # Repair ledgers are intentionally hidden from the scientific dashboard, but
-    # this Docker shard completes the canonical GPT-5-mini x=1000 RLM arm.
+    gpt_non_docker_rows = [
+        flattened
+        for run in x1000["runs"]
+        if (flattened := flatten_run(run, scope="rlm_x1000"))["model"] == "gpt-5-mini"
+        and flattened["method"] == "rlm"
+    ]
+    # The scientific dashboard view deliberately folds shard campaigns into the generic
+    # x=1000 study and omits the held Docker campaign. Keep the raw merged campaign only long
+    # enough to complete the canonical 135 non-Docker + 15 Docker arm.
     gpt_docker_campaign = raw_campaigns.get(GPT_RLM_X1000_DOCKER_CAMPAIGN)
-    if gpt_docker_campaign is not None:
-        gpt_non_docker_rows = [
-            flattened
-            for run in x1000["runs"]
-            if (flattened := flatten_run(run, scope="rlm_x1000"))["model"] == "gpt-5-mini"
-            and flattened["method"] == "rlm"
-        ]
-        gpt_docker_rows = [
-            flatten_run(run, scope="rlm_x1000") for run in gpt_docker_campaign["runs"]
-        ]
-        gpt_rlm_rows = gpt_non_docker_rows + gpt_docker_rows
-        if len(gpt_non_docker_rows) != 135 or len(gpt_docker_rows) != 15:
-            raise ValueError(
-                "GPT-5-mini RLM x1000 cardinality mismatch: "
-                f"{len(gpt_non_docker_rows)} non-Docker and {len(gpt_docker_rows)} Docker"
-            )
-        unresolved_gpt = [
-            row["run_id"] for row in gpt_rlm_rows if row["status"] not in {"succeeded", "failed"}
-        ]
-        if unresolved_gpt:
-            raise ValueError(f"GPT-5-mini RLM x1000 arm is not terminal: {unresolved_gpt[:3]!r}")
+    if gpt_docker_campaign is None:
+        raise ValueError("Missing GPT-5-mini RLM x1000 Docker campaign")
+    gpt_docker_rows = [
+        flatten_run(run, scope="rlm_x1000") for run in gpt_docker_campaign["runs"]
+    ]
+    gpt_rlm_rows = gpt_non_docker_rows + gpt_docker_rows
+    if len(gpt_non_docker_rows) != 135 or len(gpt_docker_rows) != 15:
+        raise ValueError(
+            "GPT-5-mini RLM x1000 cardinality mismatch: "
+            f"{len(gpt_non_docker_rows)} non-Docker and {len(gpt_docker_rows)} Docker"
+        )
+    if len({str(row["run_id"]) for row in gpt_rlm_rows}) != 150:
+        raise ValueError("GPT-5-mini RLM x1000 contains duplicate run IDs")
+    unresolved_gpt = [
+        row["run_id"] for row in gpt_rlm_rows if row["status"] not in {"succeeded", "failed"}
+    ]
+    if unresolved_gpt:
+        raise ValueError(f"GPT-5-mini RLM x1000 arm is not terminal: {unresolved_gpt[:3]!r}")
+    gpt_rlm_recovery_manifest = apply_score_recoveries(
+        gpt_rlm_rows, args.gpt_rlm_x1000_score_recoveries
+    )
     rlm_x1000_rows = qwen_rlm_rows + deepseek_rlm_rows + gemini_rlm_rows + gpt_rlm_rows
     all_rows = rows + extension_rows + rlm_x1000_rows
-    score_recovery_manifest = apply_score_recoveries(all_rows, args.score_recoveries)
+    ground_truth_correction_manifest = apply_ground_truth_corrections(
+        all_rows, args.ground_truth_corrections
+    )
+    corrected_recovery_manifest, corrected_recovery_count = apply_corrected_score_recoveries(
+        all_rows, args.corrected_score_recoveries
+    )
+    carried_score_count = carry_forward_pending_corrected_scores(all_rows)
     arms = arm_summaries(all_rows)
     add_arm_finality(all_rows, arms)
     scaling = scaling_summaries(all_rows)
@@ -946,9 +1029,21 @@ def main() -> None:
     write_csv(output / "full_benchmark_records.csv", rows)
     write_csv(output / "codeact_x1000_records.csv", extension_rows)
     write_csv(output / "rlm_x1000_records.csv", rlm_x1000_rows)
-    write_csv(output / "final_arm_records.csv", [row for row in all_rows if row["arm_final"]])
+    paper_rows = [
+        row
+        for row in all_rows
+        if str(row["model"])
+        in EXPECTED_MODELS_BY_METHOD_CONTEXT[(str(row["method"]), str(row["context"]))]
+    ]
+    paper_run_ids = {str(row["run_id"]) for row in paper_rows}
+    write_csv(output / "final_arm_records.csv", [row for row in paper_rows if row["arm_final"]])
     write_csv(
-        output / "provisional_arm_records.csv", [row for row in all_rows if not row["arm_final"]]
+        output / "provisional_arm_records.csv",
+        [
+            row
+            for row in all_rows
+            if str(row["run_id"]) not in paper_run_ids or not row["arm_final"]
+        ],
     )
     write_csv(output / "arm_status.csv", arms)
     write_csv(output / "tier_scaling.csv", scaling)
@@ -1038,6 +1133,34 @@ def main() -> None:
             "path": str(args.score_recoveries),
             "sha256": sha256_file(args.score_recoveries),
             "count": len(score_recovery_manifest["recoveries"]),
+        },
+        "gpt_rlm_x1000_score_recoveries": {
+            "path": str(args.gpt_rlm_x1000_score_recoveries),
+            "sha256": sha256_file(args.gpt_rlm_x1000_score_recoveries),
+            "count": len(gpt_rlm_recovery_manifest["recoveries"]),
+        },
+        "ground_truth_corrections": {
+            "path": str(args.ground_truth_corrections),
+            "sha256": sha256_file(args.ground_truth_corrections),
+            "correction_id": ground_truth_correction_manifest["correction_id"],
+            "corrected_bundle": ground_truth_correction_manifest["corrected_bundle"],
+            "affected_tasks": ground_truth_correction_manifest["affected_tasks"],
+        },
+        "corrected_score_recoveries": {
+            "path": str(args.corrected_score_recoveries),
+            "sha256": sha256_file(args.corrected_score_recoveries),
+            "recovery_id": corrected_recovery_manifest["recovery_id"],
+            "available": len(corrected_recovery_manifest["recoveries"]),
+            "applied": corrected_recovery_count,
+        },
+        "submission_score_freeze": {
+            "freeze_id": SUBMISSION_SCORE_FREEZE_ID,
+            "policy": (
+                "Use exact corrected rescores where available; otherwise carry forward the "
+                "preserved historical score while retaining historical_score_invalidated "
+                "status in the internal post-submission queue."
+            ),
+            "carried_historical_scores": carried_score_count,
         },
         "source_snapshots": [
             {

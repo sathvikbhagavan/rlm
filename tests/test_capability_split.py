@@ -25,6 +25,7 @@ def test_capability_split_weights_questions_and_scores_terminal_failure_zero() -
             "question_count": 3,
             "status": "failed",
             "f1": None,
+            "score_available": False,
             "arm_final": True,
         },
         {

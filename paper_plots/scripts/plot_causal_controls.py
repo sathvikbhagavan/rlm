@@ -29,6 +29,10 @@ CONTEXT_LABELS = ("100", "500", "5k", "50k", "Full")
 apply_paper_style()
 
 
+def as_bool(value: Any) -> bool:
+    return str(value).strip().lower() in {"1", "true", "yes"}
+
+
 def read_records(path: Path) -> list[dict[str, Any]]:
     rows: list[dict[str, Any]] = []
     with path.open(newline="", encoding="utf-8") as stream:
@@ -39,7 +43,10 @@ def read_records(path: Path) -> list[dict[str, Any]]:
                     "tier": int(row["tier"]),
                     "repetition": int(row["repetition"]),
                     "question_count": int(row["question_count"]),
-                    "f1": float(row["f1"]),
+                    "score_available": as_bool(row["score_available"]),
+                    "f1": float(row["f1"]) if row["f1"] else None,
+                    "precision": float(row["precision"]) if row.get("precision") else None,
+                    "recall": float(row["recall"]) if row.get("recall") else None,
                 }
             )
     return rows
@@ -48,12 +55,15 @@ def read_records(path: Path) -> list[dict[str, Any]]:
 def weighted_replication_means(
     rows: Iterable[dict[str, Any]],
     key_fields: tuple[str, ...],
+    metric: str = "f1",
 ) -> dict[tuple[Any, ...], list[float]]:
     accum: dict[tuple[Any, ...], list[float]] = defaultdict(lambda: [0.0, 0.0])
     for row in rows:
+        if not row["score_available"] or row[metric] is None:
+            continue
         key = tuple(row[field] for field in key_fields) + (row["repetition"],)
         weight = row["question_count"]
-        accum[key][0] += row["f1"] * weight
+        accum[key][0] += row[metric] * weight
         accum[key][1] += weight
     replications: dict[tuple[Any, ...], list[tuple[int, float]]] = defaultdict(list)
     for key, (weighted_sum, total_weight) in accum.items():
@@ -70,9 +80,15 @@ def mean_sd(values: list[float]) -> tuple[float, float]:
 
 def aggregate_rows(records: list[dict[str, Any]]) -> list[dict[str, Any]]:
     matched = [row for row in records if row["study"] == "matched_cardinality"]
-    if {row["model_label"] for row in matched} != {"GPT-5 mini"}:
-        raise ValueError("Matched-cardinality figure must contain only completed GPT-5-mini data")
-    matched_reps = weighted_replication_means(matched, ("condition", "context", "tier"))
+    matched_reps = weighted_replication_means(
+        matched, ("model_label", "condition", "context", "tier")
+    )
+    matched_precision_reps = weighted_replication_means(
+        matched, ("model_label", "condition", "context", "tier"), "precision"
+    )
+    matched_recall_reps = weighted_replication_means(
+        matched, ("model_label", "condition", "context", "tier"), "recall"
+    )
 
     oracle = [
         row
@@ -81,24 +97,61 @@ def aggregate_rows(records: list[dict[str, Any]]) -> list[dict[str, Any]]:
     ]
     oracle_reps = weighted_replication_means(oracle, ("model_label", "context", "arm"))
 
+    def coverage(group: list[dict[str, Any]]) -> tuple[int, int, float]:
+        total = sum(int(row["question_count"]) for row in group)
+        scored = sum(
+            int(row["question_count"])
+            for row in group
+            if row["score_available"] and row["f1"] is not None
+        )
+        return scored, total, scored / total if total else 0.0
+
     aggregates: list[dict[str, Any]] = []
-    for (condition, context, tier), values in sorted(matched_reps.items()):
+    for (model_label, condition, context, tier), values in sorted(matched_reps.items()):
         mean, sd = mean_sd(values)
+        precision_mean, precision_sd = mean_sd(
+            matched_precision_reps[(model_label, condition, context, tier)]
+        )
+        recall_mean, recall_sd = mean_sd(
+            matched_recall_reps[(model_label, condition, context, tier)]
+        )
+        group = [
+            row
+            for row in matched
+            if row["model_label"] == model_label
+            and row["condition"] == condition
+            and row["context"] == context
+            and row["tier"] == tier
+        ]
+        scored, total, fraction = coverage(group)
         aggregates.append(
             {
                 "study": "matched_cardinality",
-                "model_label": "GPT-5 mini",
+                "model_label": model_label,
                 "arm": "matched",
                 "condition": condition,
                 "context": context,
                 "tier": tier,
                 "mean_f1": mean,
                 "sd_f1": sd,
+                "mean_precision": precision_mean,
+                "sd_precision": precision_sd,
+                "mean_recall": recall_mean,
+                "sd_recall": recall_sd,
                 "replications": len(values),
+                "scored_question_trajectories": scored,
+                "total_question_trajectories": total,
+                "score_coverage": fraction,
             }
         )
     for (model_label, context, arm), values in sorted(oracle_reps.items()):
         mean, sd = mean_sd(values)
+        group = [
+            row
+            for row in oracle
+            if row["model_label"] == model_label and row["context"] == context and row["arm"] == arm
+        ]
+        scored, total, fraction = coverage(group)
         aggregates.append(
             {
                 "study": "oracle_predicate",
@@ -109,7 +162,14 @@ def aggregate_rows(records: list[dict[str, Any]]) -> list[dict[str, Any]]:
                 "tier": "",
                 "mean_f1": mean,
                 "sd_f1": sd,
+                "mean_precision": "",
+                "sd_precision": "",
+                "mean_recall": "",
+                "sd_recall": "",
                 "replications": len(values),
+                "scored_question_trajectories": scored,
+                "total_question_trajectories": total,
+                "score_coverage": fraction,
             }
         )
     return aggregates
@@ -135,13 +195,16 @@ def matched_lookup(
     }
 
 
-def plot_matched_scale(axis: plt.Axes, aggregates: list[dict[str, Any]]) -> None:
+def plot_matched_scale(
+    axis: plt.Axes, aggregates: list[dict[str, Any]], *, model_label: str, panel: str
+) -> None:
     positions = np.arange(len(CONTEXTS))
     for tier in (2, 3):
         values = {
             row["context"]: row
             for row in aggregates
             if row["study"] == "matched_cardinality"
+            and row["model_label"] == model_label
             and str(row["condition"]).startswith("scale-")
             and row["tier"] == tier
         }
@@ -162,11 +225,14 @@ def plot_matched_scale(axis: plt.Axes, aggregates: list[dict[str, Any]]) -> None
     axis.set_xticks(positions, CONTEXT_LABELS)
     axis.set_xlabel("Corpus size $N$")
     axis.set_ylabel("Macro F1")
-    axis.set_title("(a) Scale ($K=1$)", loc="left", pad=5)
+    display_name = MODEL_DISPLAY_NAMES.get(model_label, model_label)
+    axis.set_title(f"({panel}) Scale ($K=1$)\n{display_name}", loc="left", pad=5, fontsize=8.0)
     style_axis(axis)
 
 
-def plot_matched_cardinality(axis: plt.Axes, aggregates: list[dict[str, Any]]) -> None:
+def plot_matched_cardinality(
+    axis: plt.Axes, aggregates: list[dict[str, Any]], *, model_label: str, panel: str
+) -> None:
     conditions = (
         ("scale-x5000-k1", "1"),
         ("cardinality-x5000-k5", "5"),
@@ -181,6 +247,7 @@ def plot_matched_cardinality(axis: plt.Axes, aggregates: list[dict[str, Any]]) -
                 row
                 for row in aggregates
                 if row["study"] == "matched_cardinality"
+                and row["model_label"] == model_label
                 and row["condition"] == condition
                 and row["tier"] == tier
             ]
@@ -203,7 +270,13 @@ def plot_matched_cardinality(axis: plt.Axes, aggregates: list[dict[str, Any]]) -
         )
     axis.set_xticks(positions, [label for _, label in conditions])
     axis.set_xlabel("Positive reactions $K$")
-    axis.set_title("(b) Cardinality ($N=5{,}000$)", loc="left", pad=5)
+    display_name = MODEL_DISPLAY_NAMES.get(model_label, model_label)
+    axis.set_title(
+        f"({panel}) Cardinality ($N=5{{,}}000$)\n{display_name}",
+        loc="left",
+        pad=5,
+        fontsize=8.0,
+    )
     style_axis(axis)
 
 
@@ -280,7 +353,14 @@ def write_aggregates(path: Path, rows: list[dict[str, Any]]) -> None:
         "tier",
         "mean_f1",
         "sd_f1",
+        "mean_precision",
+        "sd_precision",
+        "mean_recall",
+        "sd_recall",
         "replications",
+        "scored_question_trajectories",
+        "total_question_trajectories",
+        "score_coverage",
     )
     with path.open("w", newline="", encoding="utf-8") as stream:
         writer = csv.DictWriter(stream, fieldnames=fieldnames, lineterminator="\n")
@@ -304,20 +384,19 @@ def main() -> int:
     write_aggregates(args.records.with_name("aggregates.csv"), aggregates)
 
     figure, axes = plt.subplots(1, 4, figsize=(7.1, 2.45), sharey=True)
-    plot_matched_scale(axes[0], aggregates)
-    plot_matched_cardinality(axes[1], aggregates)
-    plot_oracle(axes[2], aggregates, model_label="Qwen 3.5", panel="c")
-    plot_oracle(axes[3], aggregates, model_label="Claude Haiku 4.5", panel="d")
+    plot_matched_scale(axes[0], aggregates, model_label="GPT-5 mini", panel="a")
+    plot_matched_cardinality(axes[1], aggregates, model_label="GPT-5 mini", panel="b")
+    plot_matched_scale(axes[2], aggregates, model_label="Qwen 3.5", panel="c")
+    plot_matched_cardinality(axes[3], aggregates, model_label="Qwen 3.5", panel="d")
     axes[1].set_ylabel("")
 
     tier_handles, tier_labels = axes[0].get_legend_handles_labels()
-    rule_handles, rule_labels = axes[2].get_legend_handles_labels()
     figure.legend(
-        tier_handles + rule_handles,
-        tier_labels + rule_labels,
+        tier_handles,
+        tier_labels,
         loc="lower center",
         bbox_to_anchor=(0.5, 0.01),
-        ncol=5,
+        ncol=2,
         frameon=False,
         handlelength=1.8,
         columnspacing=1.3,

@@ -1,21 +1,8 @@
 import argparse
-import os
 import random
 import uuid
 
 import wandb
-
-from rxnhaystack.campaign_metrics import install_campaign_metrics
-
-from rlm import RLM
-from rxnhaystack.worker import instrument_rlm_from_environment
-from rlm.codeact_helpers import (
-    build_context_pipeline,
-    load_lines,
-    parse_indices,
-    precision_recall_f1,
-)
-from rlm.tracing import init_tracing, using_tracing_attributes
 from task7_hardcoded_ground_truth import (
     TASK7_GROUND_TRUTH_DEFINITION,
     TASK7_HARDCODED_GROUND_TRUTH_INDICES_BY_REACTION,
@@ -26,11 +13,27 @@ from task7_hardcoded_ground_truth import (
     TASK7_VALID_REACTIONS,
 )
 
+from rlm import RLM
+from rlm.codeact_helpers import (
+    build_context_pipeline,
+    load_lines,
+    parse_indices,
+    precision_recall_f1,
+)
+from rlm.tracing import init_tracing, using_tracing_attributes
+from rxnhaystack.campaign_metrics import install_campaign_metrics
+from rxnhaystack.worker import instrument_rlm_from_environment
+
 install_campaign_metrics(wandb)
 
 # os.environ["WANDB_MODE"] = "disabled"
 
-DATASET_PATH = __import__("os").environ.get("RXNHAYSTACK_CLEANED_DATASET", __import__("os").path.expanduser("~/datasets/rxnhaystack/reactionSmilesFigShareUSPTO2023_cleaned.txt"))
+DATASET_PATH = __import__("os").environ.get(
+    "RXNHAYSTACK_CLEANED_DATASET",
+    __import__("os").path.expanduser(
+        "~/datasets/rxnhaystack/reactionSmilesFigShareUSPTO2023_cleaned.txt"
+    ),
+)
 BACKEND = "openrouter"
 MODEL_NAME = __import__("os").environ.get("RXNHAYSTACK_MODEL", "openai/gpt-5-mini")
 ENABLE_TRACING = True
@@ -85,6 +88,7 @@ def build_question(reaction_label: str, reaction_description: str) -> str:
     - Use RDKit for parsing reactions and programmatic classification.
     - Represent the transformation as a reaction-level pattern (for example, SMIRKS or reaction SMARTS) that encodes reactants and products together.
     - Pattern matching and substructure checks on mapped reaction templates are appropriate ways to decide membership.
+    - A reaction still matches when the same described transformation occurs at multiple sites in one reactant and all such sites are transformed in the recorded product.
     - Ignore reagents (middle field).
     - Handle multi-component sides separated by dots (.).
     - Skip malformed reactions and matching failures.
@@ -349,9 +353,9 @@ def main(model_name: str, context_size: int) -> None:
     print(f"Macro F1: {macro_f1:.4f}")
 
     for reaction_key in reaction_keys:
-        run.summary[f"full_ground_truth/{reaction_key}/count"] = (
-            TASK7_POSITIVE_REACTIONS_BY_KEY[reaction_key]
-        )
+        run.summary[f"full_ground_truth/{reaction_key}/count"] = TASK7_POSITIVE_REACTIONS_BY_KEY[
+            reaction_key
+        ]
 
     run.summary["exact_match_correct"] = exact_match_count
     run.summary["total"] = total
@@ -362,9 +366,7 @@ def main(model_name: str, context_size: int) -> None:
     run.summary["ground_truth/total_reactions"] = TASK7_TOTAL_REACTIONS
     run.summary["ground_truth/valid_reactions"] = TASK7_VALID_REACTIONS
     run.summary["ground_truth/skipped_reactions"] = TASK7_SKIPPED_REACTIONS
-    run.summary["avg_total_input_tokens_per_sample"] = (
-        total_input_tokens / total if total else 0.0
-    )
+    run.summary["avg_total_input_tokens_per_sample"] = total_input_tokens / total if total else 0.0
     run.summary["avg_total_output_tokens_per_sample"] = (
         total_output_tokens / total if total else 0.0
     )

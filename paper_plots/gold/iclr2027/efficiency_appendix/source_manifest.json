@@ -6,7 +6,7 @@
     "included": "successful scored jobs from terminal model/method arms",
     "peak_memory": "mean peak combined host-process-tree plus Docker memory per job"
   },
-  "generated_at": "2026-09-25T09:23:59.125785+00:00",
+  "generated_at": "2026-09-26T00:59:35.499413+00:00",
   "outputs": [
     {
       "path": "per_model.csv",
@@ -18,16 +18,16 @@
     }
   ],
   "schema_version": 1,
-  "source_repository_commit": "91d13f9853884d2055a7d1c525c8e7826c796259",
-  "source_snapshot_as_of": "2026-09-25T09:15:30.738545+00:00",
+  "source_repository_commit": "a74cae3a776406b053792ea47b488180ce812b65",
+  "source_snapshot_as_of": "2026-09-26T00:47:16.402100+00:00",
   "sources": [
     {
       "path": "paper_plots/gold/iclr2027/full_benchmark_records.csv",
-      "sha256": "11ad780d29f0b214bc8f4836e0f720cd13370e9921fbee40bd4a7958797783b1"
+      "sha256": "cffff19a9dad878cd3dd5e70f2c38a49dd64f63460cca0780ab65ac8d6dbd1a6"
     },
     {
       "path": "paper_plots/gold/iclr2027/source_manifest.json",
-      "sha256": "8926b463146b4556a6e75e401b1185f715dd8ed6da2a13ce86df3e514b68601b"
+      "sha256": "cacd5cf75b98d2e181316fef588956ff84b1eea8f8250083123046e3a0358c15"
     }
   ]
 }

@@ -1,35 +1,35 @@
 {
   "aggregation": {
-    "additive_resources": "sum divided by successful question trajectories",
-    "f1": "question-weighted within each repetition; terminal failures score zero",
+    "additive_resources": "sum divided by all successful question trajectories",
+    "f1": "question-weighted within each repetition; terminal failures score zero; pending corrected rescores use the submission-freeze historical value and retain their internal queue status",
     "peak_memory": "mean combined process-tree plus Docker peak per successful job",
     "variation": "population standard deviation across five repetitions"
   },
-  "generated_at": "2026-09-26T10:39:15.378035+00:00",
+  "generated_at": "2026-09-26T10:46:01.810038+00:00",
   "model": "claude-haiku-4.5",
   "outputs": [
     {
       "path": "tier_metrics.csv",
-      "sha256": "befdcfa633911843ee554b8832dcca18060f52b8ef0bb5b01c8d71c73b407580"
+      "sha256": "e700dfd0bc6f7ae625983ff74669a2e564fbab630b11f6e67e36e09664dccf2d"
     },
     {
       "path": "task_f1.csv",
-      "sha256": "4dc21060e3f5ec66c41a83fed962256ffe5ddb727857167c10f57baa878d4a49"
+      "sha256": "be3e37361329176f4d3eba4056456b88be9c3aaa4230c63bfe2682866a9d1263"
     }
   ],
   "schema_version": 1,
   "sources": [
     {
       "path": "paper_plots/gold/iclr2027/full_benchmark_records.csv",
-      "sha256": "43bbc0542c9ca2164fc71ea245cff0dadc5bc2edf41297aa0fceded25b74f9f0"
+      "sha256": "cffff19a9dad878cd3dd5e70f2c38a49dd64f63460cca0780ab65ac8d6dbd1a6"
     },
     {
       "path": "paper_plots/gold/iclr2027/codeact_x1000_records.csv",
-      "sha256": "52b76824c624aeaa913833ba742089da2806672bb9d9d16de345713752bf702d"
+      "sha256": "58a64baa74843ec12ec17687cd8c1d9250945e2881b74c59cb22903f9c6f94e5"
     },
     {
       "path": "paper_plots/gold/iclr2027/rlm_x1000_records.csv",
-      "sha256": "9a60eb374d4e70ae8ef76f12762bef74a283ffe8e761e744275080ae8d43325d"
+      "sha256": "f03aeb76280c1007c85bb162324e3d400fa6a52ede3f97311a45fcb6ff972c64"
     }
   ]
 }

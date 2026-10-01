@@ -1,0 +1,14 @@
+method,task,question_outputs,exact,empty_answer,omissions_only,extra_selections_only,mixed_omissions_and_extras
+codeact,tier3/task10,278,110,5,48,54,61
+codeact,tier3/task18,65,4,1,5,23,32
+codeact,tier3/task23,66,62,2,1,0,1
+codeact,tier3/task6,235,38,16,42,81,58
+codeact,tier3/task7,303,167,8,60,49,19
+llm,tier3/task10,11,0,10,0,1,0
+llm,tier3/task18,33,0,3,8,15,7
+llm,tier3/task7,12,0,7,5,0,0
+rlm,tier3/task10,425,125,35,33,92,140
+rlm,tier3/task18,28,1,16,0,4,7
+rlm,tier3/task23,13,10,0,0,0,3
+rlm,tier3/task6,340,48,24,32,89,147
+rlm,tier3/task7,420,166,34,64,95,61

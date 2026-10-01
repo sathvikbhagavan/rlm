@@ -2,11 +2,11 @@
   "figures": [
     {
       "path": "qwen3_5_core_metrics.pdf",
-      "sha256": "617ff89356e3fcab1d3dd6d5342374318152edc9d00a5a514ab3331094f96a4e"
+      "sha256": "01691eaed35a047b7d343124bf020ac482a215d3034bfd08a2d762baac098e62"
     },
     {
       "path": "qwen3_5_core_metrics.png",
-      "sha256": "79c516c686021576c150e06db55143ee59e0bfd3e267bf79288a6c93eea4c299"
+      "sha256": "3182827e6ab12c9787bc6a5162a2fbf78b4d8b190159c1f2b625ae946ecce86e"
     },
     {
       "path": "qwen3_5_resource_diagnostics.pdf",
@@ -18,11 +18,11 @@
     },
     {
       "path": "qwen3_5_task_heatmap.pdf",
-      "sha256": "c396f7b595dd077c4b7fe1b7722f5b748c7127f54d5a6074872d93ecef03753f"
+      "sha256": "09a5c01bbae7760178bca3fdabaa661e95420b98795f6d6583eed600551092b2"
     },
     {
       "path": "qwen3_5_task_heatmap.png",
-      "sha256": "3ccbb943984a0884e5e826afe8c0abf51518c81fbf496b7fadfe46de2446ea38"
+      "sha256": "0ef96c2db91ee8c0059083537e8ae1f78e6dfdf52173c5c5ff142ef64d8f2a87"
     }
   ],
   "model": "qwen3.5",
@@ -32,11 +32,11 @@
   "sources": [
     {
       "path": "paper_plots/gold/iclr2027/model_appendix/qwen3.5/tier_metrics.csv",
-      "sha256": "d2b5ee0ec1dca721b574a508f074e206feec9e650f4f720a31d22f82db4e8eb3"
+      "sha256": "0d927f8311fdfa5ea84f5996905fe7a8b632494cb4d7d08b3a873afa5e820ee8"
     },
     {
       "path": "paper_plots/gold/iclr2027/model_appendix/qwen3.5/task_f1.csv",
-      "sha256": "8a3829369024f7751c20f7c357cba6b605b258daedf62f9f543f559fb3f6b758"
+      "sha256": "283e15e704a530717386c65f06efe0ffba0f71d17fb92c448fa2d13566cd5d0c"
     }
   ]
 }

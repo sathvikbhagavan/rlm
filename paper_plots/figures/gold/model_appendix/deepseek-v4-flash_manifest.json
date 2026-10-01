@@ -2,27 +2,27 @@
   "figures": [
     {
       "path": "deepseek-v4-flash_core_metrics.pdf",
-      "sha256": "2fef353a3718b4c2e7077cb969e365784fdf0021cac0d86c50578ad1eb576490"
+      "sha256": "9efd426c1aa34a686a12a4a49fa3a2e6ee607a53b7ef497cd11f3f5cfb3f4c27"
     },
     {
       "path": "deepseek-v4-flash_core_metrics.png",
-      "sha256": "e8a73b3d3a6e2b7893809a8435da2bec2cf3aaf29c9a9afe706343224cffd213"
+      "sha256": "69502123887d8997a38cf5a341842c4aefaae2ab34df71ea3a8575daffaf3b3f"
     },
     {
       "path": "deepseek-v4-flash_resource_diagnostics.pdf",
-      "sha256": "63b2f37c9db39fd551e3dc25275dce6c6b6b1d8f07538c96294a2214f5d4cc0f"
+      "sha256": "290c4d572ffbb29241cd14bcfd6510f14bc371e98bcfdfd68f9988fc03e98172"
     },
     {
       "path": "deepseek-v4-flash_resource_diagnostics.png",
-      "sha256": "9a956a762fe7f5ca54877b0ae8365cf7e21bb6027c4612c0783d2cc627a3f65d"
+      "sha256": "3a3112459da66b80199518c981a5b0aa4caccd9165f28af33dc6cd9fa5524869"
     },
     {
       "path": "deepseek-v4-flash_task_heatmap.pdf",
-      "sha256": "e017eb0060d1ce16e603ed833c3aef4b609338c12faf9302a864ea9a2c874462"
+      "sha256": "123ed644ce8a394ba57aef34c43b7c806d3659979c8aa5d96bfe394b2208d225"
     },
     {
       "path": "deepseek-v4-flash_task_heatmap.png",
-      "sha256": "77f17808c1cba4d23191f6ac2b058f12fe4959ec4c8b49a3a2d8a3292577f869"
+      "sha256": "46a58db1a9970088731a3a722ea12aaf5d136893544e314a814e1773b20a78e7"
     }
   ],
   "model": "deepseek-v4-flash",
@@ -32,11 +32,11 @@
   "sources": [
     {
       "path": "paper_plots/gold/iclr2027/model_appendix/deepseek-v4-flash/tier_metrics.csv",
-      "sha256": "c5dab5d56bc99bfe363b8dd078f21fc177ceca66682f2d1da58b1382a96200e5"
+      "sha256": "d0540fe819a774ac7e58689ccee97d74fdc13b24fc6db61b3241f8dbdae39587"
     },
     {
       "path": "paper_plots/gold/iclr2027/model_appendix/deepseek-v4-flash/task_f1.csv",
-      "sha256": "8b351e3d8078ec5e30306c076e6c93323c0a539a3fb4b8948a9a7e595feeb388"
+      "sha256": "c03284873c689429a058a6228a424ce42cedb0f20ed86cac14a2c793f5032f6e"
     }
   ]
 }

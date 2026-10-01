@@ -1,0 +1,132 @@
+{
+  "excluded": [
+    "reactionSmilesFigShareUSPTO2023_cleaned.txt",
+    "*.pkl",
+    "*.pyc",
+    "__pycache__/"
+  ],
+  "members": [
+    {
+      "bytes": 1121,
+      "path": "check.txt",
+      "sha256": "5df164275837bebfbf6fce8ba524cb6aca2278c90deedf52c0509994cb03f82b"
+    },
+    {
+      "bytes": 397,
+      "path": "human_eval/tier1/rxh_t1_task1_03.py",
+      "sha256": "78d337ee7a0ef25bcd8c37fb92c858a40e8b7112dd2f7651c179fbd863f6d8fd"
+    },
+    {
+      "bytes": 355,
+      "path": "human_eval/tier1/rxh_t1_task1_10.py",
+      "sha256": "a488726b19bbcae37e483102b62b87935312a755824622fd86b45d2e3d0b1ee5"
+    },
+    {
+      "bytes": 835,
+      "path": "human_eval/tier2/rxh_t2_task2_218.py",
+      "sha256": "18115a2eb95205804fbdfa93a048aea0249ff96f236eb0a3f9cd0ecb3e75203c"
+    },
+    {
+      "bytes": 811,
+      "path": "human_eval/tier2/rxh_t2_task3_2.py",
+      "sha256": "3a23618e09098522069f669cea9b1eee1d131b82d92cccb48f5f5effd702f554"
+    },
+    {
+      "bytes": 900,
+      "path": "human_eval/tier2/rxh_t2_task4_5.py",
+      "sha256": "8efe6fa53974c63032f01a785b6c416d877bc8edd152bd229d0233c90bcda67c"
+    },
+    {
+      "bytes": 1104,
+      "path": "human_eval/tier2/rxh_t2_task5_100_2.py",
+      "sha256": "8fe1666d29561d2d302a003b209ff786a2fa5ed15d9d69740dcea9cfc10ee6c4"
+    },
+    {
+      "bytes": 0,
+      "path": "human_eval/tier3/rxh_t3_task10_wittig_olefination.py",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 1100,
+      "path": "human_eval/tier3/rxh_t3_task12.py",
+      "sha256": "91acddeb532c90e735db8290bdc67a41370859f5d20c8d8a00e7553519af8f24"
+    },
+    {
+      "bytes": 827,
+      "path": "human_eval/tier3/rxh_t3_task19.py",
+      "sha256": "fae1d145d2e2f8721b8ca13381996fb1689bcf0c854d8f60b22775917134cd5b"
+    },
+    {
+      "bytes": 951,
+      "path": "human_eval/tier3/rxh_t3_task22.py",
+      "sha256": "f387cb24bd6107c286008de3e72ad68c68a5a46c4314aed9534c61e504c4f3dc"
+    },
+    {
+      "bytes": 816,
+      "path": "human_eval/tier3/rxh_t3_task23.py",
+      "sha256": "cc1b4c7e1db3e7a46a600d5691c3a1259670802902712aaeb6caf18e6953032f"
+    },
+    {
+      "bytes": 0,
+      "path": "human_eval/tier3/rxh_t3_task6_carboxylic_acid_with_primary_amine.py",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 0,
+      "path": "human_eval/tier3/rxh_t3_task8_boc_secondary_amine_deprotection.py",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 1829,
+      "path": "human_eval/tier4/rxh_t4_task12b.py",
+      "sha256": "bee52a369f5eb1ce768f0ed40663659a0a10710f4f479f8abbc7d9d7ac7a30da"
+    },
+    {
+      "bytes": 3495,
+      "path": "human_eval/tier4/rxh_t4_task13_alkyl_halide_tertiary_amine.py",
+      "sha256": "dfc665e3a3bc32c3665b241196666934414ae0c89a207e7ebe1c3cb26e4843a1"
+    },
+    {
+      "bytes": 3154,
+      "path": "human_eval/tier4/rxh_t4_task15_benzothiazole.py",
+      "sha256": "73d89538a6909514c437b045e35ba3c0bd948f84eec0c14404ccc58c750c9f87"
+    },
+    {
+      "bytes": 0,
+      "path": "human_eval/tier4/rxh_t4_task16_pyrimidine_piperazine.py",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 0,
+      "path": "human_eval/tier4/rxh_t4_task16_quinazoline_halide.py",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 0,
+      "path": "human_eval/tier4/rxh_t4_task17_boc_buchwald.py",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 0,
+      "path": "human_eval/tier4/rxh_t4_task17b_aryl_brom_suzuki_ester_red.py",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "bytes": 549,
+      "path": "human_eval/utils.py",
+      "sha256": "1f3f70f96e3846210b0aa05980570182ae4db7b14bc7e6845041c435da647fc8"
+    },
+    {
+      "bytes": 795,
+      "path": "results.txt",
+      "sha256": "7ddb0464e72b6011972964b345f1cfa92be21362ad461e04d9dbd118d12d2b63"
+    }
+  ],
+  "reviewer_id": "rxh-e39c32021e72",
+  "schema_version": 1,
+  "source_archive": {
+    "bytes": 7075576,
+    "filename": "rxnhaystack_theo.zip",
+    "sha256": "271806ad5af0e9c906e6af79c7d65847fe75e0892ff686181e044b19002940f0"
+  }
+}

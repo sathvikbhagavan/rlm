@@ -2,11 +2,11 @@
   "figures": [
     {
       "path": "claude-haiku-4_5_core_metrics.pdf",
-      "sha256": "577c527bc8be7f904e99c1e466651e30bb27e8d1c307aa7aaca3a21a2d846357"
+      "sha256": "b73be8fa4980be8380ea078e857732369801ba6652004b7ca8b401505a802d41"
     },
     {
       "path": "claude-haiku-4_5_core_metrics.png",
-      "sha256": "9bad5650b82b31118f8d942fc0357b2ab1712f90124684a8e78fa8b2c5041431"
+      "sha256": "eac9891897091189420b3fe81c217cb56bf9e2a823dc7b9d1340b55a4212ea9d"
     },
     {
       "path": "claude-haiku-4_5_resource_diagnostics.pdf",
@@ -18,11 +18,11 @@
     },
     {
       "path": "claude-haiku-4_5_task_heatmap.pdf",
-      "sha256": "aa8636ee79d49d913ea46ba6fbab07774a5c1f3df938f20e7ae3cf89718024a0"
+      "sha256": "31da30767cb01b0064966a349982b525b079eb4f1f1a070a603dba99295fa663"
     },
     {
       "path": "claude-haiku-4_5_task_heatmap.png",
-      "sha256": "d5a02596b6ad27d3f2e047ce3993bfa93fd972f1967a05fc4a6aaea5df8a7020"
+      "sha256": "1d912bfd2dc38ce5760d94bdfbaa8fbad81ee25cfc9c0fe1e4e000631f8533a3"
     }
   ],
   "model": "claude-haiku-4.5",
@@ -32,11 +32,11 @@
   "sources": [
     {
       "path": "paper_plots/gold/iclr2027/model_appendix/claude-haiku-4.5/tier_metrics.csv",
-      "sha256": "befdcfa633911843ee554b8832dcca18060f52b8ef0bb5b01c8d71c73b407580"
+      "sha256": "e700dfd0bc6f7ae625983ff74669a2e564fbab630b11f6e67e36e09664dccf2d"
     },
     {
       "path": "paper_plots/gold/iclr2027/model_appendix/claude-haiku-4.5/task_f1.csv",
-      "sha256": "4dc21060e3f5ec66c41a83fed962256ffe5ddb727857167c10f57baa878d4a49"
+      "sha256": "be3e37361329176f4d3eba4056456b88be9c3aaa4230c63bfe2682866a9d1263"
     }
   ]
 }

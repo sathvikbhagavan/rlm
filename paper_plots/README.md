@@ -19,3 +19,46 @@ uv run --with-requirements paper_plots/requirements.txt \
 the workshop-era input and plotting implementation for historical
 reproducibility. Their superseded figure exports are intentionally not kept in
 the active figure directory.
+
+## Post-submission corrected-score audit
+
+After a versioned ground-truth change, preserved logs can reconstruct exact
+scores for audit. Submission-time builders use exact recovered scores where
+available and explicitly marked historical scores for the unresolved rows:
+
+```sh
+WANDB_API_KEY=... uv run python \
+  paper_plots/scripts/recover_corrected_scores.py \
+  --snapshot-dir artifacts/control-room/shared \
+  --artifact-tar /path/to/campaign-artifacts.tar \
+  --phoenix-db /path/to/phoenix.db
+uv run python paper_plots/scripts/build_gold_results.py
+uv run python paper_plots/scripts/build_causal_controls.py
+uv run python paper_plots/scripts/build_post_submission_queue.py
+```
+
+The recovery command reconstructs the original sampled context and validates the
+historical score before accepting a corrected result. It recovers exact predictions
+using the historical parser semantics where possible. When indices are absent, it
+accepts an aggregate recovery only if every contingency table compatible with the
+logged count and four-decimal precision/recall/F1 has the same corrected score.
+Artifact tars are read in place without filesystem extraction; successful attempts
+are selected by the W&B URL recorded in metadata, and duplicate backup copies must
+be byte-identical.
+When `--phoenix-db` is supplied, the database is opened in immutable read-only mode.
+Execution windows from the selected artifact attempts are matched to exactly one
+Phoenix task project and model before a retained answer is accepted. The recorded
+prediction count and historical score must still validate. The database itself is
+never copied into the repository; the recovery manifest records its checksum, size,
+match diagnostics, and hashes of the extracted answers.
+It writes an exact-rescore manifest and a separate prediction ledger under
+`paper_plots/gold/`; neither contains credentials. Retrieved console logs stay
+in the ignored local cache `artifacts/score-recovery/`. The recovery ledger is
+replaced atomically and, by default, cannot be replaced by one with fewer
+recovered runs. It can then be joined to the frozen experiment tables by
+`build_post_submission_queue.py`, which records every affected run with
+its experiment, arm, model, task, context, configured seed, and repetition.
+The current submission freeze restores exact recovered scores. Only unresolved
+identities remain in the post-submission queue; their preserved historical
+scores keep the terminal trajectory denominator complete and retain an explicit
+internal status marker.

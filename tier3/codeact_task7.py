@@ -5,26 +5,22 @@ import random
 import uuid
 
 import wandb
-
-from rxnhaystack.campaign_metrics import install_campaign_metrics
-from rxnhaystack.worker import (
-    codeact_callbacks_from_environment,
-    codeact_workflow_timeout,
-)
-from rxnhaystack.concurrency import (
-    OrderedAsyncGate,
-    map_async_bounded,
-    question_parallelism_from_environment,
-)
-
 from llama_index.core.workflow import Context
-from rxnhaystack.providers import build_benchmark_llm
+from task7_hardcoded_ground_truth import (
+    TASK7_GROUND_TRUTH_DEFINITION,
+    TASK7_HARDCODED_GROUND_TRUTH_INDICES_BY_REACTION,
+    TASK7_POSITIVE_REACTIONS_BY_KEY,
+    TASK7_SKIPPED_REACTIONS,
+    TASK7_TO_FG_SMIRKS,
+    TASK7_TOTAL_REACTIONS,
+    TASK7_VALID_REACTIONS,
+)
 
 from rlm.codeact_core import (
-    CodeActAgent,
     INDEX_CODEACT_SYSTEM_PROMPT,
     INDEX_FORCE_LOOP_MESSAGE,
     INDEX_OBSERVATION_FOLLOWUP,
+    CodeActAgent,
     make_simple_code_executor,
     run_agent_verbose,
 )
@@ -37,19 +33,26 @@ from rlm.codeact_helpers import (
 )
 from rlm.tracing import get_tracer, init_tracing, using_tracing_attributes
 from rlm.utils.token_utils import count_tokens
-from task7_hardcoded_ground_truth import (
-    TASK7_GROUND_TRUTH_DEFINITION,
-    TASK7_HARDCODED_GROUND_TRUTH_INDICES_BY_REACTION,
-    TASK7_POSITIVE_REACTIONS_BY_KEY,
-    TASK7_SKIPPED_REACTIONS,
-    TASK7_TO_FG_SMIRKS,
-    TASK7_TOTAL_REACTIONS,
-    TASK7_VALID_REACTIONS,
+from rxnhaystack.campaign_metrics import install_campaign_metrics
+from rxnhaystack.concurrency import (
+    OrderedAsyncGate,
+    map_async_bounded,
+    question_parallelism_from_environment,
+)
+from rxnhaystack.providers import build_benchmark_llm
+from rxnhaystack.worker import (
+    codeact_callbacks_from_environment,
+    codeact_workflow_timeout,
 )
 
 install_campaign_metrics(wandb)
 
-DATASET_PATH = __import__("os").environ.get("RXNHAYSTACK_CLEANED_DATASET", __import__("os").path.expanduser("~/datasets/rxnhaystack/reactionSmilesFigShareUSPTO2023_cleaned.txt"))
+DATASET_PATH = __import__("os").environ.get(
+    "RXNHAYSTACK_CLEANED_DATASET",
+    __import__("os").path.expanduser(
+        "~/datasets/rxnhaystack/reactionSmilesFigShareUSPTO2023_cleaned.txt"
+    ),
+)
 MODEL_NAME = __import__("os").environ.get("RXNHAYSTACK_MODEL", "openai/gpt-5-mini")
 OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
 ENABLE_TRACING = True
@@ -106,6 +109,7 @@ def build_question(reaction_label: str, reaction_description: str) -> str:
     - Use RDKit for parsing reactions and programmatic classification.
     - Represent the transformation as a reaction-level pattern (for example, reaction SMIRKS or reaction SMARTS with atom mapping) that encodes reactants and products together.
     - Pattern matching and substructure checks on mapped reaction templates are appropriate ways to decide membership.
+    - A reaction still matches when the same described transformation occurs at multiple sites in one reactant and all such sites are transformed in the recorded product.
     - Ignore reagents (middle field).
     - Handle multi-component sides separated by dots (.).
     - Skip malformed reactions and matching failures.
@@ -225,7 +229,16 @@ async def main(model_name: str, context_size: int) -> None:
     _preparation_gate = OrderedAsyncGate()
 
     async def _evaluate_question(_item):
-        nonlocal exact_match_count, macro_f1, macro_precision, macro_recall, samples_run, samples_with_cost, total_cost_usd, total_input_tokens, total_output_tokens
+        nonlocal \
+            exact_match_count, \
+            macro_f1, \
+            macro_precision, \
+            macro_recall, \
+            samples_run, \
+            samples_with_cost, \
+            total_cost_usd, \
+            total_input_tokens, \
+            total_output_tokens
         (i, reaction_key) = _item
         async with _preparation_gate.turn(i):
             if reaction_key in SKIPPED_REACTION_KEYS:
@@ -385,7 +398,9 @@ async def main(model_name: str, context_size: int) -> None:
         final_total_tokens = sum(
             int(metric.get("iteration_total_tokens", 0)) for metric in llm_turn_metrics
         )
-        final_cost = sum(float(metric.get("iteration_cost_usd", 0.0)) for metric in llm_turn_metrics)
+        final_cost = sum(
+            float(metric.get("iteration_cost_usd", 0.0)) for metric in llm_turn_metrics
+        )
         has_cost = any("iteration_cost_usd" in metric for metric in llm_turn_metrics)
         if has_cost:
             total_cost_usd += final_cost
@@ -454,9 +469,7 @@ async def main(model_name: str, context_size: int) -> None:
     run.summary["macro_precision"] = macro_precision
     run.summary["macro_recall"] = macro_recall
     run.summary["macro_f1"] = macro_f1
-    run.summary["avg_total_input_tokens_per_sample"] = (
-        total_input_tokens / total if total else 0.0
-    )
+    run.summary["avg_total_input_tokens_per_sample"] = total_input_tokens / total if total else 0.0
     run.summary["avg_total_output_tokens_per_sample"] = (
         total_output_tokens / total if total else 0.0
     )
@@ -470,9 +483,9 @@ async def main(model_name: str, context_size: int) -> None:
         run.summary["avg_cost_per_sample_usd"] = total_cost_usd / samples_with_cost
 
     for reaction_key in reaction_keys:
-        run.summary[f"full_ground_truth/{reaction_key}/count"] = (
-            TASK7_POSITIVE_REACTIONS_BY_KEY[reaction_key]
-        )
+        run.summary[f"full_ground_truth/{reaction_key}/count"] = TASK7_POSITIVE_REACTIONS_BY_KEY[
+            reaction_key
+        ]
 
     wandb.finish()
 

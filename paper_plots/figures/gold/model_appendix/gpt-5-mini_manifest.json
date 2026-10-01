@@ -2,27 +2,27 @@
   "figures": [
     {
       "path": "gpt-5-mini_core_metrics.pdf",
-      "sha256": "b8866903e6dd74efce7b7a43e0bbe9985e92d23d6beb4cbe7df78dcad64dea4a"
+      "sha256": "a00189218d4ee1155c015531b8234ab47dcd30897fa2ace2f7d33a1db702401f"
     },
     {
       "path": "gpt-5-mini_core_metrics.png",
-      "sha256": "d6240ddd956bf2159f5b47c8fded4d0d3d995e2b90000903f31367ea7766a0a2"
+      "sha256": "31059a7cec4705f2802c72d05d3e2526fdcbae7b16ce92eb15224afac32ad308"
     },
     {
       "path": "gpt-5-mini_resource_diagnostics.pdf",
-      "sha256": "e7ed617ddc00de790aa13e49cbf508aba1972b8eed89e48ebff323caee22bd02"
+      "sha256": "15e18f120a076d73bd06e2234a779da4a22f190fb041fd86d40d21e81b5610a7"
     },
     {
       "path": "gpt-5-mini_resource_diagnostics.png",
-      "sha256": "54cfdd327d3d207e6ef75f20062e6dfda525c0d9cb0a1369c94a23506816941f"
+      "sha256": "75e4eeec0ffe29e4fa9b96d29db57433a39a3d38df728c4eda397116754b864d"
     },
     {
       "path": "gpt-5-mini_task_heatmap.pdf",
-      "sha256": "5ed4319d482ed6775fee7496179624cd535fdafe2d70dca5c12367205f1b9a79"
+      "sha256": "91588da891e59bda48934017a238a867c9f1d634b413feae07c1050072e16f96"
     },
     {
       "path": "gpt-5-mini_task_heatmap.png",
-      "sha256": "990d223f52aad7bde30d842bf51c5f5ee09b2e3d0936ea0d3a39030d701f613e"
+      "sha256": "3012f7cbf5c22d70e3fe7b8ac8d51e1575d9118da509be669bc38c836ff508d1"
     }
   ],
   "model": "gpt-5-mini",
@@ -32,11 +32,11 @@
   "sources": [
     {
       "path": "paper_plots/gold/iclr2027/model_appendix/gpt-5-mini/tier_metrics.csv",
-      "sha256": "16937781b6eb50238191de9f1ef0fe590e87e64ddde9926e52581663954f5b30"
+      "sha256": "5ad38403c4765f1e7b438f285533c82d97acd163e06be24091c924aa33fb2dbe"
     },
     {
       "path": "paper_plots/gold/iclr2027/model_appendix/gpt-5-mini/task_f1.csv",
-      "sha256": "99e7d4973290fc0586095a4c83abe8d90167f2436719db1e9a19576ead461d16"
+      "sha256": "0ec38bbde36b39ba8e5a29f16e8fd31a078e8f3fdb9338042b070afc5f16d398"
     }
   ]
 }

@@ -87,12 +87,24 @@ def capability_summaries(
         denominator = 0
         failures = 0
         for row in members:
+            # A terminal failure has no model answer to rescore, but it remains a
+            # resolved benchmark trajectory and therefore contributes zero.  The
+            # score-availability gate applies only to successful runs whose
+            # historical prediction could not be scored under the frozen evaluator.
+            if (
+                row["status"] == "succeeded"
+                and "score_available" in row
+                and not as_bool(row.get("score_available"))
+            ):
+                continue
             weight = int(row["question_count"])
             denominator += weight
             if row["status"] == "succeeded" and row.get("f1") not in {None, ""}:
                 numerator += float(row["f1"]) * weight
             else:
                 failures += 1
+        if denominator == 0:
+            continue
         per_model.append(
             {
                 "model": model,
@@ -163,6 +175,10 @@ def main() -> None:
             "scope": "terminal full-corpus RLM arms",
             "within_model": "question-weighted mean across task scripts and repetitions",
             "terminal_failures": "score zero",
+            "corrected_tasks": (
+                "exact corrected rescores where recoverable; otherwise the explicit "
+                "submission-freeze historical value"
+            ),
             "across_models": "unweighted mean and observed model range",
         },
     }
