@@ -1,0 +1,29 @@
+{
+  "schema_version": "1.2.0",
+  "study_id": "rxnhaystack-followup-theo-2026-10-v1",
+  "mode": "baseline",
+  "seed": 20261019,
+  "bundle_version": "rxnhaystack-human-1.6.0",
+  "estimated_core_minutes": 65,
+  "estimated_cross_check_minutes": 25,
+  "core_question_ids": [
+    "rxh-t3-task6-carboxylic-acid-with-primary-amine",
+    "rxh-t3-task8-boc-secondary-amine-deprotection",
+    "rxh-t4-task16-quinazoline-halide",
+    "rxh-t4-task16-pyrimidine-piperazine",
+    "rxh-t4-task17b-aryl-brom-suzuki-ester-red"
+  ],
+  "validation_cross_check_question_ids": [
+    "rxh-t3-task10-wittig-olefination",
+    "rxh-t4-task17-boc-buchwald"
+  ],
+  "question_ids": [
+    "rxh-t3-task6-carboxylic-acid-with-primary-amine",
+    "rxh-t3-task8-boc-secondary-amine-deprotection",
+    "rxh-t4-task16-quinazoline-halide",
+    "rxh-t4-task16-pyrimidine-piperazine",
+    "rxh-t4-task17b-aryl-brom-suzuki-ester-red",
+    "rxh-t3-task10-wittig-olefination",
+    "rxh-t4-task17-boc-buchwald"
+  ]
+}

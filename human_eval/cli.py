@@ -9,7 +9,7 @@ from rxnhaystack.dataset import verify_cleaned
 
 from .analysis import analyze
 from .app import create_app
-from .assignments import assign_questions
+from .assignments import resolve_assignment
 from .candidate_export import build_candidate_pack, write_candidate_pack
 from .candidates import import_candidate_pack
 from .canonical import build_bundle, validate_taxonomy
@@ -185,13 +185,18 @@ def main(argv: list[str] | None = None) -> int:
                 for candidate in public_candidates(store)
             ]
         annotators = manifest.get("annotators") or [
-            {"annotator_id": store.profile()["annotator_id"], "quotas": manifest.get("quotas")}
+            {
+                "annotator_id": store.profile()["annotator_id"],
+                "quotas": manifest.get("quotas"),
+                "question_ids": manifest.get("question_ids"),
+            }
         ]
         assignments = {
-            str(a["annotator_id"]): assign_questions(
+            str(a["annotator_id"]): resolve_assignment(
                 assignment_items,
                 seed=int(manifest["seed"]),
                 quotas=a.get("quotas"),
+                question_ids=a.get("question_ids"),
                 annotator_id=str(a["annotator_id"]),
             )
             for a in annotators

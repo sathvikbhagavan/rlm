@@ -3,7 +3,9 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from human_eval.assignments import assign_questions, blinded_order
+import pytest
+
+from human_eval.assignments import assign_questions, blinded_order, resolve_assignment
 from human_eval.candidates import import_candidate_pack, public_candidates
 from human_eval.db import Store
 
@@ -18,6 +20,18 @@ def test_assignment_and_order_deterministic_and_stratified():
     assert blinded_order(["c", "a", "b"], seed=9, annotator_id="u") == blinded_order(
         ["b", "c", "a"], seed=9, annotator_id="u"
     )
+
+
+def test_explicit_assignment_preserves_order_and_rejects_invalid_ids():
+    questions = [{"question_id": f"q{x}", "category": "a"} for x in range(3)]
+
+    assert resolve_assignment(
+        questions, seed=42, annotator_id="u", question_ids=["q2", "q0"]
+    ) == ["q2", "q0"]
+    with pytest.raises(ValueError, match="duplicate"):
+        resolve_assignment(questions, seed=42, annotator_id="u", question_ids=["q0", "q0"])
+    with pytest.raises(ValueError, match="unknown"):
+        resolve_assignment(questions, seed=42, annotator_id="u", question_ids=["missing"])
 
 
 def test_candidate_pack_is_blinded_recursively(tmp_path: Path):

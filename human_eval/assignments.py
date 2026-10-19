@@ -33,6 +33,28 @@ def assign_questions(
     return selected
 
 
+def resolve_assignment(
+    questions: Iterable[dict[str, Any]],
+    *,
+    seed: int,
+    annotator_id: str,
+    quotas: dict[str, int] | None = None,
+    question_ids: Iterable[str] | None = None,
+) -> list[str]:
+    """Resolve an explicit ordered assignment or a deterministic quota sample."""
+    values = list(questions)
+    if question_ids is None:
+        return assign_questions(values, seed=seed, quotas=quotas, annotator_id=annotator_id)
+    selected = [str(question_id) for question_id in question_ids]
+    if len(selected) != len(set(selected)):
+        raise ValueError("Explicit study assignments must not contain duplicate question IDs")
+    available = {str(question["question_id"]) for question in values}
+    unknown = sorted(set(selected) - available)
+    if unknown:
+        raise ValueError(f"Explicit study assignment contains unknown question IDs: {unknown}")
+    return selected
+
+
 def blinded_order(item_ids: Iterable[str], *, seed: int, annotator_id: str) -> list[str]:
     values = sorted(item_ids)
     random.Random(stable_seed(seed, f"candidate:{annotator_id}")).shuffle(values)

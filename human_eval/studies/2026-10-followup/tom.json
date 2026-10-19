@@ -1,0 +1,37 @@
+{
+  "schema_version": "1.2.0",
+  "study_id": "rxnhaystack-followup-tom-2026-10-v1",
+  "mode": "baseline",
+  "seed": 20261019,
+  "bundle_version": "rxnhaystack-human-1.6.0",
+  "estimated_core_minutes": 150,
+  "estimated_cross_check_minutes": 20,
+  "core_question_ids": [
+    "rxh-t4-task11-11605-3",
+    "rxh-t4-task11-23326-4",
+    "rxh-t4-task12-1",
+    "rxh-t4-task12-2",
+    "rxh-t4-task13-nitrile-primary-amide",
+    "rxh-t4-task14-boc-n",
+    "rxh-t4-task15-quinoline",
+    "rxh-t4-task15-benzimidazole",
+    "rxh-t4-task16-acrylamide-biaryl",
+    "rxh-t4-task17-nitro-reduction-amide"
+  ],
+  "validation_cross_check_question_ids": [
+    "rxh-t4-task15-indole"
+  ],
+  "question_ids": [
+    "rxh-t4-task11-11605-3",
+    "rxh-t4-task11-23326-4",
+    "rxh-t4-task12-1",
+    "rxh-t4-task12-2",
+    "rxh-t4-task13-nitrile-primary-amide",
+    "rxh-t4-task14-boc-n",
+    "rxh-t4-task15-quinoline",
+    "rxh-t4-task15-benzimidazole",
+    "rxh-t4-task16-acrylamide-biaryl",
+    "rxh-t4-task17-nitro-reduction-amide",
+    "rxh-t4-task15-indole"
+  ]
+}

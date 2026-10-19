@@ -67,6 +67,10 @@ uv run --frozen --with-requirements human_eval/requirements.txt \
 
 The manifest may list multiple `annotators`, each with category `quotas`; stable
 annotator-specific randomization naturally supports overlap and double annotation.
+For a prespecified ordered chunk, use `question_ids` either at the manifest root
+(the current local profile) or inside an `annotators` entry. Explicit IDs are
+validated against the installed bundle, preserve their listed order, and are
+recorded in the export's study manifest.
 
 Import prospective candidates as an administrator:
 

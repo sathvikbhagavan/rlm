@@ -1,0 +1,39 @@
+{
+  "schema_version": "1.2.0",
+  "study_id": "rxnhaystack-followup-sarina-2026-10-v1",
+  "mode": "baseline",
+  "seed": 20261019,
+  "bundle_version": "rxnhaystack-human-1.6.0",
+  "estimated_core_minutes": 100,
+  "estimated_cross_check_minutes": 20,
+  "core_question_ids": [
+    "rxh-t2-task2-320",
+    "rxh-t2-task3-3",
+    "rxh-t2-task3-4",
+    "rxh-t2-task3-5",
+    "rxh-t2-task4-2",
+    "rxh-t3-task6-acyl-chloride-with-secondary-amine",
+    "rxh-t3-task7-alcohol-to-azide",
+    "rxh-t3-task7-nitro-groups-to-amines",
+    "rxh-t3-task10-ester-hydrolysis-deprotection-with-oh",
+    "rxh-t3-task10-knoevenagel-aldol-condensation"
+  ],
+  "validation_cross_check_question_ids": [
+    "rxh-t2-task5-150-2",
+    "rxh-t3-task18"
+  ],
+  "question_ids": [
+    "rxh-t2-task2-320",
+    "rxh-t2-task3-3",
+    "rxh-t2-task3-4",
+    "rxh-t2-task3-5",
+    "rxh-t2-task4-2",
+    "rxh-t3-task6-acyl-chloride-with-secondary-amine",
+    "rxh-t3-task7-alcohol-to-azide",
+    "rxh-t3-task7-nitro-groups-to-amines",
+    "rxh-t3-task10-ester-hydrolysis-deprotection-with-oh",
+    "rxh-t3-task10-knoevenagel-aldol-condensation",
+    "rxh-t2-task5-150-2",
+    "rxh-t3-task18"
+  ]
+}
