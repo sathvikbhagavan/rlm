@@ -317,6 +317,7 @@ def test_same_type_prefill_and_direct_question_navigation(
     assert 'name="prefill_source_question_id" value="rxh-t1-fixture"' in page.text
     assert "Do not copy this." not in page.text
     assert 'name="verified_logic" checked' not in page.text
+    assert "Required when you used any tools" in page.text
     assert "← Previous" in page.text
     assert "Question 2 of 2" in page.text
     assert "data-question-nav" in page.text

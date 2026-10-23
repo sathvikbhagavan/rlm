@@ -111,7 +111,8 @@
     <label><input type="checkbox" name="tools[]" value="{{ x }}" {% if x in (p.tools or []) %}checked{% endif %}> {{ x|replace('_',' ') }}</label>
     {% endfor %}
   </fieldset>
-  <label><input type="checkbox" name="verified_logic" {% if p.verified_logic %}checked{% endif %}> I inspected and checked the method or logic for this question; the final judgment is mine.</label>
+  <label><input type="checkbox" name="verified_logic" aria-describedby="verification-help" {% if p.verified_logic %}checked{% endif %}> I inspected and checked the method or logic for this question; the final judgment is mine.</label>
+  <small id="verification-help">Required when you used any tools. Please confirm this separately for each question, even when tool choices were copied from a previous answer.</small>
   {% else %}
   <fieldset>
     <legend>Audit checks</legend>
