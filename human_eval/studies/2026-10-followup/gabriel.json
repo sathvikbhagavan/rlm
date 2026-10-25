@@ -5,7 +5,7 @@
   "seed": 20261019,
   "bundle_version": "rxnhaystack-human-1.6.0",
   "estimated_core_minutes": 95,
-  "estimated_cross_check_minutes": 20,
+  "estimated_cross_check_minutes": 50,
   "core_question_ids": [
     "rxh-t1-task1-02",
     "rxh-t1-task1-05",
@@ -21,6 +21,8 @@
     "rxh-t3-task20"
   ],
   "validation_cross_check_question_ids": [
+    "rxh-t4-task13-nitrile-primary-amide",
+    "rxh-t4-task17b-boc-deprot-buchwald",
     "rxh-t2-task2-184",
     "rxh-t3-task6-acyl-chloride-with-primary-amine"
   ],
@@ -37,6 +39,8 @@
     "rxh-t2-task5-100-1",
     "rxh-t3-task15",
     "rxh-t3-task20",
+    "rxh-t4-task13-nitrile-primary-amide",
+    "rxh-t4-task17b-boc-deprot-buchwald",
     "rxh-t2-task2-184",
     "rxh-t3-task6-acyl-chloride-with-primary-amine"
   ]

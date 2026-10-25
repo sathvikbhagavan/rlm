@@ -34,5 +34,5 @@ def test_followup_studies_complete_coverage_and_preserve_cross_checks() -> None:
     assert len(core) == len(set(core)) == 56
     assert set(core).isdisjoint(existing)
     assert existing | set(core) == questions
-    assert len(cross_checks) == 10
-    assert set(cross_checks) <= existing
+    assert len(cross_checks) == 12
+    assert set(cross_checks) <= existing | set(core)

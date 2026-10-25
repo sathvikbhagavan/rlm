@@ -3,14 +3,14 @@
 These five manifests complete first-pass human coverage of all 100 canonical
 questions when combined with the three frozen exports in
 `paper_plots/gold/iclr2027/human_validation`. The final questions in each
-manifest are validation cross-checks selected for known evaluator sensitivity
-or an earlier non-exact answer.
+manifest are validation cross-checks selected for known evaluator sensitivity,
+an earlier non-exact answer, or overlap with another follow-up assignment.
 
 | Annotator | Core | Validation cross-checks | Estimated core time | Estimated cross-check time |
 | --- | ---: | ---: | ---: | ---: |
 | Tom | 10 | 1 | 2.5--3 hours | 15--20 minutes |
 | Theo | 5 | 2 | 65--75 minutes | 25--30 minutes |
-| Gabriel | 12 | 2 | 95--105 minutes | 20--25 minutes |
+| Gabriel | 12 | 4 | 95--105 minutes | 50--55 minutes |
 | Sarina | 10 | 2 | 100--115 minutes | 20--25 minutes |
 | Vu | 19 | 3 | 4--4.5 hours | 40--50 minutes |
 
